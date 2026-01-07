@@ -1,0 +1,245 @@
+<!doctype html>
+<meta charset="utf-8">
+<script>
+(function() {
+  // stages_frame_v3 with required_parts dummy and weight=9
+  var data = [
+  {
+  "stage_id": "제 1장 1-1",
+  "simple": 1,
+  "cute": 2,
+  "lively": 2.93,
+  "pure": 2,
+  "cool": 1,
+},
+{
+  "stage_id": "제 1장 1-2",
+  "simple": 2.8,
+  "cute": 1.6,
+  "elegant": 2.67,
+  "pure": 3,
+  "warm": 1
+},
+{
+  "stage_id": "제 1장 1-3",
+  "flair": 1.87,
+  "mature": 0.93,
+  "elegant": 2.73,
+  "pure": 1.87,
+  "cool": 0.93,
+  "tag_rules": [
+    { "name": "中式古典", "tier": "A", "stacks": 0.25 }
+  ]
+},
+{
+  "stage_id": "제 1장 1-4",
+  "simple": 2.07,
+  "mature": 3.13,
+  "elegant": 2.07,
+  "flair": 1.07,
+  "warm": 1.07
+},
+{
+  "stage_id": "제 1장 1-5",
+  "flair": 1.07,
+  "cute": 3.13,
+  "lively": 2.13,
+  "sexy": 2.13,
+  "cool": 1.07
+},
+{
+  "stage_id": "제 1장 1-6",
+  "simple": 2.13,
+  "cute": 1.07,
+  "elegant": 2.13,
+  "pure": 3.2,
+  "cool": 1.07
+},
+{
+  "stage_id": "제 1장 1-7",
+  "simple": 2.93,
+  "mature": 1.93,
+  "elegant": 1.93,
+  "pure": 0.93,
+  "cool": 0.93,
+  "tag_rules": [
+    { "name": "中性风", "tier": "A", "stacks": 0.25 }
+  ]
+},
+{
+  "stage_id": "제 1장 1-8",
+  "flair": 1.07,
+  "mature": 2.2,
+  "elegant": 2.2,
+  "sexy": 4,
+  "cool": 1.07
+},
+{
+  "stage_id": "제 1장 1-9",
+  "flair": 1.4,
+  "mature": 2.73,
+  "lively": 2.73,
+  "sexy": 4.13,
+  "cool": 1.4
+},
+{
+  "stage_id": "제 1장 2-1",
+  "flair": 2.27,
+  "cute": 3.4,
+  "lively": 1.13,
+  "pure": 2.27,
+  "cool": 1.13
+},
+{
+  "stage_id": "스타일대회 - 극지의 온기(冬天里的一把火)",
+  "flair": 0.67,
+  "cute": 1,
+  "lively": 1.33,
+  "sexy": 1.33,
+  "warm": 1.33
+},
+{
+  "stage_id": "스타일대회 - 마라톤 대회(运动进行时)",
+  "simple": 1,
+  "cute": 0.67,
+  "lively": 1.33,
+  "pure": 1.33,
+  "cool": 1.33
+},
+{
+  "stage_id": "스타일대회 - 명탐정 셜록(大侦探福尔摩斯)",
+  "simple": 1.33,
+  "mature": 1.33,
+  "elegant": 1.33,
+  "pure": 0.67,
+  "warm": 1
+},
+{
+  "stage_id": "스타일대회 - 봄 소풍(年轻的春游)",
+  "simple": 1.33,
+  "cute": 1.33,
+  "lively": 1.33,
+  "pure": 1,
+  "cool": 0.67
+},
+{
+  "stage_id": "스타일대회 - 봄은 어디에(春天在哪里)",
+  "simple": 0.67,
+  "cute": 1.33,
+  "lively": 1.33,
+  "pure": 1.33,
+  "cool": 1
+},
+{
+  "stage_id": "스타일대회 - 소녀와 숙녀사이(有女初长成)",
+  "simple": 0.67,
+  "mature": 1.33,
+  "elegant": 1.33,
+  "pure": 1.33,
+  "warm": 1
+},
+{
+  "stage_id": "스타일대회 - 여름 가든파티(夏季游园会)",
+  "simple": 1.33,
+  "cute": 1,
+  "lively": 0.67,
+  "pure": 1.33,
+  "cool": 1.33
+},
+{
+  "stage_id": "스타일대회 - 여왕 룩(女王大人)",
+  "flair": 1,
+  "mature": 1.33,
+  "elegant": 1.33,
+  "sexy": 1.33,
+  "cool": 0.67
+},
+{
+  "stage_id": "스타일대회 - 연주회 관람(金色音乐厅)",
+  "flair": 1.33,
+  "mature": 1.33,
+  "elegant": 1.33,
+  "sexy": 1,
+  "warm": 0.67
+},
+{
+  "stage_id": "스타일대회 - 오피스스타(办公室明星)",
+  "simple": 1.33,
+  "mature": 1.33,
+  "elegant": 1.33,
+  "sexy": 1,
+  "cool": 0.67
+},
+{
+  "stage_id": "스타일대회 - 왕궁 무도회(宫廷歌舞会)",
+  "flair": 1.33,
+  "mature": 1,
+  "elegant": 1.33,
+  "sexy": 1.33,
+  "warm": 0.67
+},
+{
+  "stage_id": "스타일대회 - 절세가인(奇幻童话园)",
+  "simple": 1.33,
+  "cute": 0.67,
+  "elegant": 1.33,
+  "pure": 1.33,
+  "cool": 1,
+  "tag_rules": [
+    { "name": "中式现代", "tier": "A", "stacks": 1 }
+  ]
+},
+{
+  "stage_id": "스타일대회 - 크리스마스 파티(圣诞家庭聚会)",
+  "simple": 1.33,
+  "cute": 1,
+  "lively": 0.67,
+  "pure": 1.33,
+  "warm": 1.33
+},
+{
+  "stage_id": "스타일대회 - 판타지 동화마을(奇幻童话园)",
+  "flair": 1.33,
+  "cute": 1.33,
+  "elegant": 1.33,
+  "pure": 1,
+  "cool": 0.67
+},
+{
+  "stage_id": "스타일대회 - 해변 파티 룩(海边派对的搭配)",
+  "simple": 0.67,
+  "cute": 1.33,
+  "lively": 1,
+  "sexy": 1.33,
+  "cool": 1.33
+},
+{
+  "stage_id": "스타일대회 - 환상의 동화마을(清秀佳人)",
+  "simple": 1.33,
+  "cute": 0.67,
+  "elegant": 1.33,
+  "pure": 1.33,
+  "cool": 1,
+  "tag_rules": [
+    { "name": "Modern China", "tier": "A", "stacks": 1 }
+  ]
+}
+];
+
+  // Normalize required_parts to ensure expected slots exist
+  (function() {
+    var defaultSlots = ["헤어", "모자", "원피스", "아우터", "상의", "하의", "양말", "신발"];
+    data = data.map(function(s) {
+      if (!s || typeof s !== "object") return s;
+      if (!s.required_parts || typeof s.required_parts !== "object") s.required_parts = {};
+      for (var i = 0; i < defaultSlots.length; i++) {
+        var k = defaultSlots[i];
+        if (!Array.isArray(s.required_parts[k])) s.required_parts[k] = [];
+      }
+      return s;
+    });
+  })();
+
+  parent.postMessage({ __splitData: true, key: "stages", data: data }, "*");
+})();
+</script>
