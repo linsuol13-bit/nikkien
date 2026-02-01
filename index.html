@@ -3921,7 +3921,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       tds.push('<td class="num">'+ esc(it.stars||'') +'</td>');
       for(var i=0;i<attrs.length;i++){ var v = it[attrs[i]]||''; tds.push('<td>'+ esc(v) +'</td>'); }
       tds.push('<td>'+ esc((it.tags||'').toString()) +'</td>');
-      tds.push('<td class="num">'+ (typeof it.score!=='undefined'? esc(Math.round(toNum(it.score))) : '') +'</td>');
+      tds.push('<td class="num">'+ (typeof it.score!=='undefined'? esc(Number(toNum(it.score)).toFixed(3)) : '') +'</td>');
       return '<tr>'+ tds.join('') +'</tr>';
     }).join('');
     tbody.innerHTML = rows || '<tr><td colspan="16" class="empty">표시할 데이터가 없습니다.</td></tr>';
@@ -3959,7 +3959,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
           + '<td class="imgcol">'+ (imgSrc(it)?('<img class="thumb sm" alt="" src="'+ esc(imgSrc(it)) +'">'):'') +'</td>'
           + '<td>'+ esc(it.name||'') +'</td>'
           + '<td class="num">'+ esc(it.stars||'') +'</td>'
-          + '<td class="num">'+ esc(Math.round(toNum(it.score))) +'</td>'
+          + '<td class="num">'+ esc(Number(toNum(it.score)).toFixed(3)) +'</td>'
           + '</tr>';
       }).join('');
       var table = '<div class="group"><details open>'
@@ -4231,7 +4231,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
         tds.push('<td class="num">'+ esc(it.stars||'') +'</td>');
         for(var i=0;i<attrs.length;i++){ var v = it[attrs[i]]||''; tds.push('<td>'+ esc(v) +'</td>'); }
         tds.push('<td>'+ esc((it.tags||'').toString()) +'</td>');
-        tds.push('<td class="num">'+ (typeof it.score!=='undefined'? esc(Math.round(toNum(it.score))) : '') +'</td>');
+        tds.push('<td class="num">'+ (typeof it.score!=='undefined'? esc(Number(toNum(it.score)).toFixed(3)) : '') +'</td>');
         return '<tr>'+ tds.join('') +'</tr>';
       }).join('');
       tbody.innerHTML = rows || '<tr><td colspan="17" class="empty">표시할 데이터가 없습니다.</td></tr>';
@@ -4272,7 +4272,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
             + '<td>'+ esc(it.name||'') +'</td>'
             + '<td>'+ esc(it.code||'') +'</td>'
             + '<td class="num">'+ esc(it.stars||'') +'</td>'
-            + '<td class="num">'+ esc(Math.round(toNum(it.score))) +'</td>'
+            + '<td class="num">'+ esc(Number(toNum(it.score)).toFixed(3)) +'</td>'
             + '</tr>';
         }).join('');
         var table = '<div class="group"><details open>'
@@ -4505,7 +4505,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
           + '<td class="num">'+ esc(it.stars||'') +'</td>'
           + attrs.map(function(a){ return '<td>'+ esc(it[a]||'') +'</td>'; }).join('')
           + '<td>'+ esc((it.tags||'').toString()) +'</td>'
-          + '<td class="num">'+ (typeof it.score!=='undefined'? esc(Math.round(toNum(it.score))) : '') +'</td>'
+          + '<td class="num">'+ (typeof it.score!=='undefined'? esc(Number(toNum(it.score)).toFixed(3)) : '') +'</td>'
           + '</tr>';
       }).join('');
       tbody.innerHTML = rows || '<tr><td colspan="17" class="empty">표시할 데이터가 없습니다.</td></tr>';
@@ -4556,7 +4556,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
             + '<td>'+ esc(it.name||'') +'</td>'
             + '<td>'+ codeCell(it) +'</td>'
             + '<td class="num">'+ esc(it.stars||'') +'</td>'
-            + '<td class="num">'+ esc(Math.round(toNum(it.score))) +'</td>'
+            + '<td class="num">'+ esc(Number(toNum(it.score)).toFixed(3)) +'</td>'
             + '</tr>';
         }).join('');
         var table = '<div class="group"><details open>'
@@ -8596,6 +8596,390 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       try{ return (typeof prev === 'function') ? prev(item, stage) : 0; }catch(_){ return 0; }
     }
   };
+})();
+</script>
+<!-- === FINAL SCORING (ALL STAGES / ATTRIBUTE ITERATION / +FIREFLY) === -->
+<script>
+(function(){
+  'use strict';
+
+  const GRADE = {
+    "SSS":130,
+    "SS":115,
+    "S":100,
+    "A":85,
+    "B":70,
+    "C":55,
+    "D":40
+  };
+
+  const PART_MULT = {
+    "장식": 0.15,
+    "헤어": 0.9617,
+    "원피스": 3.832350,
+    "아우터": 0.373913,
+    "상의": 1.923561,
+    "하의": 1.911129,
+    "양말장식": 0.561508,
+    "양말": 0.619258,
+    "신발": 0.844369,
+    "뷰티": 0.223041,
+    "반딧불의 영혼": 0.306456
+  };
+
+  const PART_CN_TO_KO = [
+    [/^饰品|^飾品|^配饰|^配飾/i, "장식"],
+    [/^头发|^髮型|^发型/i, "헤어"],
+    [/^连衣裙|^連衣裙/i, "원피스"],
+    [/^外套/i, "아우터"],
+    [/^上衣/i, "상의"],
+    [/^下装|^下裝/i, "하의"],
+    [/^袜套|^襪套|^袜饰|^襪飾|^袜部件|^襪部件/i, "양말장식"],
+    [/^袜子|^襪子/i, "양말"],
+    [/^鞋子|^鞋/i, "신발"],
+    [/^妆容|^妝容|^美妆|^美妝|^彩妆|^彩妝/i, "뷰티"],
+    [/^萤火|^螢火/i, "반딧불의 영혼"]
+  ];
+
+  const STAT_CN_TO_EN = {
+    "华丽":"flair",
+    "簡約":"simple","简约":"simple",
+    "优雅":"elegant","優雅":"elegant",
+    "活泼":"lively","活潑":"lively",
+    "成熟":"mature",
+    "可爱":"cute","可愛":"cute",
+    "性感":"sexy",
+    "清纯":"pure","清純":"pure","清新":"pure",
+    "清凉":"cool","清涼":"cool",
+    "保暖":"warm"
+  };
+
+  const ATTRS = [
+    "simple","mature","elegant","sexy","cool",
+    "pure","cute","flair","lively","warm"
+  ];
+
+  function normVal(v){
+    if(v==null) return null;
+    const n = Number(v);
+    if(Number.isFinite(n)) return n;
+    const s = String(v).trim().toUpperCase();
+    return s || null;
+  }
+
+  function normalizeItem(item){
+    const out = Object.assign({}, item||{});
+    if(out.part!=null){
+      let p = String(out.part).trim();
+      for(const m of PART_CN_TO_KO){
+        if(m[0].test(p)){ p = m[1] + p.replace(m[0],''); break; }
+      }
+      out.part = p;
+    }
+    for(const cn in STAT_CN_TO_EN){
+      const en = STAT_CN_TO_EN[cn];
+      if(out[en]==null && out[cn]!=null) out[en]=normVal(out[cn]);
+    }
+    for(const k of ATTRS){ if(out[k]!=null) out[k]=normVal(out[k]); }
+    return out;
+  }
+
+  // ===== TAG HANDLING =====
+// 스테이지 tag_rules 전용 처리
+// - 형식: { name, tier, stacks }
+// - weight 개념 없음
+// - tier에 따라 배율 적용
+
+const TAG_TIER_MULT = {
+  "SSS": 0.08,
+  "SS":  0.06,
+  "S":   0.05,
+  "A":   0.04,
+  "B":   0.03,
+  "C":   0.02,
+  "D":   0.01
+};
+
+const TAG_ALIAS = {
+  "洛丽塔": "롤리타",
+  "欧式古典": "유럽고전",
+  "未来系": "미래계",
+  "童话系": "동화계",
+  "睡衣": "잠옷",
+  "动物系": "애니멀룩"
+};
+
+function normalizeTags(item){
+  const tags = Array.isArray(item.tags) ? item.tags : (item.tags ? [item.tags] : []);
+  const set = new Set();
+  for(const t of tags){
+    const s = String(t||"").trim();
+    if(!s) continue;
+    set.add(s);
+    if(TAG_ALIAS[s]) set.add(TAG_ALIAS[s]);
+  }
+  return set;
+}
+
+function applyStageTagRules(sum, item, stage){
+  const rules = Array.isArray(stage.tag_rules) ? stage.tag_rules : [];
+  if(rules.length === 0) return sum;
+
+  const tagSet = normalizeTags(item);
+
+  for(const r of rules){
+    if(!r) continue;
+    const name = String(r.name || "").trim();
+    if(!name || !tagSet.has(name)) continue;
+
+    const tier = String(r.tier || "C").toUpperCase();
+    const stacks = Number(r.stacks ?? 1) || 1;
+    const mult = TAG_TIER_MULT[tier] ?? 0;
+
+    sum *= (1 + mult * stacks);
+  }
+  return sum;
+}
+  }
+  return sum;
+}
+    return bonus;
+  }
+
+  window.scoreItemForStage = function(item, stage){
+    if(!item||!stage) return 0;
+    const it = normalizeItem(item);
+    const part = String(it.part||"");
+
+    const basePart =
+      part.startsWith("장식") ? "장식" :
+      part.startsWith("헤어") ? "헤어" :
+      part.startsWith("원피스") ? "원피스" :
+      part.startsWith("아우터") ? "아우터" :
+      part.startsWith("상의") ? "상의" :
+      part.startsWith("하의") ? "하의" :
+      part.startsWith("양말장식") ? "양말장식" :
+      part.startsWith("양말") ? "양말" :
+      part.startsWith("신발") ? "신발" :
+      part.startsWith("뷰티") ? "뷰티" :
+      (part.startsWith("반딧불") ? "반딧불의 영혼" : null);
+
+    if(!basePart) return 0;
+
+    let sum = 0;
+    for(const attr of ATTRS){
+      if(stage[attr]){
+        sum += (GRADE[it[attr]] || 0) * stage[attr];
+      }
+    }
+
+    sum += getFlatTagBonus(item);
+
+const star = Number(it.stars || it.star || 0);
+const starMult = STAR_MULT[star] ?? 1;
+return sum * PART_MULT[basePart] * starMult;
+  };
+})();
+</script>
+
+<script>
+(function(){
+  window.__SCORING_VERSION = "scoring_v20260125_231951";
+  function addBadge(){
+    try{
+      if(document.getElementById('__scoringVersionBadge')) return;
+      const d=document.createElement('div');
+      d.id='__scoringVersionBadge';
+      d.textContent='SCORING VERSION: scoring_v20260125_231951';
+      d.style.position='fixed';
+      d.style.bottom='8px';
+      d.style.right='8px';
+      d.style.zIndex='99999';
+      d.style.background='rgba(0,0,0,0.75)';
+      d.style.color='#fff';
+      d.style.font='12px/1.2 sans-serif';
+      d.style.padding='6px 8px';
+      d.style.borderRadius='8px';
+      d.style.pointerEvents='none';
+      document.body.appendChild(d);
+    }catch(e){}
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', addBadge);
+  else addBadge();
+})();
+</script>
+
+<!-- === FINAL SCORING OVERRIDE (single source of truth) === -->
+<script>
+(function(){
+  const toNum = (v)=> (v==null || v==="") ? 0 : (typeof v==="number" ? v : Number(v)) || 0;
+
+  // Grade -> numeric
+  const GRADE = { SSS:130, SS:115, S:100, A:85, B:70, C:55, D:40 };
+
+  // Star multiplier (1~5)
+  const STAR_MULT = { 1:0.90, 2:0.93, 3:0.96, 4:0.98, 5:1.00 };
+
+  // Part multiplier (Korean part names)
+  const PART_MULT = {
+    "원피스": 2.0,
+    "상의": 1.0,
+    "하의": 1.0,
+    "아우터": 0.8,
+    "헤어": 1.0,
+    "신발": 0.8,
+    "양말": 0.5,
+    "양말장식": 0.2,
+    "장식": 0.2,
+    "뷰티": 0.2,
+    "반딧불의 영혼": 0.2
+  };
+
+  // Stage tag rules (additive): {name, tier, stacks}
+  const TAG_TIER_MULT = { SSS:0.08, SS:0.06, S:0.05, A:0.04, B:0.03, C:0.02, D:0.01 };
+
+  // Minimal aliases for matching (do NOT transform stored tags)
+  const TAG_ALIAS = {
+    "洛丽塔": "롤리타",
+    "欧式古典": "유럽고전",
+    "未来系": "미래계",
+    "童话系": "동화계",
+    "睡衣": "잠옷",
+    "动物系": "애니멀룩"
+  };
+
+  function normalizePart(part){
+    return String(part||"").trim();
+  }
+  function normalizeTags(item){
+    const tags = Array.isArray(item.tags) ? item.tags : (item.tags ? [item.tags] : []);
+    const set = new Set();
+    for(const t of tags){
+      const s = String(t||"").trim();
+      if(!s) continue;
+      set.add(s);
+      if(TAG_ALIAS[s]) set.add(TAG_ALIAS[s]);
+    }
+    return set;
+  }
+
+  function applyStageTagRules(sum, item, stage){
+    const rules = Array.isArray(stage && stage.tag_rules) ? stage.tag_rules : [];
+    if(rules.length===0) return sum;
+    const tagSet = normalizeTags(item);
+    let add = 0;
+    for(const r of rules){
+      const name = String(r && r.name || "").trim();
+      if(!name || !tagSet.has(name)) continue;
+      const tier = String(r.tier || "C").toUpperCase();
+      const stacks = toNum(r.stacks ?? 1) || 1;
+      const mult = TAG_TIER_MULT[tier] ?? 0;
+      add += mult * stacks;
+    }
+    return sum * (1 + add);
+  }
+
+  // The ONE scoring function used everywhere
+  window.scoreItemForStage = function(item, stage){
+    if(!item || !stage) return 0;
+
+    // Stage weights (english keys)
+    const w = {
+      flair: toNum(stage.flair),
+      simple: toNum(stage.simple),
+      elegant: toNum(stage.elegant),
+      lively: toNum(stage.lively),
+      mature: toNum(stage.mature),
+      cute: toNum(stage.cute),
+      sexy: toNum(stage.sexy),
+      pure: toNum(stage.pure),
+      cool: toNum(stage.cool),
+      warm: toNum(stage.warm)
+    };
+
+    // Item grades (english keys)
+    const g = (key)=>{
+      const v = item[key];
+      if(v==null) return 0;
+      const s = String(v).trim().toUpperCase();
+      return GRADE[s] ?? 0;
+    };
+
+    let sum = 0;
+    sum += g("flair") * w.flair;
+    sum += g("simple") * w.simple;
+    sum += g("elegant") * w.elegant;
+    sum += g("lively") * w.lively;
+    sum += g("mature") * w.mature;
+    sum += g("cute") * w.cute;
+    sum += g("sexy") * w.sexy;
+    sum += g("pure") * w.pure;
+    sum += g("cool") * w.cool;
+    sum += g("warm") * w.warm;
+
+// Firefly (반딧불의 영혼) fixed bonus handling:
+// - Prefer item.bonus: { flair:200 } (english stat key)
+// - Fallback: parse tags like "华丽+200", "화려+200", "flair+200"
+function getFireflyBonus(it){
+  if(!it) return null;
+  // direct field
+  const b = it.bonus || it.firefly_bonus || null;
+  if(b && typeof b === "object"){
+    const keys = ["flair","simple","elegant","lively","mature","cute","sexy","pure","cool","warm"];
+    for(const k of keys){
+      const v = toNum(b[k]);
+      if(v) return { key:k, value:v };
+    }
+  }
+  // parse from tags
+  const tags = Array.isArray(it.tags) ? it.tags : (it.tags ? [it.tags] : []);
+  const MAP = {
+    "华丽":"flair","화려":"flair","flair":"flair",
+    "简约":"simple","심플":"simple","simple":"simple",
+    "优雅":"elegant","우아":"elegant","elegant":"elegant",
+    "活泼":"lively","활발":"lively","lively":"lively",
+    "成熟":"mature","성숙":"mature","mature":"mature",
+    "可爱":"cute","큐티":"cute","cute":"cute",
+    "性感":"sexy","섹시":"sexy","sexy":"sexy",
+    "清纯":"pure","청순":"pure","pure":"pure",
+    "清凉":"cool","시원":"cool","cool":"cool",
+    "保暖":"warm","보온":"warm","warm":"warm"
+  };
+  for(const t of tags){
+    const s = String(t||"").trim();
+    const m = s.match(/^([^\+\s]+)\s*\+\s*(\d+(?:\.\d+)?)$/);
+    if(!m) continue;
+    const k = MAP[m[1]];
+    if(!k) continue;
+    const v = toNum(m[2]);
+    if(v) return { key:k, value:v };
+  }
+  return null;
+}
+
+if(String(item.part||"").trim() === "반딧불의 영혼"){
+  const fb = getFireflyBonus(item);
+  if(fb && fb.key){
+    sum += fb.value * (w[fb.key] || 0);
+  }
+}
+
+    // stage tag rules
+    sum = applyStageTagRules(sum, item, stage);
+
+    const part = normalizePart(item.part);
+    const partMult = PART_MULT[part] ?? 1;
+    const star = toNum(item.stars ?? item.star) || 0;
+    const starMult = STAR_MULT[star] ?? 1;
+
+    const finalScore = sum * partMult * starMult;
+
+    // expose config for debug
+    window.__SCORING_CONFIG__ = { GRADE, STAR_MULT, PART_MULT, TAG_TIER_MULT };
+
+    return finalScore;
+  };
+
 })();
 </script>
 </body>
