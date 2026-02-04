@@ -1,0 +1,3842 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>퀴즈 이벤트</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,AppleSDGothicNeo,Segoe UI,Roboto,sans-serif;background:#f7f7fb;color:#222}
+  header{padding:14px 16px;background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:2}
+  h1{margin:0;font-size:18px}
+  .sub{margin-top:6px;color:#666;font-size:12px}
+  main{padding:14px 16px}
+  .card{background:#fff;border:1px solid #eee;border-radius:14px;padding:12px;margin:10px 0;box-shadow:0 1px 0 rgba(0,0,0,0.02)}
+  .top{display:flex;gap:10px;align-items:center;justify-content:space-between}
+  .qid{font-size:12px;color:#666}
+  .qtitle{font-weight:800;font-size:15px;margin:6px 0 8px 0}
+  .qtext{white-space:pre-wrap;line-height:1.4}
+  details{margin-top:10px}
+  summary{cursor:pointer;user-select:none;color:#2563eb;font-weight:700}
+  .choices{margin-top:10px;display:grid;gap:6px}
+  .choice{padding:8px 10px;border:1px solid #eee;border-radius:12px;background:#fafafa}
+  .answer{margin-top:10px;padding:10px;border-radius:12px;border:1px solid #cfe4ff;background:#eef6ff}
+  .answer b{display:block;margin-bottom:4px}
+  .exp{margin-top:8px;color:#444;white-space:pre-wrap;line-height:1.4}
+  .muted{color:#666;font-size:12px}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+  input[type=text]{padding:9px 10px;border:1px solid #ddd;border-radius:10px;background:#fff;min-width:220px}
+  button{padding:9px 10px;border:1px solid #ddd;border-radius:10px;background:#fff;cursor:pointer}
+  button:hover{background:#fafafa}
+  .empty{color:#666;padding:16px}
+</style>
+</head>
+<body>
+<header>
+  <h1>퀴즈 이벤트</h1>
+  <div class="sub"></div>
+</header>
+
+<main>
+  <div class="toolbar">
+    <input id="qSearch" type="text" placeholder="문제 검색 (제목/내용)" />
+    <button id="btnExpand">전부 열기</button>
+    <button id="btnCollapse">전부 닫기</button>
+  </div>
+
+  <div id="quizList"></div>
+</main>
+
+
+<script>
+// ✅ 여기만 수정하면 됨: 문제/정답(정답은 글자로 그대로 적기)
+// - 보기(choices)는 있어도 되고 없어도 돼.
+// - 정답은 answer: "정답 텍스트" 로 작성하면 끝.
+// - (옵션) 예전 방식(answerIndex)도 그대로 동작하게 남겨둠.
+const QUIZ_QUESTIONS = [
+  {
+    id: "Q1",
+    title: "Whimsical Pictor",
+    question: "Which of the following is not a Water Sign?",
+    choices: ["Cancer", "Pisces", "Scorpio", "Aquarius"],
+    answer: "Aquarius",
+    explanation: ""
+  },
+  {
+    id: "Q2",
+    title: "Whimsical Pictor",
+    question: "Pictor belongs to which group of constellations?",
+    choices: ["Bobo constellations", "Southern constellations", "Annabel constellations", "Momo constellations"],
+    answer: "Southern constellations",
+    explanation: ""
+  },
+  {
+    id: "Q3",
+    title: "Whimsical Pictor",
+    question: "Which of the following sign does not belong to the signs of the Zodiac?",
+    choices: ["Aries", "Leo", "Sagittarius", "Andromeda"],
+    answer: "Andromeda",
+    explanation: ""
+  },
+  {
+    id: "Q4",
+    title: "Whimsical Pictor",
+    question: "What is NIKKI's sign?",
+    choices: ["Cancer", "Pisces", "Momo Sign", "Sagittarius"],
+    answer: "Sagittarius",
+    explanation: ""
+  },
+  {
+    id: "Q5",
+    title: "Whimsical Pictor",
+    question: "Who did Starlet learn divination from?",
+    choices: ["Fantasy Envoy", "Momo", "Moon Sign fortuneteller", "Star Seer"],
+    answer: "Fantasy Envoy",
+    explanation: ""
+  },
+  {
+    id: "Q6",
+    title: "Whimsical Pictor",
+    question: "Which of the following is not a Water Sign?",
+    choices: ["Cancer", "Pisces", "Scorpio", "Aquarius"],
+    answer: "Aquarius",
+    explanation: ""
+  },
+  {
+    id: "Q7",
+    title: "Whimsical Pictor",
+    question: "Which of the following stars is not located in Pictor?",
+    choices: ["Bobo Star", "Alpha Pictoris", "Kapteyn's Star", "D"],
+    answer: "Bobo Star",
+    explanation: ""
+  },
+  {
+    id: "Q8",
+    title: "Whimsical Pictor",
+    question: "Which of the following constellations is not adjacent to Pictor",
+    choices: ["Columba constellations", "Dorado constellations", "Grilled Fish constellations", "Carina constellations"],
+    answer: "Grilled Fish constellations",
+    explanation: ""
+  },
+  {
+    id: "Q9",
+    title: "Whimsical Pictor",
+    question: "In early star charts, what was Pictor depicted as?",
+    choices: ["An alarm clock and a sofa", "A round table and a design", "A grill and grilled fish", "An easel and a palette"],
+    answer: "An easel and a palette",
+    explanation: ""
+  },
+  {
+    id: "Q10",
+    title: "Whimsical Pictor",
+    question: "Pictor lies between Canopus and which galaxy?",
+    choices: ["Pigeon Kingdom Galaxy", "Hillside Plaza Galaxy", "Large Magellanic Cloud", "Black Water City Galaxy"],
+    answer: "Large Magellanic Cloud",
+    explanation: ""
+  },
+  {
+    id: "Q11",
+    title: "Whimsical Pictor",
+    question: "What do the signs of the Zodiac refer to?",
+    choices: ["Ascendant Sign", "Sun Sign", "Moon Sign", "Momo constellations"],
+    answer: "Sun Sign",
+    explanation: ""
+  },
+
+  // ✅ 보기 없는(주관식) 문제 예시: choices 없이 answer만 쓰면 됨
+  {
+    id: "Q12",
+    title: "Ancient Fossil Hall",
+    question: "Which is the carrier of fossil?",
+    answer: "All the rest",
+    explanation: ""
+  },
+  {
+    id: "Q13",
+    title: "Ancient Fossil Hall",
+    question: "What's necessary to the formation of fossil?",
+    answer: "Long petrification",
+    explanation: ""
+  },
+  {
+    id: "Q14",
+    title: "Ancient Fossil Hall",
+    question: "Where is the only museum in Miraland that collects fossil?",
+    answer: "Pigeon",
+    explanation: ""
+  },
+  {
+    id: "Q15",
+    title: "Ancient Fossil Hall",
+    question: "What animal lived in the same age with the dinosaur?",
+    answer: "Limulus",
+    explanation: ""
+  },
+  {
+    id: "Q16",
+    title: "Ancient Fossil Hall",
+    question: "Which of the following is not a necessity during excavation?",
+    answer: "Momo",
+    explanation: ""
+  },
+  {
+    id: "Q17",
+    title: "Ancient Fossil Hall",
+    question: "From the perspective of preserving, what's the type of dinosaur's footprint?",
+    answer: "Trace fossil",
+    explanation: ""
+  },
+  {
+    id: "Q18",
+    title: "Ancient Fossil Hall",
+    question: "What should you do when you are lost in the wilderness?",
+    answer: "Use compass or judge by stars",
+    explanation: ""
+  },
+  {
+    id: "Q19",
+    title: "Ancient Fossil Hall",
+    question: "Generally, in what kind of stone can fossil be found?",
+    answer: "Sedimentary Rock",
+    explanation: ""
+  },
+  {
+    id: "Q20",
+    title: "Ancient Fossil Hall",
+    question: "What usually doesn't form a fossil?",
+    answer: "Grilled fish hidden by Momo",
+    explanation: ""
+  },
+  {
+    id: "Q21",
+    title: "Ancient Fossil Hall",
+    question: "What's main source of dinosaur's food?",
+    answer: "Varies among different species",
+    explanation: ""
+  },
+{
+  id: "Q22",
+  title: "Libra Elegance",
+  question: "What does the signs of Zodiac usually refer to?",
+  answer: "Sun Sign"
+},
+{
+  id: "Q23",
+  title: "Libra Elegance",
+  question: "Which of the following does not belong to the signs of the Zodiac?",
+  answer: "Andromeda"
+},
+{
+  id: "Q24",
+  title: "Libra Elegance",
+  question: "What is the sign of the first day of a year?",
+  answer: "Capricorn"
+},
+{
+  id: "Q25",
+  title: "Libra Elegance",
+  question: "What's the season a Libra is likely to be born?",
+  answer: "Autumn"
+},
+{
+  id: "Q26",
+  title: "Libra Elegance",
+  question: "What is the constellation attribute of Libra?",
+  answer: "Air Sign"
+},
+{
+  id: "Q27",
+  title: "Libra Elegance",
+  question: "Which is the ruling planet of Libra?",
+  answer: "Venus"
+},
+{
+  id: "Q28",
+  title: "Libra Elegance",
+  question: "Which house of the Zodiac does a Libra govern?",
+  answer: "Seventh House"
+},
+{
+  id: "Q29",
+  title: "Libra Elegance",
+  question: "What is Nikki's sign?",
+  answer: "Sagittarius"
+},
+{
+  id: "Q30",
+  title: "Libra Elegance",
+  question: "Who did Starlet learn divination from?",
+  answer: "Star Seer"
+},
+{
+  id: "Q31",
+  title: "Libra Elegance",
+  question: "What is the star sign of Zhu Yuxian?",
+  answer: "Libra"
+},
+{
+  id: "Q32",
+  title: "Frank Aries",
+  question: "Generally, by zodiac signs we mean:",
+  answer: "Sun Sign"
+},
+{
+  id: "Q33",
+  title: "Frank Aries",
+  question: "Which of the following does not belong to the signs of the Zodiac?",
+  answer: "Andromeda"
+},
+{
+  id: "Q34",
+  title: "Frank Aries",
+  question: "What is the sign of the first day of a year?",
+  answer: "Capricorn"
+},
+{
+  id: "Q35",
+  title: "Frank Aries",
+  question: "Children born in which of the following seasons are likely to be Aries?",
+  answer: "Spring"
+},
+{
+  id: "Q36",
+  title: "Frank Aries",
+  question: "What is the element of Aries?",
+  answer: "Fire Sign"
+},
+{
+  id: "Q37",
+  title: "Frank Aries",
+  question: "Which is the ruling planet of Aries?",
+  answer: "Mars"
+},
+{
+  id: "Q38",
+  title: "Frank Aries",
+  question: "Which house does Aries rule?",
+  answer: "First House"
+},
+{
+  id: "Q39",
+  title: "Frank Aries",
+  question: "What is Nikki's sign?",
+  answer: "Sagittarius"
+},
+{
+  id: "Q40",
+  title: "Frank Aries",
+  question: "Who did Starlet learn divination from?",
+  answer: "Star Seer"
+},
+{
+  id: "Q41",
+  title: "Frank Aries",
+  question: "What is the sign of Fu Su?",
+  answer: "Aries"
+},
+{
+  id: "Q42",
+  title: "Cosmic Murmurs",
+  question: "What is the origin of the zodiac?",
+  answer: "Babylon"
+},
+{
+  id: "Q43",
+  title: "Cosmic Murmurs",
+  question: "Which of the following is not part of the Great Winter Triangle?",
+  answer: "Scorpio"
+},
+{
+  id: "Q44",
+  title: "Cosmic Murmurs",
+  question: "Which galaxy does our solar system belong to?",
+  answer: "Milky Way"
+},
+{
+  id: "Q45",
+  title: "Cosmic Murmurs",
+  question: "Which one of the following planets is ringed?",
+  answer: "Saturn"
+},
+{
+  id: "Q46",
+  title: "Cosmic Murmurs",
+  question: "Which is the closest star to us other than the Sun?",
+  answer: "Proxima Centauri"
+},
+{
+  id: "Q47",
+  title: "Cosmic Murmurs",
+  question: "How many stars are there in the Milky Way?",
+  answer: "Several hundred billion"
+},
+{
+  id: "Q48",
+  title: "Cosmic Murmurs",
+  question: "Which of the following will a star never evolve into?",
+  answer: "Comet"
+},
+{
+  id: "Q49",
+  title: "Cosmic Murmurs",
+  question: "Which of the following is not a parameter of a black hole?",
+  answer: "Size"
+},
+{
+  id: "Q50",
+  title: "Cosmic Murmurs",
+  question: "How much dark matter is there in the universe?",
+  answer: "23%"
+},
+{
+  id: "Q51",
+  title: "Cosmic Murmurs",
+  question: "Which is the third cosmic velocity?",
+  answer: "16.7km/s"
+},
+{
+  id: "Q52",
+  title: "Faith Ursa Major",
+  question: "The 12 signs of the Zodiac are known as:",
+  answer: "Sun Signs"
+},
+{
+  id: "Q53",
+  title: "Faith Ursa Major",
+  question: "Which one below does not belong to the 12 signs of the Zodiac?",
+  answer: "Andromeda"
+},
+{
+  id: "Q54",
+  title: "Faith Ursa Major",
+  question: "Which one below does not belong to masculine sign?",
+  answer: "Pisces"
+},
+{
+  id: "Q55",
+  title: "Faith Ursa Major",
+  question: "What is the most important star image of Ursa Major?",
+  answer: "The Big Dipper"
+},
+{
+  id: "Q56",
+  title: "Faith Ursa Major",
+  question: "Three stars of Ursa Major are seen by people as:",
+  answer: "Ladle"
+},
+{
+  id: "Q57",
+  title: "Faith Ursa Major",
+  question: "Which season is the best time to observe Ursa Major?",
+  answer: "Spring"
+},
+{
+  id: "Q58",
+  title: "Faith Ursa Major",
+  question: "Which star of Ursa Major is related to literature and tests?",
+  answer: "The Star of Wisdom"
+},
+{
+  id: "Q59",
+  title: "Faith Ursa Major",
+  question: "Which constellation is in contrast with Ursa Major?",
+  answer: "Cassiopeia"
+},
+{
+  id: "Q60",
+  title: "Faith Ursa Major",
+  question: "What is the constellation of Nikki?",
+  answer: "Sagittarius"
+},
+{
+  id: "Q61",
+  title: "Faith Ursa Major",
+  question: "Who does Starlet learn augury from?",
+  answer: "Star Astrologer"
+},
+{
+  id: "Q62",
+  title: "Capricious Gemini",
+  question: "What is the zodiac element of Gemini?",
+  answer: "Air Sign"
+},
+{
+  id: "Q63",
+  title: "Capricious Gemini",
+  question: "What is Gemini's ruling planet?",
+  answer: "Mercury"
+},
+{
+  id: "Q64",
+  title: "Capricious Gemini",
+  question: "What season is most fitting for observing Geminis?",
+  answer: "Winter"
+},
+{
+  id: "Q65",
+  title: "Capricious Gemini",
+  question: "Which of the twelve houses does Gemini rule?",
+  answer: "The 3rd House"
+},
+{
+  id: "Q66",
+  title: "Capricious Gemini",
+  question: "What are the twelve zodiac signs?",
+  answer: "Sun Signs"
+},
+{
+  id: "Q67",
+  title: "Capricious Gemini",
+  question: "Which of the following is not a Water Sign?",
+  answer: "Aquarius"
+},
+{
+  id: "Q68",
+  title: "Capricious Gemini",
+  question: "Which of the following signs does not belong to the twelve zodiac signs?",
+  answer: "Andromeda"
+},
+{
+  id: "Q69",
+  title: "Capricious Gemini",
+  question: "What is Bobo's zodiac sign?",
+  answer: "Gemini"
+},
+{
+  id: "Q70",
+  title: "Capricious Gemini",
+  question: "What is Nikki's zodiac sign?",
+  answer: "Sagittarius"
+},
+{
+  id: "Q71",
+  title: "Capricious Gemini",
+  question: "Who does Starlet learn augury from?",
+  answer: "Star Seer"
+},
+{
+  id: "Q72",
+  title: "Lovely Lyra",
+  question: "Which instrument does the Lyra constellation get its name from?",
+  answer: "Harp"
+},
+{
+  id: "Q73",
+  title: "Lovely Lyra",
+  question: "Which symbol can represent the Lyra constellation in the ancient star charts?",
+  answer: "A vulture with a harp"
+},
+{
+  id: "Q74",
+  title: "Lovely Lyra",
+  question: "Which season is most ideal for observing the Lyra constellation?",
+  answer: "Summer"
+},
+{
+  id: "Q75",
+  title: "Lovely Lyra",
+  question: "What is the brightest star in the Lyra constellation?",
+  answer: "Vega star"
+},
+{
+  id: "Q76",
+  title: "Lovely Lyra",
+  question: "What are the twelve zodiac signs?",
+  answer: "Sun Signs"
+},
+{
+  id: "Q77",
+  title: "Lovely Lyra",
+  question: "Which of the following is not a Water Sign?",
+  answer: "Aquarius"
+},
+{
+  id: "Q78",
+  title: "Lovely Lyra",
+  question: "Which of the following signs does not belong to the twelve zodiac signs?",
+  answer: "Andromeda"
+},
+{
+  id: "Q79",
+  title: "Lovely Lyra",
+  question: "What is the instrument Chloris played by Lake Bovaly?",
+  answer: "Harp"
+},
+{
+  id: "Q80",
+  title: "Lovely Lyra",
+  question: "What is Nikki's zodiac sign?",
+  answer: "Sagittarius"
+},
+{
+  id: "Q81",
+  title: "Lovely Lyra",
+  question: "Who does Starlet learn augury from?",
+  answer: "Star Seer"
+},
+{
+  id: "Q82",
+  title: "Mysterious Scorpion",
+  question: "What are the twelve zodiac signs?",
+  answer: "Sun Signs"
+},
+{
+  id: "Q83",
+  title: "Mysterious Scorpion",
+  question: "Which of the following is not a Water Sign?",
+  answer: "Aquarius"
+},
+{
+  id: "Q84",
+  title: "Mysterious Scorpion",
+  question: "What is Nikki's zodiac sign?",
+  answer: "Sagittarius"
+},
+{
+  id: "Q85",
+  title: "Mysterious Scorpion",
+  question: "Who does Starlet learn augury from?",
+  answer: "Star Seer"
+},
+{
+  id: "Q86",
+  title: "Mysterious Scorpion",
+  question: "Which of the following signs does not belong to the twelve zodiac signs?",
+  answer: "Andromeda"
+},
+{
+  id: "Q87",
+  title: "Mysterious Scorpion",
+  question: "What's Sofia's sign of the zodiac?",
+  answer: "Scorpio"
+},
+{
+  id: "Q88",
+  title: "Mysterious Scorpion",
+  question: "Which is the guardian star of Scorpion?",
+  answer: "Pluto"
+},
+{
+  id: "Q89",
+  title: "Mysterious Scorpion",
+  question: "Legend had it that the Scorpion had beef with the incarnation of another sign of the zodiac. Which sign was that?",
+  answer: "Orion"
+},
+{
+  id: "Q90",
+  title: "Mysterious Scorpion",
+  question: "Which of the Twelve Zodiacs is under the control of the Scorpion?",
+  answer: "The 8th House"
+},
+{
+  id: "Q91",
+  title: "Mysterious Scorpion",
+  question: "What is the Element of Scorpion?",
+  answer: "Zodiac of Water"
+},
+{
+  id: "Q92",
+  title: "Wise Aquarius",
+  question: "What are the twelve zodiac signs?",
+  answer: "Sun Signs"
+},
+{
+  id: "Q93",
+  title: "Wise Aquarius",
+  question: "Which of the following is not a Water Sign?",
+  answer: "Aquarius"
+},
+{
+  id: "Q94",
+  title: "Wise Aquarius",
+  question: "What is Nikki's zodiac sign?",
+  answer: "Sagittarius"
+},
+{
+  id: "Q95",
+  title: "Wise Aquarius",
+  question: "Who does Starlet learn augury from?",
+  answer: "Star Seer"
+},
+{
+  id: "Q96",
+  title: "Wise Aquarius",
+  question: "Which of the following signs does not belong to the twelve zodiac signs?",
+  answer: "Andromeda"
+},
+{
+  id: "Q97",
+  title: "Wise Aquarius",
+  question: "What is the element of Aquarius?",
+  answer: "Air"
+},
+{
+  id: "Q98",
+  title: "Wise Aquarius",
+  question: "What sign is Aquarius opposite to?",
+  answer: "Leo"
+},
+{
+  id: "Q99",
+  title: "Wise Aquarius",
+  question: "What is Ming Shuiyuan's zodiac sign?",
+  answer: "Aquarius"
+},
+{
+  id: "Q100",
+  title: "Wise Aquarius",
+  question: "Which of the twelve zodiac signs is under the control of Aquarius?",
+  answer: "The Eleventh Zodiac"
+},
+{
+  id: "Q101",
+  title: "Miraland Quiz",
+  question: "How can we get the Dreamland Teatime set of Lilith Kingdom?",
+  answer: "Pavilion of Fantasy"
+},
+{
+  id: "Q102",
+  title: "Miraland Quiz",
+  question: "How can we get the Locco's Tea Party set?",
+  answer: "Room of Mystery"
+},
+{
+  id: "Q103",
+  title: "Miraland Quiz",
+  question: "How can we get the Master Magician set?",
+  answer: "Pavilion of Fantasy"
+},
+{
+  id: "Q104",
+  title: "Miraland Quiz",
+  question: "How did Mela get her name?",
+  answer: "By robbing"
+},
+{
+  id: "Q105",
+  title: "Miraland Quiz",
+  question: "How did Nikki and her friends come to the Republic of Wasteland from the Lilith Kingdom?",
+  answer: "By train"
+},
+{
+  id: "Q106",
+  title: "Miraland Quiz",
+  question: "How do we get the special background in Journey?",
+  answer: "Time Diary"
+},
+{
+  id: "Q107",
+  title: "Miraland Quiz",
+  question: "How many bags can Nikki wear at the same time?",
+  answer: "As many as she wants"
+},
+{
+  id: "Q108",
+  title: "Miraland Quiz",
+  question: "How many colors are there for the “Rose Dress”?",
+  answer: "2"
+},
+{
+  id: "Q109",
+  title: "Miraland Quiz",
+  question: "How many colors are there for the dress “Teddy” series?",
+  answer: "3"
+},
+{
+  id: "Q110",
+  title: "Miraland Quiz",
+  question: "How many colors does suit Flower Fairy Mevilla have?",
+  answer: "3"
+},
+{
+  id: "Q111",
+  title: "Miraland Quiz",
+  question: "How many colors does the “Rustling Bamboo” dress come in?",
+  answer: "4"
+},
+{
+  id: "Q112",
+  title: "Miraland Quiz",
+  question: "How many Crystal Roses are needed for the special accessory “Too Beautiful to Fall”?",
+  answer: "6"
+},
+{
+  id: "Q113",
+  title: "Miraland Quiz",
+  question: "How many Crystal Roses are needed for the special accessory “Call me Cute” from the Styling Contest?",
+  answer: "10"
+},
+{
+  id: "Q114",
+  title: "Miraland Quiz",
+  question: "How many Crystal Roses are needed to exchange Miss Puff In Crystal Garden?",
+  answer: "165"
+},
+{
+  id: "Q115",
+  title: "Miraland Quiz",
+  question: "How many Crystal Roses can a player obtain if she reaches top 1%-5% in Competition?",
+  answer: "20"
+},
+{
+  id: "Q116",
+  title: "Miraland Quiz",
+  question: "How many Crystal Shoe pieces are needed to make one shoe?",
+  answer: "50"
+},
+{
+  id: "Q117",
+  title: "Miraland Quiz",
+  question: "How many diamonds are needed for 10 draws in Pavilion of Fantasy?",
+  answer: "540"
+},
+{
+  id: "Q118",
+  title: "Miraland Quiz",
+  question: "How many diamonds can you get by finishing Daily Quests?",
+  answer: "65"
+},
+{
+  id: "Q119",
+  title: "Miraland Quiz",
+  question: "How many functions are there in Workshop?",
+  answer: "4"
+},
+{
+  id: "Q120",
+  title: "Miraland Quiz",
+  question: "How many nations are there across the Miraland?",
+  answer: "7"
+},
+{
+  id: "Q121",
+  title: "Miraland Quiz",
+  question: "How many parts are there in suit Star Sea, the treasure of December Troupe?",
+  answer: "6"
+},
+{
+  id: "Q122",
+  title: "Miraland Quiz",
+  question: "How many people designed the mansion theme suits?",
+  answer: "1"
+},
+{
+  id: "Q123",
+  title: "Miraland Quiz",
+  question: "How many photos can be saved in Starry Corridor at most?",
+  answer: "50"
+},
+{
+  id: "Q124",
+  title: "Miraland Quiz",
+  question: "How many pieces are needed to make one Crystal Shoe?",
+  answer: "50"
+},
+{
+  id: "Q125",
+  title: "Miraland Quiz",
+  question: "How many Pink Wings-Gorgeous are needed to evolve into one Pink Wings-Treasured?",
+  answer: "4"
+},
+{
+  id: "Q126",
+  title: "Miraland Quiz",
+  question: "How many powerful stylists are there in the Iron Rose Stylist Legion?",
+  answer: "10"
+},
+{
+  id: "Q127",
+  title: "Miraland Quiz",
+  question: "How many SS attributes does Star Prophecy, jacket of the Star Seer outfit, have?",
+  answer: "5"
+},
+{
+  id: "Q128",
+  title: "Miraland Quiz",
+  question: "How many stamina can you claim in friends' mails?",
+  answer: "50"
+},
+{
+  id: "Q129",
+  title: "Miraland Quiz",
+  question: "How many Star Coins can you earn when you win the battle?",
+  answer: "5"
+},
+{
+  id: "Q130",
+  title: "Miraland Quiz",
+  question: "How many suits are included in event Ghost Gathering?",
+  answer: "5"
+},
+{
+  id: "Q131",
+  title: "Miraland Quiz",
+  question: "How many suits are there in Time Yard?",
+  answer: "8"
+},
+{
+  id: "Q132",
+  title: "Miraland Quiz",
+  question: "How many times can the 'Story of Shanghai' dress be evolved?",
+  answer: "2"
+},
+{
+  id: "Q133",
+  title: "Miraland Quiz",
+  question: "How much discount is provided to someone with V6 privilege in the Clothes Store?",
+  answer: "15%"
+},
+{
+  id: "Q134",
+  title: "Miraland Quiz",
+  question: "How much does Miss Anna cost in Store of Starlight?",
+  answer: "39 Starlight Coins"
+},
+{
+  id: "Q135",
+  title: "Miraland Quiz",
+  question: "How much is Memory of Youth in Store?",
+  answer: "2387 Gold"
+},
+{
+  id: "Q136",
+  title: "Miraland Quiz",
+  question: "How to get Black Swan when you have White Swan?",
+  answer: "Evolution"
+},
+{
+  id: "Q137",
+  title: "Miraland Quiz",
+  question: "What are the names of two characters in The Song of Summer Ocean?",
+  answer: "Elisa and Fleur"
+},
+{
+  id: "Q138",
+  title: "Miraland Quiz",
+  question: "What can you do in Starry Corridor?",
+  answer: "Share your style"
+},
+{
+  id: "Q139",
+  title: "Miraland Quiz",
+  question: "What can you not do in Competition?",
+  answer: "Have a style contest with an NPC"
+},
+{
+  id: "Q140",
+  title: "Miraland Quiz",
+  question: "What can you not do in Home?",
+  answer: "Cook food"
+},
+{
+  id: "Q141",
+  title: "Miraland Quiz",
+  question: "What discount can a VIP6 player get in Store?",
+  answer: "15%"
+},
+{
+  id: "Q142",
+  title: "Miraland Quiz",
+  question: "What does Momo usually wear?",
+  answer: "A cloak"
+},
+{
+  id: "Q143",
+  title: "Miraland Quiz",
+  question: "What flower does Nikki have in her mouth in the Romeo outfit?",
+  answer: "Rose"
+},
+{
+  id: "Q144",
+  title: "Miraland Quiz",
+  question: "What is Momo's favorite food?",
+  answer: "Grilled Fish"
+},
+{
+  id: "Q145",
+  title: "Miraland Quiz",
+  question: "What is Supermodel Hiber's true identity?",
+  answer: "One of the Phantom Thief group"
+},
+{
+  id: "Q146",
+  title: "Miraland Quiz",
+  question: "What is the best Art Academy in Apple Federation?",
+  answer: "Rawding Academy"
+},
+{
+  id: "Q147",
+  title: "Miraland Quiz",
+  question: "What is the first set that introduced dynamic effect in Love Nikki?",
+  answer: "Princess Azhar"
+},
+{
+  id: "Q148",
+  title: "Miraland Quiz",
+  question: "What is the first set with dynamic effects in Miracle Nikki?",
+  answer: "Summer Foam and Sea Songs"
+},
+{
+  id: "Q149",
+  title: "Miraland Quiz",
+  question: "What is the most amount of activity diamonds you can get by finishing Daily Quests?",
+  answer: "65"
+},
+{
+  id: "Q150",
+  title: "Miraland Quiz",
+  question: "What is the name of Orlando's cat?",
+  answer: "Mr. Lancelot"
+},
+{
+  id: "Q151",
+  title: "Miraland Quiz",
+  question: "What is the name of Power Phoenix's Treasure House?",
+  answer: "Seamoon Pavilion"
+},
+{
+  id: "Q152",
+  title: "Miraland Quiz",
+  question: "What is the name of the \"Icewind Warchant\" that Eunikina got from Eagle?",
+  answer: "Grani Lightning"
+},
+{
+  id: "Q153",
+  title: "Miraland Quiz",
+  question: "What is the only island nation in Miraland?",
+  answer: "Ruin"
+},
+{
+  id: "Q154",
+  title: "Miraland Quiz",
+  question: "What is the price for \"Fresh Stripes\" in the Store of Starlight in Stylist Arena?",
+  answer: "20 Starlight Coins"
+},
+{
+  id: "Q155",
+  title: "Miraland Quiz",
+  question: "What is the price for Nikki's Dress in the Clothes Store?",
+  answer: "7580 Gold"
+},
+{
+  id: "Q156",
+  title: "Miraland Quiz",
+  question: "What is the target suit at the end of Chapter 3?",
+  answer: "Rock Singer"
+},
+{
+  id: "Q157",
+  title: "Miraland Quiz",
+  question: "What is needed to convert “Panda Pajamas” into “Heart Pajamas”?",
+  answer: "Polka Dots"
+},
+{
+  id: "Q158",
+  title: "Miraland Quiz",
+  question: "What items can you buy at Time Yard?",
+  answer: "Karma Crystal"
+},
+{
+  id: "Q159",
+  title: "Miraland Quiz",
+  question: "What material is needed to customize 'Panda Pajamas' into 'Heart Pajamas'?",
+  answer: "Polka Dots"
+},
+{
+  id: "Q160",
+  title: "Miraland Quiz",
+  question: "What is Annabel's profession?",
+  answer: "Manga Artist"
+},
+{
+  id: "Q161",
+  title: "Miraland Quiz",
+  question: "What set is Nikki wearing in the Pavilion of Fantasy poster?",
+  answer: "Sheer Dance"
+},
+{
+  id: "Q162",
+  title: "Miraland Quiz",
+  question: "What suit caused misunderstanding between Bai Jinjin and Zhong Lizi?",
+  answer: "Bunny"
+},
+{
+  id: "Q163",
+  title: "Miraland Quiz",
+  question: "What takes the longest time in Life Bits quests?",
+  answer: "Arrange"
+},
+{
+  id: "Q164",
+  title: "Miraland Quiz",
+  question: "What were Nikki and her friends seeking in Wasteland after the mutiny of Nidhogg?",
+  answer: "Miracle Scroll"
+},
+{
+  id: "Q165",
+  title: "Miraland Quiz",
+  question: "What will you gain after reading Little Red Riding Hood in the Association?",
+  answer: "Max stamina boost"
+},
+{
+  id: "Q166",
+  title: "Miraland Quiz",
+  question: "What's correct to secure your account?",
+  answer: "Link account with a mail"
+},
+{
+  id: "Q167",
+  title: "Miraland Quiz",
+  question: "What's Henry's favorite small animal?",
+  answer: "Rabbit"
+},
+{
+  id: "Q168",
+  title: "Miraland Quiz",
+  question: "What's prize set in Love Nikki anniversary event?",
+  answer: "Sweet Breeze"
+},
+{
+  id: "Q169",
+  title: "Miraland Quiz",
+  question: "What's Nidhogg's favorite small animal?",
+  answer: "Rabbit"
+},
+{
+  id: "Q170",
+  title: "Miraland Quiz",
+  question: "What's Nikki's constellation?",
+  answer: "Sagittarius"
+},
+{
+  id: "Q171",
+  title: "Miraland Quiz",
+  question: "What's NOT another word for motherboard?",
+  answer: "Keyboard"
+},
+{
+  id: "Q172",
+  title: "Miraland Quiz",
+  question: "What's special cloth owned by Lunar's family?",
+  answer: "Cloud Calico"
+},
+{
+  id: "Q173",
+  title: "Miraland Quiz",
+  question: "What's special stylist group commanded by Queen Elle?",
+  answer: "Iron Rose"
+},
+{
+  id: "Q174",
+  title: "Miraland Quiz",
+  question: "What's the city that Luna works in as Chief Designer?",
+  answer: "Cloud City"
+},
+{
+  id: "Q175",
+  title: "Miraland Quiz",
+  question: "What's the color of Kaja's spectacle frames?",
+  answer: "Blue"
+},
+{
+  id: "Q176",
+  title: "Miraland Quiz",
+  question: "What's the first set that has transparent limb parts?",
+  answer: "Cosmos Tide"
+},
+{
+  id: "Q177",
+  title: "Miraland Quiz",
+  question: "What's the gender of the Fantasy Envoy?",
+  answer: "Male"
+},
+{
+  id: "Q178",
+  title: "Miraland Quiz",
+  question: "What's the homeland of Nidhogg?",
+  answer: "North"
+},
+{
+  id: "Q179",
+  title: "Miraland Quiz",
+  question: "What's the most number of photos that can be saved at the Starry Corridor?",
+  answer: "50"
+},
+{
+  id: "Q180",
+  title: "Miraland Quiz",
+  question: "What's the name of the queen who summoned Nikki to Miraland?",
+  answer: "Nanari"
+},
+{
+  id: "Q181",
+  title: "Miraland Quiz",
+  question: "What's the only Island nation in Miraland?",
+  answer: "Ruin"
+},
+{
+  id: "Q182",
+  title: "Miraland Quiz",
+  question: "What's the real identity of Tuda?",
+  answer: "Son of Tribe Chieftain"
+},
+{
+  id: "Q183",
+  title: "Miraland Quiz",
+  question: "What's the relationship between Princess Dawn and Queen Night?",
+  answer: "The Same Person"
+},
+{
+  id: "Q184",
+  title: "Miraland Quiz",
+  question: "What's the target suit at the end of Chapter 3?",
+  answer: "Rock Singer"
+},
+{
+  id: "Q185",
+  title: "Miraland Quiz",
+  question: "What's the theme of Kimi's graduation design?",
+  answer: "Love of Life"
+},
+{
+  id: "Q186",
+  title: "Miraland Quiz",
+  question: "What's the title of archpriest Imm?",
+  answer: "Wind Whisperer"
+},
+{
+  id: "Q187",
+  title: "Miraland Quiz",
+  question: "What's the true identity of Wasteland Priest Ransa?",
+  answer: "Iron Rose Legion"
+},
+{
+  id: "Q188",
+  title: "Miraland Quiz",
+  question: "What is Priestess Ransa's true identity?",
+  answer: "An Iron Rose Legion member"
+},
+{
+  id: "Q189",
+  title: "Miraland Quiz",
+  question: "What's Toto's Aries boyfriend's profession?",
+  answer: "Photographer"
+},
+{
+  id: "Q190",
+  title: "Miraland Quiz",
+  question: "What's young chopper Fu Su's true identity?",
+  answer: "Master Designer's disciple"
+},
+{
+  id: "Q191",
+  title: "Miraland Quiz",
+  question: "'Full of dough, full of meat', what does this poem describe?",
+  answer: "Crab"
+},
+{
+  id: "Q192",
+  title: "Miraland Quiz",
+  question: "According to the Stars Record, what is Mela's special skill?",
+  answer: "Snap fingers 30 times in 10s"
+},
+{
+  id: "Q193",
+  title: "Miraland Quiz",
+  question: "After clearing the main stages, where can we review stories and manga?",
+  answer: "In Time Diary"
+},
+{
+  id: "Q194",
+  title: "Miraland Quiz",
+  question: "After giving 10 like in Competition, you can open the gift box, which reward is a possible drop?",
+  answer: "Crystal Rose"
+},
+{
+  id: "Q195",
+  title: "Miraland Quiz",
+  question: "Congrats! you drew a simple Question!",
+  answer: "Choose this one"
+},
+{
+  id: "Q196",
+  title: "Miraland Quiz",
+  question: "If you sign in monthly, which is the set you will obtain in the first month?",
+  answer: "Cinnabar Cloud"
+},
+{
+  id: "Q197",
+  title: "Miraland Quiz",
+  question: "In the first round of the Fantasy Styling Contest, who's Nikki's opponent?",
+  answer: "Sherry"
+},
+{
+  id: "Q198",
+  title: "Miraland Quiz",
+  question: "In which city did Nine-Day War break out?",
+  answer: "Rolterdan"
+},
+{
+  id: "Q199",
+  title: "Miraland Quiz",
+  question: "In which event did we first introduce avatar pendant?",
+  answer: "Haunted Night"
+},
+{
+  id: "Q200",
+  title: "Miraland Quiz",
+  question: "In which show's rehearse Nikki and Royce were invited to join?",
+  answer: "Romeo and Cinderella"
+},
+{
+  id: "Q201",
+  title: "Miraland Quiz",
+  question: "In what chapter does Kimi first show up?",
+  answer: "Chapter 2"
+},
+{
+  id: "Q202",
+  title: "Miraland Quiz",
+  question: "Starlet said: Stars can foresee fate but they cannot foresee ___?",
+  answer: "Direction"
+},
+{
+  id: "Q203",
+  title: "Miraland Quiz",
+  question: "There are 5 tiers in the Stylist Arena. Which is the 3rd tier?",
+  answer: "Senior Stylist"
+},
+{
+  id: "Q204",
+  title: "Miraland Quiz",
+  question: "According to the legend, what did Patrick's walking stick grow into?",
+  answer: "A living tree."
+},
+{
+  id: "Q205",
+  title: "Miraland Quiz",
+  question: "According to the legend, why doesn't Ireland have snakes?",
+  answer: "They had all been banished by Patrick."
+},
+{
+  id: "Q206",
+  title: "Miraland Quiz",
+  question: "Since when does the sun shine directly on the equator and are the lengths of day and night equal?",
+  answer: "Spring Equinox"
+},
+{
+  id: "Q207",
+  title: "Miraland Quiz",
+  question: "The climate with short-term heat recovery after early fall is usually called?",
+  answer: "Autumn Tiger"
+},
+{
+  id: "Q208",
+  title: "Miraland Quiz",
+  question: "How many leaves do Shamrocks usually have?",
+  answer: "Three"
+},
+{
+  id: "Q209",
+  title: "Miraland Quiz",
+  question: "By whom was the idea of celebrating Father's Day introduced in America?",
+  answer: "Sonora Dodd"
+},
+{
+  id: "Q210",
+  title: "Miraland Quiz",
+  question: "What is the theme of Father's Day?",
+  answer: "Honor fathers"
+},
+{
+  id: "Q211",
+  title: "Miraland Quiz",
+  question: "What's the most popular date to celebrate Father's Day publicly?",
+  answer: "Third Sunday in June"
+},
+{
+  id: "Q212",
+  title: "Miraland Quiz",
+  question: "When did people begin to celebrate Father's Day publicly?",
+  answer: "Early 20th century"
+},
+{
+  id: "Q213",
+  title: "Miraland Quiz",
+  question: "Which country first celebrated Father's Day publicly?",
+  answer: "America"
+},
+{
+  id: "Q214",
+  title: "Miraland Quiz",
+  question: "Which factor helped in the establishment of Father's Day?",
+  answer: "Commercial profit"
+},
+{
+  id: "Q215",
+  title: "Miraland Quiz",
+  question: "Which of the following is hardly a gift for Father's Day?",
+  answer: "Sleep the day off"
+},
+{
+  id: "Q216",
+  title: "Miraland Quiz",
+  question: "Which state first celebrated Father's Day?",
+  answer: "Washington"
+},
+{
+  id: "Q217",
+  title: "Miraland Quiz",
+  question: "Which US president signed Father's Day into law and made it a permanent national holiday?",
+  answer: "Nixon"
+},
+{
+  id: "Q218",
+  title: "Miraland Quiz",
+  question: "Who is commonly known as The Father of Video Games?",
+  answer: "Ralph H. Baer"
+},
+{
+  id: "Q219",
+  title: "Miraland Quiz",
+  question: "Who is known as the Father of Medicine?",
+  answer: "Hippocrates"
+},
+{
+  id: "Q220",
+  title: "Miraland Quiz",
+  question: "Who is popularly known as father of History?",
+  answer: "Herodotus"
+},
+{
+  id: "Q221",
+  title: "Miraland Quiz",
+  question: "By Guinness World Records, how many children does the most prolific mother have?",
+  answer: "69"
+},
+{
+  id: "Q222",
+  title: "Miraland Quiz",
+  question: "Which Ancient Civilization first started celebrating Mother's Day?",
+  answer: "Ancient Greece"
+},
+{
+  id: "Q223",
+  title: "Miraland Quiz",
+  question: "What's Mother Teresa known for?",
+  answer: "Charity work"
+},
+{
+  id: "Q224",
+  title: "Miraland Quiz",
+  question: "When is the American Mother's Day?",
+  answer: "The second Sunday of May"
+},
+{
+  id: "Q225",
+  title: "Miraland Quiz",
+  question: "When was the first modern Mother's Day celebrated?",
+  answer: "1908"
+},
+{
+  id: "Q226",
+  title: "Miraland Quiz",
+  question: "When is the date of this year's Mother's Day?",
+  answer: "13th May"
+},
+{
+  id: "Q227",
+  title: "Miraland Quiz",
+  question: "Which of the actions below would not be a good gift for Mother's Day?",
+  answer: "Sleeping for the entire day"
+},
+{
+  id: "Q228",
+  title: "Miraland Quiz",
+  question: "Which of the characters in the game might celebrate Mother's Day?",
+  answer: "Nikki's Mother"
+},
+{
+  id: "Q229",
+  title: "Miraland Quiz",
+  question: "Which of the people below is a mother?",
+  answer: "Marie Curie"
+},
+{
+  id: "Q230",
+  title: "Miraland Quiz",
+  question: "Which option below would be a good Mother's Day Gift?",
+  answer: "Giving your mom a heartfelt hug"
+},
+{
+  id: "Q231",
+  title: "Miraland Quiz",
+  question: "Which person said the following line: “One good mother is worth 100...”?",
+  answer: "George Herbert"
+},
+{
+  id: "Q232",
+  title: "Miraland Quiz",
+  question: "Who is credited with founding Mother's Day?",
+  answer: "Anna Jarvis"
+},
+{
+  id: "Q233",
+  title: "Miraland Quiz",
+  question: "Who is the first woman in the bible?",
+  answer: "Eve"
+},
+{
+  id: "Q234",
+  title: "Miraland Quiz",
+  question: "In Greek mythology, who's known as the mother of gods?",
+  answer: "Rhea"
+},
+{
+  id: "Q235",
+  title: "Miraland Quiz",
+  question: "Usually, which flower will be given on Mother's Day?",
+  answer: "Carnations"
+},
+{
+  id: "Q236",
+  title: "Miraland Quiz",
+  question: "Which is NOT a good choice for Mother's Day?",
+  answer: "Sleep off the day"
+},
+{
+  id: "Q237",
+  title: "Miraland Quiz",
+  question: "Which country celebrates Mother's Day on the second Sunday of May?",
+  answer: "Japan"
+},
+{
+  id: "Q238",
+  title: "Miraland Quiz",
+  question: "Where does modern Mother's Day originate?",
+  answer: "America"
+},
+{
+  id: "Q239",
+  title: "Miraland Quiz",
+  question: "What does NOT Mother's Day honor?",
+  answer: "World peace"
+},
+{
+  id: "Q240",
+  title: "Miraland Quiz",
+  question: "Among Monday to Sunday, which one is for Easter Day?",
+  answer: "Sunday"
+},
+{
+  id: "Q241",
+  title: "Miraland Quiz",
+  question: "What do baby animals represent on Easter?",
+  answer: "Spring and new life"
+},
+{
+  id: "Q242",
+  title: "Miraland Quiz",
+  question: "What do Easter bunnies represent?",
+  answer: "Fertility"
+},
+{
+  id: "Q243",
+  title: "Miraland Quiz",
+  question: "What do people usually do on Easter Day?",
+  answer: "Decorate Eggs"
+},
+{
+  id: "Q244",
+  title: "Miraland Quiz",
+  question: "What might be in the chocolate Easter eggs?",
+  answer: "Candies"
+},
+{
+  id: "Q245",
+  title: "Miraland Quiz",
+  question: "What might Nikki have on Easter breakfast?",
+  answer: "Hot Cross Buns"
+},
+{
+  id: "Q246",
+  title: "Miraland Quiz",
+  question: "When is Easter Day 2019?",
+  answer: "April 21"
+},
+{
+  id: "Q247",
+  title: "Miraland Quiz",
+  question: "Which flower might Nikki send to her friends on Easter?",
+  answer: "Lilies"
+},
+{
+  id: "Q248",
+  title: "Miraland Quiz",
+  question: "Which one will Momo not do on Easter Day?",
+  answer: "Light the Red lanterns"
+},
+{
+  id: "Q249",
+  title: "Miraland Quiz",
+  question: "Which one is not a symbol of Easter?",
+  answer: "Grilled fish"
+},
+{
+  id: "Q250",
+  title: "Miraland Quiz",
+  question: "Which egg-related activity will Nikki not do on Easter?",
+  answer: "Hatch eggs"
+},
+{
+  id: "Q251",
+  title: "Miraland Quiz",
+  question: "What does Easter Day celebrate?",
+  answer: "The resurrection of Jesus"
+},
+{
+  id: "Q252",
+  title: "Miraland Quiz",
+  question: "Which animal is NOT related to Easter?",
+  answer: "Cat"
+},
+{
+  id: "Q253",
+  title: "Miraland Quiz",
+  question: "What do people also call Easter Day?",
+  answer: "Resurrection Sunday"
+},
+{
+  id: "Q254",
+  title: "Miraland Quiz",
+  question: "What do baby animals represent on easter ?",
+  answer: "Spring and new life"
+},
+{
+  id: "Q255",
+  title: "Miraland Quiz",
+  question: "When did Association Shop refresh at night?",
+  answer: "20:00:00"
+},
+{
+  id: "Q256",
+  title: "Miraland Quiz",
+  question: "When the Starry Corridor opened, how many times was it decorated?",
+  answer: "Hundreds of times"
+},
+{
+  id: "Q257",
+  title: "Miraland Quiz",
+  question: "When skill “Smile” reaches max level, how much can your score be improved?",
+  answer: "0.27"
+},
+{
+  id: "Q258",
+  title: "Miraland Quiz",
+  question: "Where can you see the map of Miraland?",
+  answer: "Time Diary"
+},
+{
+  id: "Q259",
+  title: "Miraland Quiz",
+  question: "Where's Fantasy Styling Contest held?",
+  answer: "Royal City"
+},
+{
+  id: "Q260",
+  title: "Miraland Quiz",
+  question: "Where did Henry become famous with Rose Dress?",
+  answer: "Designer's Tea Party"
+},
+{
+  id: "Q261",
+  title: "Miraland Quiz",
+  question: "Where did Nidhogg first gain fame?",
+  answer: "Designer's Tea Party"
+},
+{
+  id: "Q262",
+  title: "Miraland Quiz",
+  question: "Where did Nikki meet Sherry first?",
+  answer: "Fantasy Styling Contest"
+},
+{
+  id: "Q263",
+  title: "Miraland Quiz",
+  question: "Where did the legend about Yunikina and Eagle happen?",
+  answer: "White Rock City"
+},
+{
+  id: "Q264",
+  title: "Miraland Quiz",
+  question: "Where does the leprechaun hide his pot of gold?",
+  answer: "At the end of the rainbow"
+},
+{
+  id: "Q265",
+  title: "Miraland Quiz",
+  question: "Where is the first place that Bai Jinjin and Zhong Lizi met?",
+  answer: "Plum Villa"
+},
+{
+  id: "Q266",
+  title: "Miraland Quiz",
+  question: "Where is Orlando from?",
+  answer: "Apple Federation"
+},
+{
+  id: "Q267",
+  title: "Miraland Quiz",
+  question: "Where was the Designer's Tea Party that made Nidhogg famous held?",
+  answer: "Wintermount"
+},
+{
+  id: "Q268",
+  title: "Miraland Quiz",
+  question: "Where is Designer's Tea Party held?",
+  answer: "Wintermount"
+},
+{
+  id: "Q269",
+  title: "Miraland Quiz",
+  question: "Where can you get a rename card?",
+  answer: "User's Shop"
+},
+{
+  id: "Q270",
+  title: "Miraland Quiz",
+  question: "Which attribute will increase after reading Little Red Riding Hood in the Association Library?",
+  answer: "Max Stamina"
+},
+{
+  id: "Q271",
+  title: "Miraland Quiz",
+  question: "Which below is NOT required to craft dress Star Sea?",
+  answer: "Polychrome"
+},
+{
+  id: "Q272",
+  title: "Miraland Quiz",
+  question: "Which book is NOT included by Association Library?",
+  answer: "Alice"
+},
+{
+  id: "Q273",
+  title: "Miraland Quiz",
+  question: "Which category does 'Washing Machine' belong to?",
+  answer: "Bottoms"
+},
+{
+  id: "Q274",
+  title: "Miraland Quiz",
+  question: "Which character did not attend Fantasy Styling Contest?",
+  answer: "Fu Su"
+},
+{
+  id: "Q275",
+  title: "Miraland Quiz",
+  question: "Which character offered the theme \"White fairy, otherworldly elegance, pure like snow, falling for love\"?",
+  answer: "Lunar"
+},
+{
+  id: "Q276",
+  title: "Miraland Quiz",
+  question: "Which city did the Nine-Day War break out in?",
+  answer: "Rolterdan"
+},
+{
+  id: "Q277",
+  title: "Miraland Quiz",
+  question: "Which city does Lunar work for as Chief Designer?",
+  answer: "Cloud City"
+},
+{
+  id: "Q278",
+  title: "Miraland Quiz",
+  question: "Which clothes do not belong to “Mori Girl” series?",
+  answer: "Queen of Deer Elf"
+},
+{
+  id: "Q279",
+  title: "Miraland Quiz",
+  question: "Which column does Starlet launch in Amphithea News?",
+  answer: "Zodiac column"
+},
+{
+  id: "Q280",
+  title: "Miraland Quiz",
+  question: "Which country is mostly covered with snow in Miraland?",
+  answer: "North Kingdom"
+},
+{
+  id: "Q281",
+  title: "Miraland Quiz",
+  question: "Which day is the settlement day for Arena?",
+  answer: "Monday"
+},
+{
+  id: "Q282",
+  title: "Miraland Quiz",
+  question: "Which dram is being rehearsed by the crew that invited Nikki and Royce to a stylist competition?",
+  answer: "Romeo and Cinderella"
+},
+{
+  id: "Q283",
+  title: "Miraland Quiz",
+  question: "Which dress was not thrown into the garbage by Kimi?",
+  answer: "Diamond Glint"
+},
+{
+  id: "Q284",
+  title: "Miraland Quiz",
+  question: "Which family is located to the east of the Cloud Empire?",
+  answer: "Dawn Dragon"
+},
+{
+  id: "Q285",
+  title: "Miraland Quiz",
+  question: "Which flower is included in suit Romeo?",
+  answer: "Rose"
+},
+{
+  id: "Q286",
+  title: "Miraland Quiz",
+  question: "Which flower might Nikki send to her friends on Easter?",
+  answer: "Lilies"
+},
+{
+  id: "Q287",
+  title: "Miraland Quiz",
+  question: "Which Fluorite can be found on Dream Island?",
+  answer: "Dazzle Stone"
+},
+{
+  id: "Q288",
+  title: "Miraland Quiz",
+  question: "Which House of the Cloud Empire is Zhu Ruosheng from?",
+  answer: "Power Phoenix"
+},
+{
+  id: "Q289",
+  title: "Miraland Quiz",
+  question: "Which instrument has not appeared in Troupe suits?",
+  answer: "Accordion"
+},
+{
+  id: "Q290",
+  title: "Miraland Quiz",
+  question: "Which is Momo's favorite?",
+  answer: "Grilled Fish"
+},
+{
+  id: "Q291",
+  title: "Miraland Quiz",
+  question: "Which is not included in the Association Library collection?",
+  answer: "Alice"
+},
+{
+  id: "Q292",
+  title: "Miraland Quiz",
+  question: "Which is the first music suit in Love Nikki?",
+  answer: "Sky Rhapsody"
+},
+{
+  id: "Q293",
+  title: "Miraland Quiz",
+  question: "Which is the first video story launched by Love Nikki?",
+  answer: "Summer Foam and Sea Songs"
+},
+{
+  id: "Q294",
+  title: "Miraland Quiz",
+  question: "Which legendary design was stolen at the famous auction?",
+  answer: "White Blossom"
+},
+{
+  id: "Q295",
+  title: "Miraland Quiz",
+  question: "Which of the following garment can't be bought from the Association Store?",
+  answer: "Meow-Wee"
+},
+{
+  id: "Q296",
+  title: "Miraland Quiz",
+  question: "Which one of the following outfits is not a wedding dress?",
+  answer: "Cake Manor"
+},
+{
+  id: "Q297",
+  title: "Miraland Quiz",
+  question: "Which option is not related to the leprechaun?",
+  answer: "Famous stylist"
+},
+{
+  id: "Q298",
+  title: "Miraland Quiz",
+  question: "Which nation did Nikki arrive in when she first came to Miraland?",
+  answer: "Apple Federation"
+},
+{
+  id: "Q299",
+  title: "Miraland Quiz",
+  question: "Which nation does Bobo's everyday dressing style belong to?",
+  answer: "Lilith Kingdom"
+},
+{
+  id: "Q300",
+  title: "Miraland Quiz",
+  question: "Which nation does suit Demon Huntress belong to?",
+  answer: "Pigeon Kingdom"
+},
+{
+  id: "Q301",
+  title: "Miraland Quiz",
+  question: "Which nation does the fashion style dress “Jellyfish” belong to?",
+  answer: "Pigeon Kingdom"
+},
+{
+  id: "Q302",
+  title: "Miraland Quiz",
+  question: "Which nation is 'the country bathed in storm and fire'?",
+  answer: "North Kingdom"
+},
+{
+  id: "Q303",
+  title: "Miraland Quiz",
+  question: "Which nation is “the neutral and cool nation under the baptism of storm and fire?",
+  answer: "North Kingdom"
+},
+{
+  id: "Q304",
+  title: "Miraland Quiz",
+  question: "Which nation of the Miraland does Bobo's everyday dressing style belong to?",
+  answer: "Lilith Kingdom"
+},
+{
+  id: "Q305",
+  title: "Miraland Quiz",
+  question: "Which newspaper does journalist Cali work for?",
+  answer: "Amphithea News"
+},
+{
+  id: "Q306",
+  title: "Miraland Quiz",
+  question: "Which NPC's suit is not included in 4 Seasons?",
+  answer: "Sofia"
+},
+{
+  id: "Q307",
+  title: "Miraland Quiz",
+  question: "Which of the following clothing garments can't be purchased from the Stylist?",
+  answer: "Meow-Wee"
+},
+{
+  id: "Q308",
+  title: "Miraland Quiz",
+  question: "Which of the following does not belong to the 'Four Gentlemen' of calligraphy and painting?",
+  answer: "Maple"
+},
+{
+  id: "Q309",
+  title: "Miraland Quiz",
+  question: "Which of the following flowers usually blooms in the fall?",
+  answer: "Golden Laurel"
+},
+{
+  id: "Q310",
+  title: "Miraland Quiz",
+  question: "Which of the following fruits is described in 'Green in summer, red in autumn'?",
+  answer: "Persimmon"
+},
+{
+  id: "Q311",
+  title: "Miraland Quiz",
+  question: "Which of the following is not a swimsuit?",
+  answer: "Little Waves"
+},
+{
+  id: "Q312",
+  title: "Miraland Quiz",
+  question: "Which of the following is not one of the four fairies in Flower Field?",
+  answer: "Snow"
+},
+{
+  id: "Q313",
+  title: "Miraland Quiz",
+  question: "Which of the following isn't an alternative color of the “Rustling Bamboo”?",
+  answer: "Rustling Bamboo - Lonely Drink"
+},
+{
+  id: "Q314",
+  title: "Miraland Quiz",
+  question: "Which of the following isn't an alternative color of the 'Rustling Bamboo'?",
+  answer: "Rustling Bamboo- Drunk"
+},
+{
+  id: "Q315",
+  title: "Miraland Quiz",
+  question: "Which of the following is the college Timi goes to for advanced studies with her senior?",
+  answer: "Cicia Design School"
+},
+{
+  id: "Q316",
+  title: "Miraland Quiz",
+  question: "Which of the following items is not a Wedding Dress?",
+  answer: "Cake Manor"
+},
+{
+  id: "Q317",
+  title: "Miraland Quiz",
+  question: "Which of the following organisms does not hibernate?",
+  answer: "Momo"
+},
+{
+  id: "Q318",
+  title: "Miraland Quiz",
+  question: "Which of these is another name for the gingko tree?",
+  answer: "Gongsun tree"
+},
+{
+  id: "Q319",
+  title: "Miraland Quiz",
+  question: "Which one does not belong the Life Bits of Home?",
+  answer: "Shopping Carnival"
+},
+{
+  id: "Q320",
+  title: "Miraland Quiz",
+  question: "Which one of the following is not part of Bai Jinjin's Family Treasure 'Stunning Beauty'?",
+  answer: "Umbrella Memory"
+},
+{
+  id: "Q321",
+  title: "Miraland Quiz",
+  question: "Which one Momo will NOT do on Easter day?",
+  answer: "Lght the Red lanterns"
+},
+{
+  id: "Q322",
+  title: "Miraland Quiz",
+  question: "Which School did Timi go to for advanced studies with her senior?",
+  answer: "Cicia Design School"
+},
+{
+  id: "Q323",
+  title: "Miraland Quiz",
+  question: "Which secret organization does Mela, who robbed Lunar's recipe, belong to?",
+  answer: "Iron Rose Stylist Legion"
+},
+{
+  id: "Q324",
+  title: "Miraland Quiz",
+  question: "Which set below does not belong to Pigeon Kingdom?",
+  answer: "Star Seer"
+},
+{
+  id: "Q325",
+  title: "Miraland Quiz",
+  question: "Which set is designed by the heir of the Apple Federation Apparel Group, Kimi?",
+  answer: "Bright Galaxy"
+},
+{
+  id: "Q326",
+  title: "Miraland Quiz",
+  question: "Which skill can remove the effect of Sleeping?",
+  answer: "True Love"
+},
+{
+  id: "Q327",
+  title: "Miraland Quiz",
+  question: "Which story is related to the Saint Patrick's Day?",
+  answer: "Pot of gold"
+},
+{
+  id: "Q328",
+  title: "Miraland Quiz",
+  question: "Which style is the weakness of Bai Jinjin?",
+  answer: "Pigeon"
+},
+{
+  id: "Q329",
+  title: "Miraland Quiz",
+  question: "Which suit belongs to Mori Girl series?",
+  answer: "Deer Elf"
+},
+{
+  id: "Q330",
+  title: "Miraland Quiz",
+  question: "Which suit has different forms in day and night?",
+  answer: "Underworld Lord"
+},
+{
+  id: "Q331",
+  title: "Miraland Quiz",
+  question: "Which theme did Zhong Lizi style to get recognition for, the Chief of North Army?",
+  answer: "Bunny"
+},
+{
+  id: "Q332",
+  title: "Miraland Quiz",
+  question: "Which item can you not buy in User's Shop?",
+  answer: "Pavilion of Mystery Sets"
+},
+{
+  id: "Q333",
+  title: "Miraland Quiz",
+  question: "Which VIP level can get the Umbrella Memory set?",
+  answer: "V12"
+},
+{
+  id: "Q334",
+  title: "Miraland Quiz",
+  question: "Which nation lies in the southwest corner of Miraland?",
+  answer: "Wasteland"
+},
+{
+  id: "Q335",
+  title: "Miraland Quiz",
+  question: "Which of the following foods should not be eaten with crabs?",
+  answer: "Persimmon"
+},
+{
+  id: "Q336",
+  title: "Miraland Quiz",
+  question: "Which of the following trees means 'you have to wait forty years to eat it's fruit'?",
+  answer: "Ginkgo"
+},
+{
+  id: "Q337",
+  title: "Miraland Quiz",
+  question: "Who designed the statue \"summer Foam Sea Songs\"?",
+  answer: "Gradis"
+},
+{
+  id: "Q338",
+  title: "Miraland Quiz",
+  question: "Who does the \"White Fairy with otherworldly elegance that is pure like snow” refer to?",
+  answer: "Immortal in Ancient Tomb"
+},
+{
+  id: "Q339",
+  title: "Miraland Quiz",
+  question: "Who is Orlando's best friend from his school days?",
+  answer: "Flynn"
+},
+{
+  id: "Q340",
+  title: "Miraland Quiz",
+  question: "Who is ranked No.10 in the Iron Rose?",
+  answer: "Debbie"
+},
+{
+  id: "Q341",
+  title: "Miraland Quiz",
+  question: "Who is the Commander-in-Chief of Trye's Coalition?",
+  answer: "Verdfurare"
+},
+{
+  id: "Q342",
+  title: "Miraland Quiz",
+  question: "Who is the designer of the White Swan set?",
+  answer: "Star Seer"
+},
+{
+  id: "Q343",
+  title: "Miraland Quiz",
+  question: "Who is the famous writer Hayden's servant?",
+  answer: "Lilian"
+},
+{
+  id: "Q344",
+  title: "Miraland Quiz",
+  question: "Who is the president of the Mercury Group?",
+  answer: "Reid"
+},
+{
+  id: "Q345",
+  title: "Miraland Quiz",
+  question: "Who put yeast in cloth in Silk Shop and took Lunar away?",
+  answer: "Mayor"
+},
+{
+  id: "Q346",
+  title: "Miraland Quiz",
+  question: "Who said this sentence “Grilled Fish is the most delicious food for me”?",
+  answer: "Momo"
+},
+{
+  id: "Q347",
+  title: "Miraland Quiz",
+  question: "Who sent Yvette a “March Hare” as a gift?",
+  answer: "Nidhogg"
+},
+{
+  id: "Q348",
+  title: "Miraland Quiz",
+  question: "Who summoned Nikki to Miraland?",
+  answer: "Nanari"
+},
+{
+  id: "Q349",
+  title: "Miraland Quiz",
+  question: "Who was apprehended after Star Sea was stolen?",
+  answer: "Lisa"
+},
+{
+  id: "Q350",
+  title: "Miraland Quiz",
+  question: "Who was the person that Nikki met at the Designer's Tea Party that looked like Nikki?",
+  answer: "Bai Jinjin"
+},
+{
+  id: "Q351",
+  title: "Miraland Quiz",
+  question: "Who wrote Nikki's Note in the Time Memory Record (Tour)?",
+  answer: "Nikki"
+},
+{
+  id: "Q352",
+  title: "Miraland Quiz",
+  question: "Who wrote the Time Diary in achievement?",
+  answer: "Nikki"
+},
+{
+  id: "Q353",
+  title: "Miraland Quiz",
+  question: "Whose works were taken by Queen Elle of Pigeon Kingdom in the Nine Day War?",
+  answer: "King Sayet"
+},
+{
+  id: "Q354",
+  title: "Miraland Quiz",
+  question: "Who's the chief designer of Apple Federation Apparel Group?",
+  answer: "Joe"
+},
+{
+  id: "Q355",
+  title: "Miraland Quiz",
+  question: "Who's the little girl Nikki met in Moonlit City?",
+  answer: "The Mayor"
+},
+{
+  id: "Q356",
+  title: "Miraland Quiz",
+  question: "Who's the seer Nikki met in Wasteland?",
+  answer: "Starlet"
+},
+{
+  id: "Q357",
+  title: "Miraland Quiz",
+  question: "Who's the writer of the fairytale: Dream of Evernight Kingdom?",
+  answer: "Hayden"
+},
+{
+  id: "Q358",
+  title: "Miraland Quiz",
+  question: "Who is Lu Yinian?",
+  answer: "Landlady of Moon Inn"
+},
+{
+  id: "Q359",
+  title: "Miraland Quiz",
+  question: "Who are the two characters in the story of Ghost Gathering?",
+  answer: "Stich and Adora"
+},
+{
+  id: "Q360",
+  title: "Miraland Quiz",
+  question: "Who robbed the design of Lunar in Wheat Field?",
+  answer: "Mela"
+},
+{
+  id: "Q361",
+  title: "Miraland Quiz",
+  question: "Who's the character crazily fond of grilled fish?",
+  answer: "Momo"
+},
+{
+  id: "Q362",
+  title: "Miraland Quiz",
+  question: "According to the Stars Record, what is Mela's special skill?",
+  answer: "Snap fingers 30 times in 10s"
+},
+{
+  id: "Q363",
+  title: "Miraland Quiz",
+  question: "After clearing the main stages, where can we review stories and manga?",
+  answer: "In Time Diary"
+},
+{
+  id: "Q364",
+  title: "Miraland Quiz",
+  question: "After giving 10 like in Competition, you can open the gift box, which reward is a possible drop?",
+  answer: "Crystal Rose"
+},
+{
+  id: "Q365",
+  title: "Miraland Quiz",
+  question: "Congrats! you drew a simple Question!",
+  answer: "Choose this one"
+},
+{
+  id: "Q366",
+  title: "Miraland Quiz",
+  question: "If you sign in monthly, which is the set you will obtain in the first month?",
+  answer: "Cinnabar Cloud"
+},
+{
+  id: "Q367",
+  title: "Miraland Quiz",
+  question: "In the first round of the Fantasy Styling Contest, who's Nikki's opponent?",
+  answer: "Sherry"
+},
+{
+  id: "Q368",
+  title: "Miraland Quiz",
+  question: "In which city did Nine-Day War break out?",
+  answer: "Rolterdan"
+},
+{
+  id: "Q369",
+  title: "Miraland Quiz",
+  question: "In which event did we first introduce avatar pendant?",
+  answer: "Haunted Night"
+},
+{
+  id: "Q370",
+  title: "Miraland Quiz",
+  question: "In which show's rehearse Nikki and Royce were invited to join?",
+  answer: "Romeo and Cinderella"
+},
+{
+  id: "Q371",
+  title: "Miraland Quiz",
+  question: "In what chapter does Kimi first show up?",
+  answer: "Chapter 2"
+},
+{
+  id: "Q372",
+  title: "Miraland Quiz",
+  question: "Starlet said: Stars can foresee fate but they cannot foresee ___?",
+  answer: "Direction"
+},
+{
+  id: "Q373",
+  title: "Miraland Quiz",
+  question: "There are 5 tiers in the Stylist Arena. Which is the 3rd tier?",
+  answer: "Senior Stylist"
+},
+{
+  id: "Q374",
+  title: "Miraland Quiz",
+  question: "According to the legend, what did Patrick's walking stick grow into?",
+  answer: "A living tree."
+},
+{
+  id: "Q375",
+  title: "Miraland Quiz",
+  question: "According to the legend, why doesn't Ireland have snakes?",
+  answer: "They had all been banished by Patrick."
+},
+{
+  id: "Q376",
+  title: "Miraland Quiz",
+  question: "Since when does the sun shine directly on the equator and are the lengths of day and night equal?",
+  answer: "Spring Equinox"
+},
+{
+  id: "Q377",
+  title: "Miraland Quiz",
+  question: "The climate with short-term heat recovery after early fall is usually called?",
+  answer: "Autumn Tiger"
+},
+{
+  id: "Q378",
+  title: "Miraland Quiz",
+  question: "How many leaves do Shamrocks usually have?",
+  answer: "Three"
+},
+{
+  id: "Q379",
+  title: "Miraland Quiz",
+  question: "By whom was the idea of celebrating Father's Day introduced in America?",
+  answer: "Sonora Dodd"
+},
+{
+  id: "Q380",
+  title: "Miraland Quiz",
+  question: "What is the theme of Father's Day?",
+  answer: "Honor fathers"
+},
+{
+  id: "Q381",
+  title: "Miraland Quiz",
+  question: "What's the most popular date to celebrate Father's Day publicly?",
+  answer: "Third Sunday in June"
+},
+{
+  id: "Q382",
+  title: "Miraland Quiz",
+  question: "When did people begin to celebrate Father's Day publicly?",
+  answer: "Early 20th century"
+},
+{
+  id: "Q383",
+  title: "Miraland Quiz",
+  question: "Which country first celebrated Father's Day publicly?",
+  answer: "America"
+},
+{
+  id: "Q384",
+  title: "Miraland Quiz",
+  question: "Which factor helped in the establishment of Father's Day?",
+  answer: "Commercial profit"
+},
+{
+  id: "Q385",
+  title: "Miraland Quiz",
+  question: "Which of the following is hardly a gift for Father's Day?",
+  answer: "Sleep the day off"
+},
+{
+  id: "Q386",
+  title: "Miraland Quiz",
+  question: "Which state first celebrated Father's Day?",
+  answer: "Washington"
+},
+{
+  id: "Q387",
+  title: "Miraland Quiz",
+  question: "Which US president signed Father's Day into law and made it a permanent national holiday?",
+  answer: "Nixon"
+},
+{
+  id: "Q388",
+  title: "Miraland Quiz",
+  question: "Who is commonly known as The Father of Video Games?",
+  answer: "Ralph H. Baer"
+},
+{
+  id: "Q389",
+  title: "Miraland Quiz",
+  question: "Who is known as the Father of Medicine?",
+  answer: "Hippocrates"
+},
+{
+  id: "Q390",
+  title: "Miraland Quiz",
+  question: "Who is popularly known as father of History?",
+  answer: "Herodotus"
+},
+{
+  id: "Q391",
+  title: "Miraland Quiz",
+  question: "By Guinness World Records, how many children does the most prolific mother have?",
+  answer: "69"
+},
+{
+  id: "Q392",
+  title: "Miraland Quiz",
+  question: "Which Ancient Civilization first started celebrating Mother's Day?",
+  answer: "Ancient Greece"
+},
+{
+  id: "Q393",
+  title: "Miraland Quiz",
+  question: "What's Mother Teresa known for?",
+  answer: "Charity work"
+},
+{
+  id: "Q394",
+  title: "Miraland Quiz",
+  question: "When is the American Mother's Day?",
+  answer: "The second Sunday of May"
+},
+{
+  id: "Q395",
+  title: "Miraland Quiz",
+  question: "When was the first modern Mother's Day celebrated?",
+  answer: "1908"
+},
+{
+  id: "Q396",
+  title: "Miraland Quiz",
+  question: "When is the date of this year's Mother's Day?",
+  answer: "13th May"
+},
+{
+  id: "Q397",
+  title: "Miraland Quiz",
+  question: "Which of the actions below would not be a good gift for Mother's Day?",
+  answer: "Sleeping for the entire day"
+},
+{
+  id: "Q398",
+  title: "Miraland Quiz",
+  question: "Which of the characters in the game might celebrate Mother's Day?",
+  answer: "Nikki's Mother"
+},
+{
+  id: "Q399",
+  title: "Miraland Quiz",
+  question: "Which of the people below is a mother?",
+  answer: "Marie Curie"
+},
+{
+  id: "Q400",
+  title: "Miraland Quiz",
+  question: "Which option below would be a good Mother's Day Gift?",
+  answer: "Giving your mom a heartfelt hug"
+},
+{
+  id: "Q401",
+  title: "Miraland Quiz",
+  question: "Which person said the following line: “One good mother is worth 100...”?",
+  answer: "George Herbert"
+},
+{
+  id: "Q402",
+  title: "Miraland Quiz",
+  question: "Who is credited with founding Mother's Day?",
+  answer: "Anna Jarvis"
+},
+{
+  id: "Q403",
+  title: "Miraland Quiz",
+  question: "Who is the first woman in the bible?",
+  answer: "Eve"
+},
+{
+  id: "Q404",
+  title: "Miraland Quiz",
+  question: "In Greek mythology, who's known as the mother of gods?",
+  answer: "Rhea"
+},
+{
+  id: "Q405",
+  title: "Miraland Quiz",
+  question: "Usually, which flower will be given on Mother's Day?",
+  answer: "Carnations"
+},
+{
+  id: "Q406",
+  title: "Miraland Quiz",
+  question: "Which is NOT a good choice for Mother's Day?",
+  answer: "Sleep off the day"
+},
+{
+  id: "Q407",
+  title: "Miraland Quiz",
+  question: "Which country celebrates Mother's Day on the second Sunday of May?",
+  answer: "Japan"
+},
+{
+  id: "Q408",
+  title: "Miraland Quiz",
+  question: "Where does modern Mother's Day originate?",
+  answer: "America"
+},
+{
+  id: "Q409",
+  title: "Miraland Quiz",
+  question: "What does NOT Mother's Day honor?",
+  answer: "World peace"
+},
+{
+  id: "Q410",
+  title: "Miraland Quiz",
+  question: "Among Monday to Sunday, which one is for Easter Day?",
+  answer: "Sunday"
+},
+{
+  id: "Q411",
+  title: "Miraland Quiz",
+  question: "What do baby animals represent on Easter?",
+  answer: "Spring and new life"
+},
+{
+  id: "Q412",
+  title: "Miraland Quiz",
+  question: "What do Easter bunnies represent?",
+  answer: "Fertility"
+},
+{
+  id: "Q413",
+  title: "Miraland Quiz",
+  question: "What do people usually do on Easter Day?",
+  answer: "Decorate Eggs"
+},
+{
+  id: "Q414",
+  title: "Miraland Quiz",
+  question: "What might be in the chocolate Easter eggs?",
+  answer: "Candies"
+},
+{
+  id: "Q415",
+  title: "Miraland Quiz",
+  question: "What might Nikki have on Easter breakfast?",
+  answer: "Hot Cross Buns"
+},
+{
+  id: "Q416",
+  title: "Miraland Quiz",
+  question: "When is Easter Day 2019?",
+  answer: "April 21"
+},
+{
+  id: "Q417",
+  title: "Miraland Quiz",
+  question: "Which flower might Nikki send to her friends on Easter?",
+  answer: "Lilies"
+},
+{
+  id: "Q418",
+  title: "Miraland Quiz",
+  question: "Which one will Momo not do on Easter Day?",
+  answer: "Light the Red lanterns"
+},
+{
+  id: "Q419",
+  title: "Miraland Quiz",
+  question: "Which one is not a symbol of Easter?",
+  answer: "Grilled fish"
+},
+{
+  id: "Q420",
+  title: "Miraland Quiz",
+  question: "Which egg-related activity will Nikki not do on Easter?",
+  answer: "Hatch eggs"
+},
+{
+  id: "Q421",
+  title: "Miraland Quiz",
+  question: "What does Easter Day celebrate?",
+  answer: "The resurrection of Jesus"
+},
+{
+  id: "Q422",
+  title: "Miraland Quiz",
+  question: "Which animal is NOT related to Easter?",
+  answer: "Cat"
+},
+{
+  id: "Q423",
+  title: "Miraland Quiz",
+  question: "What do people also call Easter Day?",
+  answer: "Resurrection Sunday"
+},
+{
+  id: "Q424",
+  title: "Silent Night Romance",
+  question: "How many reindeers does Santa Claus have?",
+  answer: "9"
+},
+{
+  id: "Q425",
+  title: "Silent Night Romance",
+  question: "If Santa Claus is leaving for Apple on 25th, but there is a 50% chance that he would be stopped by Ice Queen, when will he arrive?",
+  answer: "In the Christmas Eve"
+},
+{
+  id: "Q426",
+  title: "Silent Night Romance",
+  question: "What's the previous night of Xmas called?",
+  answer: "24th Dec."
+},
+{
+  id: "Q427",
+  title: "Silent Night Romance",
+  question: "What's the common food of Xmas?",
+  answer: "Turkey dinner"
+},
+{
+  id: "Q428",
+  title: "Silent Night Romance",
+  question: "What's the traditional ornament for Xmas?",
+  answer: "Christmas Tree"
+},
+{
+  id: "Q429",
+  title: "Silent Night Romance",
+  question: "What's the classic song for Xmas?",
+  answer: "Jingle Bells"
+},
+{
+  id: "Q430",
+  title: "Silent Night Romance",
+  question: "What's the origin of Xmas?",
+  answer: "Commemorate the birth of Jesus"
+},
+{
+  id: "Q431",
+  title: "Silent Night Romance",
+  question: "What are the classic colors of Xmas?",
+  answer: "Red, Green, White"
+},
+{
+  id: "Q432",
+  title: "Silent Night Romance",
+  question: "What kind of children will receive Christmas gifts?",
+  answer: "On the list of 'Good Children'"
+},
+{
+  id: "Q433",
+  title: "Silent Night Romance",
+  question: "What's a Christmas tree usually?",
+  answer: "Pine"
+},
+{
+  id: "Q434",
+  title: "Silent Night Romance",
+  question: "What's the usual name for Santa Claus?",
+  answer: "Saint Nicolas"
+},
+{
+  id: "Q435",
+  title: "Silent Night Romance",
+  question: "What's the traffic tool of Santa Claus?",
+  answer: "Sleigh"
+},
+{
+  id: "Q436",
+  title: "Silent Night Romance",
+  question: "What's a traditional snack for Christmas?",
+  answer: "Gingerbread"
+},
+{
+  id: "Q437",
+  title: "Silent Night Romance",
+  question: "When is Christmas usually observed?",
+  answer: "Gala Night"
+},
+{
+  id: "Q438",
+  title: "Silent Night Romance",
+  question: "Where does Santa Claus put the gifts?",
+  answer: "In the socks"
+},
+{
+  id: "Q439",
+  title: "Silent Night Romance",
+  question: "Where will Santa Claus send in the gifts?",
+  answer: "In the chimney"
+},
+{
+  id: "Q440",
+  title: "Silent Night Romance",
+  question: "Which animal is known to pull the sleigh for Santa Claus?",
+  answer: "Reindeer"
+},
+{
+  id: "Q441",
+  title: "Silent Night Romance",
+  question: "Which plant is often used to decorate rooms for Xmas?",
+  answer: "Holly, Mistletoe"
+},
+{
+  id: "Q442",
+  title: "Silent Night Romance",
+  question: "Who will give out gifts in Xmas?",
+  answer: "Santa Claus"
+},
+{
+  id: "Q443",
+  title: "Silent Night Romance",
+  question: "Under which plant cannot a person refuse other's kiss on Xmas?",
+  answer: "Mistletoe"
+},
+{
+  id: "Q444",
+  title: "Butterfly Mystery",
+  question: "Contrary to Aria, what's the recitation called?",
+  answer: "Recitative"
+},
+{
+  id: "Q445",
+  title: "Butterfly Mystery",
+  question: "What does the line in a five-line staff mean?",
+  answer: "Musical pitch"
+},
+{
+  id: "Q446",
+  title: "Butterfly Mystery",
+  question: "What does the word Grandet refer to?",
+  answer: "A greedy person"
+},
+{
+  id: "Q447",
+  title: "Butterfly Mystery",
+  question: "What is a common performance during an opera?",
+  answer: "Singing"
+},
+{
+  id: "Q448",
+  title: "Butterfly Mystery",
+  question: "What is a Pulled rickshaw?",
+  answer: "Man-powered cart"
+},
+{
+  id: "Q449",
+  title: "Butterfly Mystery",
+  question: "What medium does Phonograph use to play music?",
+  answer: "Record"
+},
+{
+  id: "Q450",
+  title: "Butterfly Mystery",
+  question: "What should you do when watching an opera?",
+  answer: "Keep quiet"
+},
+{
+  id: "Q451",
+  title: "Butterfly Mystery",
+  question: "What's not a common performance in an opera?",
+  answer: "Magic"
+},
+{
+  id: "Q452",
+  title: "Butterfly Mystery",
+  question: "What's the dress that gets stolen in Sofia's performance?",
+  answer: "Star Sea"
+},
+{
+  id: "Q453",
+  title: "Butterfly Mystery",
+  question: "What's the name of the self-contained solo in opera?",
+  answer: "Aria"
+},
+{
+  id: "Q454",
+  title: "Butterfly Mystery",
+  question: "Which is not a common number of acts that an opera has?",
+  answer: "99"
+},
+{
+  id: "Q455",
+  title: "Butterfly Mystery",
+  question: "Which music is often used in a nostalgic ballroom?",
+  answer: "Jazz"
+},
+{
+  id: "Q456",
+  title: "Butterfly Mystery",
+  question: "Which of following is not the Four Great Comedies of Shakespeare?",
+  answer: "Romeo and Juliet"
+},
+{
+  id: "Q457",
+  title: "Butterfly Mystery",
+  question: "Which of following is not the Four Great Tragedies of Shakespeare?",
+  answer: "Twelfth Night"
+},
+{
+  id: "Q458",
+  title: "Butterfly Mystery",
+  question: "Which of the following is not a commong longtang game?",
+  answer: "Basketball"
+},
+{
+  id: "Q459",
+  title: "Butterfly Mystery",
+  question: "Which of the following is not a major role in the Peking Opera?",
+  answer: "God"
+},
+{
+  id: "Q460",
+  title: "Butterfly Mystery",
+  question: "Which of the following is NOT a reason for rugged walls in a theatre?",
+  answer: "For decoration"
+},
+{
+  id: "Q461",
+  title: "Butterfly Mystery",
+  question: "Which of the following is not a work of December Troupe?",
+  answer: "Romeo and Cinderella"
+},
+{
+  id: "Q462",
+  title: "Butterfly Mystery",
+  question: "Which of the following is not an instrument of an orchestra?",
+  answer: "Harmonica"
+},
+{
+  id: "Q463",
+  title: "Butterfly Mystery",
+  question: "Who is the heroine in the Phantom of the Opera?",
+  answer: "Christine"
+},
+{
+  id: "Q464",
+  title: "Fate Echo",
+  question: "What's the origin of the western astrology?",
+  answer: "Mesopotamia"
+},
+{
+  id: "Q465",
+  title: "Fate Echo",
+  question: "Which of the following doesn't match Wasteland's weather?",
+  answer: "Abundant rain"
+},
+{
+  id: "Q466",
+  title: "Fate Echo",
+  question: "What are the 12 astrological signs?",
+  answer: "12 ecliptic sectors"
+},
+{
+  id: "Q467",
+  title: "Fate Echo",
+  question: "What's the reason of eclipse?",
+  answer: "Sun blocked by earth"
+},
+{
+  id: "Q468",
+  title: "Fate Echo",
+  question: "Which star system does Star Secret theme suits relate to?",
+  answer: "28 Mansions"
+},
+{
+  id: "Q469",
+  title: "Fate Echo",
+  question: "Which NPC knows astrology best?",
+  answer: "Starlet"
+},
+{
+  id: "Q470",
+  title: "Fate Echo",
+  question: "What's the plane that Sun follows over the course of a year?",
+  answer: "Ecliptic"
+},
+{
+  id: "Q471",
+  title: "Fate Echo",
+  question: "Which of the following cannot be done by astrology?",
+  answer: "Change reality"
+},
+{
+  id: "Q472",
+  title: "Fate Echo",
+  question: "Beside human affairs, what's a common usage of orthodox astrology?",
+  answer: "Predict nation fortune"
+},
+{
+  id: "Q473",
+  title: "Fate Echo",
+  question: "When you travel in the Wasteland, what's the least possible thing to see?",
+  answer: "Snow"
+},
+{
+  id: "Q474",
+  title: "Fate Echo",
+  question: "What's the biggest desert in the world?",
+  answer: "Antarctic Desert"
+},
+{
+  id: "Q475",
+  title: "Fate Echo",
+  question: "How to call a watery area in a desert?",
+  answer: "Oasis"
+},
+{
+  id: "Q476",
+  title: "Fate Echo",
+  question: "What's not a necessity for a desert travel?",
+  answer: "Momo"
+},
+{
+  id: "Q477",
+  title: "Fate Echo",
+  question: "Which of the following can help survive a desert?",
+  answer: "Bring sufficient water"
+},
+{
+  id: "Q478",
+  title: "Fate Echo",
+  question: "You see a city in the desert. What could that be?",
+  answer: "Mirage"
+},
+{
+  id: "Q479",
+  title: "Fate Echo",
+  question: "What's a common plant in the desert?",
+  answer: "Cactus"
+},
+{
+  id: "Q480",
+  title: "Fate Echo",
+  question: "What's the device to measure the position of the celestial body?",
+  answer: "Astrolabe"
+},
+{
+  id: "Q481",
+  title: "Fate Echo",
+  question: "What's NOT a common resource in the desert?",
+  answer: "Momo"
+},
+{
+  id: "Q482",
+  title: "Fate Echo",
+  question: "Besides observing, how can ancient people perform astrology?",
+  answer: "Calculate"
+},
+{
+  id: "Q483",
+  title: "Fate Echo",
+  question: "Which celestial body is deemed ominous in ancient times?",
+  answer: "Comet"
+},
+{
+  id: "Q484",
+  title: "Bell Tower Phantom",
+  question: "How many times will minute hand and hour hand coincide in one day?",
+  answer: "22"
+},
+{
+  id: "Q485",
+  title: "Bell Tower Phantom",
+  question: "Which of the following is not a tool to record time?",
+  answer: "Triangular ruler"
+},
+{
+  id: "Q486",
+  title: "Bell Tower Phantom",
+  question: "Which of the following country does prime meridian NOT cross?",
+  answer: "Canada"
+},
+{
+  id: "Q487",
+  title: "Bell Tower Phantom",
+  question: "International date line is not a straight one. Which of the following is NOT around its turning point?",
+  answer: "Strait of Gibraltar"
+},
+{
+  id: "Q488",
+  title: "Bell Tower Phantom",
+  question: "What happens to the date when you cross the international date line from east to west?",
+  answer: "One day forward"
+},
+{
+  id: "Q489",
+  title: "Bell Tower Phantom",
+  question: "What happens to the date when you cross the international date line from west to east?",
+  answer: "One day backward"
+},
+{
+  id: "Q490",
+  title: "Bell Tower Phantom",
+  question: "What is the unit of time in the international system of units?",
+  answer: "Second"
+},
+{
+  id: "Q491",
+  title: "Bell Tower Phantom",
+  question: "How many seconds are there in an hour?",
+  answer: "3600"
+},
+{
+  id: "Q492",
+  title: "Bell Tower Phantom",
+  question: "A clock chimes every other hour. It takes 5 seconds to chime 6 times. How long will it take to chime 12 times?",
+  answer: "11"
+},
+{
+  id: "Q493",
+  title: "Bell Tower Phantom",
+  question: "In the Gregorian calendar year, how often does leap day happen?",
+  answer: "Every 4 years"
+},
+{
+  id: "Q494",
+  title: "Bell Tower Phantom",
+  question: "Which is the slowest pointer on a normal clock?",
+  answer: "Hour hand"
+},
+{
+  id: "Q495",
+  title: "Bell Tower Phantom",
+  question: "At the International Longitude Conference in 1884, in order to avoid the chaos of time, how many time zones are there on the earth surface?",
+  answer: "24"
+},
+{
+  id: "Q496",
+  title: "Bell Tower Phantom",
+  question: "Summer Time is a system regulated by human for saving energy, how?",
+  answer: "Set clock one hour forward"
+},
+{
+  id: "Q497",
+  title: "Bell Tower Phantom",
+  question: "By what principle that pendulum clock records time?",
+  answer: "Isochronism of the pendulum"
+},
+{
+  id: "Q498",
+  title: "Bell Tower Phantom",
+  question: "Who was the inventor of pendulum clock?",
+  answer: "Huygens"
+},
+{
+  id: "Q499",
+  title: "Bell Tower Phantom",
+  question: "What's the working principle of quartz clock?",
+  answer: "Piezoelectric effect"
+},
+{
+  id: "Q500",
+  title: "Bell Tower Phantom",
+  question: "Who was the inventor of quartz clock?",
+  answer: "Warren Marrison"
+},
+{
+  id: "Q501",
+  title: "Bell Tower Phantom",
+  question: "Which is not a main structure of a clock?",
+  answer: "Harajuku"
+},
+{
+  id: "Q502",
+  title: "Bell Tower Phantom",
+  question: "Which of the following factors will affect the accuracy of a clock?",
+  answer: "All the rest"
+},
+{
+  id: "Q503",
+  title: "Bell Tower Phantom",
+  question: "Which of the following is not a type of clock oscillator?",
+  answer: "Dimension Cube"
+},
+{
+  id: "Q504",
+  title: "Moonlight Dancer",
+  question: "Which time unit is related to the moon?",
+  answer: "Month"
+},
+{
+  id: "Q505",
+  title: "Moonlight Dancer",
+  question: "Which of the following is related to the moon?",
+  answer: "Tide"
+},
+{
+  id: "Q506",
+  title: "Moonlight Dancer",
+  question: "When will there be a blood moon?",
+  answer: "Full lunar eclipse"
+},
+{
+  id: "Q507",
+  title: "Moonlight Dancer",
+  question: "When will Lunar Eclipse happen?",
+  answer: "Moon moves into Earth's shadow"
+},
+{
+  id: "Q508",
+  title: "Moonlight Dancer",
+  question: "Which of the following is not a major moon phase?",
+  answer: "Old Moon"
+},
+{
+  id: "Q509",
+  title: "Moonlight Dancer",
+  question: "Which of the following is not true about the moon?",
+  answer: "A person weighs heavier on the moon"
+},
+{
+  id: "Q510",
+  title: "Moonlight Dancer",
+  question: "Which of the following has nothing to do with the moon in myths?",
+  answer: "Fate"
+},
+{
+  id: "Q511",
+  title: "Moonlight Dancer",
+  question: "What animal dwells on the moon in the legend?",
+  answer: "Rabbit"
+},
+{
+  id: "Q512",
+  title: "Moonlight Dancer",
+  question: "What's the goddess of the moon in Greek mythology?",
+  answer: "Selene"
+},
+{
+  id: "Q513",
+  title: "Moonlight Dancer",
+  question: "What's Luna's mount in Roman myth?",
+  answer: "Two-yoke chariot"
+},
+{
+  id: "Q514",
+  title: "Moonlight Dancer",
+  question: "In the legend of Cloud Empire, who is the husband of Chang'e?",
+  answer: "Hou Yi"
+},
+{
+  id: "Q515",
+  title: "Moonlight Dancer",
+  question: "What's not an ingredient of Lady Fu's Osmanthus Cake?",
+  answer: "Garlic"
+},
+{
+  id: "Q516",
+  title: "Moonlight Dancer",
+  question: "Who made the first step on the moon?",
+  answer: "Neil Armstrong"
+},
+{
+  id: "Q517",
+  title: "Moonlight Dancer",
+  question: "Who's the first woman astronaut?",
+  answer: "Valentina Tereshkova"
+},
+{
+  id: "Q518",
+  title: "Moonlight Dancer",
+  question: "When is the Mid-Autumn Day?",
+  answer: "The fifteenth day of the eighth lunar month"
+},
+{
+  id: "Q519",
+  title: "Moonlight Dancer",
+  question: "What's the phase of the moon at the night of Mid-autumn?",
+  answer: "Full Moon"
+},
+{
+  id: "Q520",
+  title: "Moonlight Dancer",
+  question: "Which flower blooms during the Mid-Autumn festival?",
+  answer: "Sweet Osmanthus"
+},
+{
+  id: "Q521",
+  title: "Moonlight Dancer",
+  question: "Which food is not usually enjoyed during the Mid-Autumn Festival?",
+  answer: "Fresh Bamboo Shoots"
+},
+{
+  id: "Q522",
+  title: "Moonlight Dancer",
+  question: "Which is not included in the traditional customs of the Mid-autumn?",
+  answer: "Dragon-boat Racing"
+},
+{
+  id: "Q523",
+  title: "Moonlight Dancer",
+  question: "Which of the following is not the tradition to celebrate the Mid-Autumn Festival?",
+  answer: "Hunting"
+},
+{
+  id: "Q524",
+  title: "Classical Concert",
+  question: "Bassoons belong to which family of woodwind instruments?",
+  answer: "Double Reed"
+},
+{
+  id: "Q525",
+  title: "Classical Concert",
+  question: "Which of the following is called the \"queen of instruments\"?",
+  answer: "Violin"
+},
+{
+  id: "Q526",
+  title: "Classical Concert",
+  question: "Which of the following is called the \"king of instruments\"?",
+  answer: "Piano"
+},
+{
+  id: "Q527",
+  title: "Classical Concert",
+  question: "Which of the following is referred to as the \"heart of the symphony\"?",
+  answer: "Strings"
+},
+{
+  id: "Q528",
+  title: "Classical Concert",
+  question: "Which of the following is not a brass instrument?",
+  answer: "Flute"
+},
+{
+  id: "Q529",
+  title: "Classical Concert",
+  question: "Which of the following is not a woodwind instrument?",
+  answer: "French Horn"
+},
+{
+  id: "Q530",
+  title: "Classical Concert",
+  question: "How many keys does a piano have?",
+  answer: "88"
+},
+{
+  id: "Q531",
+  title: "Classical Concert",
+  question: "To which instrument family does the clarinet belong?",
+  answer: "Single Reed"
+},
+{
+  id: "Q532",
+  title: "Classical Concert",
+  question: "Which instrument has 6 strings?",
+  answer: "Guitar"
+},
+{
+  id: "Q533",
+  title: "Classical Concert",
+  question: "Which string instrument must be played standing up?",
+  answer: "Bass"
+},
+{
+  id: "Q534",
+  title: "Classical Concert",
+  question: "Do you know what instrument is referred to as the \"black pipe\"?",
+  answer: "Clarinet / Single Reed"
+},
+{
+  id: "Q535",
+  title: "Classical Concert",
+  question: "In classical music, what is the term for musical composition that consists of only a single movement?",
+  answer: "Symphonic poem"
+},
+{
+  id: "Q536",
+  title: "Classical Concert",
+  question: "What is the term for musical notes that are off-beat?",
+  answer: "Syncopation"
+},
+{
+  id: "Q537",
+  title: "Classical Concert",
+  question: "Which of the instruments are not a western classical instrument?",
+  answer: "Chinese lute"
+},
+{
+  id: "Q538",
+  title: "Classical Concert",
+  question: "Which of the following is not a necessary part of music?",
+  answer: "Lyrics"
+},
+{
+  id: "Q539",
+  title: "Classical Concert",
+  question: "Which of the following instruments are not played by plucking?",
+  answer: "Flute"
+},
+{
+  id: "Q540",
+  title: "Classical Concert",
+  question: "What is the term for a musical composition that consists of a solo instrument and a symphony?",
+  answer: "Concerto"
+},
+{
+  id: "Q541",
+  title: "Classical Concert",
+  question: "Round dances are also called…?",
+  answer: "Waltz"
+},
+{
+  id: "Q542",
+  title: "Classical Concert",
+  question: "Which instruments in a symphony has the tallest structure, the highest pitch, and the most complex expression?",
+  answer: "Bass, piccolo, violin"
+},
+{
+  id: "Q543",
+  title: "Classical Concert",
+  question: "What is the simplest wind instrument?",
+  answer: "Harmonica"
+},
+{
+  id: "Q544",
+  title: "Classical Concert",
+  question: "Who won one of King Sayet's three legacies?",
+  answer: "Hostess L"
+},
+{
+  id: "Q545",
+  title: "Classical Concert",
+  question: "What is the condition for unlocking the next stage?",
+  answer: "A rating of C or above"
+},
+{
+  id: "Q546",
+  title: "Classical Concert",
+  question: "How many Pink Wings are needed to evolve?",
+  answer: "4"
+},
+{
+  id: "Q547",
+  title: "Classical Concert",
+  question: "Which chapter on the Miraland has the first side quest?",
+  answer: "2"
+},
+{
+  id: "Q548",
+  title: "Smile's Circus Show",
+  question: "How many jokers are there in a pack of cards?",
+  answer: "Two"
+},
+{
+  id: "Q549",
+  title: "Smile's Circus Show",
+  question: "Please identify the following false information.",
+  answer: "Earth is flat"
+},
+{
+  id: "Q550",
+  title: "Smile's Circus Show",
+  question: "What's correct about circus?",
+  answer: "You can watch circus on TV"
+},
+{
+  id: "Q551",
+  title: "Smile's Circus Show",
+  question: "What's NOT a type of magician?",
+  answer: "Stylist"
+},
+{
+  id: "Q552",
+  title: "Smile's Circus Show",
+  question: "What's NOT true about Diamond Mask?",
+  answer: "It can not be removed upon wearing"
+},
+{
+  id: "Q553",
+  title: "Smile's Circus Show",
+  question: "What's NOT true about magic?",
+  answer: "It's supernatural"
+},
+{
+  id: "Q554",
+  title: "Smile's Circus Show",
+  question: "What's the real magic of Magic Card?",
+  answer: "Smile of Claire"
+},
+{
+  id: "Q555",
+  title: "Smile's Circus Show",
+  question: "What's the standard diameter of a tent used in circus?",
+  answer: "42 ft"
+},
+{
+  id: "Q556",
+  title: "Smile's Circus Show",
+  question: "When did modern circus appear?",
+  answer: "18th Century"
+},
+{
+  id: "Q557",
+  title: "Smile's Circus Show",
+  question: "Where did modern circus start?",
+  answer: "England"
+},
+{
+  id: "Q558",
+  title: "Smile's Circus Show",
+  question: "Which act is connected to the name of 'circus'?",
+  answer: "Trick Riding"
+},
+{
+  id: "Q559",
+  title: "Smile's Circus Show",
+  question: "Which of following is a famous magician?",
+  answer: "David Copperfield"
+},
+{
+  id: "Q560",
+  title: "Smile's Circus Show",
+  question: "Which of the following is not an iconic feature of a clown?",
+  answer: "Slender legs"
+},
+{
+  id: "Q561",
+  title: "Smile's Circus Show",
+  question: "Which of the following is not a traditional Chinese festival?",
+  answer: "April Fool's Day"
+},
+{
+  id: "Q562",
+  title: "Smile's Circus Show",
+  question: "Which one is NOT a common act in a circus show?",
+  answer: "Football"
+},
+{
+  id: "Q563",
+  title: "Smile's Circus Show",
+  question: "Which poker card's face is a clown?",
+  answer: "Joker"
+},
+{
+  id: "Q564",
+  title: "Smile's Circus Show",
+  question: "Who's known as the father of modern circus?",
+  answer: "Philip Astley"
+},
+{
+  id: "Q565",
+  title: "Smile's Circus Show",
+  question: "Why does Smile use Magic Card to perform?",
+  answer: "It gives Claire joy"
+},
+{
+  id: "Q566",
+  title: "Smile's Circus Show",
+  question: "Usually, where is a circus held?",
+  answer: "In a tent"
+},
+{
+  id: "Q567",
+  title: "Smile's Circus Show",
+  question: "Usually, which animal is NOT used in a circus show?",
+  answer: "Blue whale"
+},
+{
+  id: "Q568",
+  title: "Midnight Escape",
+  question: "Who is the most dangerous to travel with?",
+  answer: "Fantasy Envoy"
+},
+{
+  id: "Q569",
+  title: "Midnight Escape",
+  question: "Who is generally considered the inventor of detective fiction?",
+  answer: "Edgar Allan Poe"
+},
+{
+  id: "Q570",
+  title: "Midnight Escape",
+  question: "Which of following is reputed to be the 'The Queen of Crime'?",
+  answer: "Agatha Christie"
+},
+{
+  id: "Q571",
+  title: "Midnight Escape",
+  question: "Which of the following is NOT a tool against criminals?",
+  answer: "Lollipop"
+},
+{
+  id: "Q572",
+  title: "Midnight Escape",
+  question: "What should you do if you see someone's wallet stolen?",
+  answer: "Call the police"
+},
+{
+  id: "Q573",
+  title: "Midnight Escape",
+  question: "What should we do first after a burglary occurs in our home?",
+  answer: "Call the police"
+},
+{
+  id: "Q574",
+  title: "Midnight Escape",
+  question: "Who took Lunar in Moonlit City?",
+  answer: "Mayor"
+},
+{
+  id: "Q575",
+  title: "Midnight Escape",
+  question: "No news is 100% true, but what info in the newspaper is usually reliable?",
+  answer: "Date"
+},
+{
+  id: "Q576",
+  title: "Midnight Escape",
+  question: "Which of the following is a famous thief in literary work?",
+  answer: "Arsene Lupin"
+},
+{
+  id: "Q577",
+  title: "Midnight Escape",
+  question: "Which is the first country in the world to set up a police station?",
+  answer: "France"
+},
+{
+  id: "Q578",
+  title: "Midnight Escape",
+  question: "Which of the following is NOT correct against theft?",
+  answer: "Electrify your door"
+},
+{
+  id: "Q579",
+  title: "Midnight Escape",
+  question: "Which place in Miraland should you stay away from?",
+  answer: "The 6th Clinic"
+},
+{
+  id: "Q580",
+  title: "Midnight Escape",
+  question: "Who stormed Moon Inn for Bai Jinjin?",
+  answer: "Qiong"
+},
+{
+  id: "Q581",
+  title: "Midnight Escape",
+  question: "Which country introduced policewoman first?",
+  answer: "Germany"
+},
+{
+  id: "Q582",
+  title: "Midnight Escape",
+  question: "What should you do if you encounter a suspicious person?",
+  answer: "Cautiously avoid him"
+},
+{
+  id: "Q583",
+  title: "Midnight Escape",
+  question: "Which of the following is a detective fiction?",
+  answer: "Murder on the Orient Express"
+},
+{
+  id: "Q584",
+  title: "Midnight Escape",
+  question: "Which of the following is NOT frequently-used by the thief?",
+  answer: "Grilled Fish"
+},
+{
+  id: "Q585",
+  title: "Midnight Escape",
+  question: "Which of the following is the right way to hunt criminals?",
+  answer: "Show identity before arrest"
+},
+{
+  id: "Q586",
+  title: "Midnight Escape",
+  question: "Who was apprehended for stealing Star Sea?",
+  answer: "Sofia"
+},
+{
+  id: "Q587",
+  title: "Midnight Escape",
+  question: "Which of the following treasures doesn't belong to Miraland?",
+  answer: "Frostmourne"
+},
+{
+  id: "Q588",
+  title: "Hip-Hop Hotspot",
+  question: "What forms does graffiti cover?",
+  answer: "All the rest"
+},
+{
+  id: "Q589",
+  title: "Hip-Hop Hotspot",
+  question: "Where does contemporary hip-hop originate?",
+  answer: "America"
+},
+{
+  id: "Q590",
+  title: "Hip-Hop Hotspot",
+  question: "Which function is included in DJ devices?",
+  answer: "All of them"
+},
+{
+  id: "Q591",
+  title: "Hip-Hop Hotspot",
+  question: "What's BPM short for in hip-hop?",
+  answer: "Beats per minute"
+},
+{
+  id: "Q592",
+  title: "Hip-Hop Hotspot",
+  question: "Where does House style originate?",
+  answer: "Chicago"
+},
+{
+  id: "Q593",
+  title: "Hip-Hop Hotspot",
+  question: "What is DJ?",
+  answer: "An occupation"
+},
+{
+  id: "Q594",
+  title: "Hip-Hop Hotspot",
+  question: "What does Freestyle mean in hip-hop?",
+  answer: "Improvised rap"
+},
+{
+  id: "Q595",
+  title: "Hip-Hop Hotspot",
+  question: "Who is known to coin the term 'hip hop'?",
+  answer: "Keith 'Cowboy' Wiggins"
+},
+{
+  id: "Q596",
+  title: "Hip-Hop Hotspot",
+  question: "What's the birthplace of DJ Kool Herc?",
+  answer: "Jamaica"
+},
+{
+  id: "Q597",
+  title: "Hip-Hop Hotspot",
+  question: "What's NOT necessary for street graffiti?",
+  answer: "Lipstick"
+},
+{
+  id: "Q598",
+  title: "Hip-Hop Hotspot",
+  question: "What does Tag refer to in graffiti?",
+  answer: "Signature"
+},
+{
+  id: "Q599",
+  title: "Hip-Hop Hotspot",
+  question: "Usually, what's NOT the feature of hip-hop clothes?",
+  answer: "Grave"
+},
+{
+  id: "Q600",
+  title: "Hip-Hop Hotspot",
+  question: "What's MC short for?",
+  answer: "Master of ceremonies"
+},
+{
+  id: "Q601",
+  title: "Hip-Hop Hotspot",
+  question: "What's NOT the type of street dance?",
+  answer: "Samba"
+},
+{
+  id: "Q602",
+  title: "Hip-Hop Hotspot",
+  question: "Where can you find graffiti usually?",
+  answer: "All the rest"
+},
+{
+  id: "Q603",
+  title: "Hip-Hop Hotspot",
+  question: "When did hip-hop music start?",
+  answer: "1970s"
+},
+{
+  id: "Q604",
+  title: "Hip-Hop Hotspot",
+  question: "What does beatbox mean?",
+  answer: "Vocal percussion"
+},
+{
+  id: "Q605",
+  title: "Hip-Hop Hotspot",
+  question: "Which element is NOT common in hip-hop?",
+  answer: "Symphony"
+},
+{
+  id: "Q606",
+  title: "Hip-Hop Hotspot",
+  question: "What Battling in rap?",
+  answer: "A vocal contest"
+},
+{
+  id: "Q607",
+  title: "Hip-Hop Hotspot",
+  question: "What should you take when you watch a street show?",
+  answer: "All the rest"
+}
+
+];
+
+function esc(s){
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+function normalize(s){
+  return String(s ?? '').trim().toLowerCase();
+}
+
+function resolveAnswerText(q){
+  // Prefer explicit answer text
+  if(q.answer != null && String(q.answer).trim() !== '') return String(q.answer);
+
+  // Back-compat: if old data uses answerIndex + choices
+  if(Array.isArray(q.choices) && q.choices.length && typeof q.answerIndex === 'number'){
+    return q.choices[q.answerIndex] ?? '';
+  }
+  return '';
+}
+
+function render(list){
+  const root = document.getElementById('quizList');
+  if(!list.length){
+    root.innerHTML = '<div class="empty">해당 없음</div>';
+    return;
+  }
+
+  root.innerHTML = list.map((q, idx) => {
+    const choices = Array.isArray(q.choices) ? q.choices : [];
+    const answerText = resolveAnswerText(q);
+    const answerNorm = normalize(answerText);
+
+    // If choices exist, try to find matching choice index for nicer display
+    let answerPos = -1;
+    if(choices.length && answerNorm){
+      for(let i=0;i<choices.length;i++){
+        if(normalize(choices[i]) === answerNorm){
+          answerPos = i; break;
+        }
+      }
+    }
+
+    const choiceHtml = choices.length
+      ? '<div class="choices">' + choices.map((c,i)=>(
+          '<div class="choice">'+esc((i+1)+'. '+c)+'</div>'
+        )).join('') + '</div>'
+      : '';
+
+    const exp = q.explanation ? '<div class="exp">'+esc(q.explanation)+'</div>' : '';
+
+    let answerLabel = '(정답 미설정)';
+    if(answerText && choices.length){
+      answerLabel = (answerPos >= 0) ? `${answerPos+1}번) ${answerText}` : `${answerText} (⚠ 보기와 불일치)`;
+    }else if(answerText){
+      answerLabel = answerText; // 주관식
+    }
+
+    return `
+      <div class="card">
+        <div class="top">
+          <div class="qid">${esc(q.id || ('Q'+(idx+1)))}</div>
+          <div class="muted">#${idx+1}</div>
+        </div>
+        <div class="qtitle">${esc(q.title || ('문제 '+(idx+1)))}</div>
+        <div class="qtext">${esc(q.question || '')}</div>
+
+        <details class="detail">
+          <summary>정답 보기</summary>
+          ${choiceHtml}
+          <div class="answer">
+            <b>정답</b>
+            ${esc(answerLabel)}
+            ${exp}
+          </div>
+        </details>
+      </div>
+    `;
+  }).join('');
+}
+
+function getFiltered(){
+  const kw = (document.getElementById('qSearch').value || '').trim().toLowerCase();
+  if(!kw) return QUIZ_QUESTIONS.slice();
+  return QUIZ_QUESTIONS.filter(q=>{
+    const t = (q.title||'').toLowerCase();
+    const c = (q.question||'').toLowerCase();
+    return t.includes(kw) || c.includes(kw);
+  });
+}
+
+document.getElementById('qSearch').addEventListener('input', ()=>render(getFiltered()));
+document.getElementById('btnExpand').addEventListener('click', ()=>{
+  document.querySelectorAll('details.detail').forEach(d=>d.open=true);
+});
+document.getElementById('btnCollapse').addEventListener('click', ()=>{
+  document.querySelectorAll('details.detail').forEach(d=>d.open=false);
+});
+
+// initial
+render(QUIZ_QUESTIONS.slice());
+</script>
+
+</body>
+</html>
