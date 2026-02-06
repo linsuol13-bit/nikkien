@@ -4,18 +4,20 @@
 (function(){
   var ITEMS = [
 {
-      part: "헤어",
-      name: "Nikki's Pinky",
-      stars: 2,
-      code: 1,
-      simple: "S",
-      lively: "A",
-      cute: "A",
-      pure: "A",
-      warm: "A",
+  part: "헤어",
+  name: "Nikki's Pinky",
+  stars: 2,
+  code: 1,
+  simple: "S",
+  lively: "A",
+  cute: "A",
+  pure: "A",
+  warm: "A",
   tags: ["기본핑크헤어"],
-      img: "https://drive.google.com/thumbnail?id=1MXJSVznrCvtsJEn7pBgTU7bAvpHZFiro&sz=w1000"
-    },
+  source: [], // 획득경로 없음(기본 지급)
+  img: "https://drive.google.com/thumbnail?id=1MXJSVznrCvtsJEn7pBgTU7bAvpHZFiro&sz=w1000"
+},
+
 {
   part: "헤어",
   name: "Sporty Teenager",
@@ -27,7 +29,7 @@
   pure: "S",
   cool: "A",
   tags: ["보이시룩", "unisex", "체육소년"],
-  source: ["shop_gold"],
+  source: ["shop_gold", "cinderella_secret", "cinderella_dream"],
   img: "https://drive.google.com/thumbnail?id=1K4jr_czjlTNi1ASrAVJpR62f6umk4_8S&sz=w1000"
 },
 {
@@ -61644,19 +61646,6 @@ part: "장식 - 소품 - 소품(우)",
 },
 {
   part: "헤어",
-  name: "Dawnstar",
-  stars: 5,
-  code: 868,
-  flair: "A",
-  pure: "S",
-  lively: "SS",
-  cool: "A",
-  cute: "S",
-  tags: ["새벽별"],
-  img: "https://drive.google.com/thumbnail?id=1dY5SGFDVeaoliH5PRUOzUWYZQaGRGmui&sz=w1000"
-},
-{
-  part: "헤어",
   name: "Vane",
   stars: 5,
   code: 869,
@@ -65402,18 +65391,35 @@ part: "장식 - 소품 - 소품(우)",
   tags: ["삐에로분장"],
   img: "https://drive.google.com/thumbnail?id=1SyNoewUkDiIttfno3YxgikR64dqHdKak&sz=w1000"
 },
+{
+  part: "하의",
+  name: "Kagamine Rin·Shorts",
+  stars: 5,
+  code: 625,
+  simple: "A",
+  pure: "SS",
+  lively: "A",
+  cool: "A",
+  cute: "SS",
+  tags: ["린반바지"],
+  img: "https://drive.google.com/thumbnail?id=1GEcGtUK_D5KdXmAWA9eksY2zXy2T7pur&sz=w1000"
+},
+{
+  part: "헤어",
+  name: "Trailed Upstyle",
+  stars: 3,
+  code: 1001,
+  simple: "S",
+  sexy: "A",
+  elegant: "A",
+  cool: "A",
+  mature: "S",
+  tags: ["달콤한헤어"],
+  img: "https://drive.google.com/thumbnail?id=1qn8oaIhaHunUc6qbshTM2gh0T6TbC-Cp&sz=w1000"
+},
 
   ];
-  
-// ---- expose minimal item index to parent via postMessage (file:// safe) ----
-try{
-  var __ITEMS_INDEX = ITEMS.map(function(item){
-    return { code:item.code, part:item.part, name:item.name, img:item.img };
-  });
-  window.parent.postMessage({ type:"ITEMS_INDEX", items: __ITEMS_INDEX }, "*");
-}catch(e){}
-// ---------------------------------------------------------------------------
-// Make them global for contentWindow access
+  // Make them global for contentWindow access
   window.ITEMS = ITEMS;
   window.items = ITEMS;
   // Notify parent (index)
