@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>아이템 정보</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,AppleSDGothicNeo,Segoe UI,Roboto,sans-serif;background:#f7f7fb;color:#222}
+  .wrap{display:flex;gap:12px;padding:12px}
+  .sidebar{width:320px;max-width:40vw;background:#fff;border:1px solid #eee;border-radius:12px;overflow:auto}
+  .side-head{padding:12px 12px 6px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+  .side-head b{font-size:14px}
+  .side-head .total{font-size:12px;color:#666}
+  .list{padding:6px}
+  .itembtn{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;
+           padding:9px 10px;border:1px solid transparent;background:#fff;border-radius:10px;cursor:pointer}
+  .itembtn:hover{background:#fafafa}
+  .itembtn.active{background:#f0f7ff;border-color:#cfe4ff}
+  .badge{font-size:12px;background:#e9f3ff;border:1px solid #cfe4ff;border-radius:999px;padding:2px 8px;color:#225}
+  .main{flex:1;min-width:0}
+  .toolbar{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-bottom:10px}
+  input,select,button{padding:8px;border:1px solid #ddd;border-radius:10px;background:#fff}
+  button{cursor:pointer}
+  .card{background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden}
+  .thumb{width:44px;height:44px;object-fit:cover;border-radius:10px;border:1px solid #eee;display:block;background:#fafafa}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:left;font-size:13px}
+  th{background:#fafafa;font-weight:700}
+  .muted{color:#777;font-size:12px}
+  .empty{padding:20px;text-align:center;color:#666}
+
+/* ===== 아이템 상세 팝업(dialog) ===== */
+.detailDialog{
+  width:min(980px, calc(100vw - 24px));
+  max-width:980px;
+  border:none;
+  padding:0;
+  border-radius:14px;
+  background:transparent;
+}
+.detailDialog::backdrop{
+  background:rgba(0,0,0,.45);
+}
+.detailDialogBox{
+  margin:0;
+  padding:0;
+  background:#fff;
+  border:1px solid #eee;
+  border-radius:14px;
+  overflow:hidden;
+}
+.detailDialogHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 12px;
+  border-bottom:1px solid #eee;
+  background:#fff;
+}
+.detailClose{
+  border:1px solid #ddd;
+  background:#fff;
+  border-radius:10px;
+  width:34px;height:34px;
+  cursor:pointer;
+}
+.detailClose:hover{ background:#fafafa; }
+.detailFrame{
+  width:100%;
+  height:min(78vh, 820px);
+  border:0;
+  display:block;
+  background:#f7f7fb;
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="sidebar">
+    <div class="side-head">
+      <b>아이템 정보</b>
+      <span class="total" id="totalText">Total 0</span>
+    </div>
+    <div class="list" id="partList"></div>
+  </aside>
+
+  <main class="main">
+    <div class="toolbar">
+      <input id="q" type="text" placeholder="이름/태그 검색" />
+      <select id="sort">
+        <option value="part_code" selected>부위→코드</option>
+        <option value="code">코드순</option>
+        <option value="name">이름순</option>
+        <option value="stars">별순</option>
+      </select>
+      <button id="clear">지우기</button>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:64px">이미지</th>
+            <th style="width:80px">코드</th>
+            <th>이름</th>
+            <th style="width:70px">별</th>
+            <th style="width:220px">부위</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="empty" id="empty" style="display:none">표시할 아이템이 없어요.</div>
+    </div>
+    <div id="pager" style="display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin-top:10px">
+      <span class="muted" id="pageInfo"></span>
+      <button id="prevPage" type="button">이전</button>
+      <button id="nextPage" type="button">다음</button>
+    </div>
+    <div class="muted" style="padding:8px 2px">※ 이 탭은 스테이지/추천 필터와 완전히 분리되어 있어.</div>
+
+    <!-- ✅ 아이템 상세 팝업: 새 창 없이 여기서만 뜸 -->
+    <dialog id="detailDialog" class="detailDialog">
+      <form method="dialog" class="detailDialogBox">
+        <div class="detailDialogHead">
+          <b>아이템 상세</b>
+          <button type="submit" class="detailClose" aria-label="닫기">✕</button>
+        </div>
+        <iframe id="detailFrame" class="detailFrame" src=""></iframe>
+      </form>
+    </dialog>
+
+</main>
+</div>
+
+<script>
+(function(){
+  const DETAIL_BASE = '.';
+  function openDetail(it){
+    if (!it) return;
+    const code = it.code ?? it.itemCode ?? '';
+    const part = it.part ?? '';
+    if (code === '' || code === null || code === undefined) return;
+
+    const safePart = String(part||'').trim().replace(/[\/]/g,'_');
+    const file = `${code}_${safePart}-${code}.html`;
+    const url = encodeURI(file);
+
+    // ✅ 새 창 금지: dialog 팝업으로만 열기
+    const dlg = document.getElementById('detailDialog');
+    const frame = document.getElementById('detailFrame');
+    if (!dlg || !frame) return;
+
+    frame.src = url;
+    if (typeof dlg.showModal === 'function'){
+      dlg.showModal();
+    }else{
+      // 구형 브라우저 fallback: 같은 페이지에서라도 보이게
+      frame.style.display = 'block';
+    }
+  }
+
+  // dialog 닫힐 때 iframe 초기화(메모리/스크롤 유지 방지)
+  (function(){
+    const dlg = document.getElementById('detailDialog');
+    const frame = document.getElementById('detailFrame');
+    if (!dlg || !frame) return;
+    dlg.addEventListener('close', ()=>{ try{ frame.src=''; }catch(e){} });
+    dlg.addEventListener('cancel', ()=>{ try{ frame.src=''; }catch(e){} });
+  })();
+
+  const PARTS = [
+    {label:'전체', parts:null},
+    {label:'헤어', parts:['헤어']},
+    {label:'원피스', parts:['원피스']},
+    {label:'아우터', parts:['아우터']},
+    {label:'상의', parts:['상의']},
+    {label:'하의', parts:['하의']},
+    {label:'양말', parts:['양말']},
+    {label:'양말장식', parts:['양말장식']},
+    {label:'신발', parts:['신발']},
+    {label:'뷰티', parts:['뷰티']},
+    {label:'반딧불의 영혼', parts:['반딧불의 영혼']},
+
+    // Accessory groups (exact part keys)
+    {label:'머리', parts:['장식 - 머리 - 머리']},
+    {label:'베일', parts:['장식 - 머리 - 베일']},
+    {label:'헤어핀', parts:['장식 - 머리 - 헤어핀']},
+    {label:'귀장식', parts:['장식 - 머리 - 귀']},
+    {label:'귀', parts:['장식 - 귀']},
+    {label:'목도리', parts:['장식 - 목 - 목도리']},
+    {label:'목걸이', parts:['장식 - 목 - 목걸이']},
+    {label:'팔찌(우)', parts:['장식 - 손 - 팔찌(우)']},
+    {label:'팔찌(좌)', parts:['장식 - 손 - 팔찌(좌)']},
+    {label:'장갑', parts:['장식 - 손 - 장갑']},
+    {label:'소품(우)', parts:['장식 - 소품 - 소품(우)']},
+    {label:'소품(좌)', parts:['장식 - 소품 - 소품(좌)']},
+    {label:'양손', parts:['장식 - 소품 - 양손']},
+    {label:'허리', parts:['장식 - 허리']},
+    {label:'얼굴', parts:['장식 - 특수 - 얼굴']},
+    {label:'가슴', parts:['장식 - 특수 - 가슴']},
+    {label:'문신', parts:['장식 - 특수 - 문신']},
+    {label:'날개', parts:['장식 - 특수 - 날개']},
+    {label:'꼬리', parts:['장식 - 특수 - 꼬리']},
+    {label:'전경', parts:['장식 - 특수 - 전경']},
+    {label:'배경', parts:['장식 - 특수 - 배경']},
+    {label:'상단', parts:['장식 - 특수 - 상단']},
+    {label:'하단', parts:['장식 - 특수 - 하단']},
+    {label:'스킨', parts:['장식 - 특수 - 스킨']},
+  ];
+
+  let ITEMS = [];
+  let active = 0;
+  const PAGE_SIZE = 100;
+  let page = 1;
+
+  // Part order for default sorting (matches sidebar order)
+  const PART_ORDER = new Map();
+  (function(){
+    let idx = 0;
+    for (const p of PARTS){
+      if (!p.parts) continue; // skip '전체'
+      for (const key of p.parts){
+        if (!PART_ORDER.has(key)) PART_ORDER.set(key, idx);
+      }
+      idx++;
+    }
+  })();
+
+  const $ = (id)=>document.getElementById(id);
+  const partList = $('partList');
+  const rows = $('rows');
+  const empty = $('empty');
+  const totalText = $('totalText');
+
+  function normTags(t){
+    if (!t) return [];
+    if (Array.isArray(t)) return t.map(String);
+    return String(t).split(/[,\s#]+/).filter(Boolean);
+  }
+
+  function buildSidebar(){
+    partList.innerHTML = '';
+    const counts = new Map();
+    for (const p of PARTS){
+      if (!p.parts){ counts.set(p.label, ITEMS.length); continue; }
+      const c = ITEMS.filter(it => p.parts.includes(String(it.part||''))).length;
+      counts.set(p.label, c);
+    }
+    PARTS.forEach((p, idx)=>{
+      const btn = document.createElement('button');
+      btn.className = 'itembtn' + (idx===active ? ' active':'');
+      btn.type = 'button';
+      btn.innerHTML = `<span>${p.label}</span><span class="badge">${counts.get(p.label) || 0}</span>`;
+      btn.addEventListener('click', ()=>{
+        active = idx;
+        [...partList.querySelectorAll('.itembtn')].forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        render();
+      });
+      partList.appendChild(btn);
+    });
+    totalText.textContent = 'Total ' + ITEMS.length;
+  }
+
+  function getFiltered(){
+    const q = $('q').value.trim().toLowerCase();
+    const sort = $('sort').value;
+
+    let list = ITEMS.slice();
+    const p = PARTS[active];
+    if (p && p.parts){
+      list = list.filter(it => p.parts.includes(String(it.part||'')));
+    }
+
+    if (q){
+      list = list.filter(it=>{
+        const name = String(it.name||'').toLowerCase();
+        const tags = normTags(it.tags).join(' ').toLowerCase();
+        return name.includes(q) || tags.includes(q);
+      });
+    }
+
+    if (sort === 'stars'){
+      list.sort((a,b)=>(Number(b.stars)||0)-(Number(a.stars)||0));
+    }else if (sort === 'name'){
+      list.sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''), 'ko'));
+    }else if (sort === 'part_code'){
+      // 1순위: 부위(정의된 순서), 2순위: 코드
+      const byCode = (x)=>Number(x.code)||0;
+      const byPart = (x)=>PART_ORDER.get(String(x.part||'')) ?? 9999;
+      list.sort((a,b)=>{
+        // If a specific part is selected, just sort by code for that part
+        if (PARTS[active] && PARTS[active].parts) return byCode(a)-byCode(b);
+        const d = byPart(a)-byPart(b);
+        if (d !== 0) return d;
+        const c = byCode(a)-byCode(b);
+        if (c !== 0) return c;
+        return String(a.name||'').localeCompare(String(b.name||''), 'ko');
+      });
+    }else{
+      // code
+      list.sort((a,b)=>(Number(a.code)||0)-(Number(b.code)||0));
+    }
+    return list;
+  }
+
+  function render(){
+    const list = getFiltered();
+    const total = list.length;
+    const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    if (page > totalPages) page = totalPages;
+    if (page < 1) page = 1;
+
+    const start = (page - 1) * PAGE_SIZE;
+    const view = list.slice(start, start + PAGE_SIZE);
+
+    rows.innerHTML = '';
+    empty.style.display = total ? 'none' : 'block';
+
+    const frag = document.createDocumentFragment();
+    for (const it of view){
+      const tr = document.createElement('tr');
+      tr.classList.add('clickable');
+      tr.addEventListener('click', ()=> openDetail(it));
+      const img = it.img ? String(it.img) : '';
+      const safeImg = img && !img.startsWith('data:') ? img : '';
+      tr.innerHTML = `
+        <td>${safeImg ? `<img loading="lazy" decoding="async" fetchpriority="low" class="thumb" src="${safeImg}" alt="">` : ''}</td>
+        <td>${it.code ?? ''}</td>
+        <td>${(it.name ?? '')}</td>
+        <td>${it.stars ?? ''}</td>
+        <td>${it.part ?? ''}</td>
+      `;
+      const timg = tr.querySelector('.thumb');
+      if (timg){
+        timg.addEventListener('click', (e)=>{ e.stopPropagation(); openDetail(it); });
+      }
+      frag.appendChild(tr);
+    }
+    rows.appendChild(frag);
+
+    // pager
+    const pager = document.getElementById('pager');
+    const info = document.getElementById('pageInfo');
+    const prev = document.getElementById('prevPage');
+    const next = document.getElementById('nextPage');
+
+    if (pager) pager.style.display = (total > PAGE_SIZE) ? 'flex' : 'none';
+    if (info) info.textContent = total ? `${page}/${totalPages} 페이지 · ${total}개` : '';
+    if (prev){
+      prev.disabled = (page <= 1);
+      if (!prev.__bind){
+        prev.__bind = true;
+        prev.addEventListener('click', ()=>{ if (page > 1){ page--; render(); } });
+      }
+    }
+    if (next){
+      next.disabled = (page >= totalPages);
+      if (!next.__bind){
+        next.__bind = true;
+        next.addEventListener('click', ()=>{ if (page < totalPages){ page++; render(); } });
+      }
+    }
+  }
+
+  $('clear').addEventListener('click', ()=>{
+    $('q').value = '';
+    $('sort').value = 'part_code';
+    active = 0;
+    buildSidebar();
+    render();
+  });
+  $('q').addEventListener('input', ()=>{ page = 1; render(); });
+  $('sort').addEventListener('change', ()=>{ page = 1; render(); });
+
+  // Message bridge
+  window.addEventListener('message', (ev)=>{
+    const msg = ev && ev.data;
+    if (!msg || typeof msg !== 'object') return;
+    if (msg.type === 'ITEMSINFO_DATA'){
+      const arr = Array.isArray(msg.items) ? msg.items : [];
+      ITEMS = arr.filter(x => x && typeof x === 'object');
+      page = 1;
+      buildSidebar();
+      render();
+    }
+  });
+
+  // Request data on load
+  window.parent && window.parent.postMessage({type:'ITEMSINFO_REQUEST_DATA'}, '*');
+})();
+</script>
+</body>
+</html>

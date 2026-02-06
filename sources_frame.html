@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>획득경로</title>
+<style>
+
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,AppleSDGothicNeo,Segoe UI,Roboto,sans-serif;background:#f7f7fb;color:#222}
+  .wrap{display:flex;gap:12px;padding:12px}
+  .sidebar{width:320px;max-width:40vw;background:#fff;border:1px solid #eee;border-radius:12px;overflow:auto}
+  .side-head{padding:12px 12px 6px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+  .side-head b{font-size:14px}
+  .side-head .total{font-size:12px;color:#666}
+  .list{padding:6px}
+  .itembtn{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;
+           padding:9px 10px;border:1px solid transparent;background:#fff;border-radius:10px;cursor:pointer}
+  .itembtn:hover{background:#fafafa}
+  .itembtn.active{background:#f0f7ff;border-color:#cfe4ff}
+  .badge{font-size:12px;background:#e9f3ff;border:1px solid #cfe4ff;border-radius:999px;padding:2px 8px;color:#225}
+  .main{flex:1;min-width:0}
+  .toolbar{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-bottom:10px}
+  input,select,button{padding:8px;border:1px solid #ddd;border-radius:10px;background:#fff}
+  button{cursor:pointer}
+  .card{background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden}
+  .thumb{width:44px;height:44px;object-fit:cover;border-radius:10px;border:1px solid #eee;display:block;background:#fafafa}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:left;font-size:13px}
+  th{background:#fafafa;font-weight:700}
+  .muted{color:#777;font-size:12px}
+  .empty{padding:20px;text-align:center;color:#666}
+
+/* ===== 아이템 상세 팝업(dialog) ===== */
+.detailDialog{
+  width:min(980px, calc(100vw - 24px));
+  max-width:980px;
+  border:none;
+  padding:0;
+  border-radius:14px;
+  background:transparent;
+}
+.detailDialog::backdrop{
+  background:rgba(0,0,0,.45);
+}
+.detailDialogBox{
+  margin:0;
+  padding:0;
+  background:#fff;
+  border:1px solid #eee;
+  border-radius:14px;
+  overflow:hidden;
+}
+.detailDialogHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 12px;
+  border-bottom:1px solid #eee;
+  background:#fff;
+}
+.detailClose{
+  border:1px solid #ddd;
+  background:#fff;
+  border-radius:10px;
+  width:34px;height:34px;
+  cursor:pointer;
+}
+.detailClose:hover{ background:#fafafa; }
+.detailFrame{
+  width:100%;
+  height:min(78vh, 820px);
+  border:0;
+  display:block;
+  background:#f7f7fb;
+}
+
+
+
+/* 획득경로 전용(아이템정보 스타일에 맞춘 최소 추가) */
+.sourceNote{padding:8px 2px}
+.sourceNote .muted{color:#777;font-size:12px}
+.pill{font-size:12px;background:#f6f7ff;border:1px solid #dbe6ff;border-radius:999px;padding:2px 8px;color:#225}
+.toolbar-left{justify-content:flex-start}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="sidebar">
+    <div class="side-head">
+      <b>획득경로</b>
+      <span class="total" id="totalText">Total 0</span>
+    </div>
+    <div class="list" id="sourceList"></div>
+  </aside>
+
+  <main class="main">
+    <div class="toolbar toolbar-left">
+      <span class="pill" id="activeLabel">전체</span>
+      <span class="muted" id="statusText">아이템 데이터 요청중…</span>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:64px">이미지</th>
+            <th style="width:80px">코드</th>
+            <th>이름</th>
+            <th style="width:220px">부위</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="empty" id="empty" style="display:none">표시할 아이템이 없어요.</div>
+    </div>
+
+    <div class="sourceNote">
+    </div>
+  </main>
+</div>
+
+    <dialog id="detailDialog" class="detailDialog">
+      <form method="dialog" class="detailDialogBox">
+        <div class="detailDialogHead">
+          <b>아이템 상세</b>
+          <button type="submit" class="detailClose" aria-label="닫기">✕</button>
+        </div>
+        <iframe id="detailFrame" class="detailFrame" src=""></iframe>
+      </form>
+    </dialog>
+
+
+<!-- sources_data.html 안에서 SOURCE_MAP을 parent.postMessage로 전달함 -->
+<iframe id="sourceDataLoader" src="sources_data.html" style="display:none"></iframe>
+<iframe id="itemsLoader" src="items.html" style="display:none"></iframe>
+<script>
+(function(){
+  // ====== SOURCES 목록(id는 sources_data.html의 sources 배열에 넣는 값) ======
+  const SOURCES = [
+    {id:"all", label:"전체"},
+    {id:"stage_girl", label:"소녀급 스테이지"},
+    {id:"stage_princess", label:"공주급 스테이지"},
+    {id:"shop_dia", label:"상점 다이아"},
+    {id:"shop_gold", label:"상점 골드"},
+    {id:"blueprint", label:"도안제작"},
+    {id:"blueprint_evo", label:"도안제작 진화"},
+    {id:"reforge", label:"리폼"},
+    {id:"evolution", label:"진화"},
+    {id:"club_shop", label:"클럽상점"},
+    {id:"club_war", label:"클럽대전"},
+    {id:"club_exchange", label:"클럽교환"},
+    {id:"event", label:"이벤트"},
+    {id:"dream_academy", label:"꿈의학회"},
+    {id:"secret_shop", label:"시크릿샵"},
+    {id:"cinderella_secret", label:"신데렐라의비밀"},
+    {id:"cinderella_dream", label:"신데렐라의꿈"},
+    {id:"cinderella_exchange", label:"신데렐라교환"},
+    {id:"mysterious_island", label:"신비한섬"},
+    {id:"achievement", label:"업적"},
+    {id:"audition_shop", label:"오디션상점"},
+    {id:"attendance", label:"출석보상"},
+    {id:"vip", label:"VIP"},
+    {id:"first_charge", label:"첫충전"},
+    {id:"cloud_tower", label:"구름천탑"},
+    {id:"moon_night", label:"달밤의비밀"},
+    {id:"wish_gate", label:"소원의문"},
+    {id:"item_exchange", label:"아이템교환"},
+    {id:"decompose_evo", label:"분해진화"},
+    {id:"decompose", label:"분해"},
+  ];
+
+  const $ = (id)=>document.getElementById(id);
+  const sourceList = $("sourceList");
+  const totalText = $("totalText");
+  const rows = $("rows");
+  const empty = $("empty");
+  const activeLabel = $("activeLabel");
+  const statusText = $("statusText");
+
+  let ITEMS = []; // full items array from parent
+  let SOURCE_MAP_DATA = []; // from sources_data.html
+  let active = "all";
+
+  function normSourceMap(sm){
+    if(!sm) return [];
+    // array form expected: [{part,code,sources:[...]}]
+    if(Array.isArray(sm)) return sm.filter(x=>x && typeof x === "object");
+    // object form: {sourceId:[{part,code}...]} -> convert to array
+    const out = [];
+    for(const sid of Object.keys(sm)){
+      const arr = Array.isArray(sm[sid]) ? sm[sid] : [sm[sid]];
+      for(const r of arr){
+        if(r && typeof r === "object") out.push({part:r.part, code:r.code, sources:[sid]});
+      }
+    }
+    return out;
+  }
+
+  function buildIndex(){
+    const byKey = Object.create(null);
+    for(const it of ITEMS){
+      const part = String(it.part||"");
+      const code = it.code;
+      if(code === null || code === undefined) continue;
+      byKey[part + "||" + code] = it;
+    }
+    return byKey;
+  }
+
+  function buildCounts(map, byKey){
+    const counts = Object.create(null);
+    for(const s of SOURCES) counts[s.id] = 0;
+
+    // 기본값
+    counts["all"] = 0;
+
+    if(!map.length || !ITEMS.length) return counts;
+
+    // ✅ 전체(all)는 "매핑된 unique 아이템 수"로 계산
+    const uniqAll = new Set();
+
+    for(const row of map){
+      const part = row.part;
+      const code = row.code;
+      const sources = row.sources || row.source || row.sourceIds || row.source_ids;
+      if(!part || code === null || code === undefined || !sources) continue;
+
+      const key = String(part) + "||" + String(code);
+      if(!byKey[key]) continue;
+
+      uniqAll.add(key);
+
+      const arr = Array.isArray(sources) ? sources : [sources];
+      for(const sid of arr){
+        const id = String(sid).trim();
+        if(!id) continue;
+        counts[id] = (counts[id]||0) + 1;
+      }
+    }
+
+    counts["all"] = uniqAll.size;
+    return counts;
+  }
+
+  function renderSidebar(){
+    const map = normSourceMap(SOURCE_MAP_DATA);
+    const byKey = buildIndex();
+    const counts = buildCounts(map, byKey);
+
+    const uniq = new Set();
+    for(const row of map){
+      if(row && row.part && row.code != null){
+        const key = String(row.part) + "||" + String(row.code);
+        if(byKey[key]) uniq.add(key);
+      }
+    }
+    totalText.textContent = "Total " + (ITEMS.length ? uniq.size : 0);
+
+    sourceList.innerHTML = "";
+    for(const s of SOURCES){
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "itembtn" + (s.id===active ? " active" : "");
+      btn.dataset.source = s.id;
+      btn.innerHTML = "<span>"+s.label+"</span><span class='badge'>"+(counts[s.id]||0)+"</span>";
+      btn.addEventListener("click", ()=>{
+        active = s.id;
+        activeLabel.textContent = s.label;
+        [...sourceList.querySelectorAll('.itembtn')].forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        renderTable();
+      });
+      sourceList.appendChild(btn);
+    }
+  }
+
+  function renderTable(){
+    const map = normSourceMap(SOURCE_MAP_DATA);
+    const byKey = buildIndex();
+
+    const wants = [];
+    if(active === "all"){
+      for(const row of map){
+        if(row && row.part && row.code != null) wants.push({part:row.part, code:row.code});
+      }
+    }else{
+      for(const row of map){
+        const sources = row.sources || row.source || row.sourceIds || row.source_ids;
+        const arr = Array.isArray(sources) ? sources : [sources];
+        if(arr.map(String).includes(active)) wants.push({part:row.part, code:row.code});
+      }
+    }
+
+    const out = [];
+    for(const w of wants){
+      const it = byKey[String(w.part)+"||"+String(w.code)];
+      if(it) out.push(it);
+    }
+
+    rows.innerHTML = "";
+    empty.style.display = out.length ? "none" : "block";
+
+    const frag = document.createDocumentFragment();
+    for(const it of out){
+      const tr = document.createElement("tr");
+      const img = it.img ? String(it.img) : "";
+      const safeImg = img && !img.startsWith("data:") ? img : "";
+      tr.innerHTML = ""
+        + "<td>" + (safeImg ? "<img loading='lazy' decoding='async' fetchpriority='low' class='thumb' src='"+safeImg+"' alt=''>" : "") + "</td>"
+        + "<td>" + (it.code ?? "") + "</td>"
+        + "<td>" + (it.name ?? "") + "</td>"
+        + "<td>" + (it.part ?? "") + "</td>";
+      tr.style.cursor = 'pointer';
+      tr.title = '클릭하면 아이템 상세가 열려.';
+      tr.addEventListener('click', ()=> openDetail(it));
+      frag.appendChild(tr);
+    }
+    rows.appendChild(frag);
+  }
+
+  
+  function openDetail(it){
+    if (!it) return;
+    const code = it.code ?? it.itemCode ?? '';
+    const part = it.part ?? '';
+    if (code === '' || code === null || code === undefined) return;
+
+    const safePart = String(part||'').trim().replace(/[\\/]/g,'_');
+    const file = `${code}_${safePart}-${code}.html`;
+    const url = encodeURI(file);
+
+    const dlg = document.getElementById('detailDialog');
+    const frame = document.getElementById('detailFrame');
+    if (!dlg || !frame) return;
+
+    frame.src = url;
+    if (typeof dlg.showModal === 'function'){
+      dlg.showModal();
+    }else{
+      frame.style.display = 'block';
+    }
+  }
+
+  (function(){
+    const dlg = document.getElementById('detailDialog');
+    const frame = document.getElementById('detailFrame');
+    if (!dlg || !frame) return;
+    dlg.addEventListener('close', ()=>{ frame.src = ''; });
+    dlg.addEventListener('cancel', ()=>{ frame.src = ''; });
+  })();
+
+
+  window.addEventListener("message", (ev)=>{
+    const msg = ev && ev.data;
+    if(!msg || typeof msg !== "object") return;
+    if(msg.__splitData === true && msg.key === "source_map"){
+      const arr = Array.isArray(msg.data) ? msg.data : [];
+      SOURCE_MAP_DATA = arr.filter(x => x && typeof x === "object");
+      // source_map이 먼저 오든 items가 먼저 오든, 둘 다 들어오면 화면 갱신
+      renderSidebar();
+      renderTable();
+      return;
+    }
+    if(msg.__splitData === true && msg.key === "items" && Array.isArray(msg.data)){
+      const arr = Array.isArray(msg.data) ? msg.data : [];
+      ITEMS = arr.filter(x => x && typeof x === "object");
+      statusText.textContent = ITEMS.length ? ("아이템 로드 완료: " + ITEMS.length + "개") : "아이템 데이터가 비어있어.";
+      renderSidebar();
+      renderTable();
+    }
+  });
+
+  try{
+    
+  }catch(e){}
+
+  renderSidebar();
+  renderTable();
+})();
+</script>
+</body>
+</html>

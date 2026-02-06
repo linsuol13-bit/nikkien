@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>item_details_frame_v1</title>
+  <style>
+    body{margin:0;font-family:system-ui,AppleSDGothicNeo,Segoe UI,Roboto,sans-serif;background:#f7f7fb;color:#222}
+    .wrap{padding:10px;font-size:13px;color:#555}
+    code{background:#fff;border:1px solid #eee;border-radius:8px;padding:2px 6px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    item_details_frame_v1 loaded — <code id="len">0</code> items
+  </div>
+
+<script>
+(function(){
+  /**
+   * ✅ 상세 데이터 전용 (무거운 데이터는 여기로)
+   * key = "code" (문자열)
+   *
+   * 필드 예시:
+   * {
+   *   desc: "아이템 설명",
+   *   imgs: ["아이템이미지1", "아이템이미지2"], // 2장 권장, 더 많아도 OK
+   *   sources: ["획득경로1", "획득경로2"],     // 문자열/배열 둘 다 OK
+   *   dye: {
+   *     enabled: true,
+   *     costume: "염색가능한 의상 이름(선택)", // 또는 배열도 OK
+   *     images: ["염색이미지1", "염색이미지2"]
+   *   }
+   * }
+   */
+  const ITEM_DETAILS = {
+    "1": {
+        "part": "헤어",
+        "heart": 2,
+        "names": {
+            "ko": "기본핑크헤어",
+            "en": "Nikki's Pinky",
+            "zh": "默认粉毛",
+            "ja": "薄紅色ロング"
+        },
+        "desc": {
+            "ko": "니키가 가장 좋아하는 헤어. 언제 어디서나 주목받는 스타일",
+            "zh": "暖暖最喜欢的招牌发型，走到哪里都光芒四射！",
+            "ja": "ニキのいつものヘアスタイル。なんだか落ち着くね。",
+            "en": "Nikki's favorite hairstyle. It shines wherever she goes!"
+        },
+        "imgs": [
+            "https://drive.google.com/thumbnail?id=1MXJSVznrCvtsJEn7pBgTU7bAvpHZFiro&sz=w1000",
+            "https://drive.google.com/thumbnail?id=1NJ_si_2uE3SBXyfkHD8lC7xCPUPliHMp&sz=w1000"
+        ],
+        "statCards": [
+            {
+                "text": "심플 / 简约 / シンプル / Simple [S]"
+            },
+            {
+                "text": "활발 / 清纯 / アクティブ / Lively [A]"
+            },
+            {
+                "text": "큐티 / 活泼 / キュート / Cute [A]"
+            },
+            {
+                "text": "청순 / 保暖 / ピュア / Pure [A]"
+            },
+            {
+                "text": "따뜻 / 可爱 / ウォーム / Warm [A]"
+            }
+        ]
+    }
+  };
+
+  // iframe 전역
+  window.ITEM_DETAILS = ITEM_DETAILS;
+  window.itemDetails  = ITEM_DETAILS;
+
+  // 부모(index)에 전역으로도 주입 (same-origin)
+  try { parent.ITEM_DETAILS = ITEM_DETAILS; } catch(e){}
+  try { parent.itemDetails  = ITEM_DETAILS; } catch(e){}
+
+  // (옵션) postMessage도 같이 쏨
+  try { parent.postMessage({ __splitData:true, key:'itemDetails', data: ITEM_DETAILS }, '*'); } catch(e){}
+
+  // 화면 표시용
+  const el = document.getElementById('len');
+  if (el) el.textContent = String(Object.keys(ITEM_DETAILS).length);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>아이템 상세</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,AppleSDGothicNeo,Segoe UI,Roboto,sans-serif;background:#f7f7fb;color:#222}
+  .wrap{max-width:980px;margin:0 auto;padding:16px}
+  .card{background:#fff;border:1px solid #eee;border-radius:14px;padding:14px}
+  .top{display:flex;gap:14px;align-items:flex-start}
+  .img{width:140px;height:140px;border-radius:14px;border:1px solid #eee;object-fit:cover;background:#fafafa;flex:0 0 auto}
+  h1{margin:0 0 6px 0;font-size:18px}
+  .meta{display:flex;gap:10px;flex-wrap:wrap;color:#555;font-size:13px}
+  .pill{background:#f0f7ff;border:1px solid #cfe4ff;border-radius:999px;padding:3px 10px}
+  .section{margin-top:14px}
+  .label{font-weight:900;margin-bottom:6px}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:left;font-size:13px}
+  th{background:#fafafa}
+  .muted{color:#666;font-size:12px}
+  .grid{display:flex;gap:8px;flex-wrap:wrap}
+  .imgGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .imgGrid img{width:100%;height:220px;object-fit:cover;border-radius:14px;border:1px solid #eee;background:#fafafa}
+  .dyeGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+  .dyeGrid img{width:100%;height:140px;object-fit:cover;border-radius:14px;border:1px solid #eee;background:#fafafa}
+  .tag{background:#fafafa;border:1px solid #eee;border-radius:999px;padding:3px 10px;font-size:12px}
+</style>
+
+<style>
+#debugBox{position:fixed;right:8px;bottom:8px;max-width:520px;max-height:220px;overflow:auto;
+background:rgba(0,0,0,.75);color:#fff;font:12px/1.4 system-ui;padding:10px;border-radius:10px;z-index:99999;display:none}
+#debugBox code{white-space:pre-wrap}
+#debugBox .row{opacity:.9;margin-top:6px}
+</style>
+</head>
+<body>
+<div id="debugBox"><div><b>item_detail debug</b> <span id="dbgOn"></span></div><div class="row" id="dbgMsg"></div><div class="row"><code id="dbgList"></code></div></div>
+<div class="wrap">
+  <div class="card" id="app">
+    <div class="muted">불러오는 중…</div>
+  </div>
+  <div class="muted" style="padding:10px 2px">※ 이 창은 세트정보에서 클릭한 아이템의 상세를 보여줘.</div>
+</div>
+
+<script>
+(async function(){
+  // ========= 설정 =========
+  // 너가 만든 "아이템 상세 HTML" 파일들이 들어있는 폴더명을 여기에 적어줘.
+  // 예) item_details / item_detail_pages / details 등
+  const DETAIL_DIRS = [
+    localStorage.getItem('ITEM_DETAIL_DIR') || 'item_details',
+    'item_details',
+    'item_detail_pages',
+    'details',
+    'item_detail',
+    'item'
+  ].filter(Boolean);
+
+  // 파일명 패턴들(필요하면 너 폴더 구조에 맞춰 더 추가해도 됨)
+  function buildCandidates(code, part){
+    const pRaw = (part||'').trim();
+    const p = pRaw ? encodeURIComponent(pRaw) : '';
+    const list = [];
+    for (const dir0 of DETAIL_DIRS){
+      const dir = String(dir0||'').replace(/\/+$/,'');
+      if (p){
+        // ✅ 기본 규칙: item_details/헤어/1.html
+        list.push(`${dir}/${p}/${code}.html`);
+        list.push(`${dir}/${p}/${code}.htm`);
+        // 흔한 변형들
+        list.push(`${dir}/${p}/item-${code}.html`);
+        list.push(`${dir}/${p}/item_${code}.html`);
+        // 예전 규칙(혼재 가능)
+        list.push(`${dir}/${p}/detail_${pRaw}_${code}.html`);
+        list.push(`${dir}/${p}/detail_${pRaw}_${code}.htm`);
+        list.push(`${dir}/${p}/detail_${pRaw}_${code}`);
+      }
+      if (pRaw){
+        list.push(`${dir}/detail_${pRaw}_${code}.html`);
+        list.push(`${dir}/detail_${pRaw}_${code}.htm`);
+        list.push(`${dir}/detail_${pRaw}_${code}`);
+      }
+      list.push(`${dir}/${code}.html`);
+      list.push(`${dir}/${code}.htm`);
+      list.push(`${dir}/item-${code}.html`);
+      list.push(`${dir}/item_${code}.html`);
+    }
+    return Array.from(new Set(list));
+  }
+
+      // 기존 후보들도 같이 유지 (혹시 다른 규칙 파일도 섞여있을 수 있음)
+      list.push(`${dir}/${code}.html`);
+      list.push(`${dir}/item-${code}.html`);
+      list.push(`${dir}/item_${code}.html`);
+      if (p) list.push(`${dir}/${p}/${code}.html`);
+      if (p) list.push(`${dir}/${p}/item-${code}.html`);
+      if (p) list.push(`${dir}/${p}/item_${code}.html`);
+    }
+    return Array.from(new Set(list));
+  }
+
+  // file:// 환경에서 404일 때 크롬이 보여주는 에러 페이지를 최대한 감지
+  function looksLikeNotFound(doc, url){
+    try{
+      const title = (doc && doc.title) ? doc.title : '';
+      const body = (doc && doc.body) ? (doc.body.innerText || '') : '';
+      const t = (title + ' ' + body).toLowerCase();
+      if (t.includes('err_file_not_found')) return true;
+      if (t.includes('file not found')) return true;
+      if (t.includes('404')) return true;
+      if (t.includes('not found')) return true;
+      // 크롬 로컬 파일 404일 때 URL이 그대로 보이면서 내용 거의 없는 경우도 있어서, 너무 빈 문서면 not found 취급
+      if (body.trim().length < 20) return true;
+      return false;
+    }catch(e){
+      // 접근이 막히면 판단 불가 -> 일단 not found로 치면 계속 실패하니까, false로 둠
+      return false;
+    }
+  }
+
+  function loadIntoIframe(iframe, url){
+    return new Promise((resolve)=>{
+      const timer = setTimeout(()=>resolve({ok:false, reason:'timeout'}), 1200);
+      iframe.onload = ()=>{
+        clearTimeout(timer);
+        try{
+          const doc = iframe.contentDocument;
+          if (looksLikeNotFound(doc, url)) return resolve({ok:false, reason:'notfound'});
+          return resolve({ok:true});
+        }catch(e){
+          // file:// 이나 보안 정책으로 접근이 안 되면 로드 자체는 성공으로 간주
+          return resolve({ok:false, reason:'noaccess'});
+        }
+      };
+      iframe.src = url;
+    });
+  }
+
+  const $app = document.getElementById('app');
+  const params = new URLSearchParams(location.search);
+  const code = params.get('code');
+  const name = params.get('name') || '';
+  const part = params.get('part') || '';
+
+  // ===== 1) 외부(별도 제작) 상세 HTML이 있으면 그걸 우선 표시 =====
+  if (code){
+    const iframe = document.createElement('iframe');
+    iframe.style.width = '100%';
+    iframe.style.height = '70vh';
+    iframe.style.border = '0';
+    iframe.style.borderRadius = '14px';
+    iframe.style.background = '#fff';
+    $app.innerHTML = '';
+    $app.appendChild(iframe);
+
+    const candidates = buildCandidates(String(code).trim(), part);
+
+    let loaded = false;
+    for (const url of candidates){
+      const res = await loadIntoIframe(iframe, url);
+      if (res.ok){
+        loaded = true;
+        break;
+      }
+    }
+
+    if (loaded){
+      // 상단에 경로 표시만 살짝
+      const hint = document.createElement('div');
+      hint.className = 'muted';
+      hint.style.marginTop = '10px';
+      hint.style.fontSize = '12px';
+      hint.textContent = `※ 상세 HTML을 폴더에서 불러왔어. (code=${code}${part?`, part=${part}`:''})`;
+      $app.appendChild(hint);
+      return;
+    }
+
+    // 못 찾았으면 아래의 기존(JSON 기반) 렌더링으로 fallback
+    $app.innerHTML = `
+      <div class="card">
+        <div style="font-weight:800;margin-bottom:8px">상세 HTML 파일을 못 찾았어</div>
+        <div class="muted" style="font-size:13px;line-height:1.45">
+          지금은 <b>code=${String(code)}</b>${part?` / <b>part=${String(part)}</b>`:''} 로 찾았는데,
+          아래 경로들 중에 실제 파일이 존재해야 바로 뜨는 구조야.
+          <div style="margin-top:10px;background:#fafafa;border:1px solid #eee;border-radius:12px;padding:10px;max-height:180px;overflow:auto">
+            ${candidates.map(u=>`<div>${u}</div>`).join('')}
+          </div>
+          <div style="margin-top:10px">
+            ✅ 해결 방법(둘 중 하나)
+            <ol style="margin:6px 0 0 18px;padding:0">
+              <li>네가 만든 상세 폴더명이 <b>item_details</b>가 아니면, 위 스크립트의 <b>DETAIL_DIRS</b> 첫번째 값을 네 폴더명으로 바꾸기</li>
+              <li>또는 콘솔에서 <code>localStorage.setItem('ITEM_DETAIL_DIR','네폴더명')</code> 한 번만 실행</li>
+            </ol>
+          </div>
+          <div style="margin-top:8px" class="muted">※ 못 찾으면 기존 데이터(JSON) 방식으로도 표시를 시도할게.</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ===== 2) 기존(JSON 기반) 렌더링 로직 (원래 있던 기능 유지) =====
+  const FALLBACK_ITEMS_FRAME = 'items.html';
+  const FALLBACK_DETAILS_FRAME = 'item_details_frame.html';
+
+  function loadHiddenFrame(src){
+    return new Promise((resolve)=>{
+      const f = document.createElement('iframe');
+      f.style.display='none';
+      f.style.width='0'; f.style.height='0'; f.style.border='0';
+      f.src = src;
+      f.onload = ()=> resolve(f);
+      document.body.appendChild(f);
+    });
+  }
+
+  let __local = null;
+  async function ensureLocalData(){
+    if (window.opener && window.opener.parent) return null;
+    const itemsFrame = await loadHiddenFrame(FALLBACK_ITEMS_FRAME);
+    const detailsFrame = await loadHiddenFrame(FALLBACK_DETAILS_FRAME);
+    return { itemsWin: itemsFrame.contentWindow, detailsWin: detailsFrame.contentWindow };
+  }
+
+  function normalizeItems(x){
+    if (Array.isArray(x)) return x;
+    if (!x) return [];
+    if (typeof x === 'string'){
+      try{ const j = JSON.parse(x); if (Array.isArray(j)) return j; }catch(e){}
+      return [];
+    }
+    if (typeof x === 'object' && Array.isArray(x.items)) return x.items;
+    return [];
+  }
+
+  function findItem(){
+    try{
+      const idxWin = window.opener && window.opener.parent ? window.opener.parent : null;
+      const items = idxWin ? normalizeItems(idxWin.items) : [];
+      if (!items.length) return null;
+
+      if (code){
+        const ncode = String(code);
+        const hit = items.find(it => String(it.code ?? '') === ncode);
+        if (hit) return hit;
+      }
+      if (name){
+        const lname = String(name).toLowerCase();
+        const hit2 = items.find(it => String(it.name||'').toLowerCase() === lname);
+        if (hit2) return hit2;
+      }
+      return null;
+    }catch(e){
+      return null;
+    }
+  }
+
+  function esc(s){
+    return String(s)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#039;');
+  }
+
+  function tagList(tags){
+    if (!tags) return [];
+    if (Array.isArray(tags)) return tags.map(String);
+    return String(tags).split(/[,\s#]+/).filter(Boolean);
+  }
+  function normalizeDetails(x){
+    if (!x) return {};
+    if (typeof x === 'string'){
+      try{ const j = JSON.parse(x); if (j && typeof j === 'object') return j; }catch(e){}
+      return {};
+    }
+    if (typeof x === 'object') return x;
+    return {};
+  }
+
+  function findItemDetailByCode(ncode){
+    try{
+      const idxWin = (window.opener && window.opener.parent) ? window.opener.parent : null;
+      let details = {};
+      if (idxWin){
+        details = normalizeDetails(idxWin.itemDetails || idxWin.ITEM_DETAILS);
+      } else if (__local && __local.detailsWin){
+        details = normalizeDetails(__local.detailsWin.itemDetails || __local.detailsWin.ITEM_DETAILS);
+      }
+      const key = String(ncode ?? '');
+      return (details && details[key]) ? details[key] : null;
+    }catch(e){
+      return null;
+    }
+  }
+
+  function render(item, detail){
+    const img = item && item.img ? item.img : '';
+    const tags = tagList(item && item.tags);
+    const stats = item ? Object.entries(item)
+      .filter(([k,v])=>['flair','simple','elegant','lively','mature','cute','sexy','pure','cool','warm'].includes(k) && v)
+      .map(([k,v])=>`<span class="badge">${esc(k)} ${esc(v)}</span>`).join(' ') : '';
+
+    const extra = detail && typeof detail === 'object'
+      ? Object.entries(detail).map(([k,v])=>{
+          if (v==null) return '';
+          if (typeof v === 'object') return '';
+          return `<div class="row"><div class="muted">${esc(k)}</div><div>${esc(v)}</div></div>`;
+        }).join('')
+      : '';
+
+    return `
+      <div class="card">
+        <div class="top">
+          <img class="img" src="${esc(img)}" alt="" onerror="this.style.display='none'"/>
+          <div style="flex:1;min-width:0">
+            <div class="title">${esc(item?.name || name || '(이름없음)')}</div>
+            <div class="muted" style="margin-top:6px">code: <b>${esc(item?.code ?? code ?? '')}</b> · part: <b>${esc(item?.part ?? part ?? '')}</b> · stars: <b>${esc(item?.stars ?? '')}</b></div>
+            <div class="muted" style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">${stats || ''}</div>
+            <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+              ${tags.map(t=>`<span class="tag">#${esc(t)}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+        ${extra ? `<div class="hr"></div><div>${extra}</div>` : ''}
+        <div class="hr"></div>
+        <div class="muted" style="font-size:12px">※ 별도 상세 HTML이 없으면, 여기서는 items/items_detail 데이터(JSON) 기준으로만 표시돼.</div>
+      </div>
+    `;
+  }
+
+  // local data load for standalone open
+  __local = await ensureLocalData();
+
+  let item = findItem();
+  if (!item && __local && __local.itemsWin){
+    const items = normalizeItems(__local.itemsWin.items);
+    if (code) item = items.find(it=>String(it.code??'')===String(code));
+    if (!item && name) item = items.find(it=>String(it.name||'').toLowerCase()===String(name).toLowerCase());
+  }
+
+  let detail = null;
+  if (code) detail = findItemDetailByCode(code);
+
+  if (!item && !detail){
+    $app.innerHTML = `<div class="card"><div style="font-weight:800">불러오는 중...</div><div class="muted" style="margin-top:8px">※ 이 창은 세트정보/아이템정보에서 클릭한 아이템의 상세로 보여줘.</div></div>`;
+    return;
+  }
+
+  $app.innerHTML = render(item || {}, detail || null);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!doctype html>
+<meta charset="utf-8">
+<script>
+window.SETS = [
+  {
+    id: "crystal_snowdream",
+    name_na: "Crystal Snowdream",
+    name_cn: "晶雪绮愿",
+    name_en: "Crystal Snowdream",
+    name_jp: "",
+    name_kr: "눈부신 설원의 기도 (번역)",
+
+    // 리스트 썸네일
+    thumb: "https://drive.google.com/thumbnail?id=1U7SpFDXpqvkLt2Dunsa-GZjpLcVuEs2P&sz=w1000",
+
+    // 상세 이미지 (최대 10장)
+    images: [
+      "https://drive.google.com/thumbnail?id=1U7SpFDXpqvkLt2Dunsa-GZjpLcVuEs2P&sz=w1000",
+      "https://drive.google.com/thumbnail?id=1xmSAY3m9QdgnKDty8HLj_ereKWb86IEe&sz=w1000",
+      "https://drive.google.com/thumbnail?id=1-pEvhnKTYRWpx3X7R2t6RpEgvEpmQVTB&sz=w1000",
+      "https://drive.google.com/thumbnail?id=1E0Im1nwSoaSfO6RMKAaewhuudTzw5Yke&sz=w1000"
+    ],
+
+    // 획득경로
+    sources: [
+      { type:"event", label:"이벤트", desc:"Crystal Fairyland" }
+    ],
+
+    // 이벤트 상세 (이벤트일 때만)
+    event: {
+      title: "Crystal Fairyland",
+      desc:
+`참여 방법 및 규칙
+가챠 진행: 루비를 이용해 전용 아이템인 스노우 글로브(Snow Globes)를 구매하여 이벤트에서 뽑기를 진행합니다.
+
+소모 비용: 1회 뽑기 시 10 루비, 10회 연속 뽑기 시 100 루비가 소모됩니다.
+
+재료 획득: 뽑기를 통해 다음 세 가지 핵심 재료를 얻을 수 있습니다.
+- 골든 벨 (Golden Bell)
+- 소프트 리본 (Soft Ribbon)
+- 크림슨 로즈 (Crimson Rose)
+
+의상 교환: 수집한 재료들을 사용하여 [Crystal Snowdream] 세트의 파츠를 정해진 순서(티어 방식)에 따라 교환합니다.`,
+      guide: "" // 공략이 있으면 여기에 넣기
+    },
+
+    // 세트 구성 (부위/코드만 넣어도 됨)
+    parts: [
+      { part:"헤어", code: 1 }
+    ]
+  }
+];
+
+try{
+  parent.postMessage({__splitData:true, key:"sets", data: window.SETS}, "*");
+}catch(e){}
+</script>

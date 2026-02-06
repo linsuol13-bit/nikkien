@@ -308,8 +308,12 @@ function displayShort(txt){
 </head>
 <body>
 <!-- === DATA FRAMES (hidden) === -->
-<iframe id="itemsFrame" src="items_frame_v2.html" style="display:none;width:0;height:0;border:0;"></iframe>
-<iframe id="stagesFrame" src="stages_frame_v2.html" style="display:none;width:0;height:0;border:0;"></iframe>
+<iframe id="itemsFrame" src="items.html" style="display:none;width:0;height:0;border:0;"></iframe>
+<iframe id="stagesFrame" src="stages.html" style="display:none;width:0;height:0;border:0;"></iframe>
+<iframe id="setsFrame" src="sets_frame_fixed.html" style="display:none;width:0;height:0;border:0;"></iframe>
+<iframe id="sourcesFrame" src="sources_frame.html" style="display:none;width:0;height:0;border:0;"></iframe>
+
+<iframe id="itemDetailsFrame" src="item_details_frame.html" style="display:none;width:0;height:0;border:0;"></iframe>
 <script>
 // Kill MutationObserver globally (surgical, to stop any render loops)
 try {
@@ -321,19 +325,67 @@ try {
 // Global aliases and safety
 window.items = window.items || [];
 window.stages = window.stages || [];
+window.sets = window.sets || [];
+window.sources = window.sources || [];
 window.ITEMS = window.items;
 var items = window.items;
 var stages = window.stages;
 </script>
-<nav class="tabs"><button class="tab active" data-tab="calc">추천/점수</button>
-<button class="tab" data-tab="table">의상 데이터(전체)</button>
-<button class="tab" data-tab="by-part">의상 데이터(부위별)</button>
-<button class="tab" data-tab="quiz">퀴즈 이벤트</button>
+<nav class="tabs">
+  <button class="tab active" data-tab="calc">추천/점수</button>
+  <button class="tab" data-tab="itemsinfo">아이템 정보</button>
+  <button class="tab" data-tab="sets">세트정보</button>
+  <button class="tab" data-tab="sources">획득경로</button>
+  <button class="tab" data-tab="quiz">퀴즈 이벤트</button>
 </nav>
+
+<script>
+(function(){
+  function showPanel(key){
+    // activate tab button
+    document.querySelectorAll('nav.tabs .tab').forEach(btn=>{
+      btn.classList.toggle('active', btn.getAttribute('data-tab')===key);
+    });
+    // show matching panel
+    document.querySelectorAll('section.panel').forEach(p=>{
+      p.classList.toggle('active', p.id === ('panel-' + key));
+    });
+    // lazy render hooks
+    try{
+      if(key==='itemsinfo' && typeof window.renderItemsInfoTab==='function') window.renderItemsInfoTab();
+      if(key==='sets' && typeof window.renderSetsTab==='function') window.renderSetsTab();
+      if(key==='sources' && typeof window.renderSourcesTab==='function') window.renderSourcesTab();
+      if(key==='calc' && typeof window.renderAll==='function') window.renderAll();
+    }catch(e){ console.warn('tab render error', e); }
+  }
+
+  document.addEventListener('click', function(ev){
+    var btn = ev.target && ev.target.closest && ev.target.closest('nav.tabs .tab');
+    if(!btn) return;
+    ev.preventDefault();
+    var key = btn.getAttribute('data-tab');
+    if(!key) return;
+    showPanel(key);
+  }, false);
+
+  document.addEventListener('DOMContentLoaded', function(){
+    // default: keep whatever is marked active, fallback to calc
+    var active = document.querySelector('nav.tabs .tab.active');
+    var key = active ? active.getAttribute('data-tab') : 'calc';
+    showPanel(key||'calc');
+  });
+  window.__showPanel = showPanel;
+})();
+</script>
+
 <section id="controls">
 <div><label>
 <div class="filter-row">
-<label for="stageSelect">스테이지 선택</label>
+<label for="stageGroupSelect">스테이지 분류</label>
+<select id="stageGroupSelect"><option value="">전체</option></select>
+<label for="stageSearchInput">검색</label>
+<input id="stageSearchInput" type="text" placeholder="하위 스테이지 검색"/>
+<label for="stageSelect">하위 스테이지</label>
 <select id="stageSelect"></select>
 <label>부위 필터 (그룹)</label><select id="partFilter"><option value="">전체</option>
 <optgroup label="의상">
@@ -435,6 +487,9 @@ var stages = window.stages;
 <button id="exportOwned" type="button">내보내기(.txt)</button>
 <button id="importOwned" type="button">불러오기(.txt)</button>
 <input accept=".txt" id="importOwnedFile" style="display:none" type="file"/>
+<button id="copyAllNames" type="button">이름 복사</button>
+<button id="copyRecentNames" type="button">최근 추가 이름 복사</button>
+
 </div>
 <div class="row" style="align-items:flex-start"></div>
 <section id="partSummary" style="margin:10px 0 4px 0">
@@ -463,30 +518,41 @@ var stages = window.stages;
 <section id="list" style="display:none"></section>
 <div class="toast" id="toast">복사됨</div>
 </section>
-<section class="panel" id="panel-table">
-<div class="table-wrap">
-<div class="row" style="justify-content:space-between;padding:6px 0">
-<div class="muted">현재 선택된 스테이지 가중치로 <b>계산 점수</b>가 표시됩니다.</div>
-<div class="row"><input id="tableSearch" placeholder="이름/부위/태그 검색" style="min-width:220px" type="text"/><button id="tableClear">지우기</button></div>
-</div>
-<div style="overflow:auto;max-height:70vh">
-<table id="itemsTable">
-<thead><tr>
-<th class="nowrap imgcol">이미지</th><th class="nowrap">부위</th><th>코드</th><th class="nowrap">이름</th><th class="num nowrap">별</th>
-<th>화려</th><th>심플</th><th>우아</th><th>활발</th><th>성숙</th>
-<th>큐티</th><th>섹시</th><th>청순</th><th>청량</th><th>따뜻</th>
-<th>태그</th><th class="num nowrap">계산 점수</th>
-</tr></thead>
-<tbody></tbody>
-</table>
-</div>
-</div>
-</section>
-<section class="panel" id="panel-by-part">
-<div class="table-wrap" id="byPartWrap"></div>
+<!-- OLD_PANELS_REMOVED -->
+
+
+<section class="panel" id="panel-itemsinfo">
+  <div style="padding:0; height: calc(100vh - 170px); min-height: 520px;">
+    <iframe id="itemsInfoFrame" src="itemsinfo_frame.html"
+            style="width:100%; height:100%; border:0; background:transparent;"
+            loading="eager"></iframe>
+  </div>
 </section>
 
-<section class="panel" id="panel-quiz" style="display:none">
+<section class="panel" id="panel-sets">
+  <div class="split">
+    <div class="left">
+      <div style="font-weight:800;font-size:16px;margin-bottom:6px">세트정보</div>
+      <div class="muted" id="setsStatus">로딩중...</div>
+    </div>
+    <div class="right" style="min-height:540px">
+      <iframe id="setsViewFrame" src="sets_frame.html" style="width:100%;height:560px;border:0;border-radius:16px;background:#fff"></iframe>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="panel-sources">
+  <div class="split">
+    <div class="left">
+      <div style="font-weight:800;font-size:16px;margin-bottom:6px">획득경로</div>
+      <div class="muted" id="sourcesStatus">로딩중...</div>
+    </div>
+    <div class="right" style="min-height:540px">
+      <iframe id="sourcesViewFrame" src="sources_frame.html" style="width:100%;height:560px;border:0;border-radius:16px;background:#fff"></iframe>
+    </div>
+  </div>
+</section>
+<section class="panel" id="panel-quiz">
   <div style="padding:12px 20px">
     <div class="row" style="justify-content:space-between;align-items:center">
       <div>
@@ -839,12 +905,6 @@ const normName = (s)=> String(s||'').normalize('NFKC').toLowerCase().replace(/\s
 })();
 </script>
 <script>
-
-<script>
-
-<script>
-
-<script>
 function toThumb(u){
     try{
       if(!u) return u;
@@ -868,7 +928,7 @@ function toThumb(u){
 </script>
 <script>
 (function(){
-  var got = {items:false, stages:false};
+  var got = {items:false, stages:false, sets:false, sources:false};
   function maybeInit(){
     if (got.items && got.stages) {
       if (!window.items) window.items = [];
@@ -878,11 +938,54 @@ function toThumb(u){
       try{ if(typeof renderAll==='function') renderAll(); }catch(e){}
     }
   }
+  function __normalizeIncomingData(key, data){
+  // Ensure we always store arrays for items/stages even if frames send JSON strings.
+  try{
+    if (key==='items'){
+      if (Array.isArray(data)) return data;
+      if (typeof data === 'string'){
+        const s = data.trim();
+        if (s && (s[0]==='[' || s[0]==='{')){
+          const parsed = JSON.parse(s);
+          if (Array.isArray(parsed)) return parsed;
+          if (parsed && Array.isArray(parsed.items)) return parsed.items;
+        }
+      }
+      // fallback: try reading directly from iframe global
+      try{
+        const f = document.getElementById('itemsFrame');
+        const v = f && f.contentWindow && f.contentWindow.items;
+        if (Array.isArray(v)) return v;
+      }catch(e){}
+      return [];
+    }
+    if (key==='stages'){
+      if (Array.isArray(data)) return data;
+      if (typeof data === 'string'){
+        const s = data.trim();
+        if (s && (s[0]==='[' || s[0]==='{')){
+          const parsed = JSON.parse(s);
+          if (Array.isArray(parsed)) return parsed;
+          if (parsed && Array.isArray(parsed.stages)) return parsed.stages;
+        }
+      }
+      try{
+        const f = document.getElementById('stagesFrame');
+        const v = f && f.contentWindow && f.contentWindow.stages;
+        if (Array.isArray(v)) return v;
+      }catch(e){}
+      return [];
+    }
+  }catch(e){}
+  return data;
+}
   window.addEventListener('message', function(ev){
     var msg = ev.data;
     if (!msg || !msg.__splitData) return;
-    if (msg.key==='items'){ window.items = msg.data; got.items = true; try{ if(window._loading) window._loading.show(true);}catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){} }
-    if (msg.key==='stages'){ window.stages = msg.data; got.stages = true; try{ if(typeof __populateStages==='function') __populateStages(); }catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){} }
+    if (msg.key==='items'){ window.items = __normalizeIncomingData('items', msg.data); got.items = true; try{ if(window._loading) window._loading.show(true);}catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){}; try{ if(typeof window.renderItemsInfoTab==='function') window.renderItemsInfoTab(); }catch(e){} }
+    if (msg.key==='stages'){ window.stages = __normalizeIncomingData('stages', msg.data); got.stages = true; try{ if(typeof __populateStages==='function') __populateStages(); }catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){} }
+    if (msg.key==='sets'){ window.sets = msg.data; got.sets = true; try{ if(typeof renderAll==='function') renderAll(); }catch(e){}; try{ if(typeof window.renderSetsTab==='function') window.renderSetsTab(); }catch(e){} }
+    if (msg.key==='sources'){ window.sources = msg.data; got.sources = true; try{ if(typeof renderAll==='function') renderAll(); }catch(e){}; try{ if(typeof window.renderSourcesTab==='function') window.renderSourcesTab(); }catch(e){} }
     maybeInit();
   });
 })();
@@ -2234,8 +2337,8 @@ var ACC_OTHER    = ["반딧불의 영혼"];
   }
   window.addEventListener('load', function(){
     // Guard: both iframes should exist
-    var s = document.querySelector('iframe[src$="stages_frame_v2.html"]');
-    var i = document.querySelector('iframe[src$="items_frame_v2.html"]');
+    var s = document.querySelector('iframe[src$="stages.html"]');
+    var i = document.querySelector('iframe[src$="items.html"]');
     if(!s || !i){ console.warn('[fix] expected stages/items iframes not found'); }
     ensureStagesSynced();
     // Observe tips only (non-intrusive)
@@ -2245,8 +2348,8 @@ var ACC_OTHER    = ["반딧불의 영혼"];
       mo.observe(tips, {childList:true, subtree:true});
 document.addEventListener('DOMContentLoaded', function(){
     // Guard: both iframes should exist
-    var s = document.querySelector('iframe[src$="stages_frame_v2.html"]');
-    var i = document.querySelector('iframe[src$="items_frame_v2.html"]');
+    var s = document.querySelector('iframe[src$="stages.html"]');
+    var i = document.querySelector('iframe[src$="items.html"]');
     if(!s || !i){ console.warn('[fix] expected stages/items iframes not found'); }
     ensureStagesSynced();
     // Observe tips only (non-intrusive)
@@ -2624,8 +2727,10 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
 });
 </script>
 <!-- data iframes (hidden) -->
-<iframe id="itemsFrame" src="./items_frame_v2.html" style="display:none;width:0;height:0;border:0;"></iframe>
-<iframe id="stagesFrame" src="./stages_frame_v2.html" style="display:none;width:0;height:0;border:0;"></iframe>
+<iframe id="itemsFrame" src="./items.html" style="display:none;width:0;height:0;border:0;"></iframe>
+<iframe id="stagesFrame" src="./stages.html" style="display:none;width:0;height:0;border:0;"></iframe>
+<iframe id="setsFrame" src="sets_frame_fixed.html" style="display:none;width:0;height:0;border:0;"></iframe>
+<iframe id="sourcesFrame" src="sources_frame.html" style="display:none;width:0;height:0;border:0;"></iframe>
 <script>
 (function(){
   // Safe override of render() that avoids DOM reorders and freezes
@@ -3862,7 +3967,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       var stf = $('stagesFrame');
       if (stf){
         stf.addEventListener('load', function(){
-          // stages_frame_v2.html posts via postMessage, but as a backup try to read globals
+          // stages.html posts via postMessage, but as a backup try to read globals
           try{
             var cw = stf.contentWindow;
             // Some builds expose a global like STAGES or data; try common names
@@ -3993,30 +4098,30 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
 
   // Tab wiring
   function activateTab(key){
-    var panels = {
-      'calc': $('panel-calc'),
-      'table': $('panel-table'),
-      'by-part': $('panel-by-part'),
-      'quiz': $('panel-quiz')
-    };
-    // toggle classes
+    // mark active tab button
     document.querySelectorAll('nav.tabs .tab').forEach(function(btn){
       btn.classList.toggle('active', btn.getAttribute('data-tab')===key);
     });
-    Object.keys(panels).forEach(function(k){
-      var on = (k===key);
-      if(panels[k]) panels[k].classList.toggle('active', on);
-      if(panels[k]) panels[k].style.display = on ? 'block' : 'none';
+
+    // show/hide panels by id convention: panel-<key>
+    document.querySelectorAll('section.panel').forEach(function(p){
+      var on = (p.id === ('panel-' + key));
+      p.classList.toggle('active', on);
+      p.style.display = on ? 'block' : 'none';
     });
-    // render target view
+
+    // render when entering a tab
     try{
-      if(key==='table') renderItemsTable();
-      if(key==='by-part') renderByPartTable();
       if(key==='calc' && typeof window.renderAll==='function') window.renderAll();
+      if(key==='itemsinfo' && typeof window.renderItemsInfoTab==='function') window.renderItemsInfoTab();
+      if(key==='sets' && typeof window.renderSetsTab==='function') window.renderSetsTab();
+      if(key==='sources' && typeof window.renderSourcesTab==='function') window.renderSourcesTab();
+      if(key==='quiz' && typeof window.renderQuizTab==='function') window.renderQuizTab();
     }catch(e){}
   }
 
   document.addEventListener('click', function(ev){
+, function(ev){
     var t = ev.target.closest && ev.target.closest('nav.tabs .tab');
     if(!t) return;
     var key = t.getAttribute('data-tab');
@@ -4024,14 +4129,16 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     activateTab(key);
   }, false);
 
-  // Keep tables in sync when key filters change
+  // Keep active view in sync when key filters change
   document.addEventListener('change', function(ev){
     var id = ev.target && ev.target.id;
-    if(id==='stageSelect' || id==='partFilter' || id==='sortBy'){
+    if(id==='stageSelect' || id==='partFilter' || id==='sortBy' || id==='ownedOnly' || id==='itemSearch'){
       var active = document.querySelector('nav.tabs .tab.active');
       var key = active ? active.getAttribute('data-tab') : 'calc';
-      if(key==='table') renderItemsTable();
-      if(key==='by-part') renderByPartTable();
+      try{
+        if(key==='calc' && typeof window.renderAll==='function') window.renderAll();
+        if(key==='itemsinfo' && typeof window.renderItemsInfoTab==='function') window.renderItemsInfoTab();
+      }catch(e){}
     }
   }, false);
 
@@ -9002,98 +9109,555 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
 
 })();
 </script>
-</body>
-</html>
-<script>(function(){if(!window.__bootDone){window.__bootDone=false;}function canInit(){try{return Array.isArray(window.items)&&window.items.length>0&&Array.isArray(window.stages)&&window.stages.length>0;}catch(e){return false;}}function tryInitNow(){if(window.__bootDone)return;if(canInit()){window.__bootDone=true;if(typeof init==='function')init();return true;}return false;}document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loading) window._loading.show(true);}catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){};if(tryInitNow())return;let n=0;const t=setInterval(function(){n++;if(tryInitNow()||n>30){clearInterval(t);}},200);});window.addEventListener('load',tryInitNow);window.addEventListener('message',function(){setTimeout(tryInitNow,0);},true);})();</script>
-<script>(function(){function ex(h){const m=h.match(/var\s+data\s*=\s*(\[[\s\S]*?\]);/);return m?m[1]:null;}async function fetchArr(u){try{const r=await fetch(u,{credentials:'same-origin'});if(!r.ok)return null;const h=await r.text();const t=ex(h);if(!t)return null;const a=Function('\"use strict\";return ('+t+')')();return Array.isArray(a)?a:null;}catch(_){return null;}}async function go(){if(!(window.items&&window.items.length)){const a=await fetchArr('items_frame_v2.html');if(a){window.items=a;items=window.items;if(window.got)window.got.items=true;}}if(!(window.stages&&window.stages.length)){const a2=await fetchArr('stages_frame_v2.html');if(a2){window.stages=a2;stages=window.stages;if(window.got)window.got.stages=true;}}if(typeof maybeInit==='function')maybeInit();}document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loading) window._loading.show(true);}catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){};setTimeout(go,800);});})();</script>
-<script>// Iframe onload fallback
-(function(){function ex(h){const m=h&&h.match(/var\s+data\s*=\s*(\[[\s\S]*?\]);/);return m?m[1]:null;}function parseIF(f){try{const d=f&&f.contentDocument;const h=d&&d.documentElement&&d.documentElement.innerHTML;const t=ex(h||'');if(!t)return null;const a=Function('\"use strict\";return ('+t+')')();return Array.isArray(a)?a:null;}catch(_){return null;}}function go(){var i=document.querySelector('iframe[src="./items_frame_v2.html"]');var s2=document.querySelector('iframe[src="./stages_frame_v2.html"]');if(i&&!(window.items&&window.items.length)){var a=parseIF(i);if(a){window.items=a;items=window.items;if(window.got)window.got.items=true;}}if(s2&&!(window.stages&&window.stages.length)){var a2=parseIF(s2);if(a2){window.stages=a2;stages=window.stages;if(window.got)window.got.stages=true;}}if(typeof maybeInit==='function')maybeInit();}window.addEventListener('load',function(){setTimeout(go,400);});document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loading) window._loading.show(true);}catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){};var i=document.querySelector('iframe[src="./items_frame_v2.html"]');var s2=document.querySelector('iframe[src="./stages_frame_v2.html"]');function onIF(){setTimeout(go,50);}if(i)i.addEventListener('load',onIF);if(s2)s2.addEventListener('load',onIF);});})();</script>
+
 <script>
 (function(){
-  function hasData(a){ return Array.isArray(a) && a.length>0; }
-  function refreshCountsNow(){
-    try{
-      if (typeof computeOwnedTotal === 'function'){
-        var res = computeOwnedTotal();
-        var badge = document.querySelector('#ownedSummary strong');
-        if (badge) badge.textContent = '보유 ' + res.owned + ' / 전체 ' + (res.total||0);
-      }
-      if (typeof renderPartCounts === 'function') renderPartCounts();
-    }catch(e){ console.warn('refreshCountsNow', e); }
+  // ===== Items Info Tab (parts menu + table) =====
+  const PARTS = [
+    {key:'', label:'전체', type:'all'},
+
+    // 기본 부위
+    {key:'헤어', label:'헤어', type:'part'},
+    {key:'원피스', label:'원피스', type:'part'},
+    {key:'아우터', label:'아우터', type:'part'},
+    {key:'상의', label:'상의', type:'part'},
+    {key:'하의', label:'하의', type:'part'},
+    {key:'양말', label:'양말', type:'part'},
+    {key:'양말장식', label:'양말장식', type:'part'},
+    {key:'신발', label:'신발', type:'part'},
+    {key:'뷰티', label:'뷰티', type:'part'},
+
+    // 엑세사리(그룹)
+    {key:'__ACC__', label:'엑세사리', type:'group'},
+
+    // 엑세사리 세부 부위
+    {key:'장식 - 머리 - 머리', label:'머리', type:'part', indent:true},
+    {key:'장식 - 머리 - 베일', label:'베일', type:'part', indent:true},
+    {key:'장식 - 머리 - 헤어핀', label:'헤어핀', type:'part', indent:true},
+    {key:'장식 - 머리 - 귀', label:'귀장식', type:'part', indent:true},
+    {key:'장식 - 귀', label:'귀', type:'part', indent:true},
+    {key:'장식 - 목 - 목도리', label:'목도리', type:'part', indent:true},
+    {key:'장식 - 목 - 목걸이', label:'목걸이', type:'part', indent:true},
+    {key:'장식 - 손 - 팔찌(우)', label:'팔찌(우)', type:'part', indent:true},
+    {key:'장식 - 손 - 팔찌(좌)', label:'팔찌(좌)', type:'part', indent:true},
+    {key:'장식 - 손 - 장갑', label:'장갑', type:'part', indent:true},
+    {key:'장식 - 소품 - 소품(우)', label:'소품(우)', type:'part', indent:true},
+    {key:'장식 - 소품 - 소품(좌)', label:'소품(좌)', type:'part', indent:true},
+    {key:'장식 - 소품 - 양손', label:'양손', type:'part', indent:true},
+    {key:'장식 - 허리', label:'허리', type:'part', indent:true},
+    {key:'장식 - 특수 - 얼굴', label:'얼굴', type:'part', indent:true},
+    {key:'장식 - 특수 - 가슴', label:'가슴', type:'part', indent:true},
+    {key:'장식 - 특수 - 문신', label:'문신', type:'part', indent:true},
+    {key:'장식 - 특수 - 날개', label:'날개', type:'part', indent:true},
+    {key:'장식 - 특수 - 꼬리', label:'꼬리', type:'part', indent:true},
+    {key:'장식 - 특수 - 전경', label:'전경', type:'part', indent:true},
+    {key:'장식 - 특수 - 배경', label:'배경', type:'part', indent:true},
+    {key:'장식 - 특수 - 상단', label:'상단', type:'part', indent:true},
+    {key:'장식 - 특수 - 하단', label:'하단', type:'part', indent:true},
+    {key:'장식 - 특수 - 스킨', label:'스킨', type:'part', indent:true},
+
+    {key:'반딧불의 영혼', label:'반딧불의 영혼', type:'part'}
+  ];
+
+  const state = { selectedKey:'', search:'', sort:'score' };
+
+  function $(id){ return document.getElementById(id); }
+  function norm(s){ return String(s||'').toLowerCase().replace(/\s+/g,'').trim(); }
+  function isAccessoryPart(p){ return String(p||'').startsWith('장식 -'); }
+
+  function getCounts(){
+    const items = (window.items || window.ITEMS || []);
+    const counts = {};
+    for(const it of items){
+      const p = String(it?.part||'').trim();
+      if(!p) continue;
+      counts[p] = (counts[p]||0) + 1;
+      if(isAccessoryPart(p)) counts['__ACC__'] = (counts['__ACC__']||0) + 1;
+    }
+    counts[''] = items.length;
+    return counts;
   }
-  // Recompute on textarea typing/paste
-  document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loading) window._loading.show(true);}catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){};
-    var ta = document.getElementById('ownedInput');
-    if (ta){
-      ['input','change','blur'].forEach(function(ev){
-        ta.addEventListener(ev, function(){ setTimeout(refreshCountsNow,0); });
+
+  function renderMenu(){
+    const tb = $('itemsInfoPartMenu');
+    if(!tb) return;
+    const counts = getCounts();
+    const rows = PARTS.map((p)=>{
+      const c = counts[p.key] || 0;
+      const isOn = state.selectedKey === p.key;
+      const pad = p.indent ? 'padding-left:28px;' : 'padding-left:12px;';
+      const bg = isOn ? 'background:#f7f7ff;' : '';
+      return `
+        <tr data-key="${String(p.key).replace(/"/g,'&quot;')}" style="cursor:pointer;${bg}">
+          <td style="${pad}padding-top:10px;padding-bottom:10px;border-bottom:1px solid #f3f3f3;">
+            <span style="color:#2d6cdf">${p.label}</span>
+          </td>
+          <td style="padding:10px 12px;border-bottom:1px solid #f3f3f3;text-align:right;">
+            <span class="countpill">${c}개</span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+    tb.innerHTML = rows;
+    const total = counts[''] || 0;
+    const totalEl = $('itemsInfoTotal');
+    if(totalEl) totalEl.textContent = `Total ${total}`;
+  }
+
+  function filterItems(){
+    const items = (window.items || window.ITEMS || []);
+    const q = norm(state.search);
+    let list = items.slice();
+
+    // part filter
+    if(state.selectedKey){
+      if(state.selectedKey === '__ACC__'){
+        list = list.filter(it=> isAccessoryPart(it?.part));
+      } else {
+        list = list.filter(it=> String(it?.part||'').trim() === state.selectedKey);
+      }
+    }
+
+    // search
+    if(q){
+      list = list.filter(it=>{
+        const name = norm(it?.name);
+        const part = norm(it?.part);
+        const tags = (window.getItemTags ? window.getItemTags(it) : (it?.tags||[]))
+          .map(t=> norm(t)).join(' ');
+        return name.includes(q) || part.includes(q) || tags.includes(q);
       });
     }
-  });
 
-  // Re-render when datasets arrive via postMessage
-  window.addEventListener('message', function(ev){
-    var d = ev && ev.data;
-    if (!d || !d.__splitData) return;
-    // Give original handlers a tick to assign window.items/stages
-    setTimeout(function(){
-      if (typeof renderAll === 'function' && hasData(window.items) && hasData(window.stages)){
-        renderAll(); refreshCountsNow();
-      }
-    },0);
-  }, true);
+    // scoring
+    const stage = (typeof getSelectedStage === 'function') ? getSelectedStage() : null;
+    list.forEach(it=>{
+      try{ it.__score = (typeof window.scoreItemForStage === 'function') ? window.scoreItemForStage(it, stage) : 0; }
+      catch(e){ it.__score = 0; }
+    });
+
+    // sort
+    if(state.sort === 'name'){
+      list.sort((a,b)=> String(a?.name||'').localeCompare(String(b?.name||''), 'ko'));
+    }else if(state.sort === 'stars'){
+      list.sort((a,b)=> (Number(b?.stars)||0) - (Number(a?.stars)||0) || (b.__score - a.__score));
+    }else{
+      list.sort((a,b)=> (b.__score - a.__score));
+    }
+    return list;
+  }
+
+  function renderTable(){
+    const tbody = document.querySelector('#itemsInfoTable tbody');
+    if(!tbody) return;
+    const title = $('itemsInfoTitle');
+    const pill = $('itemsInfoCountPill');
+    const empty = $('itemsInfoEmpty');
+
+    const list = filterItems();
+    const partLabel = PARTS.find(p=> p.key===state.selectedKey)?.label || '전체';
+    if(title) title.textContent = partLabel;
+    if(pill) pill.textContent = `${list.length} items`;
+
+    if(list.length===0){
+      tbody.innerHTML = '';
+      if(empty) empty.style.display = 'block';
+      return;
+    }
+    if(empty) empty.style.display = 'none';
+
+    const toThumb = window.toThumb || function(u){ return u; };
+
+    tbody.innerHTML = list.slice(0, 2000).map(it=>{
+      const img = toThumb(it?.img||'');
+      const part = String(it?.part||'');
+      const code = (it?.code==null?'':it.code);
+      const name = String(it?.name||'');
+      const stars = (it?.stars==null?'':it.stars);
+      const sc = Math.round(Number(it.__score)||0);
+      return `
+        <tr>
+          <td class="imgcol"><img class="thumb sm" src="${img}" alt=""></td>
+          <td class="nowrap">${part}</td>
+          <td class="nowrap">${code}</td>
+          <td class="nowrap">${name}</td>
+          <td class="num nowrap">${stars}</td>
+          <td class="num nowrap">${sc}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function bind(){
+    const search = $('itemsInfoSearch');
+    const sort = $('itemsInfoSort');
+    const clear = $('itemsInfoClear');
+    const menu = $('itemsInfoPartMenu');
+
+    if(search){
+      search.addEventListener('input', ()=>{ state.search = search.value||''; renderTable(); });
+    }
+    if(sort){
+      sort.addEventListener('change', ()=>{ state.sort = sort.value; renderTable(); });
+    }
+    if(clear){
+      clear.addEventListener('click', ()=>{
+        state.search = '';
+        if(search) search.value = '';
+        renderTable();
+      });
+    }
+    if(menu){
+      menu.addEventListener('click', (ev)=>{
+        const tr = ev.target.closest('tr[data-key]');
+        if(!tr) return;
+        state.selectedKey = tr.getAttribute('data-key') || '';
+        renderMenu();
+        renderTable();
+      });
+    }
+
+    // re-render when stage changes (so score column updates)
+    const stageSel = document.getElementById('stageSelect');
+    if(stageSel){
+      stageSel.addEventListener('change', ()=>{ renderTable(); });
+    }
+  }
+
+  window.renderItemsInfoTab = function(){
+    renderMenu();
+    renderTable();
+  };
+
+  window.renderSetsTab = function(){
+    const el = document.getElementById('setsStatus');
+    const n = Array.isArray(window.sets) ? window.sets.length : 0;
+    if(el) el.textContent = n ? `세트 데이터 ${n}개 로드됨` : '세트 데이터가 아직 없습니다.';
+  };
+
+  window.renderSourcesTab = function(){
+    const el = document.getElementById('sourcesStatus');
+    const n = Array.isArray(window.sources) ? window.sources.length : 0;
+    if(el) el.textContent = n ? `획득경로 데이터 ${n}개 로드됨` : '획득경로 데이터가 아직 없습니다.';
+  };
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    bind();
+    // Try render after data load; renderAll wrapper also calls, but do it once.
+    setTimeout(()=>{ try{ window.renderItemsInfoTab(); }catch(e){}; try{ window.renderSetsTab(); }catch(e){}; try{ window.renderSourcesTab(); }catch(e){}; }, 150);
+  });
 })();
 </script>
-<!-- STRONG FIX: override updateOwnedBadges with robust totals + observers (keeps calc as first tab) -->
+ 
 <script>
 (function(){
-  function getItemsTotal(){
-    try{
-      if (Array.isArray(window.ITEMS) && window.ITEMS.length) return window.ITEMS.length;
-      if (Array.isArray(window.items) && window.items.length) return window.items.length;
-    }catch(e){}
-    try{ return document.querySelectorAll('.card').length || 0; }catch(e){}
-    return 0;
-  }
-  function norm(s){ return String(s||'').toLowerCase().replace(/[\s\u00A0]+/g,' ').trim(); }
-  function parseOwned(text){ return String(text||'').split(/[\n\r;,]+|\s{2,}/g).map(function(s){return s.trim();}).filter(Boolean); }
-  function getOwnedCount(){
-    var src = Array.isArray(window.ITEMS)&&window.ITEMS.length? window.ITEMS : (Array.isArray(window.items)? window.items : []);
-    var by = Object.create(null);
-    for (var i=0;i<src.length;i++){ var k = norm(src[i] && src[i].name); if(k && !(k in by)) by[k]=true; }
-    var ta = document.getElementById('ownedInput'); var names = ta ? Array.from(new Set(parseOwned(ta.value))) : [];
-    var n=0; for (var j=0;j<names.length;j++){ var k=norm(names[j]); if(k && (k in by)) n++; }
-    return n;
-  }
-  // Override
-  window.updateOwnedBadges = (function(ORIG){
-    return function(){
-      try{
-        var total = getItemsTotal() + GRADE_OFFSET[item.grade];
-        var owned = getOwnedCount();
-        var el1 = document.getElementById('ownedSummary');
-        var el2 = document.getElementById('ownedSummaryMini');
-        if (el1) el1.textContent = '보유 ' + owned + ' / 전체 ' + total;
-        if (el2) el2.textContent = '보유 ' + owned + ' / 전체 ' + total;
-        // store diag
-        if (el2) el2.title = 'ITEMS:' + (Array.isArray(window.ITEMS)?window.ITEMS.length:0)
-                            + ' items:' + (Array.isArray(window.items)?window.items.length:0)
-                            + ' cards:' + (function(){try{return document.querySelectorAll(".card").length||0;}catch(e){return 0;}})();
-      }catch(e){ try{ if(typeof ORIG==='function') ORIG(); }catch(_){ } }
-    };
-  })(window.updateOwnedBadges);
-  // Trigger updates at useful times
-  function tick(){ try{ updateOwnedBadges(); }catch(e){} }
-  window.addEventListener('load', function(){ setTimeout(tick,50); setTimeout(tick,300); setTimeout(tick,1000); });
-  window.addEventListener('message', function(ev){ var m=ev.data||{}; if(m.__splitData && (m.key==='items'||m.key==='stages')){ setTimeout(tick,0); setTimeout(tick,200); setTimeout(tick,800);} });
-  // Mutation observer on cards container
-  try{
-    var mo = new MutationObserver(function(){ tick(); });
-    mo.observe(document.body, { childList:true, subtree:true });
-  }catch(e){}
-})();
-</script>
+  // ---------- ItemsInfo: independent renderer (no stage/추천 필터 영향) ----------
+  const PARTS = [
+    {type:'item', label:'전체', part:null, key:'ALL'},
+    {type:'hr'},
+    {type:'item', label:'헤어', part:'헤어'},
+    {type:'item', label:'원피스', part:'원피스'},
+    {type:'item', label:'아우터', part:'아우터'},
+    {type:'item', label:'상의', part:'상의'},
+    {type:'item', label:'하의', part:'하의'},
+    {type:'item', label:'양말', part:'양말'},
+    {type:'item', label:'양말장식', part:'양말장식'},
+    {type:'item', label:'신발', part:'신발'},
+    {type:'item', label:'뷰티', part:'뷰티'},
+    {type:'item', label:'반딧불의 영혼', part:'반딧불의 영혼'},
+    {type:'hr'},
+    {type:'header', label:'엑세사리 분류'},
+    {type:'item', label:'머리', part:'장식 - 머리 - 머리'},
+    {type:'item', label:'베일', part:'장식 - 머리 - 베일'},
+    {type:'item', label:'헤어핀', part:'장식 - 머리 - 헤어핀'},
+    {type:'item', label:'귀장식', part:'장식 - 머리 - 귀'},
+    {type:'item', label:'귀', part:'장식 - 귀'},
+    {type:'item', label:'목도리', part:'장식 - 목 - 목도리'},
+    {type:'item', label:'목걸이', part:'장식 - 목 - 목걸이'},
+    {type:'item', label:'팔찌(우)', part:'장식 - 손 - 팔찌(우)'},
+    {type:'item', label:'팔찌(좌)', part:'장식 - 손 - 팔찌(좌)'},
+    {type:'item', label:'장갑', part:'장식 - 손 - 장갑'},
+    {type:'item', label:'소품(우)', part:'장식 - 소품 - 소품(우)'},
+    {type:'item', label:'소품(좌)', part:'장식 - 소품 - 소품(좌)'},
+    {type:'item', label:'양손', part:'장식 - 소품 - 양손'},
+    {type:'item', label:'허리', part:'장식 - 허리'},
+    {type:'item', label:'얼굴', part:'장식 - 특수 - 얼굴'},
+    {type:'item', label:'가슴', part:'장식 - 특수 - 가슴'},
+    {type:'item', label:'문신', part:'장식 - 특수 - 문신'},
+    {type:'item', label:'날개', part:'장식 - 특수 - 날개'},
+    {type:'item', label:'꼬리', part:'장식 - 특수 - 꼬리'},
+    {type:'item', label:'전경', part:'장식 - 특수 - 전경'},
+    {type:'item', label:'배경', part:'장식 - 특수 - 배경'},
+    {type:'item', label:'상단', part:'장식 - 특수 - 상단'},
+    {type:'item', label:'하단', part:'장식 - 특수 - 하단'},
+    {type:'item', label:'스킨', part:'장식 - 특수 - 스킨'},
+  ];
 
+  const state = window.__itemsInfoState || { partKey:'ALL', keyword:'', sort:'score' };
+  window.__itemsInfoState = state;
+
+  function $(id){ return document.getElementById(id); }
+  function norm(s){
+    return String(s||'').normalize('NFKC').toLowerCase().replace(/[\s\u00A0]+/g,'');
+  }
+
+  function getItems(){
+    return Array.isArray(window.items) ? window.items : [];
+  }
+
+  function safeTags(it){
+    const t = it && it.tags;
+    if (Array.isArray(t)) return t.join(' ');
+    return String(t||'');
+  }
+
+  function getSelectedStageSafe(){
+    try{ return (typeof getSelectedStage === 'function') ? getSelectedStage() : null; }catch(e){ return null; }
+  }
+
+  const scoreCache = new Map(); // key: stage_id|code
+  function getScore(it){
+    const stage = getSelectedStageSafe();
+    if (!stage || typeof window.scoreItemForStage !== 'function') return 0;
+    const code = (it && (it.code ?? it.id ?? it.name)) + '';
+    const k = stage.stage_id + '|' + code;
+    if (scoreCache.has(k)) return scoreCache.get(k);
+    let v = 0;
+    try{ v = Number(window.scoreItemForStage(it, stage)) || 0; }catch(e){ v = 0; }
+    scoreCache.set(k, v);
+    return v;
+  }
+
+  function buildCounts(items){
+    const map = new Map();
+    for (const it of items){
+      const p = it && it.part;
+      if (!p) continue;
+      map.set(p, (map.get(p)||0) + 1);
+    }
+    return map;
+  }
+
+  function renderPartMenu(items){
+    const tbody = $('itemsInfoPartMenu');
+    if (!tbody) return;
+    const counts = buildCounts(items);
+
+    tbody.innerHTML = '';
+    for (const row of PARTS){
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.style.padding = '8px 10px';
+      td.style.borderBottom = '1px solid #f5f5f5';
+
+      if (row.type === 'hr'){
+        td.style.padding = '6px 0';
+        td.style.borderBottom = '0';
+        td.innerHTML = '<div style="height:1px;background:#f0f0f0;margin:6px 0"></div>';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        continue;
+      }
+      if (row.type === 'header'){
+        td.style.borderBottom = '0';
+        td.innerHTML = '<div class="muted" style="font-size:12px;padding:4px 10px 0 10px">'+row.label+'</div>';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        continue;
+      }
+
+      const isActive = state.partKey === row.key || (row.part && state.partKey === row.part);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'partbtn';
+      btn.style.width = '100%';
+      btn.style.display = 'flex';
+      btn.style.justifyContent = 'space-between';
+      btn.style.alignItems = 'center';
+      btn.style.gap = '8px';
+      btn.style.padding = '8px 10px';
+      btn.style.border = '0';
+      btn.style.background = isActive ? '#eef3ff' : 'transparent';
+      btn.style.cursor = 'pointer';
+      btn.style.textAlign = 'left';
+
+      const left = document.createElement('span');
+      left.textContent = row.label;
+      const right = document.createElement('span');
+      right.className = 'countpill';
+      const c = row.part ? (counts.get(row.part)||0) : items.length;
+      right.textContent = String(c);
+
+      btn.appendChild(left);
+      btn.appendChild(right);
+
+      btn.addEventListener('click', function(){
+        state.partKey = row.part ? row.part : 'ALL';
+        const title = $('itemsInfoTitle');
+        if (title) title.textContent = row.part ? row.label : '전체';
+        renderTable();
+        // re-highlight menu quickly
+        renderPartMenu(getItems());
+      });
+
+      td.appendChild(btn);
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+    }
+  }
+
+  function applyFilters(items){
+    let out = items.slice();
+
+    if (state.partKey && state.partKey !== 'ALL'){
+      out = out.filter(it => (it && it.part) === state.partKey);
+    }
+
+    const kw = norm(state.keyword);
+    if (kw){
+      out = out.filter(it=>{
+        const n = norm(it && it.name);
+        const t = norm(safeTags(it));
+        return (n && n.includes(kw)) || (t && t.includes(kw));
+      });
+    }
+    return out;
+  }
+
+  function sortItems(items){
+    const sort = state.sort || 'score';
+    if (sort === 'name'){
+      items.sort((a,b)=> String(a?.name||'').localeCompare(String(b?.name||''), 'ko'));
+    } else if (sort === 'stars'){
+      items.sort((a,b)=> (Number(b?.stars)||0) - (Number(a?.stars)||0));
+    } else { // score
+      items.sort((a,b)=> getScore(b) - getScore(a));
+    }
+  }
+
+  function renderTable(){
+    const tbody = document.querySelector('#itemsInfoTable tbody');
+    const empty = $('itemsInfoEmpty');
+    const pill = $('itemsInfoCountPill');
+    if (!tbody) return;
+
+    const base = getItems();
+    const filtered = applyFilters(base);
+    sortItems(filtered);
+
+    if (pill) pill.textContent = String(filtered.length);
+
+    tbody.innerHTML = '';
+    const max = filtered.length; // show all; could cap later
+    for (let i=0;i<max;i++){
+      const it = filtered[i];
+      const tr = document.createElement('tr');
+
+      const tdImg = document.createElement('td');
+      tdImg.className = 'imgcol';
+      tdImg.style.whiteSpace = 'nowrap';
+      const img = document.createElement('img');
+      img.loading = 'lazy';
+      img.referrerPolicy = 'no-referrer';
+      img.src = it && it.img ? it.img : '';
+      img.alt = it && it.name ? it.name : '';
+      img.style.width = '34px';
+      img.style.height = '34px';
+      img.style.objectFit = 'cover';
+      img.style.borderRadius = '8px';
+      tdImg.appendChild(img);
+
+      const tdPart = document.createElement('td');
+      tdPart.textContent = it?.part || '';
+
+      const tdCode = document.createElement('td');
+      tdCode.textContent = (it?.code ?? '');
+
+      const tdName = document.createElement('td');
+      tdName.textContent = it?.name || '';
+
+      const tdStars = document.createElement('td');
+      tdStars.className = 'num';
+      tdStars.textContent = String(it?.stars ?? '');
+
+      const tdScore = document.createElement('td');
+      tdScore.className = 'num';
+      tdScore.textContent = String(Math.round(getScore(it)));
+
+      tr.appendChild(tdImg);
+      tr.appendChild(tdPart);
+      tr.appendChild(tdCode);
+      tr.appendChild(tdName);
+      tr.appendChild(tdStars);
+      tr.appendChild(tdScore);
+
+      tbody.appendChild(tr);
+    }
+
+    const has = filtered.length > 0;
+    if (empty) empty.style.display = has ? 'none' : 'block';
+  }
+
+  function bindControls(){
+    const search = $('itemsInfoSearch');
+    const sort = $('itemsInfoSort');
+    const clear = $('itemsInfoClear');
+
+    if (search && !search.__bind){
+      search.__bind = true;
+      search.addEventListener('input', function(){
+        state.keyword = search.value || '';
+        renderTable();
+      });
+    }
+    if (sort && !sort.__bind){
+      sort.__bind = true;
+      sort.addEventListener('change', function(){
+        state.sort = sort.value || 'score';
+        renderTable();
+      });
+    }
+    if (clear && !clear.__bind){
+      clear.__bind = true;
+      clear.addEventListener('click', function(){
+        state.keyword = '';
+        state.partKey = 'ALL';
+        if (search) search.value = '';
+        if (sort) sort.value = 'score';
+        const title = $('itemsInfoTitle'); if (title) title.textContent = '전체';
+        renderPartMenu(getItems());
+        renderTable();
+      });
+    }
+  }
+
+  window.renderItemsInfoTab = function(){
+    const items = getItems();
+    const total = $('itemsInfoTotal');
+    if (total) total.textContent = items.length ? ('Total ' + items.length) : '';
+    // Always reset default view when first time entering (prevents "갑자기 가슴" 같은 꼬임)
+    if (!window.__itemsInfoInited){
+      state.partKey = 'ALL';
+      state.keyword = '';
+      state.sort = 'score';
+      window.__itemsInfoInited = true;
+      const title = $('itemsInfoTitle'); if (title) title.textContent = '전체';
+      const search = $('itemsInfoSearch'); if (search) search.value = '';
+      const sort = $('itemsInfoSort'); if (sort) sort.value = 'score';
+    }
+    bindControls();
+    renderPartMenu(items);
+    renderTable();
+  };
+
+  // If items already loaded, render once after DOM ready
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){
+      try{ if (Array.isArray(window.items) && window.items.length) window.renderItemsInfoTab(); }catch(e){}
+    }, 0);
+  });
+})();
+</script> 
 
 <!-- === Pagination patch (2026-01-07): show 24 items per page in 추천/점수 card list === -->
 <style>
@@ -9377,3 +9941,318 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
 })();
 </script>
 
+
+
+<script>
+/* ItemsInfo iframe bridge (v1) */
+(function(){
+  const FRAME_ID = 'itemsInfoFrame';
+  function getFrameWin(){
+    const el = document.getElementById(FRAME_ID);
+    return el && el.contentWindow ? el.contentWindow : null;
+  }
+  function normalizeItems(x){
+    // Ensure array of objects. If string, try JSON parse.
+    if (Array.isArray(x)) return x;
+    if (!x) return [];
+    if (typeof x === 'string'){
+      try{
+        const j = JSON.parse(x);
+        if (Array.isArray(j)) return j;
+      }catch(e){}
+      return [];
+    }
+    if (typeof x === 'object' && Array.isArray(x.items)) return x.items;
+    return [];
+  }
+  function sendItems(){
+    const w = getFrameWin();
+    if (!w) return;
+    const items = normalizeItems(window.items);
+    w.postMessage({ type:'ITEMSINFO_DATA', items }, '*');
+  }
+
+  // If legacy renderer exists, disable to avoid double-render and DOM clobbering.
+  try{ window.renderItemsInfoTab = function(){}; }catch(e){}
+
+  // Respond to iframe requests
+  window.addEventListener('message', function(ev){
+    const msg = ev && ev.data;
+    if (!msg || typeof msg !== 'object') return;
+    if (msg.type === 'ITEMSINFO_REQUEST_DATA'){
+      sendItems();
+    }
+  });
+
+  // Push once when iframe loads
+  window.addEventListener('load', function(){
+    const el = document.getElementById(FRAME_ID);
+    if (el){
+      el.addEventListener('load', function(){ sendItems(); });
+    }
+    // Also send after a short delay (in case items arrive slightly later)
+    setTimeout(sendItems, 200);
+    setTimeout(sendItems, 800);
+  });
+
+  // Watch for items arrival/update
+  let lastLen = -1;
+  setInterval(function(){
+    const arr = normalizeItems(window.items);
+    const len = arr.length;
+    if (len !== lastLen){
+      lastLen = len;
+      if (len > 0) sendItems();
+    }
+  }, 500);
+})();
+</script>
+
+
+<script>
+/* Stage group + search filter for 추천/점수 (v1) */
+(function(){
+  function stageCategory(stageId){
+    const s = String(stageId||'').trim();
+    if (!s) return '기타';
+    if (/^\[이벤트\]/.test(s)) return '이벤트';
+    if (s.includes('스타일대회')) return '스타일대회';
+    if (s.includes('클럽대전')) return '클럽대전';
+    let m = s.match(/클럽미션\s*(\d+)/);
+    if (m) return '클럽미션 ' + Number(m[1]);
+    m = s.match(/제\s*(\d+)\s*장/);
+    if (m) return '제 ' + Number(m[1]) + '장';
+    // fallback: if it looks like "[제1장] 1-1" etc
+    m = s.match(/\[제\s*(\d+)\s*장\]/);
+    if (m) return '제 ' + Number(m[1]) + '장';
+    return '기타';
+  }
+
+  function sortGroup(a,b){
+    const A = String(a), B = String(b);
+    const order = {'이벤트':0,'스타일대회':1,'클럽대전':2};
+    const aBase = order.hasOwnProperty(A) ? order[A] : 99;
+    const bBase = order.hasOwnProperty(B) ? order[B] : 99;
+    if (aBase !== bBase) return aBase - bBase;
+
+    const am = A.match(/^클럽미션\s*(\d+)/);
+    const bm = B.match(/^클럽미션\s*(\d+)/);
+    if (am && bm) return Number(am[1]) - Number(bm[1]);
+    if (am && !bm) return -1;
+    if (!am && bm) return 1;
+
+    const ac = A.match(/^제\s*(\d+)\s*장$/);
+    const bc = B.match(/^제\s*(\d+)\s*장$/);
+    if (ac && bc) return Number(ac[1]) - Number(bc[1]);
+    if (ac && !bc) return -1;
+    if (!ac && bc) return 1;
+
+    return A.localeCompare(B,'ko');
+  }
+
+  function ensureDedupStages(){
+    const list = Array.isArray(window.stages) ? window.stages.slice() : [];
+    const seen = new Set();
+    const dedup = list.filter(s=>{
+      if (!s || !s.stage_id) return false;
+      const key = String(s.stage_id);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    return dedup;
+  }
+
+  function applyStageFilter(){
+    const groupSel = document.getElementById('stageGroupSelect');
+    const search = document.getElementById('stageSearchInput');
+    const stageSel = document.getElementById('stageSelect');
+    if (!stageSel) return;
+
+    const all = window.__stagesDedup || ensureDedupStages();
+    const g = groupSel ? groupSel.value : '';
+    const q = search ? String(search.value||'').trim().toLowerCase() : '';
+
+    const prev = stageSel.value;
+    const filtered = all.filter(s=>{
+      const id = String(s.stage_id||'');
+      const cat = stageCategory(id);
+      if (g && cat !== g) return false;
+      if (q && !id.toLowerCase().includes(q)) return false;
+      return true;
+    });
+
+    stageSel.innerHTML = '';
+    filtered.forEach(s=>{
+      const o = document.createElement('option');
+      o.value = s.stage_id;
+      o.textContent = s.stage_id;
+      stageSel.appendChild(o);
+    });
+
+    // restore if possible, else select first
+    if (prev && Array.from(stageSel.options).some(o=>o.value===prev)) stageSel.value = prev;
+    else if (stageSel.options.length) stageSel.selectedIndex = 0;
+
+    // trigger downstream render
+    try{ if (typeof window.renderAll === 'function') window.renderAll(); }catch(e){}
+  }
+
+  function populateGroups(){
+    const groupSel = document.getElementById('stageGroupSelect');
+    if (!groupSel) return;
+
+    const all = window.__stagesDedup || ensureDedupStages();
+    const groups = new Set();
+    all.forEach(s=> groups.add(stageCategory(s.stage_id)));
+    const arr = Array.from(groups);
+    arr.sort(sortGroup);
+
+    const prev = groupSel.value;
+    groupSel.innerHTML = '<option value="">전체</option>';
+    arr.forEach(g=>{
+      if (!g || g==='기타') return; // 숨기고 싶으면 여기서 조절
+      const o = document.createElement('option');
+      o.value = g;
+      o.textContent = g;
+      groupSel.appendChild(o);
+    });
+
+    if (prev && Array.from(groupSel.options).some(o=>o.value===prev)) groupSel.value = prev;
+  }
+
+  // Wrap existing __populateStages to also set up groups + filter
+  const orig = window.__populateStages;
+  window.__populateStages = function(){
+    const dedup = ensureDedupStages();
+    window.__stagesDedup = dedup;
+
+    // keep original fill (in case other code depends), then replace with filtered view
+    try{ if (typeof orig === 'function') orig(); }catch(e){}
+
+    populateGroups();
+    applyStageFilter();
+  };
+
+  // Events
+  document.addEventListener('change', function(e){
+    const t = e.target;
+    if (!t) return;
+    if (t.id === 'stageGroupSelect') applyStageFilter();
+  });
+  document.addEventListener('input', function(e){
+    const t = e.target;
+    if (!t) return;
+    if (t.id === 'stageSearchInput') applyStageFilter();
+  });
+
+})();
+</script>
+
+
+<script>
+// Split-detail data alias
+window.itemDetails = window.itemDetails || {};
+window.ITEM_DETAILS = window.itemDetails;
+</script>
+
+
+<script>
+(function(){
+  function $(id){ return document.getElementById(id); }
+  window.addEventListener('message', function(ev){
+    var d = ev && ev.data;
+    if(!d || typeof d!=='object') return;
+    if(d.type==='sources-ready'){
+      try{ window.sources = d.sources || window.sources || []; }catch(e){}
+      var st = $('sourcesStatus');
+      if(st){
+        var n = (d.count!=null)? d.count : (window.sources? window.sources.length:0);
+        st.textContent = '총 ' + (n||0) + '개';
+      }
+    }
+  }, false);
+
+  // Also poll in case postMessage timing misses
+  function poll(){
+    var st = $('sourcesStatus');
+    if(!st) return;
+    var arr = window.sources || window.SOURCES || [];
+    if(Array.isArray(arr) && arr.length){
+      st.textContent = '총 ' + arr.length + '개';
+      return;
+    }
+    setTimeout(poll, 300);
+  }
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(poll, 50); });
+})();
+</script>
+
+
+<script>
+/* __ITEMS_INDEX_BRIDGE__ : respond to sources_frame requesting minimal item index (file:// safe) */
+(function(){
+  function buildIndex(items){
+    try{
+      return (items||[]).map(function(it){
+        return { code: it.code, part: it.part, name: it.name, img: it.img };
+      });
+    }catch(e){ return []; }
+  }
+
+  function resolveItems(){
+    try{
+      if (typeof window.__resolveItems === 'function'){
+        var r = window.__resolveItems();
+        if (Array.isArray(r)) return r;
+      }
+    }catch(e){}
+    if (Array.isArray(window.items)) return window.items;
+    if (Array.isArray(window.ITEMS)) return window.ITEMS;
+    return null;
+  }
+
+  function send(toWin, reqId){
+    var items = resolveItems();
+    if (!items || !items.length){
+      // retry for up to ~4 seconds
+      var n=0;
+      var t=setInterval(function(){
+        n++;
+        var it = resolveItems();
+        if (it && it.length){
+          clearInterval(t);
+          try{ toWin.postMessage({ type:"ITEMS_INDEX", reqId:reqId, items: buildIndex(it) }, "*"); }catch(e){}
+        }
+        if (n>40){ clearInterval(t); }
+      }, 100);
+      return;
+    }
+    try{ toWin.postMessage({ type:"ITEMS_INDEX", reqId:reqId, items: buildIndex(items) }, "*"); }catch(e){}
+  }
+
+  window.addEventListener("message", function(ev){
+    var msg = ev && ev.data;
+    if (!msg) return;
+    if (msg.type === "REQUEST_ITEMS_INDEX"){
+      send(ev.source || window, msg.reqId || null);
+    }
+  }, false);
+})();
+</script>
+
+
+<script>
+/* Quiz tab helpers */
+document.addEventListener('DOMContentLoaded', function(){
+  var btn = document.getElementById('openQuizNewTab');
+  if(btn && !btn.__bound){
+    btn.__bound = true;
+    btn.addEventListener('click', function(){
+      try { window.open('quiz_event.html', '_blank'); } catch(e) {}
+    });
+  }
+});
+</script>
+</body>
+</html>

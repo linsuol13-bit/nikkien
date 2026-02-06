@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>세트정보</title>
+<!-- sets_frame_fixed_v3 2026-02-06 -->
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,AppleSDGothicNeo,Segoe UI,Roboto,sans-serif;background:#f7f7fb;color:#222}
+  .wrap{padding:12px}
+  .topbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+  .title{font-weight:800;font-size:16px}
+  .muted{color:#777;font-size:12px}
+  input[type=text]{padding:8px 10px;border:1px solid #ddd;border-radius:10px;background:#fff;min-width:220px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+  .card{background:#fff;border:1px solid #eee;border-radius:16px;overflow:hidden;cursor:pointer;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+  .thumb{width:100%;height:220px;object-fit:cover;background:#fafafa;display:block}
+  .card .meta{padding:10px 10px 12px 10px;display:flex;flex-direction:column;gap:6px}
+  .name{font-weight:800;font-size:14px;line-height:1.2}
+  .sub{font-size:12px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pillrow{display:flex;gap:6px;flex-wrap:wrap}
+  .pill{font-size:11px;border:1px solid #eee;padding:3px 8px;border-radius:999px;background:#fafafa}
+  .empty{padding:22px 6px;color:#666}
+  dialog{border:0;padding:0;border-radius:18px;max-width:min(980px,96vw);width:980px;box-shadow:0 20px 70px rgba(0,0,0,.22)}
+  dialog::backdrop{background:rgba(0,0,0,.35)}
+  .dlg{display:flex;flex-direction:column;max-height:88vh;background:#fff;border-radius:18px;overflow:hidden}
+  .dlgHead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:14px 16px;border-bottom:1px solid #eee;background:#fff}
+  .dlgTitle{display:flex;flex-direction:column;gap:4px}
+  .dlgTitle .main{font-weight:900;font-size:18px}
+  .dlgTitle .names{font-size:12px;color:#666;display:flex;flex-direction:column;gap:2px}
+  .close{border:1px solid #eee;background:#fff;border-radius:12px;padding:8px 10px;cursor:pointer}
+  .close:hover{background:#fafafa}
+  .dlgBody{padding:14px 16px;overflow:auto;background:#f7f7fb}
+  .section{background:#fff;border:1px solid #eee;border-radius:16px;padding:12px;margin-bottom:12px}
+  .section h3{margin:0 0 8px 0;font-size:14px}
+
+  /* acquisition emphasis */
+  .acqSection{border:2px solid #cdb7ff;background:linear-gradient(180deg,#fbf8ff 0%, #ffffff 60%);}
+  .acqHead{display:flex;align-items:center;gap:10px;margin:0 0 10px 0}
+  .acqBadge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:1000;letter-spacing:.2px;background:#6b3df0;color:#fff}
+  .acqTitle{font-size:15px;font-weight:1000;color:#2b115f}
+
+  /* 이벤트 설명/공략은 내부에 별도 강조 박스가 있으므로, 바깥 컨테이너는 "박스"가 아닌 여백만 */
+  .eventPlain{margin-bottom:12px}
+  .eventPlain h3{margin:0 0 10px 0;font-size:15px;font-weight:1000;color:#0f2042}
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+  .gimg{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;border:1px solid #eee;background:#fafafa;cursor:zoom-in}
+  .sources{display:flex;flex-direction:column;gap:6px}
+  .src{display:flex;gap:8px;align-items:flex-start}
+  .src .k{min-width:110px;font-weight:700;font-size:12px;color:#333}
+  .src .v{font-size:12px;color:#555;white-space:pre-wrap}
+  .guide{margin-top:8px;padding-top:8px;border-top:1px dashed #eee;font-size:12px;color:#444;white-space:pre-wrap}
+  .parts{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+  .pitem{display:flex;gap:10px;align-items:center;border:1px solid #eee;border-radius:14px;padding:10px;background:#fff;cursor:pointer}
+  .pitem:hover{background:#fafcff}
+  .pimg{width:56px;height:56px;border-radius:12px;object-fit:cover;border:1px solid #eee;background:#fafafa}
+  .pmeta{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .pname{font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ppart{font-size:12px;color:#666}
+  .code{font-size:11px;color:#777}
+
+  /* emphasized event/guide boxes */
+  .eventBox{border:2px solid #ffcc6a;background:#fff3d8;border-radius:16px;padding:12px 12px 12px 12px;margin-top:10px}
+  .guideBox{border:2px solid #7bb6ff;background:#e9f3ff;border-radius:16px;padding:12px 12px 12px 12px;margin-top:10px}
+
+  .hdr{display:flex;align-items:center;gap:10px;font-weight:900}
+  .hdr .ico{font-size:18px}
+  .hdr .tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:.2px}
+  .hdr .tag-event{background:#ffb01a;color:#1a1200}
+  .hdr .tag-guide{background:#1e7cff;color:#fff}
+  .hdr .title{font-size:14px;font-weight:1000}
+
+  .eventBox .body{margin-top:8px;font-size:13px;color:#2a1d00;white-space:pre-wrap;line-height:1.7}
+  .guideBox .body{margin-top:8px;font-size:13px;color:#0f2042;white-space:pre-wrap;line-height:1.7}
+
+  /* (eventPlain에서 처리) */
+
+  /* image zoom */
+  .zoomDlg{max-width:min(980px,96vw);width:980px}
+  .zoomBox{background:#000;border-radius:18px;overflow:hidden}
+  .zoomImg{width:100%;height:auto;display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="title">세트 목록</div>
+    <input id="q" type="text" placeholder="세트 이름 검색 (한/중/영/북미)"/>
+    <div class="muted" id="status">로딩중...</div>
+  </div>
+
+  <div id="grid" class="grid"></div>
+  <div id="empty" class="empty" style="display:none">세트 데이터가 비어있어. (sets_data.html에 세트 추가해줘)</div>
+</div>
+
+<dialog id="dlg">
+  <div class="dlg">
+    <div class="dlgHead">
+      <div class="dlgTitle">
+        <div class="main" id="dlgMain">-</div>
+        <div class="names" id="dlgNames"></div>
+      </div>
+      <button class="close" id="closeBtn" type="button">닫기</button>
+    </div>
+    <div class="dlgBody">
+      <div class="section">
+        <h3>세트사진</h3>
+        <div class="gallery" id="gallery"></div>
+      </div>
+
+      <div class="section acqSection" id="acqSection">
+        <div class="acqHead">
+          <span class="acqBadge">📍 세트 획득경로</span>
+        </div>
+        <div class="sources" id="sources"></div>
+      </div>
+
+      <!-- 이벤트 영역은 내부에 이미 강조 박스(eventBox/guideBox)가 있으니, 바깥 섹션 박스는 제거해서 중첩 박스 느낌을 없앰 -->
+      <div id="eventSection" class="eventPlain" style="display:none">
+        <div class="sources" id="eventInfo"></div>
+      </div>
+
+      <div class="section">
+        <h3>세트 부위별 정보</h3>
+        <div class="muted" style="margin-bottom:8px">부위를 클릭하면 해당 의상 상세페이지가 열려.</div>
+        <div class="parts" id="parts"></div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="zoomDlg" class="zoomDlg">
+  <div class="zoomBox">
+    <img id="zoomImg" class="zoomImg" src="" alt="">
+  </div>
+</dialog>
+
+<!-- Loaders (file:// safe) -->
+<iframe id="setsLoader" src="sets_data.html" style="display:none"></iframe>
+<iframe id="itemsLoader" src="items.html" style="display:none"></iframe>
+
+<script>
+(function(){
+  const $ = (id)=>document.getElementById(id);
+  const grid = $("grid");
+  const empty = $("empty");
+  const status = $("status");
+  const q = $("q");
+
+  const dlg = $("dlg");
+  const closeBtn = $("closeBtn");
+  const dlgMain = $("dlgMain");
+  const dlgNames = $("dlgNames");
+  const gallery = $("gallery");
+  const sources = $("sources");
+  const parts = $("parts");
+  const eventSection = $("eventSection");
+  const eventInfo = $("eventInfo");
+
+  const zoomDlg = $("zoomDlg");
+  const zoomImg = $("zoomImg");
+
+  let SETS = [];
+  let ITEMS = [];
+  let BYKEY = Object.create(null);
+
+  function norm(s){ return (s==null) ? "" : String(s); }
+  function trim(s){ return norm(s).trim(); }
+
+  function itemKey(part, code){
+    return trim(part) + "||" + String(code);
+  }
+
+  function buildItemIndex(){
+    const by = Object.create(null);
+    for(const it of ITEMS){
+      const part = trim(it.part);
+      const code = it.code;
+      if(!part || code==null) continue;
+      by[itemKey(part, code)] = it;
+    }
+    BYKEY = by;
+  }
+
+  // ✅ 리스트 화면에서는 중국어를 보여주지 않음 (영어/일본어 우선)
+  function listMainName(set){
+    return trim(set.name_en) || trim(set.name_jp) || trim(set.name_na) || trim(set.name_kr) || trim(set.name) || "이름없음";
+  }
+
+  function listSubName(set){
+    // 서브 라인은 일본어만 (없으면 비움)
+    return trim(set.name_jp) || "";
+  }
+
+  // ✅ 상세 팝업에서는 중국어 포함 전체 이름 표시
+  function displayName(set){
+    return trim(set.name_kr) || trim(set.name_cn) || trim(set.name_en) || trim(set.name_na) || trim(set.name) || "이름없음";
+  }
+
+  function allNames(set){
+    const na = trim(set.name_na);
+    const cn = trim(set.name_cn);
+    const en = trim(set.name_en);
+    let kr = trim(set.name_kr);
+
+    // fallback: if KR missing, show "(번역)" using CN -> EN -> NA
+    if(!kr){
+      const base = cn || en || na;
+      if(base) kr = base + " (번역)";
+    }
+    const lines = [];
+    if(na) lines.push("북미: " + na);
+    if(cn) lines.push("중국: " + cn);
+    if(en) lines.push("영어: " + en);
+    if(kr) lines.push("한국: " + kr);
+    return lines;
+  }
+
+  function matchesQuery(set, query){
+    if(!query) return true;
+    const hay = [
+      set.name_kr, set.name_cn, set.name_en, set.name_na, set.name,
+      set.id
+    ].map(x=>trim(x).toLowerCase()).join(" ");
+    return hay.includes(query.toLowerCase());
+  }
+
+  function renderList(){
+    const query = trim(q.value);
+    const list = SETS.filter(s=>matchesQuery(s, query));
+    grid.innerHTML = "";
+    empty.style.display = (list.length===0) ? "block" : "none";
+
+    const frag = document.createDocumentFragment();
+    for(const s of list){
+      const card = document.createElement("div");
+      card.className = "card";
+      const img = trim(s.thumb) || (Array.isArray(s.images) && s.images[0]) || "";
+      const sub = listSubName(s);
+      card.innerHTML = `
+        ${img ? `<img class="thumb" loading="lazy" decoding="async" src="${img}" alt="">` : `<div class="thumb"></div>`}
+        <div class="meta">
+          <div class="name">${escapeHtml(listMainName(s))}</div>
+          ${sub ? `<div class="sub">${escapeHtml(sub)}</div>` : ``}
+          <div class="pillrow">
+            ${Array.isArray(s.parts) ? `<span class="pill">부위 ${s.parts.length}</span>` : ``}
+            ${Array.isArray(s.images) ? `<span class="pill">사진 ${s.images.length}</span>` : ``}
+          </div>
+        </div>
+      `;
+      card.addEventListener("click", ()=>openSet(s));
+      frag.appendChild(card);
+    }
+    grid.appendChild(frag);
+
+    status.textContent = `세트 ${list.length} / 전체 ${SETS.length}`;
+  }
+
+  function openSet(set){
+    if(!set) return;
+
+    dlgMain.textContent = displayName(set);
+    dlgNames.innerHTML = "";
+    for(const line of allNames(set)){
+      const div = document.createElement("div");
+      div.textContent = line;
+      dlgNames.appendChild(div);
+    }
+
+    // gallery
+    gallery.innerHTML = "";
+    const imgs = Array.isArray(set.images) ? set.images.slice(0, 10) : [];
+    if(imgs.length){
+      for(const u of imgs){
+        const url = trim(u);
+        if(!url) continue;
+        const im = document.createElement("img");
+        im.className = "gimg";
+        im.src = url;
+        im.loading = "lazy";
+        im.decoding = "async";
+        im.addEventListener("click", ()=>{
+          zoomImg.src = url;
+          if(zoomDlg && zoomDlg.showModal) zoomDlg.showModal();
+        });
+        gallery.appendChild(im);
+      }
+    }else{
+      gallery.innerHTML = `<div class="muted">사진 데이터가 없어.</div>`;
+    }
+
+    // sources
+    sources.innerHTML = "";
+    const srcs = Array.isArray(set.sources) ? set.sources : (set.source ? [set.source] : []);
+    if(srcs.length){
+      for(const s of srcs){
+        const row = document.createElement("div");
+        row.className = "src";
+        const k = trim(s.label || s.type || "획득");
+        const v = trim(s.text || s.desc || s.value || "");
+        row.innerHTML = `<div class="k">${escapeHtml(k)}</div><div class="v">${escapeHtml(v||"-")}</div>`;
+        sources.appendChild(row);
+        const guideText = trim(s.guide || s.tips || "");
+        if(guideText){
+          const g = document.createElement("div");
+          g.className = "guide";
+          g.textContent = guideText;
+          sources.appendChild(g);
+        }
+      }
+    }else{
+      sources.innerHTML = `<div class="muted">획득경로 데이터가 없어.</div>`;
+    }
+
+    // event section (optional)
+    const ev = set.event || null;
+    if(ev && (trim(ev.desc)||trim(ev.guide)||trim(ev.title))){
+      eventSection.style.display = "block";
+      eventInfo.innerHTML = "";
+      const title = trim(ev.title) || "이벤트";
+      const desc = trim(ev.desc) || "-";
+      const guide = trim(ev.guide) || "";
+
+      // 🎉 이벤트 설명 박스
+      const eBox = document.createElement("div");
+      eBox.className = "eventBox";
+      eBox.innerHTML = `
+        <div class="hdr">
+          <span class="ico">🎉</span>
+          <span class="tag tag-event">이벤트 설명</span>
+          <span class="title">${escapeHtml(title)}</span>
+        </div>
+        <div class="body">${escapeHtml(desc)}</div>
+      `;
+      eventInfo.appendChild(eBox);
+
+      // 🧭 공략 박스 (있을 때만)
+      if(guide){
+        const gBox = document.createElement("div");
+        gBox.className = "guideBox";
+        gBox.innerHTML = `
+          <div class="hdr">
+            <span class="ico">🧭</span>
+            <span class="tag tag-guide">공략</span>
+            <span class="title">핵심 포인트</span>
+          </div>
+          <div class="body">${escapeHtml(guide)}</div>
+        `;
+        eventInfo.appendChild(gBox);
+      }
+    }else{
+      eventSection.style.display = "none";
+      eventInfo.innerHTML = "";
+    }
+
+    // parts
+    parts.innerHTML = "";
+    const plist = Array.isArray(set.parts) ? set.parts : [];
+    if(plist.length){
+      const frag = document.createDocumentFragment();
+      for(const p of plist){
+        const part = trim(p.part);
+        const code = (p.code==null) ? "" : p.code;
+        const fromItems = BYKEY[itemKey(part, code)] || null;
+
+        const img = trim(p.img) || trim(fromItems && fromItems.img) || "";
+        const name = trim(p.name) || trim(fromItems && fromItems.name) || "-";
+
+        const div = document.createElement("div");
+        div.className = "pitem";
+        div.innerHTML = `
+          ${img ? `<img class="pimg" src="${img}" alt="">` : `<div class="pimg"></div>`}
+          <div class="pmeta">
+            <div class="pname">${escapeHtml(name)}</div>
+            <div class="ppart">${escapeHtml(part || "-")}</div>
+            <div class="code">code: ${escapeHtml(String(code||"-"))}</div>
+          </div>
+        `;
+        div.addEventListener("click", ()=>openItemDetail({part, code}));
+        frag.appendChild(div);
+      }
+      parts.appendChild(frag);
+    }else{
+      parts.innerHTML = `<div class="muted">세트 부위 데이터가 없어.</div>`;
+    }
+
+    if(dlg && dlg.showModal) dlg.showModal();
+  }
+
+  function openItemDetail(ref){
+    const part = trim(ref && ref.part);
+    const code = ref && ref.code;
+    if(!part || code==null || code==="") return;
+
+    // Same convention as sources_frame.html
+    const safePart = part.replace(/[\\/]/g,'_');
+    const file = `${code}_${safePart}-${code}.html`;
+    const url = encodeURI(file);
+
+    // Open in new tab (popup inside popup is messy)
+    window.open(url, "_blank");
+  }
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, function(m){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]);
+    });
+  }
+
+  closeBtn.addEventListener("click", ()=>{ try{ dlg.close(); }catch(e){} });
+  if(dlg){
+    dlg.addEventListener("close", ()=>{ /* noop */ });
+    dlg.addEventListener("cancel", ()=>{ /* noop */ });
+  }
+  if(zoomDlg){
+    zoomDlg.addEventListener("click", ()=>{ try{ zoomDlg.close(); }catch(e){} });
+    zoomDlg.addEventListener("cancel", ()=>{ try{ zoomDlg.close(); }catch(e){} });
+  }
+
+  q.addEventListener("input", ()=>renderList());
+
+  // receive data from iframes
+  window.addEventListener("message", (ev)=>{
+    const msg = ev && ev.data;
+    if(!msg || typeof msg !== "object") return;
+
+    if(msg.__splitData === true && msg.key === "sets" && Array.isArray(msg.data)){
+      SETS = msg.data.filter(x=>x && typeof x === "object");
+      status.textContent = SETS.length ? ("세트 로드 완료: " + SETS.length + "개") : "세트 데이터가 비어있어.";
+      renderList();
+      return;
+    }
+
+    if(msg.__splitData === true && msg.key === "items" && Array.isArray(msg.data)){
+      ITEMS = msg.data.filter(x=>x && typeof x === "object");
+      buildItemIndex();
+      // keep status if sets already loaded
+      renderList();
+      return;
+    }
+  });
+
+  // initial render
+  renderList();
+})();
+</script>
+</body>
+</html>
