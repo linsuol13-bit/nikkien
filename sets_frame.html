@@ -29,7 +29,7 @@
   .pbtn[disabled]:hover{background:#fff}
   .pbtn.active{background:#2b115f;color:#fff;border-color:#2b115f}
   .pdots{color:#777;font-size:12px;padding:0 4px}
-  dialog{border:0;padding:0;border-radius:18px;max-width:min(980px,96vw);width:980px;box-shadow:0 20px 70px rgba(0,0,0,.22)}
+  dialog{border:0;padding:0;border-radius:18px;max-width:min(980px,96vw);width:980px;box-shadow:0 20px 70px rgba(0,0,0,.22);position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);margin:0}
   dialog::backdrop{background:rgba(0,0,0,.35)}
   .dlg{display:flex;flex-direction:column;max-height:88vh;background:#fff;border-radius:18px;overflow:hidden}
   .dlgHead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:14px 16px;border-bottom:1px solid #eee;background:#fff}
@@ -115,6 +115,10 @@
   .evoStage{margin-top:14px}
   .evoTitle{font-weight:1000;font-size:13px;color:#2b115f;margin:6px 0}
   .evoSub{font-weight:900;font-size:12px;color:#666;margin:8px 0}
+
+
+  /* ✅ mobile: dialogs should appear immediately without needing to scroll */
+  #itemDetailDialog{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);margin:0}
 
 </style>
 </head>
@@ -226,6 +230,7 @@
 
 
   const dlg = $("dlg");
+  const dlgBody = dlg ? dlg.querySelector(".dlgBody") : null;
   const closeBtn = $("closeBtn");
   const dlgMain = $("dlgMain");
   const dlgNames = $("dlgNames");
@@ -240,6 +245,9 @@
 
   const zoomDlg = $("zoomDlg");
   const zoomImg = $("zoomImg");
+
+  const setsLoaderEl = $("setsLoader");
+  const itemsLoaderEl = $("itemsLoader");
 
   let SETS = [];
   let ITEMS = [];
@@ -749,7 +757,44 @@ function trim(s){ return norm(s).trim(); }
     }
   });
 
-  // initial render
+
+  // ✅ fallback: file:// 환경에서 sets_data.html / items.html 이 postMessage를 안 보내는 경우,
+  // iframe 안의 window.SETS / window.ITEMS 를 직접 읽어서 로딩
+  function tryReadFromIframes(){
+    // sets
+    try{
+      if(Array.isArray(SETS) && SETS.length){} else{
+        const data = setsLoaderEl && setsLoaderEl.contentWindow && setsLoaderEl.contentWindow.SETS;
+        if(Array.isArray(data)){
+          SETS = data.filter(x=>x && typeof x === "object");
+          status.textContent = SETS.length ? ("세트 로드 완료: " + SETS.length + "개") : "세트 데이터가 비어있어.";
+          renderList();
+          schedulePostHeight(true);
+        }
+      }
+    }catch(e){}
+    // items
+    try{
+      if(Array.isArray(ITEMS) && ITEMS.length){} else{
+        const data2 = itemsLoaderEl && itemsLoaderEl.contentWindow && (itemsLoaderEl.contentWindow.ITEMS || itemsLoaderEl.contentWindow.items || itemsLoaderEl.contentWindow.window && itemsLoaderEl.contentWindow.window.ITEMS);
+        if(Array.isArray(data2)){
+          ITEMS = data2.filter(x=>x && typeof x === "object");
+          buildItemIndex();
+          renderList();
+        }
+      }
+    }catch(e){}
+  }
+
+  if(setsLoaderEl){
+    setsLoaderEl.addEventListener("load", ()=>{ tryReadFromIframes(); });
+  }
+  if(itemsLoaderEl){
+    itemsLoaderEl.addEventListener("load", ()=>{ tryReadFromIframes(); });
+  }
+
+
+    // initial render
   renderList();
 })();
 
