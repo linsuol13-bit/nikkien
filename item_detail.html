@@ -1,356 +1,512 @@
 <!doctype html>
-<html lang="ko">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta charset="utf-8">
 <title>아이템 상세</title>
 <style>
+  :root{
+    --bg:#f6f7fb;
+    --card:#ffffff;
+    --border:#e6e8ef;
+    --text:#111827;
+    --muted:#6b7280;
+    --pill:#f3f4f6;
+    --shadow:0 6px 20px rgba(17,24,39,.06);
+  }
   *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,AppleSDGothicNeo,Segoe UI,Roboto,sans-serif;background:#f7f7fb;color:#222}
-  .wrap{max-width:980px;margin:0 auto;padding:16px}
-  .card{background:#fff;border:1px solid #eee;border-radius:14px;padding:14px}
-  .top{display:flex;gap:14px;align-items:flex-start}
-  .img{width:140px;height:140px;border-radius:14px;border:1px solid #eee;object-fit:cover;background:#fafafa;flex:0 0 auto}
-  h1{margin:0 0 6px 0;font-size:18px}
-  .meta{display:flex;gap:10px;flex-wrap:wrap;color:#555;font-size:13px}
-  .pill{background:#f0f7ff;border:1px solid #cfe4ff;border-radius:999px;padding:3px 10px}
-  .section{margin-top:14px}
-  .label{font-weight:900;margin-bottom:6px}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:left;font-size:13px}
-  th{background:#fafafa}
-  .muted{color:#666;font-size:12px}
-  .grid{display:flex;gap:8px;flex-wrap:wrap}
-  .imgGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  .imgGrid img{width:100%;height:220px;object-fit:cover;border-radius:14px;border:1px solid #eee;background:#fafafa}
-  .dyeGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-  .dyeGrid img{width:100%;height:140px;object-fit:cover;border-radius:14px;border:1px solid #eee;background:#fafafa}
-  .tag{background:#fafafa;border:1px solid #eee;border-radius:999px;padding:3px 10px;font-size:12px}
+  body{margin:0; padding:16px; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text);}
+  .wrap{max-width:980px; margin:0 auto;}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow);; position:relative}
+  .head{display:flex; gap:14px; align-items:flex-start; padding:16px;}
+  .thumb{width:86px; height:86px; border-radius:14px; border:1px solid var(--border); background:#fff; object-fit:cover; flex:0 0 auto;}
+  .hcol{flex:1 1 auto; min-width:240px;}
+  .title{font-size:22px; font-weight:800; margin:0 0 2px;}
+  .sub{font-size:13px; color:var(--muted); margin:0 0 10px;}
+  .chips{display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:var(--pill); border:1px solid var(--border); font-size:12px; color:#111827;}
+  .chip b{font-weight:700}
+  .section{padding:0 16px 16px;}
+  .sec-title{display:flex; align-items:center; gap:8px; font-weight:800; margin:12px 0 10px;}
+  .sec-title small{font-weight:600; color:var(--muted)}
+  .box{border:1px solid var(--border); border-radius:14px; background:#fff; padding:12px;}
+  .box-plain{border:0; background:transparent; padding:0;}
+
+  .box-plain{border:0; background:transparent; padding:0;}
+  .lang{display:grid; grid-template-columns:74px 1fr; gap:10px 12px; align-items:start;}
+  .lang + .lang{margin-top:10px}
+  .pill{display:inline-flex; align-items:center; justify-content:center; height:24px; padding:0 10px; border-radius:999px; font-size:12px; border:1px solid var(--border); background:#fff; color:#111827; width:max-content;}
+  .pill.ko{background:#fff1f2; border-color:#fecdd3;}
+  .pill.zh{background:#fff7ed; border-color:#fed7aa;}
+  .pill.ja{background:#eef2ff; border-color:#c7d2fe;}
+  .pill.en{background:#ecfeff; border-color:#a5f3fc;}
+  .text{white-space:pre-wrap; line-height:1.5; font-size:13.5px;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .imgcard{border:1px solid var(--border); border-radius:14px; background:#fff; overflow:hidden; min-height:180px; display:flex; align-items:center; justify-content:center;}
+  .imgcard img{max-width:100%; height:auto; display:block;}
+  /* Dye thumbnails (small like materials) */
+  .dyegrid{display:flex; flex-wrap:wrap; gap:12px;}
+  .dyeitem{width:62px; text-align:center;}
+  .dyeitem img{width:56px; height:56px; border-radius:12px; object-fit:cover; display:block; border:1px solid var(--border); background:#fff;}
+
+  .muted{color:var(--muted); font-size:13px;}
+  .stats{display:flex; flex-wrap:wrap; gap:10px;}
+  .stat{display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:12px; border:1px solid var(--border); background:#fff; font-size:13px;}
+  .grade{width:28px; height:28px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:900; border:1px solid var(--border); background:var(--pill);}
+
+  /* ===== 스펙 등급 색상 ===== */
+  .grade.grade-SSS{background:linear-gradient(135deg,#c62828,#ff7043); color:#fff; border-color:rgba(198,40,40,.35); box-shadow:0 0 6px rgba(198,40,40,.35);}
+  .grade.grade-SS{background:linear-gradient(135deg,#ad1457,#f06292); color:#fff; border-color:rgba(173,20,87,.28);}
+  .grade.grade-S{background:linear-gradient(135deg,#f9a825,#ffd54f); color:#4a3500; border-color:rgba(249,168,37,.35);}
+  .grade.grade-A{background:linear-gradient(135deg,#1565c0,#64b5f6); color:#fff; border-color:rgba(21,101,192,.25);}
+  .grade.grade-C{background:linear-gradient(135deg,#616161,#bdbdbd); color:#222; border-color:rgba(97,97,97,.25);}
+
+  .list{margin:0; padding-left:18px;}
+  .materials{display:flex; flex-wrap:wrap; gap:12px;}
+  .mat{width:62px; text-align:center;}
+  .mat .mimg{width:56px; height:56px; border-radius:12px; border:1px solid var(--border); background:#fff; object-fit:cover;}
+  .qty{margin-top:6px; font-size:12px; color:var(--muted);}
+  .rowline{height:1px; background:var(--border); margin:0 16px;}
+
+  .clickable{cursor:pointer}
+  .matbtn{all:unset; cursor:pointer; width:62px; text-align:center;}
+  .matbtn:focus{outline:2px solid rgba(59,130,246,.35); outline-offset:2px; border-radius:12px;}
+  .matbtn:hover .mimg{transform:translateY(-1px); box-shadow:0 8px 18px rgba(17,24,39,.10);}
+  .mimg{transition:transform .12s ease, box-shadow .12s ease;}
+  .imgbtn{all:unset; cursor:pointer; display:block;}
+  .imgbtn:hover img{transform:translateY(-1px); box-shadow:0 8px 18px rgba(17,24,39,.10);}
+  .imgbtn img{transition:transform .12s ease, box-shadow .12s ease;}
+
+
+  .controls{position:absolute; top:10px; right:10px; display:flex; gap:6px; z-index:5;}
+  .ctrl-btn{width:32px; height:32px; border:1px solid var(--border); border-radius:10px; background:#fff; cursor:pointer;
+            display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--muted); padding:0;}
+  .ctrl-btn:hover{background:var(--pill); color:var(--text);}
+
+
+  /* ===== 획득경로 강조 ===== */
+  .source-box{
+    border:1px solid var(--border);
+    background:linear-gradient(180deg, #ffffff 0%, #fff7ed 100%);
+    padding:12px;
+    border-radius:14px;
+    box-shadow: var(--shadow);
+  }
+  .source-list{list-style:none; padding:0; margin:0; display:flex; flex-wrap:wrap; gap:8px;}
+  .source-list li{
+    padding:8px 10px;
+    border-radius:999px;
+    background:#ffffff;
+    border:1px solid #ffd7aa;
+    font-weight:700;
+    color:#9a3412;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .source-list li::before{
+    content:"🎁";
+    font-size:14px;
+  }
+
 </style>
 
-<style>
-#debugBox{position:fixed;right:8px;bottom:8px;max-width:520px;max-height:220px;overflow:auto;
-background:rgba(0,0,0,.75);color:#fff;font:12px/1.4 system-ui;padding:10px;border-radius:10px;z-index:99999;display:none}
-#debugBox code{white-space:pre-wrap}
-#debugBox .row{opacity:.9;margin-top:6px}
-</style>
-</head>
-<body>
-<div id="debugBox"><div><b>item_detail debug</b> <span id="dbgOn"></span></div><div class="row" id="dbgMsg"></div><div class="row"><code id="dbgList"></code></div></div>
 <div class="wrap">
-  <div class="card" id="app">
-    <div class="muted">불러오는 중…</div>
+  <div class="card">
+  <div class="controls">
+    <button class="ctrl-btn" id="btnBack" title="뒤로가기" aria-label="뒤로가기">←</button>
+    <button class="ctrl-btn" id="btnClose" title="닫기" aria-label="닫기">×</button>
   </div>
-  <div class="muted" style="padding:10px 2px">※ 이 창은 세트정보에서 클릭한 아이템의 상세를 보여줘.</div>
+
+    <div class="head">
+      <img id="thumb" class="thumb" alt="" />
+      <div class="hcol">
+        <h1 class="title" id="title">아이템 상세</h1>
+        <p class="sub" id="subtitle">불러오는 중…</p>
+        <div class="chips" id="chips"></div>
+      </div>
+    </div>
+
+    <div class="rowline"></div>
+
+    <div class="section">
+      <div id="content" class="muted" style="padding:10px 2px;">불러오는 중…</div>
+    </div>
+  </div>
 </div>
 
 <script>
-(async function(){
-  // ========= 설정 =========
-  // 너가 만든 "아이템 상세 HTML" 파일들이 들어있는 폴더명을 여기에 적어줘.
-  // 예) item_details / item_detail_pages / details 등
-  const DETAIL_DIRS = [
-    localStorage.getItem('ITEM_DETAIL_DIR') || 'item_details',
-    'item_details',
-    'item_detail_pages',
-    'details',
-    'item_detail',
-    'item'
-  ].filter(Boolean);
 
-  // 파일명 패턴들(필요하면 너 폴더 구조에 맞춰 더 추가해도 됨)
-  function buildCandidates(code, part){
-    const pRaw = (part||'').trim();
-    const p = pRaw ? encodeURIComponent(pRaw) : '';
-    const list = [];
-    for (const dir0 of DETAIL_DIRS){
-      const dir = String(dir0||'').replace(/\/+$/,'');
-      if (p){
-        // ✅ 기본 규칙: item_details/헤어/1.html
-        list.push(`${dir}/${p}/${code}.html`);
-        list.push(`${dir}/${p}/${code}.htm`);
-        // 흔한 변형들
-        list.push(`${dir}/${p}/item-${code}.html`);
-        list.push(`${dir}/${p}/item_${code}.html`);
-        // 예전 규칙(혼재 가능)
-        list.push(`${dir}/${p}/detail_${pRaw}_${code}.html`);
-        list.push(`${dir}/${p}/detail_${pRaw}_${code}.htm`);
-        list.push(`${dir}/${p}/detail_${pRaw}_${code}`);
-      }
-      if (pRaw){
-        list.push(`${dir}/detail_${pRaw}_${code}.html`);
-        list.push(`${dir}/detail_${pRaw}_${code}.htm`);
-        list.push(`${dir}/detail_${pRaw}_${code}`);
-      }
-      list.push(`${dir}/${code}.html`);
-      list.push(`${dir}/${code}.htm`);
-      list.push(`${dir}/item-${code}.html`);
-      list.push(`${dir}/item_${code}.html`);
-    }
-    return Array.from(new Set(list));
-  }
+(function(){
 
-      // 기존 후보들도 같이 유지 (혹시 다른 규칙 파일도 섞여있을 수 있음)
-      list.push(`${dir}/${code}.html`);
-      list.push(`${dir}/item-${code}.html`);
-      list.push(`${dir}/item_${code}.html`);
-      if (p) list.push(`${dir}/${p}/${code}.html`);
-      if (p) list.push(`${dir}/${p}/item-${code}.html`);
-      if (p) list.push(`${dir}/${p}/item_${code}.html`);
-    }
-    return Array.from(new Set(list));
-  }
-
-  // file:// 환경에서 404일 때 크롬이 보여주는 에러 페이지를 최대한 감지
-  function looksLikeNotFound(doc, url){
+  function closeDetailView(){
     try{
-      const title = (doc && doc.title) ? doc.title : '';
-      const body = (doc && doc.body) ? (doc.body.innerText || '') : '';
-      const t = (title + ' ' + body).toLowerCase();
-      if (t.includes('err_file_not_found')) return true;
-      if (t.includes('file not found')) return true;
-      if (t.includes('404')) return true;
-      if (t.includes('not found')) return true;
-      // 크롬 로컬 파일 404일 때 URL이 그대로 보이면서 내용 거의 없는 경우도 있어서, 너무 빈 문서면 not found 취급
-      if (body.trim().length < 20) return true;
-      return false;
-    }catch(e){
-      // 접근이 막히면 판단 불가 -> 일단 not found로 치면 계속 실패하니까, false로 둠
-      return false;
-    }
+      const t = window.top;
+      if (t && typeof t.closeDetail === "function") { t.closeDetail(); return; }
+    }catch(e){}
+    try{
+      const p = window.parent;
+      if (p && typeof p.closeDetail === "function") { p.closeDetail(); return; }
+    }catch(e){}
+    // fallback: hide self if embedded, else attempt window.close
+    try{ window.close(); }catch(e){}
   }
 
-  function loadIntoIframe(iframe, url){
-    return new Promise((resolve)=>{
-      const timer = setTimeout(()=>resolve({ok:false, reason:'timeout'}), 1200);
-      iframe.onload = ()=>{
-        clearTimeout(timer);
+  function bindHeaderButtons(){
+    const back = document.getElementById("btnBack");
+    const close = document.getElementById("btnClose");
+    if (back) back.addEventListener("click", () => history.back());
+    if (close) close.addEventListener("click", closeDetailView);
+  }
+
+  bindHeaderButtons();
+
+  const qs = new URLSearchParams(location.search);
+  const code = String(qs.get("code") || "");
+  const part = String(qs.get("part") || "");
+
+  const elTitle = document.getElementById("title");
+  const elSub = document.getElementById("subtitle");
+  const elChips = document.getElementById("chips");
+  const elThumb = document.getElementById("thumb");
+  const elContent = document.getElementById("content");
+
+  function esc(s){ return String(s ?? "").replace(/[&<>"]/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c])); }
+
+  function chip(html){ const d=document.createElement("div"); d.className="chip"; d.innerHTML=html; return d; }
+
+  // --- Detail loader via postMessage (works even on file://) ---
+  function loadDetail(){
+    return new Promise((resolve) => {
+      const frame = document.createElement("iframe");
+      frame.style.display = "none";
+      frame.src = "./item_details_frame.html";
+      document.body.appendChild(frame);
+
+      let done = false;
+      const timeout = setTimeout(() => {
+        if (done) return;
+        done = true;
+        cleanup();
+        resolve({ok:false, error:"item_details_frame.html에 데이터가 없거나, 로드에 실패했어."});
+      }, 1800);
+
+      function cleanup(){
+        clearTimeout(timeout);
+        window.removeEventListener("message", onMsg);
+        try{ frame.remove(); }catch(e){}
+      }
+
+      function request(){
         try{
-          const doc = iframe.contentDocument;
-          if (looksLikeNotFound(doc, url)) return resolve({ok:false, reason:'notfound'});
-          return resolve({ok:true});
-        }catch(e){
-          // file:// 이나 보안 정책으로 접근이 안 되면 로드 자체는 성공으로 간주
-          return resolve({ok:false, reason:'noaccess'});
+          frame.contentWindow.postMessage({type:"GET_ITEM_DETAIL", code}, "*");
+        }catch(e){}
+      }
+
+      function onMsg(ev){
+        const d = ev.data || {};
+        if (d.type === "ITEM_DETAIL" && String(d.code) === code){
+          if (done) return;
+          done = true;
+          cleanup();
+          resolve({ok:true, detail:d.detail});
         }
-      };
-      iframe.src = url;
+        if (d.type === "ITEM_DETAILS_LOADED"){
+          request();
+        }
+      }
+
+      window.addEventListener("message", onMsg);
+      frame.addEventListener("load", () => request());
     });
   }
 
-  const $app = document.getElementById('app');
-  const params = new URLSearchParams(location.search);
-  const code = params.get('code');
-  const name = params.get('name') || '';
-  const part = params.get('part') || '';
+  function pickThumb(detail){
+    const imgs = detail && detail.imgs ? (Array.isArray(detail.imgs) ? detail.imgs : [detail.imgs]) : [];
+    return imgs[0] || "";
+  }
 
-  // ===== 1) 외부(별도 제작) 상세 HTML이 있으면 그걸 우선 표시 =====
-  if (code){
-    const iframe = document.createElement('iframe');
-    iframe.style.width = '100%';
-    iframe.style.height = '70vh';
-    iframe.style.border = '0';
-    iframe.style.borderRadius = '14px';
-    iframe.style.background = '#fff';
-    $app.innerHTML = '';
-    $app.appendChild(iframe);
+  function render(detail){
+    // header
+    const nm = (detail.names && (detail.names.ko || detail.names.en || detail.names.zh || detail.names.ja)) || "";
+    elTitle.textContent = nm || "아이템 상세";
+    elSub.textContent = (detail.part || part || "") + " · 코드 " + (detail.code ?? code);
 
-    const candidates = buildCandidates(String(code).trim(), part);
+    // thumb
+    const th = pickThumb(detail);
+    if (th){ elThumb.src = th; elThumb.style.visibility = "visible"; }
+    else { elThumb.style.visibility = "hidden"; }
 
-    let loaded = false;
-    for (const url of candidates){
-      const res = await loadIntoIframe(iframe, url);
-      if (res.ok){
-        loaded = true;
-        break;
-      }
+    // chips
+    elChips.innerHTML = "";
+    if (detail.heart) elChips.appendChild(chip("<b>❤</b> " + esc(detail.heart)));
+    if (detail.part || part) elChips.appendChild(chip("<b>부위</b> " + esc(detail.part || part)));
+    elChips.appendChild(chip("<b>코드</b> " + esc(detail.code ?? code)));
+
+    const tags = Array.isArray(detail.tags) ? detail.tags.filter(Boolean) : [];
+    for (const t of tags.slice(0, 12)){
+      elChips.appendChild(chip(esc(t)));
     }
 
-    if (loaded){
-      // 상단에 경로 표시만 살짝
-      const hint = document.createElement('div');
-      hint.className = 'muted';
-      hint.style.marginTop = '10px';
-      hint.style.fontSize = '12px';
-      hint.textContent = `※ 상세 HTML을 폴더에서 불러왔어. (code=${code}${part?`, part=${part}`:''})`;
-      $app.appendChild(hint);
+    // content sections
+    const sections = [];
+
+    // Names
+    if (detail.names){
+      const n = detail.names || {};
+      sections.push(`
+        <div class="sec-title">이름 <small>4개 언어</small></div>
+        <div class="box">
+          <div class="lang"><span class="pill ko">한국</span><div class="text">${esc(n.ko||"")}</div></div>
+          <div class="lang"><span class="pill en">영어</span><div class="text">${esc(n.en||"")}</div></div>
+          <div class="lang"><span class="pill zh">중국</span><div class="text">${esc(n.zh||"")}</div></div>
+          <div class="lang"><span class="pill ja">일본</span><div class="text">${esc(n.ja||"")}</div></div>
+        </div>
+      `);
+    }
+
+    // Description
+    if (detail.desc){
+      const d = detail.desc || {};
+      sections.push(`
+        <div class="sec-title">아이템 설명</div>
+        <div class="box">
+          ${d.ko ? `<div class="lang"><span class="pill ko">한국</span><div class="text">${esc(d.ko)}</div></div>` : ""}
+          ${d.zh ? `<div class="lang"><span class="pill zh">중국</span><div class="text">${esc(d.zh)}</div></div>` : ""}
+          ${d.ja ? `<div class="lang"><span class="pill ja">일본</span><div class="text">${esc(d.ja)}</div></div>` : ""}
+          ${d.en ? `<div class="lang"><span class="pill en">영어</span><div class="text">${esc(d.en)}</div></div>` : ""}
+        </div>
+      `);
+    }
+
+    // Images
+    const imgs = detail.imgs ? (Array.isArray(detail.imgs) ? detail.imgs : [detail.imgs]) : [];
+    if (imgs.length){
+      const pairs = imgs.slice(0, 6);
+      const cards = pairs.map(src => `<div class="imgcard"><img src="${esc(src)}" alt=""></div>`).join("");
+      sections.push(`
+        <div class="sec-title">이미지</div>
+        <div class="grid2">${cards}</div>
+      `);
+    }
+
+    // Stats
+    const statCards = Array.isArray(detail.statCards) ? detail.statCards : [];
+    if (statCards.length){
+      const statsHtml = statCards.map(s=>{
+        const name = esc(s.name || "");
+        const grade = esc(s.grade || "");
+        const txt = esc(s.text || "");
+        const label = name ? name : (txt ? txt.split("/")[0].trim() : "");
+        const g = grade || (txt.match(/\[([A-Z]{1,3})\]/)?.[1] || "");
+        return `<div class="stat"><div class="grade grade-${g||""}">${g||"?"}</div><div>${esc(label||"스탯")}</div></div>`;
+      }).join("");
+      sections.push(`
+        <div class="sec-title">스펙</div>
+        <div class="stats">${statsHtml}</div>
+      `);
+    }
+
+    // Sources
+    const sources = detail.sources ? (Array.isArray(detail.sources) ? detail.sources : [detail.sources]) : [];
+    if (sources.length){
+      sections.push(`
+        <div class="sec-title">획득경로</div>
+        <div class="source-box">
+          <ul class="source-list">${sources.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>
+        </div>
+      `);
+    }
+
+    // Reform / materials (도안 재료)
+    if (detail.reform && detail.reform.enabled){
+      const mats = Array.isArray(detail.reform.materials) ? detail.reform.materials : [];
+      const matsHtml = mats.length ? mats.map(m=>{
+        const img = esc(m.img || "");
+        const qty = esc(m.qty || "");
+        return `<div class="mat"><button class="matbtn" type="button" data-img="${img}"><img class="mimg" src="${img}" alt=""><div class="qty">× ${qty}</div></button></div>`;
+      }).join("") : `<div class="muted">재료 정보가 없어.</div>`;
+      sections.push(`
+        <div class="sec-title">도안 재료</div>
+        <div class="box box-plain">
+          <div class="materials">${matsHtml}</div>
+        </div>
+      `);
+    }
+
+    // Dye
+    if (detail.dye && detail.dye.enabled){
+      const dimgs = Array.isArray(detail.dye.images) ? detail.dye.images : [];
+      const dpages = Array.isArray(detail.dye.pages) ? detail.dye.pages : [];
+      const dHtml = dimgs.length ? dimgs.map((src, i)=>{
+        const s = esc(src);
+        const page = dpages[i] ? esc(dpages[i]) : "";
+        const dataAttr = page ? ` data-page="${page}"` : ` data-img="${s}"`;
+        return `<div class="dyeitem"><button class="imgbtn" type="button"${dataAttr}><img src="${s}" alt=""></button></div>`;
+      }).join("") : `<div class="muted">염색 이미지가 없어.</div>`;
+      sections.push(`
+        <div class="sec-title">염색</div>
+        <div class="dyegrid">${dHtml}</div>
+      `);
+    }
+
+    // fallback
+    if (!sections.length){
+      sections.push(`<div class="muted">표시할 상세 정보가 없어.</div>`);
+    }
+
+    elContent.className = "";
+    elContent.innerHTML = sections.join("");
+  }
+
+  
+  function getParentItems(){
+    try{
+      // Walk up the frame tree to find the page that owns #itemsFrame
+      let w = window;
+      for (let i=0; i<8; i++){
+        try{
+          if (w && w.document){
+            const fr = w.document.getElementById("itemsFrame");
+            if (fr && fr.contentWindow && fr.contentWindow.ITEMS) return fr.contentWindow.ITEMS;
+          }
+        }catch(e){}
+        if (!w || w === w.parent) break;
+        w = w.parent;
+      }
+
+      // Also try opener chains (if opened as a popup)
+      let o = window.opener;
+      for (let i=0; i<4 && o; i++){
+        try{
+          if (o.document){
+            const fr = o.document.getElementById("itemsFrame");
+            if (fr && fr.contentWindow && fr.contentWindow.ITEMS) return fr.contentWindow.ITEMS;
+          }
+        }catch(e){}
+        try{ if (o === o.parent) break; o = o.parent; }catch(e){ break; }
+      }
+
+      // Fallbacks (in case someone already mirrored ITEMS onto a parent)
+      try{ if (window.ITEMS) return window.ITEMS; }catch(e){}
+      try{ if (window.parent && window.parent.ITEMS) return window.parent.ITEMS; }catch(e){}
+      try{ if (window.top && window.top.ITEMS) return window.top.ITEMS; }catch(e){}
+      try{ if (window.opener && window.opener.ITEMS) return window.opener.ITEMS; }catch(e){}
+      return null;
+    }catch(e){
+      return null;
+    }
+  }
+
+  
+  function requestTargetByImg(imgUrl){
+    return new Promise((resolve) => {
+      const reqId = "req_" + Math.random().toString(36).slice(2) + Date.now();
+      let done = false;
+      function cleanup(){
+        window.removeEventListener('message', onMsg);
+      }
+      function onMsg(ev){
+        const m = ev.data || {};
+        if (m.type === 'FIND_ITEM_BY_IMG_RESPONSE' && m.reqId === reqId){
+          done = true;
+          cleanup();
+          resolve(m.target || null);
+        }
+      }
+      window.addEventListener('message', onMsg);
+      // send to top; index.html will relay to itemsFrame
+      try{ window.top.postMessage({ type:'FIND_ITEM_BY_IMG_REQUEST', reqId:reqId, img: imgUrl || "" }, '*'); }catch(e){}
+      setTimeout(()=>{ if(done) return; cleanup(); resolve(null); }, 1200);
+    });
+  }
+function parsePageToTarget(page){
+    // expects like "1_헤어-18.html" or "1_원피스-598.html"
+    const m = String(page||"").match(/^[^_]+_(.+)-(\d+)\.html$/);
+    if (!m) return null;
+    return { part: m[1], code: m[2] };
+  }
+
+  function gotoDetail(target){
+    if (!target || !target.code) return;
+    const params = new URLSearchParams(location.search);
+    params.set("code", String(target.code));
+    if (target.part) params.set("part", String(target.part));
+    location.search = "?" + params.toString();
+  }
+
+  function driveId(url){
+    const s = String(url||"");
+    let m = s.match(/[?&]id=([a-zA-Z0-9_-]{10,})/);
+    if (m) return m[1];
+    m = s.match(/\/file\/d\/([a-zA-Z0-9_-]{10,})/);
+    if (m) return m[1];
+    m = s.match(/thumbnail\?id=([a-zA-Z0-9_-]{10,})/);
+    if (m) return m[1];
+    return null;
+  }
+
+  function findByImg(img){
+    const items = getParentItems();
+    if (!items || !img) return null;
+
+    const id = driveId(img);
+    const norm = String(img).replace(/&sz=w\d+/g,"");
+
+    for (const it of items){
+      const cand = (it.thumb || it.img || it.image || "");
+      if (!cand) continue;
+
+      const cid = driveId(cand);
+      if (id && cid && id === cid) return { code: it.code, part: it.part };
+
+      const c = String(cand).replace(/&sz=w\d+/g,"");
+      if (c === norm) return { code: it.code, part: it.part };
+    }
+    return null;
+  }
+
+  // Delegate clicks for materials/dye thumbnails
+  elContent.addEventListener("click", (ev)=>{
+    const btn = ev.target.closest("button[data-page], button[data-img], [data-code]");
+    if (!btn) return;
+    const page = btn.getAttribute("data-page");
+    if (page){
+      const t = parsePageToTarget(page);
+      if (t) return gotoDetail(t);
+    }
+    const codeAttr = btn.getAttribute("data-code");
+    if (codeAttr){
+      return gotoDetail({ code: codeAttr, part: btn.getAttribute("data-part") || "" });
+    }
+    const imgAttr = btn.getAttribute("data-img");
+    if (imgAttr){
+      // Try local match (may fail on file:// due to origin restrictions)
+      const tLocal = findByImg(imgAttr);
+      if (tLocal) return gotoDetail(tLocal);
+
+      // Ask index(itemsFrame) via postMessage relay
+      requestTargetByImg(imgAttr).then(t=>{
+        if (t) return gotoDetail(t);
+        // not found: keep focus only
+      });
       return;
     }
+  });
 
-    // 못 찾았으면 아래의 기존(JSON 기반) 렌더링으로 fallback
-    $app.innerHTML = `
-      <div class="card">
-        <div style="font-weight:800;margin-bottom:8px">상세 HTML 파일을 못 찾았어</div>
-        <div class="muted" style="font-size:13px;line-height:1.45">
-          지금은 <b>code=${String(code)}</b>${part?` / <b>part=${String(part)}</b>`:''} 로 찾았는데,
-          아래 경로들 중에 실제 파일이 존재해야 바로 뜨는 구조야.
-          <div style="margin-top:10px;background:#fafafa;border:1px solid #eee;border-radius:12px;padding:10px;max-height:180px;overflow:auto">
-            ${candidates.map(u=>`<div>${u}</div>`).join('')}
-          </div>
-          <div style="margin-top:10px">
-            ✅ 해결 방법(둘 중 하나)
-            <ol style="margin:6px 0 0 18px;padding:0">
-              <li>네가 만든 상세 폴더명이 <b>item_details</b>가 아니면, 위 스크립트의 <b>DETAIL_DIRS</b> 첫번째 값을 네 폴더명으로 바꾸기</li>
-              <li>또는 콘솔에서 <code>localStorage.setItem('ITEM_DETAIL_DIR','네폴더명')</code> 한 번만 실행</li>
-            </ol>
-          </div>
-          <div style="margin-top:8px" class="muted">※ 못 찾으면 기존 데이터(JSON) 방식으로도 표시를 시도할게.</div>
-        </div>
-      </div>
-    `;
-  }
-
-  // ===== 2) 기존(JSON 기반) 렌더링 로직 (원래 있던 기능 유지) =====
-  const FALLBACK_ITEMS_FRAME = 'items.html';
-  const FALLBACK_DETAILS_FRAME = 'item_details_frame.html';
-
-  function loadHiddenFrame(src){
-    return new Promise((resolve)=>{
-      const f = document.createElement('iframe');
-      f.style.display='none';
-      f.style.width='0'; f.style.height='0'; f.style.border='0';
-      f.src = src;
-      f.onload = ()=> resolve(f);
-      document.body.appendChild(f);
-    });
-  }
-
-  let __local = null;
-  async function ensureLocalData(){
-    if (window.opener && window.opener.parent) return null;
-    const itemsFrame = await loadHiddenFrame(FALLBACK_ITEMS_FRAME);
-    const detailsFrame = await loadHiddenFrame(FALLBACK_DETAILS_FRAME);
-    return { itemsWin: itemsFrame.contentWindow, detailsWin: detailsFrame.contentWindow };
-  }
-
-  function normalizeItems(x){
-    if (Array.isArray(x)) return x;
-    if (!x) return [];
-    if (typeof x === 'string'){
-      try{ const j = JSON.parse(x); if (Array.isArray(j)) return j; }catch(e){}
-      return [];
-    }
-    if (typeof x === 'object' && Array.isArray(x.items)) return x.items;
-    return [];
-  }
-
-  function findItem(){
-    try{
-      const idxWin = window.opener && window.opener.parent ? window.opener.parent : null;
-      const items = idxWin ? normalizeItems(idxWin.items) : [];
-      if (!items.length) return null;
-
-      if (code){
-        const ncode = String(code);
-        const hit = items.find(it => String(it.code ?? '') === ncode);
-        if (hit) return hit;
-      }
-      if (name){
-        const lname = String(name).toLowerCase();
-        const hit2 = items.find(it => String(it.name||'').toLowerCase() === lname);
-        if (hit2) return hit2;
-      }
-      return null;
-    }catch(e){
-      return null;
-    }
-  }
-
-  function esc(s){
-    return String(s)
-      .replace(/&/g,'&amp;')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;')
-      .replace(/'/g,'&#039;');
-  }
-
-  function tagList(tags){
-    if (!tags) return [];
-    if (Array.isArray(tags)) return tags.map(String);
-    return String(tags).split(/[,\s#]+/).filter(Boolean);
-  }
-  function normalizeDetails(x){
-    if (!x) return {};
-    if (typeof x === 'string'){
-      try{ const j = JSON.parse(x); if (j && typeof j === 'object') return j; }catch(e){}
-      return {};
-    }
-    if (typeof x === 'object') return x;
-    return {};
-  }
-
-  function findItemDetailByCode(ncode){
-    try{
-      const idxWin = (window.opener && window.opener.parent) ? window.opener.parent : null;
-      let details = {};
-      if (idxWin){
-        details = normalizeDetails(idxWin.itemDetails || idxWin.ITEM_DETAILS);
-      } else if (__local && __local.detailsWin){
-        details = normalizeDetails(__local.detailsWin.itemDetails || __local.detailsWin.ITEM_DETAILS);
-      }
-      const key = String(ncode ?? '');
-      return (details && details[key]) ? details[key] : null;
-    }catch(e){
-      return null;
-    }
-  }
-
-  function render(item, detail){
-    const img = item && item.img ? item.img : '';
-    const tags = tagList(item && item.tags);
-    const stats = item ? Object.entries(item)
-      .filter(([k,v])=>['flair','simple','elegant','lively','mature','cute','sexy','pure','cool','warm'].includes(k) && v)
-      .map(([k,v])=>`<span class="badge">${esc(k)} ${esc(v)}</span>`).join(' ') : '';
-
-    const extra = detail && typeof detail === 'object'
-      ? Object.entries(detail).map(([k,v])=>{
-          if (v==null) return '';
-          if (typeof v === 'object') return '';
-          return `<div class="row"><div class="muted">${esc(k)}</div><div>${esc(v)}</div></div>`;
-        }).join('')
-      : '';
-
-    return `
-      <div class="card">
-        <div class="top">
-          <img class="img" src="${esc(img)}" alt="" onerror="this.style.display='none'"/>
-          <div style="flex:1;min-width:0">
-            <div class="title">${esc(item?.name || name || '(이름없음)')}</div>
-            <div class="muted" style="margin-top:6px">code: <b>${esc(item?.code ?? code ?? '')}</b> · part: <b>${esc(item?.part ?? part ?? '')}</b> · stars: <b>${esc(item?.stars ?? '')}</b></div>
-            <div class="muted" style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">${stats || ''}</div>
-            <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
-              ${tags.map(t=>`<span class="tag">#${esc(t)}</span>`).join('')}
-            </div>
-          </div>
-        </div>
-        ${extra ? `<div class="hr"></div><div>${extra}</div>` : ''}
-        <div class="hr"></div>
-        <div class="muted" style="font-size:12px">※ 별도 상세 HTML이 없으면, 여기서는 items/items_detail 데이터(JSON) 기준으로만 표시돼.</div>
-      </div>
-    `;
-  }
-
-  // local data load for standalone open
-  __local = await ensureLocalData();
-
-  let item = findItem();
-  if (!item && __local && __local.itemsWin){
-    const items = normalizeItems(__local.itemsWin.items);
-    if (code) item = items.find(it=>String(it.code??'')===String(code));
-    if (!item && name) item = items.find(it=>String(it.name||'').toLowerCase()===String(name).toLowerCase());
-  }
-
-  let detail = null;
-  if (code) detail = findItemDetailByCode(code);
-
-  if (!item && !detail){
-    $app.innerHTML = `<div class="card"><div style="font-weight:800">불러오는 중...</div><div class="muted" style="margin-top:8px">※ 이 창은 세트정보/아이템정보에서 클릭한 아이템의 상세로 보여줘.</div></div>`;
+// start
+  if (!code){
+    elSub.textContent = "코드를 받지 못했어.";
+    elContent.textContent = "아이템 리스트에서 클릭하면 코드가 전달돼.";
     return;
   }
 
-  $app.innerHTML = render(item || {}, detail || null);
+  loadDetail().then(res=>{
+    if (!res.ok || !res.detail){
+      elSub.textContent = "코드 " + (code||"?") + " 상세를 찾지 못함";
+      elContent.className = "muted";
+      elContent.textContent = res.error || "상세 데이터가 없어.";
+      return;
+    }
+    render(res.detail);
+  });
 })();
+
 </script>
-</body>
-</html>

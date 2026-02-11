@@ -144,11 +144,9 @@
     const part = it.part ?? '';
     if (code === '' || code === null || code === undefined) return;
 
-    const safePart = String(part||'').trim().replace(/[\/]/g,'_');
-    const file = `${code}_${safePart}-${code}.html`;
-    const url = encodeURI(file);
+    // ✅ 통합 상세: item_detail.html 로 열기 (개별 1_헤어-1.html 파일 방식은 사용 안 함)
+    const url = `item_detail.html?code=${encodeURIComponent(code)}&part=${encodeURIComponent(part)}`;
 
-    // ✅ 새 창 금지: dialog 팝업으로만 열기
     const dlg = document.getElementById('detailDialog');
     const frame = document.getElementById('detailFrame');
     if (!dlg || !frame) return;
@@ -157,10 +155,11 @@
     if (typeof dlg.showModal === 'function'){
       dlg.showModal();
     }else{
-      // 구형 브라우저 fallback: 같은 페이지에서라도 보이게
-      frame.style.display = 'block';
+      // 구형 대체
+      dlg.setAttribute('open','open');
     }
   }
+
 
   // dialog 닫힐 때 iframe 초기화(메모리/스크롤 유지 방지)
   (function(){
@@ -392,6 +391,21 @@
   // Request data on load
   window.parent && window.parent.postMessage({type:'ITEMSINFO_REQUEST_DATA'}, '*');
 })();
+
+  // ✅ dialog 빈 화면 클릭 시 닫기 (backdrop)
+  (function(){
+    const dlg = document.getElementById('detailDialog');
+    if(!dlg) return;
+    dlg.addEventListener('click', (e)=>{
+      if(e.target === dlg){
+        try{ dlg.close(); }catch(err){}
+      }
+    });
+    dlg.addEventListener('cancel', ()=>{
+      try{ dlg.close(); }catch(err){}
+    });
+  })();
+
 </script>
 </body>
 </html>

@@ -6,27 +6,17 @@ window.SETS = [
     id: "crystal_snowdream",
     name_na: "Crystal Snowdream",
     name_cn: "晶雪绮愿",
-    name_en: "Crystal Snowdream",
     name_jp: "",
-    name_kr: "눈부신 설원의 기도 (번역)",
-
-    // 리스트 썸네일
+    name_kr: "눈부신 설원의 기도",
+    desc: "부드럽고 찬란한 빛이 소설의 가슴에서 피어오르며, 붉은 기운이 수정구를 가득 채운다. 그 광경은 눈 덮인 설원 위에 바치는 한 송이의 기도처럼, 장미가 피어나는 순간을 닮아 있다.",
     thumb: "https://drive.google.com/thumbnail?id=1U7SpFDXpqvkLt2Dunsa-GZjpLcVuEs2P&sz=w1000",
-
-    // 상세 이미지 (최대 10장)
     images: [
       "https://drive.google.com/thumbnail?id=1U7SpFDXpqvkLt2Dunsa-GZjpLcVuEs2P&sz=w1000",
       "https://drive.google.com/thumbnail?id=1xmSAY3m9QdgnKDty8HLj_ereKWb86IEe&sz=w1000",
       "https://drive.google.com/thumbnail?id=1-pEvhnKTYRWpx3X7R2t6RpEgvEpmQVTB&sz=w1000",
       "https://drive.google.com/thumbnail?id=1E0Im1nwSoaSfO6RMKAaewhuudTzw5Yke&sz=w1000"
     ],
-
-    // 획득경로
-    sources: [
-      { type:"event", label:"이벤트", desc:"Crystal Fairyland" }
-    ],
-
-    // 이벤트 상세 (이벤트일 때만)
+    sources: [{ type:"event", label:"이벤트", desc:"Crystal Fairyland" }],
     event: {
       title: "Crystal Fairyland",
       desc:
@@ -41,17 +31,2044 @@ window.SETS = [
 - 크림슨 로즈 (Crimson Rose)
 
 의상 교환: 수집한 재료들을 사용하여 [Crystal Snowdream] 세트의 파츠를 정해진 순서(티어 방식)에 따라 교환합니다.`,
-      guide: "" // 공략이 있으면 여기에 넣기
+      guide: ""
+    },
+    parts: [{ part:"헤어", code: 1 }]
+  },
+
+  {
+    id: "raspberry_pink_rock",
+    name_en: "Raspberry Pink Rock",
+    name_cn: "莓粉摇滚",
+    name_jp: "ロックンベリー",
+    name_kr: "핑크 락스타",
+    desc: "화려함은 나이가 상관없어! 역동적인 핑크 다이아몬드와 라즈베리 컬러의 꿈같은 조합. 정말 특별한 사람들에게 가장 잘 어울리는 스타일이야!",
+    thumb: "https://drive.google.com/thumbnail?id=19jUvSOQ8xm9Jsx8SsG-KKxgf8Zh0RkHe&sz=w1000",
+    images: [
+      "https://drive.google.com/thumbnail?id=19jUvSOQ8xm9Jsx8SsG-KKxgf8Zh0RkHe&sz=w1000"
+    ],
+    sources: [{ type:"event", label:"이벤트", desc:"로그인 이벤트" }],
+    event: { title: "로그인 이벤트", desc: `로그인 누적 접속 보상`, guide: "" },
+    parts: [
+      { part:"헤어", code:1015 },
+      { part:"아우터", code:417 },
+      { part:"상의", code:488 },
+      { part:"하의", code:449 },
+      { part:"양말", code:383 },
+      { part:"신발", code:906 },
+      { part:"장식 - 머리 - 머리", code:1735 },
+      { part:"장식 - 목 - 목걸이", code:1732 },
+      { part:"장식 - 손 - 팔찌(우)", code:1733 },
+      { part:"장식 - 소품 - 소품(좌)", code:1736 },
+      { part:"장식 - 특수 - 얼굴", code:1734 }
+    ]
+  },
+
+  {
+    id: "youth_poem",
+    name_cn: "青春交响诗",
+    name_en: "Youth Poem",
+    name_jp: "青春シンフォニー",
+    name_kr: "청춘 교향곡",
+    desc: "청춘만이 품을 수 있는 사랑스러움과 고운 기품이 있어. 흘러가는 시간 속, 청춘은 우리 삶을 가장 아름답게 울리는 멜로디 같아.",
+    thumb: "https://drive.google.com/thumbnail?id=1bQw73qXmhpcAj00YfT4cQW1BZ2l262Fm&sz=w1000",
+    images: [
+      "https://drive.google.com/thumbnail?id=1bQw73qXmhpcAj00YfT4cQW1BZ2l262Fm&sz=w1000"
+    ],
+    sources: [{ type:"shop", label:"상점", desc:"옷가게 구매" }],
+    parts: [
+      { part:"헤어", code:850 },
+      { part:"원피스", code:705 },
+      { part:"아우터", code:1327 },
+      { part:"양말", code:323 },
+      { part:"신발", code:773 },
+      { part:"장식 - 머리 - 머리", code:1325 },
+      { part:"장식 - 소품 - 소품(우)", code:1328 },
+      { part:"장식 - 특수 - 얼굴", code:1326 }
+    ]
+  },
+
+  {
+    id: "wings_of_steam",
+    name_cn: "蒸汽之翼",
+    name_en: "Wings of Steam",
+    name_jp: "蒸気の翼",
+    name_kr: "내일의 날개",
+    desc: "귀를 스치는 기적 소리와 함께, 흩어지는 증기가 공기 속에서 사라져 갔어. 빛을 머금은 금속 장식은 은하처럼 반짝였고, 하늘을 가르는 거대한 비행선은 마치 꿈과 현실의 경계를 넘어오는 듯했지.",
+    thumb: "https://drive.google.com/thumbnail?id=1Dqqc88QxjEwhIukzIz1XQmYzI7lkaC2H&sz=w1000",
+    images: [
+      "https://drive.google.com/thumbnail?id=1Dqqc88QxjEwhIukzIz1XQmYzI7lkaC2H&sz=w1000"
+    ],
+    sources: [{ type:"vip", label:"VIP", desc:"VIP 15 달성 시 지급" }],
+    parts: [
+      { part:"헤어", code:855 },
+      { part:"원피스", code:710 },
+      { part:"신발", code:777 },
+      { part:"장식 - 머리 - 머리", code:1335 },
+      { part:"장식 - 목 - 목도리", code:1336 },
+      { part:"장식 - 손 - 장갑", code:1337 },
+      { part:"장식 - 특수 - 날개", code:1334 },
+      { part:"뷰티", code:58 }
+    ]
+  },
+{
+  id: "magnificent_flower",
+
+  name_cn: "瑰丽之花",
+  name_en: "Magnificent Flower",
+  name_jp: "紅薔薇夫人",
+  name_kr: "매혹의 장미",
+
+  desc: `귀를 스치는 기적 소리와 함께, 흩어지는 증기가 공기 속에서 사라져 갔어.
+빛을 머금은 금속 장식은 은하처럼 반짝였고,
+하늘을 가르는 거대한 비행선은 마치 꿈과 현실의 경계를 넘어오는 듯했지.`,
+
+  thumb: "https://drive.google.com/thumbnail?id=16RSnLZFJce94zWg02y8mU-Hqy5SfKZbq&sz=w1000",
+
+  images: [
+    "https://drive.google.com/thumbnail?id=16RSnLZFJce94zWg02y8mU-Hqy5SfKZbq&sz=w1000"
+  ],
+
+  sources: [
+    { type: "vip", label: "VIP", desc: "VIP 14 달성 시 지급" }
+  ],
+
+  parts: [
+    { part: "헤어", code: 859 },
+    { part: "원피스", code: 714 },
+    { part: "원피스", code: 713 },
+    { part: "신발", code: 781 },
+    { part: "장식 - 머리 - 머리", code: 1345 },
+    { part: "장식 - 소품 - 소품(좌)", code: 1346 }
+  ]
+},
+{
+  id: "crystal_lady",
+
+  name_cn: "水晶球夫人",
+  name_en: "Crystal Lady",
+  name_jp: "ミセス・クリスタル",
+  name_kr: "수정 귀부인",
+
+  desc: "작은 수정구슬 속에는, 남편의 깊은 사랑과 아내의 밤을 지새우는 소망이 가득 담겨 있어. 그것은 사랑과 기다림이 조화롭게 어우러지는 이야기 같아.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1JW2BciyGwN2FitTKO4gHF1OVIX8wgeK3&sz=w1000",
+
+  images: [
+    "https://drive.google.com/thumbnail?id=1JW2BciyGwN2FitTKO4gHF1OVIX8wgeK3&sz=w1000"
+  ],
+
+  sources: [
+    { type: "vip", label: "VIP", desc: "VIP 13 달성 시 지급" }
+  ],
+
+  parts: [
+    { part: "헤어", code: 858 },
+    { part: "원피스", code: 712 },
+    { part: "신발", code: 780 },
+    { part: "장식 - 머리 - 베일", code: 1343 },
+    { part: "장식 - 목 - 목걸이", code: 1344 },
+    { part: "장식 - 손 - 장갑", code: 1342 }
+  ]
+},
+{
+  id: "umbrella_memory",
+
+  name_cn: "花清泓",
+  name_en: "Umbrella Memory",
+  name_jp: "青磁の花",
+  name_kr: "꽃잎샘물",
+
+  desc: "도자기 위에 펼쳐진 푸른 꽃무늬는, 시간과 열 속에서 피어난 아름다움 같아. 그 안에 숨겨진 이야기는, 과거의 기억을 담은 우산처럼 우아하게 펼쳐진다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1nF7dcGhXz6Zl0kLe-BwZnvw4N86LmaZP&sz=w1000",
+
+  images: [
+    "https://drive.google.com/thumbnail?id=1nF7dcGhXz6Zl0kLe-BwZnvw4N86LmaZP&sz=w1000"
+  ],
+
+  sources: [
+    { type: "vip", label: "VIP", desc: "VIP 12 달성 시 지급" }
+  ],
+
+  parts: [
+    { part: "헤어", code: 856 },
+    { part: "원피스", code: 709 },
+    { part: "아우터", code: 354 },
+    { part: "아우터", code: 353 },
+    { part: "신발", code: 778 },
+    { part: "장식 - 머리 - 머리", code: 1338 },
+    { part: "장식 - 손 - 팔찌(우)", code: 3230 }
+  ]
+},
+{
+  id: "annas_party",
+
+  name_cn: "安娜的舞会",
+  name_en: "Anna's Party",
+  name_jp: "アンナの舞踏会",
+  name_kr: "리아의 무도회",
+
+  desc: "한밤중 종소리가 울리고, 무도회는 끝을 맞이했어. 아무리 아쉬워도 이제 내려놓아야만 해. 이것은 잠시의 이별일 뿐, 다시 만날 순간은 분명 찾아올 거야.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1lSrxxFkphLpXIY9C5I0e0bjPUGj_5mzE&sz=w1000",
+
+  images: [
+    "https://drive.google.com/thumbnail?id=1lSrxxFkphLpXIY9C5I0e0bjPUGj_5mzE&sz=w1000"
+  ],
+
+  sources: [
+    { type: "vip", label: "VIP", desc: "VIP 11 달성 시 지급" }
+  ],
+
+  parts: [
+    { part: "헤어", code: 857 },
+    { part: "원피스", code: 711 },
+    { part: "신발", code: 779 },
+    { part: "장식 - 머리 - 머리", code: 1339 },
+    { part: "장식 - 목 - 목걸이", code: 1340 },
+    { part: "장식 - 손 - 장갑", code: 1341 }
+  ]
+},
+{
+  id: "pink_wishes",
+
+  name_cn: "生日贺礼",
+  name_en: "Pink Wishes",
+  name_jp: "誕生日プレゼント",
+  name_kr: "생일 선물",
+
+  desc: "멀리 다른 세계로 와도, 소중한 친구들이 곁에 생겨나는 건 아마도 인연이라는 마법 때문이겠지. 생일처럼 따뜻한 순간들이, 너에게 계속 이어지길 바라.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1cCtzHoPbxuz-9zUGFDOPbz1rpssJh9Xf&sz=w1000",
+
+  images: [
+    "https://drive.google.com/thumbnail?id=1cCtzHoPbxuz-9zUGFDOPbz1rpssJh9Xf&sz=w1000"
+  ],
+
+  sources: [
+    { type: "shop", label: "상점", desc: "옷가게 구매" }
+  ],
+
+  parts: [
+    { part: "헤어", code: 713 },
+    { part: "원피스", code: 598 },
+    { part: "아우터", code: 297 },
+    { part: "신발", code: 648 },
+    { part: "장식 - 머리 - 머리", code: 961 },
+    { part: "장식 - 목 - 목걸이", code: 963 },
+    { part: "장식 - 손 - 장갑", code: 960 },
+    { part: "장식 - 소품 - 소품(좌)", code: 959 },
+    { part: "장식 - 소품 - 소품(우)", code: 962 },
+    { part: "장식 - 특수 - 배경", code: 958 }
+  ]
+},
+{
+  id: "vintage_lady",
+
+  name_cn: "黑白名媛",
+  name_en: "Vintage Lady",
+  name_jp: "白黒のお嬢様",
+  name_kr: "흑백 레이디",
+
+  desc: "흑백의 우아함을 완벽하게 다루는 그녀들. 애플 왕국에서 패션의 흐름은 언제나 이들에게서 시작돼.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1L-vA5PExTc0usEWveCNJmvPYd6KFBt2C&sz=w1000",
+
+  images: [
+    "https://drive.google.com/thumbnail?id=1L-vA5PExTc0usEWveCNJmvPYd6KFBt2C&sz=w1000"
+  ],
+
+  sources: [
+    { type: "craft", label: "제작", desc: "도안 제작" }
+  ],
+
+  parts: [
+    { part: "헤어", code: 660 },
+    { part: "상의", code: 404 },
+    { part: "하의", code: 371 },
+    { part: "신발", code: 603 },
+    { part: "장식 - 머리 - 머리", code: 823 },
+    { part: "장식 - 소품 - 소품(우)", code: 822 }
+  ]
+},
+{
+  id: "dynamic_maiden",
+
+  name_cn: "跃动少女",
+  name_en: "Dynamic Maiden",
+  name_jp: "アクティブガール",
+  name_kr: "에너지소녀",
+
+  desc: "겨울산 해변에서는, 모모의 색깔을 담은 구명조끼가 언제나 네 곁에 있어야 해. 그 색은 바다처럼 시원하고, 널 지켜줄 거야.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1g4J2wyrmg4PlZnrL1QQ1o6qpolNMImEK&sz=w1000",
+
+  images: [
+    "https://drive.google.com/thumbnail?id=1g4J2wyrmg4PlZnrL1QQ1o6qpolNMImEK&sz=w1000"
+  ],
+
+  sources: [
+    { type: "shop", label: "상점", desc: "옷가게 구매" }
+  ],
+
+  parts: [
+    { part: "헤어", code: 648 },
+    { part: "상의", code: 395 },
+    { part: "아우터", code: 269 },
+    { part: "하의", code: 367 },
+    { part: "신발", code: 589 },
+    { part: "장식 - 머리 - 머리", code: 786 },
+    { part: "장식 - 목 - 목걸이", code: 803 },
+    { part: "장식 - 손 - 팔찌(우)", code: 784 },
+    { part: "장식 - 소품 - 소품(좌)", code: 785 }
+  ],
+
+  variants: [
+    {
+      type: "reform",
+      label: "리폼",
+      items: [
+        { base_code: 648, part: "헤어", code: 649 },
+        { base_code: 395, part: "상의", code: 396 },
+        { base_code: 367, part: "하의", code: 368 },
+        { base_code: 269, part: "아우터", code: 270 },
+        { base_code: 589, part: "신발", code: 590 },
+        { base_code: 786, part: "장식 - 머리 - 머리", code: 788 },
+        { base_code: 803, part: "장식 - 목 - 목걸이", code: 787 },
+        { base_code: 784, part: "장식 - 손 - 팔찌(우)", code: 784 },
+        { base_code: 785, part: "장식 - 소품 - 소품(좌)", code: 785 }
+      ]
+    },
+    {
+      type: "reform",
+      label: "리폼",
+      items: [
+        { base_code: 648, part: "헤어", code: 650 },
+        { base_code: 395, part: "상의", code: 397 },
+        { base_code: 367, part: "하의", code: 369 },
+        { base_code: 269, part: "아우터", code: 271 },
+        { base_code: 589, part: "신발", code: 591 },
+        { base_code: 786, part: "장식 - 머리 - 머리", code: 792 },
+        { base_code: 803, part: "장식 - 목 - 목걸이", code: 789 },
+        { base_code: 784, part: "장식 - 손 - 팔찌(우)", code: 790 },
+        { base_code: 785, part: "장식 - 소품 - 소품(좌)", code: 791 }
+      ]
+    }
+  ]
+},
+{
+  id: "steam_punk",
+
+  name_cn: "蒸汽朋克",
+  name_en: "Steam Punk",
+  name_jp: "スチームパンク",
+  name_kr: "공예가의 자태",
+
+  desc: "그녀는 자신을 내던지고, 장인들의 손길 속에서 새로운 꿈을 찾아 나섰다. 그 길은 과거의 시간과 기술을 이어가며, 이제는 나만의 세계를 만들어간다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1LewSwTVM5Q-URhh1YnCdp2NHKYxBz1Q4&sz=w1000",
+
+  images: [
+    "https://drive.google.com/thumbnail?id=1LewSwTVM5Q-URhh1YnCdp2NHKYxBz1Q4&sz=w1000"
+  ],
+
+  sources: [
+    { type: "shop_cinderella", label: "신데렐라 상점", desc: "신데렐라 상점에서 유리구두로 구매" }
+  ],
+
+  parts: [
+    { part: "헤어", code: 644 },
+    { part: "원피스", code: 542 },
+    { part: "아우터", code: 267 },
+    { part: "양말", code: 250 },
+    { part: "신발", code: 587 },
+    { part: "장식 - 머리 - 머리", code: 780 },
+    { part: "장식 - 목 - 목걸이", code: 781 }
+  ],
+
+  variants: [
+    {
+      type: "reform",
+      label: "리폼",
+      items: [
+        { base_code: 644, part: "헤어", code: 645 },
+        { base_code: 542, part: "원피스", code: 543 },
+        { base_code: 267, part: "아우터", code: 268 },
+        { base_code: 250, part: "양말", code: 251 },
+        { base_code: 587, part: "신발", code: 588 },
+        { base_code: 780, part: "장식 - 머리 - 머리", code: 782 },
+        { base_code: 781, part: "장식 - 목 - 목걸이", code: 781 }
+      ]
+    }
+  ]
+},
+{
+  id: "snow_lotus",
+
+  name_cn: "雪莲",
+  name_en: "Snow Lotus",
+  name_jp: "雪蓮花",
+  name_kr: "눈꽃요정",
+
+  desc: "하얀 설원에서 태어난 엘프들은, 눈과 바람을 부드럽게 부르는 특별한 힘을 지녔어. 그녀가 지나가는 자리마다 겨울의 숨결이 피어나는 것 같아.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1j9XS4YYfBrr7tUZDUfuAQYiyRmBhaEQx&sz=w1000",
+
+  images: [
+    "https://drive.google.com/thumbnail?id=1j9XS4YYfBrr7tUZDUfuAQYiyRmBhaEQx&sz=w1000"
+  ],
+
+  sources: [
+    { type: "Cinderella", label: "신데렐라", desc: "신데렐라의 꿈" }
+  ],
+
+  parts: [
+    { part: "헤어", code: 643 },
+    { part: "원피스", code: 541 },
+    { part: "아우터", code: 266 },
+    { part: "신발", code: 586 },
+    { part: "장식 - 머리 - 머리", code: 777 },
+    { part: "장식 - 목 - 목걸이", code: 778 },
+    { part: "장식 - 손 - 장갑", code: 779 }
+  ]
+},
+{
+  id: "master_magician",
+
+  name_cn: "魔术大师",
+  name_en: "Master Magician",
+  name_jp: "マジシャン",
+  name_kr: "마술사",
+
+  desc: "그는 마법의 세계에서 모든 것을 할 수 있는 존재. 떠다니는 카드, 읽는 마음, 그의 마법은 끝이 없다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=13ZVyz-pT1Mp1x_IXjiuirs647S7roynk&sz=w1000",
+
+  images: [
+    "https://drive.google.com/thumbnail?id=13ZVyz-pT1Mp1x_IXjiuirs647S7roynk&sz=w1000"
+  ],
+
+  sources: [
+    { type: "Cinderella", label: "신데렐라", desc: "신데렐라의 꿈" }
+  ],
+
+  parts: [
+    { part: "헤어", code: 642 },
+    { part: "상의", code: 394 },
+    { part: "하의", code: 366 },
+    { part: "아우터", code: 265 },
+    { part: "신발", code: 585 },
+    { part: "장식 - 머리 - 머리", code: 776 },
+    { part: "장식 - 목 - 목도리", code: 774 },
+    { part: "장식 - 손 - 장갑", code: 775 },
+    { part: "장식 - 소품 - 소품(우)", code: 773 },
+    { part: "장식 - 소품 - 소품(좌)", code: 772 }
+  ]
+},
+{
+  id: "socialite",
+
+  name_cn: "夜系名媛",
+  name_en: "Socialite",
+  name_jp: "黒ドレスの令嬢",
+  name_kr: "밤의 따님",
+
+  desc: "가문이 어떻게 변하든, 그녀는 여전히 밤처럼 우아한 존재야. 모두의 시선 속에서, 그녀는 변함없는 귀한 사람으로 남아.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1jEADLEkb-W2wfTEQovc_4TxWmZZ6_1NR&sz=w1000",
+
+  images: [
+    "https://drive.google.com/thumbnail?id=1jEADLEkb-W2wfTEQovc_4TxWmZZ6_1NR&sz=w1000"
+  ],
+
+  sources: [
+    { type: "evolve", label: "진화", desc: "분해 진화" }
+  ],
+
+  // ✅ 세트 완성 기준(최종 단계로 잡음)
+  parts: [
+    { part: "헤어", code: 549 },
+    { part: "원피스", code: 434 },
+    { part: "아우터", code: 232 },
+    { part: "신발", code: 528 },
+    { part: "장식 - 머리 - 머리", code: 607 },
+    { part: "장식 - 소품 - 소품(우)", code: 610 }
+  ],
+
+  variants: [
+    {
+      type: "evolve",
+      label: "진화",
+      stages: [
+        {
+          stage: 1,
+          label: "진화",
+          items: [
+            { part: "헤어", code: 547 },
+            { part: "원피스", code: 432 },
+            { part: "아우터", code: 230 },
+            { part: "신발", code: 526 },
+            { part: "장식 - 머리 - 머리", code: 605 },
+            { part: "장식 - 소품 - 소품(우)", code: 608 }
+          ]
+        },
+        {
+          stage: 2,
+          label: "진화",
+          items: [
+            { chain_from: 547, part: "헤어", code: 548 },
+            { chain_from: 432, part: "원피스", code: 433 },
+            { chain_from: 230, part: "아우터", code: 231 },
+            { chain_from: 526, part: "신발", code: 527 },
+            { chain_from: 605, part: "장식 - 머리 - 머리", code: 606 },
+            { chain_from: 609, part: "장식 - 소품 - 소품(우)", code: 609 }
+          ]
+        },
+        {
+          stage: 3,
+          label: "진화",
+          items: [
+            { chain_from: 548, part: "헤어", code: 549 },
+            { chain_from: 433, part: "원피스", code: 434 },
+            { chain_from: 231, part: "아우터", code: 232 },
+            { chain_from: 527, part: "신발", code: 528 },
+            { chain_from: 606, part: "장식 - 머리 - 머리", code: 607 },
+            { chain_from: 610, part: "장식 - 소품 - 소품(우)", code: 610 }
+          ]
+        }
+      ]
+    }
+  ]
+},
+{
+  id: "mori_girl",
+
+  name_cn: "森女羊",
+  name_en: "Mori Girl",
+  name_jp: "森の小羊",
+  name_kr: "숲 속의 양",
+
+  desc: "숲 속에서 자아내는 평화로움, 복고풍의 드레스는 그 자체로 자연을 품고 있어. 모든 색감이 숲의 여유로움을 말해줘",
+
+  thumb: "https://drive.google.com/thumbnail?id=1xASQLlZm2-5OJpJ6xe0HAHI_7Thzco9L&sz=w1000",
+
+  images: [
+    "https://drive.google.com/thumbnail?id=1xASQLlZm2-5OJpJ6xe0HAHI_7Thzco9L&sz=w1000"
+  ],
+
+  sources: [
+    { type: "evolve", label: "진화", desc: "분해진화" }
+  ],
+
+  parts: [
+    { part: "헤어", code: 521 },
+    { part: "원피스", code: 400 },
+    { part: "아우터", code: 219 },
+    { part: "양말", code: 212 },
+    { part: "신발", code: 503 },
+    { part: "장식 - 머리 - 머리", code: 534 }
+  ],
+
+  variants: [
+    {
+      type: "evolve",
+      label: "진화 I",
+      items: [
+        { base_code: 521, part: "헤어", code: 554 },
+        { base_code: 400, part: "원피스", code: 435 },
+        { base_code: 219, part: "아우터", code: 236 },
+        { base_code: 212, part: "양말", code: 212 },
+        { base_code: 503, part: "신발", code: 529 },
+        { base_code: 534, part: "장식 - 머리 - 머리", code: 616 }
+      ]
+    },
+    {
+      type: "evolve",
+      label: "진화 II",
+      items: [
+        { base_code: 521, part: "헤어", code: 521 },
+        { base_code: 400, part: "원피스", code: 436 },
+        { base_code: 219, part: "아우터", code: 219 },
+        { base_code: 212, part: "양말", code: 212 },
+        { base_code: 503, part: "신발", code: 503 },
+        { base_code: 534, part: "장식 - 머리 - 머리", code: 534 }
+      ]
+    },
+    {
+      type: "evolve",
+      label: "진화 III",
+      items: [
+        { base_code: 521, part: "헤어", code: 521 },
+        { base_code: 400, part: "원피스", code: 400 },
+        { base_code: 219, part: "아우터", code: 219 },
+        { base_code: 212, part: "양말", code: 212 },
+        { base_code: 503, part: "신발", code: 503 },
+        { base_code: 534, part: "장식 - 머리 - 머리", code: 534 }
+      ]
+    }
+  ]
+},
+{
+  id: "tarot_fortuneteller",
+
+  name_cn: "塔罗牌师",
+  name_en: "Tarot Fortuneteller",
+  name_jp: "タロット占い師",
+  name_kr: "타로술사",
+
+  desc: "그녀들은 별빛처럼 하늘을 떠도는 타로 카드의 여인들. 예언하는 그들의 손길은 항상 신비로움에 가득 차 있으며, 그 존재 자체가 우아하고 매혹적이다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=15_fZGYz1RvyhIU3YwUmxMFgB7Sr8KNUV&sz=w1000",
+
+  images: [
+    "https://drive.google.com/thumbnail?id=15_fZGYz1RvyhIU3YwUmxMFgB7Sr8KNUV&sz=w1000"
+  ],
+
+  sources: [
+    { type: "evolve", label: "진화", desc: "분해진화" }
+  ],
+
+  parts: [
+    { part: "헤어", code: 519 },
+    { part: "상의", code: 355 },
+    { part: "하의", code: 335 },
+    { part: "양말장식", code: 223 },
+    { part: "장식 - 머리 - 머리", code: 528 },
+    { part: "장식 - 소품 - 소품(좌)", code: 529 }
+  ],
+
+  variants: [
+    {
+      type: "evolve",
+      label: "진화 I",
+      items: [
+        { base_code: 519, part: "헤어", code: 550 },
+        { base_code: 355, part: "상의", code: 362 },
+        { base_code: 335, part: "하의", code: 341 },
+        { base_code: 223, part: "양말장식", code: 221 },
+        { base_code: 528, part: "장식 - 머리 - 머리", code: 611 },
+        { base_code: 529, part: "장식 - 소품 - 소품(좌)", code: 529 }
+      ]
+    },
+    {
+      type: "evolve",
+      label: "진화 II",
+      items: [
+        { base_code: 519, part: "헤어", code: 551 },
+        { base_code: 355, part: "상의", code: 363 },
+        { base_code: 335, part: "하의", code: 342 },
+        { base_code: 223, part: "양말장식", code: 222 },
+        { base_code: 528, part: "장식 - 머리 - 머리", code: 612 },
+        { base_code: 529, part: "장식 - 소품 - 소품(좌)", code: 529 }
+      ]
+    },
+    {
+      type: "evolve",
+      label: "진화 III",
+      items: [
+        { base_code: 519, part: "헤어", code: 519 },
+        { base_code: 355, part: "상의", code: 355 },
+        { base_code: 335, part: "하의", code: 335 },
+        { base_code: 223, part: "양말장식", code: 223 },
+        { base_code: 528, part: "장식 - 머리 - 머리", code: 528 },
+        { base_code: 529, part: "장식 - 소품 - 소품(좌)", code: 529 }
+      ]
+    }
+  ]
+},
+{
+  id: "fluffy_lop",
+
+  name_cn: "绒绒垂耳兔",
+  name_en: "Fluffy Lop",
+  name_jp: "垂れ耳うさぎ",
+  name_kr: "밀크티 토끼",
+
+  desc: "그토록 부드럽고 귀여운 토끼도, 한 번 화나면 다르게 변할 수 있어. 그들만의 귀여운 매력은 화가 나면 확 달라지지.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1XdByrwy0vksFiwwjeJWCnGgBE6UNgxR2&sz=w1000",
+
+  images: [
+    "https://drive.google.com/thumbnail?id=1XdByrwy0vksFiwwjeJWCnGgBE6UNgxR2&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "evolve",
+      label: "진화",
+      desc: "공주급 스테이지 진화 (제 1장 8스테이지)"
+    }
+  ],
+
+  parts: [
+    { part: "헤어", code: 542 },
+    { part: "원피스", code: 420 },
+    { part: "양말", code: 218 },
+    { part: "신발", code: 520 },
+    { part: "장식 - 머리 - 머리", code: 579 },
+    { part: "장식 - 손 - 장갑", code: 581 },
+    { part: "장식 - 소품 - 소품(우)", code: 580 },
+    { part: "장식 - 특수 - 꼬리", code: 582 },
+    { part: "뷰티", code: 21 }
+  ],
+
+  variants: [
+    {
+      type: "evolve",
+      label: "진화 I",
+      items: [
+        { base_code: 542, part: "헤어", code: 541 },
+        { base_code: 420, part: "원피스", code: 419 },
+        { base_code: 218, part: "양말", code: 217 },
+        { base_code: 520, part: "신발", code: 519 },
+        { base_code: 579, part: "장식 - 머리 - 머리", code: 576 },
+        { base_code: 581, part: "장식 - 손 - 장갑", code: 578 },
+        { base_code: 580, part: "장식 - 소품 - 소품(우)", code: 577 },
+        { base_code: 582, part: "장식 - 특수 - 꼬리", code: 582 },
+        { base_code: 21, part: "뷰티", code: 21 }
+      ]
+    },
+    {
+      type: "evolve",
+      label: "진화 II",
+      items: [
+        { base_code: 542, part: "헤어", code: 542 },
+        { base_code: 420, part: "원피스", code: 420 },
+        { base_code: 218, part: "양말", code: 218 },
+        { base_code: 520, part: "신발", code: 520 },
+        { base_code: 579, part: "장식 - 머리 - 머리", code: 579 },
+        { base_code: 581, part: "장식 - 손 - 장갑", code: 581 },
+        { base_code: 580, part: "장식 - 소품 - 소품(우)", code: 580 },
+        { base_code: 582, part: "장식 - 특수 - 꼬리", code: 582 },
+        { base_code: 21, part: "뷰티", code: 21 }
+      ]
+    }
+  ]
+},
+{
+  id: "time_idol",
+
+  name_cn: "时空偶像",
+  name_en: "Time Idol",
+  name_jp: "時空アイドル",
+  name_kr: "캠퍼스의 아이돌",
+
+  desc: "그녀는 가끔은 진지하게, 가끔은 웃으며, 그 미소 속에서 캠퍼스의 중심이 되어 있다. 순수하고 빛나는, 모두의 시선을 사로잡는 소녀.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1V_kyQ8ILYCFO02GEiJFBtTF3Ix_rT86Q&sz=w1000",
+
+  images: [
+    "https://drive.google.com/thumbnail?id=1V_kyQ8ILYCFO02GEiJFBtTF3Ix_rT86Q&sz=w1000"
+  ],
+
+  sources: [
+    { type: "craft", label: "제작", desc: "도안제작" }
+  ],
+
+  parts: [
+    { part: "헤어", code: 523 },
+    { part: "상의", code: 358 },
+    { part: "하의", code: 338 },
+    { part: "양말", code: 213 },
+    { part: "신발", code: 505 },
+    { part: "장식 - 머리 - 머리", code: 538 }
+  ]
+},
+{
+  id: "polychrome",
+
+  name_cn: "姹紫嫣红",
+  name_en: "Polychrome",
+  name_jp: "百花",
+  name_kr: "꽃의 왕 모란",
+
+  desc: "봄바람이 스치면, 정원 속 꽃들이 다시 눈을 떠. 형형색색의 꽃잎들이 어우러져, 마치 세상이 한꺼번에 피어나는 듯한 순간.",
+
+  thumb: "https://drive.google.com/thumbnail?id=19A6RylFg-lqq9-Taz683FKDrOPDvWHzO&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=19A6RylFg-lqq9-Taz683FKDrOPDvWHzO&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "evolve",
+      label: "진화",
+      desc: "공주급 스테이지 진화 (제 1장 8스테이지)"
+    }
+  ],
+
+  // ✅ 완성(최종) 구성
+  parts: [
+    { part: "헤어", code: 534 },
+    { part: "원피스", code: 412 },
+    { part: "신발", code: 516 },
+    { part: "장식 - 머리 - 베일", code: 560 }
+  ],
+
+  // ✅ 진화 단계 (Fluffy Lop 포맷)
+  variants: [
+    {
+      type: "evolve",
+      label: "진화 I",
+      items: [
+        { base_code: 534, part: "헤어", code: 532 },
+        { base_code: 412, part: "원피스", code: 410 },
+        { base_code: 516, part: "신발", code: 514 },
+        { base_code: 560, part: "장식 - 머리 - 베일", code: 558 }
+      ]
+    },
+    {
+      type: "evolve",
+      label: "진화 II",
+      items: [
+        { base_code: 534, part: "헤어", code: 533 },
+        { base_code: 412, part: "원피스", code: 411 },
+        { base_code: 516, part: "신발", code: 515 },
+        { base_code: 560, part: "장식 - 머리 - 베일", code: 559 }
+      ]
+    },
+    {
+      type: "evolve",
+      label: "진화 III",
+      items: [
+        { base_code: 534, part: "헤어", code: 534 },
+        { base_code: 412, part: "원피스", code: 412 },
+        { base_code: 516, part: "신발", code: 516 },
+        { base_code: 560, part: "장식 - 머리 - 베일", code: 560 }
+      ]
+    }
+  ]
+},
+{
+  id: "spring_camellia",
+
+  name_cn: "山茶春色",
+  name_en: "Spring Camellia",
+  name_jp: "山の春",
+  name_kr: "봄의 찻잎",
+
+  desc: "봄바람이 스치는 산길에서, 소녀들은 노래를 흘리며 찻잎을 따러 간다. 푸른 잎 사이로 번지는 그 노랫소리는, 봄의 향기와 함께 흐른다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1HpGAdT4nu2ioAbG55Wgc6Oy3-gh82R1A&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1HpGAdT4nu2ioAbG55Wgc6Oy3-gh82R1A&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "craft_evolve",
+      label: "도안제작진화",
+      desc: ""
+    }
+  ],
+
+  // ✅ 완성(최종) 구성
+  parts: [
+    { part: "헤어", code: 536 },
+    { part: "원피스", code: 414 },
+    { part: "아우터", code: 227 },
+    { part: "신발", code: 518 },
+    { part: "장식 - 머리 - 머리", code: 563 },
+    { part: "장식 - 소품 - 소품(좌)", code: 561 }
+  ],
+
+  // ✅ 진화 단계 (base_code = 최종 코드 기준)
+  variants: [
+    {
+      type: "evolve",
+      label: "진화 I",
+      items: [
+        { base_code: 536, part: "헤어", code: 535 },
+        { base_code: 414, part: "원피스", code: 413 },
+        { base_code: 227, part: "아우터", code: 226 },
+        { base_code: 518, part: "신발", code: 517 },
+        { base_code: 563, part: "장식 - 머리 - 머리", code: 562 },
+        { base_code: 561, part: "장식 - 소품 - 소품(좌)", code: 561 }
+      ]
+    },
+    {
+      type: "evolve",
+      label: "진화 II",
+      items: [
+        { base_code: 536, part: "헤어", code: 536 },
+        { base_code: 414, part: "원피스", code: 414 },
+        { base_code: 227, part: "아우터", code: 227 },
+        { base_code: 518, part: "신발", code: 518 },
+        { base_code: 563, part: "장식 - 머리 - 머리", code: 563 },
+        { base_code: 561, part: "장식 - 소품 - 소품(좌)", code: 561 }
+      ]
+    }
+  ]
+},
+{
+  id: "ink_wash_painting",
+
+  name_cn: "水墨青花",
+  name_en: "Ink Wash Painting",
+  name_jp: "墨の花",
+  name_kr: "수채꽃",
+
+  desc: "먹 한 번 스친 듯한 그녀는, 생기 있으면서도 단아하다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1wrDUIbpe3eYosrLIf3RoCFz-2OWuM4Ao&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1wrDUIbpe3eYosrLIf3RoCFz-2OWuM4Ao&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "craft",
+      label: "도안제작",
+      desc: ""
+    }
+  ],
+
+  parts: [
+    { part: "헤어", code: 517 },
+    { part: "원피스", code: 399 },
+    { part: "신발", code: 499 },
+    { part: "장식 - 머리 - 머리", code: 524 },
+    { part: "장식 - 목 - 목걸이", code: 525 },
+    { part: "장식 - 손 - 팔찌(우)", code: 526 }
+  ]
+},
+{
+  id: "stripe_gentleman",
+
+  name_cn: "条纹绅士",
+  name_en: "Stripe Gentleman",
+  name_jp: "ストライプの紳士",
+  name_kr: "줄무늬신사",
+
+  desc: "잔잔한 오후, 줄무늬 수트의 신사는 밀크티 한 모금에 평온을 담아낸다. 햇살 아래 기댄 채, 시간이 천천히 흐르는 순간을 즐기는 모습이 인상적이야.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1fnwJbPupOWk0Bn5cfZYLdJr6nsWZoqMN&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1fnwJbPupOWk0Bn5cfZYLdJr6nsWZoqMN&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "craft",
+      label: "도안제작",
+      desc: ""
+    }
+  ],
+
+  parts: [
+    { part: "헤어", code: 518 },
+    { part: "상의", code: 354 },
+    { part: "하의", code: 334 },
+    { part: "아우터", code: 215 },
+    { part: "신발", code: 500 }
+  ]
+},
+{
+  id: "light_fairy",
+
+  name_cn: "光明精灵",
+  name_en: "Light Fairy",
+  name_jp: "光のフェアリー",
+  name_kr: "빛의 요정",
+
+  desc: "햇살이 따스하게 내려앉는 카나리아 숲에서 자란 그녀들은, 빛과 자연이 어우러진 숨결을 품고 있어. 세상과 조화를 이루는 순백의 요정들.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1Hx9ETXk15PtGHNEoXWdLFfL-E_fpjil1&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1Hx9ETXk15PtGHNEoXWdLFfL-E_fpjil1&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "craft_evolve",
+      label: "도안제작진화",
+      desc: ""
+    }
+  ],
+
+  // ✅ 최종(완성) 구성
+  parts: [
+    { part: "헤어", code: 539 },
+    { part: "원피스", code: 417 },
+    { part: "아우터", code: 224 },
+    { part: "양말장식", code: 216 },
+    { part: "장식 - 머리 - 머리", code: 570 },
+    { part: "장식 - 귀", code: 568 },
+    { part: "장식 - 목 - 목걸이", code: 572 },
+    { part: "장식 - 소품 - 소품(좌)", code: 574 }
+  ],
+
+  // ✅ 진화 단계 (base_code = 최종 코드 기준)
+  variants: [
+    {
+      type: "evolve",
+      label: "진화 I",
+      items: [
+        { base_code: 539, part: "헤어", code: 537 },
+        { base_code: 417, part: "원피스", code: 415 },
+        { base_code: 224, part: "아우터", code: 222 },
+        { base_code: 216, part: "양말장식", code: 214 },
+        { base_code: 570, part: "장식 - 머리 - 머리", code: 570 },
+        { base_code: 568, part: "장식 - 귀", code: 568 },
+        { base_code: 572, part: "장식 - 목 - 목걸이", code: 572 },
+        { base_code: 574, part: "장식 - 소품 - 소품(좌)", code: 573 }
+      ]
+    },
+    {
+      type: "evolve",
+      label: "진화 II",
+      items: [
+        { base_code: 539, part: "헤어", code: 538 },
+        { base_code: 417, part: "원피스", code: 416 },
+        { base_code: 224, part: "아우터", code: 223 },
+        { base_code: 216, part: "양말장식", code: 215 },
+        { base_code: 570, part: "장식 - 머리 - 머리", code: 570 },
+        { base_code: 568, part: "장식 - 귀", code: 568 },
+        { base_code: 572, part: "장식 - 목 - 목걸이", code: 572 },
+        { base_code: 574, part: "장식 - 소품 - 소품(좌)", code: 574 }
+      ]
+    },
+    {
+      type: "evolve",
+      label: "진화 III",
+      items: [
+        { base_code: 539, part: "헤어", code: 539 },
+        { base_code: 417, part: "원피스", code: 417 },
+        { base_code: 224, part: "아우터", code: 224 },
+        { base_code: 216, part: "양말장식", code: 216 },
+        { base_code: 570, part: "장식 - 머리 - 머리", code: 570 },
+        { base_code: 568, part: "장식 - 귀", code: 568 },
+        { base_code: 572, part: "장식 - 목 - 목걸이", code: 572 },
+        { base_code: 574, part: "장식 - 소품 - 소품(좌)", code: 574 }
+      ]
+    },
+    {
+      type: "recolor",
+      label: "리폼",
+      items: [
+        { base_code: 539, part: "헤어", code: 540 },
+        { base_code: 417, part: "원피스", code: 418 },
+        { base_code: 224, part: "아우터", code: 225 },
+        { base_code: 216, part: "양말장식", code: 215 },
+        { base_code: 570, part: "장식 - 머리 - 머리", code: 570 },
+        { base_code: 568, part: "장식 - 귀", code: 568 },
+        { base_code: 572, part: "장식 - 목 - 목걸이", code: 572 },
+        { base_code: 574, part: "장식 - 소품 - 소품(좌)", code: 575 }
+      ]
+    }
+  ]
+},
+{
+  id: "stunning_beauty",
+
+  name_cn: "韶颜倾城",
+  name_en: "Stunning Beauty",
+  name_jp: "絶世の美女",
+  name_kr: "고대의 백조",
+
+  desc: "밤바람이 은은히 스치면, 촛불과 대나무도 함께 춤춰. 그 속에서 피어나는 봄빛은 소녀의 얼굴에 곱게 내려앉아, 한순간을 전설처럼 아름답게 만들어.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1C2W01CP1C-BdiS-6eC4Dhgu98zku6AJl&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1C2W01CP1C-BdiS-6eC4Dhgu98zku6AJl&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "craft",
+      label: "도안제작",
+      desc: ""
+    }
+  ],
+
+  parts: [
+    { part: "헤어", code: 514 },
+    { part: "원피스", code: 397 },
+    { part: "아우터", code: 213 },
+    { part: "신발", code: 497 },
+    { part: "장식 - 머리 - 머리", code: 517 },
+    { part: "장식 - 귀", code: 518 },
+    { part: "장식 - 손 - 팔찌(우)", code: 520 },
+    { part: "장식 - 특수 - 전경", code: 519 },
+    { part: "뷰티", code: 16 }
+  ],
+
+  variants: [
+    {
+      type: "recolor",
+      label: "리폼 I",
+      items: [
+        { base_code: 514, part: "헤어", code: 515 },
+        { base_code: 397, part: "원피스", code: 398 },
+        { base_code: 213, part: "아우터", code: 214 },
+        { base_code: 497, part: "신발", code: 498 },
+        { base_code: 517, part: "장식 - 머리 - 머리", code: 521 },
+        { base_code: 518, part: "장식 - 귀", code: 522 },
+        { base_code: 520, part: "장식 - 손 - 팔찌(우)", code: 523 },
+        { base_code: 519, part: "장식 - 특수 - 전경", code: 519 },
+        { base_code: 16, part: "뷰티", code: 17 }
+      ]
+    },
+    {
+      type: "recolor",
+      label: "리폼 II",
+      items: [
+        { base_code: 514, part: "헤어", code: 516 }
+      ]
+    }
+  ]
+},
+{
+  id: "lotus_chant",
+
+  name_cn: "荷花吟",
+  name_en: "Lotus Chant",
+  name_jp: "蓮花",
+  name_kr: "연꽃 노래",
+
+  desc: "진흙 속에서 고요히 피어난 연꽃, 물결에 살며시 흔들리며도 그 고운 자태는 변하지 않아. 그녀의 순수하고 담백한 아름다움은 그 자체로 눈부시다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1sXcgwmBSFR7-ioKQmFT1UYa5mnVqg_Se&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1sXcgwmBSFR7-ioKQmFT1UYa5mnVqg_Se&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "shop_cinderella",
+      label: "신데렐라 상점",
+      desc: "신데렐라 상점에서 유리구두로 구매"
+    }
+  ],
+
+  parts: [
+    { part: "헤어", code: 522 },
+    { part: "상의", code: 357 },
+    { part: "하의", code: 337 },
+    { part: "신발", code: 504 },
+    { part: "장식 - 머리 - 머리", code: 535 },
+    { part: "장식 - 목 - 목걸이", code: 536 },
+    { part: "장식 - 소품 - 소품(우)", code: 537 }
+  ]
+},
+{
+  id: "crystal_rose",
+
+  name_cn: "冰晶玫瑰",
+  name_en: "Crystal Rose",
+  name_jp: "氷の薔薇",
+  name_kr: "얼음 장미",
+
+  desc: "그녀는 카나리아 설산의 엘프 여왕이다. 마치 거친 설산 속에서 피어난 한 송이 수정 장미와 같은 고결한 자태를 지니고 있다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1hyaG3DIGkxEA93bardh0lmGamJXbD4pz&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1hyaG3DIGkxEA93bardh0lmGamJXbD4pz&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "achievement_rank",
+      label: "엽적 달성",
+      desc: "스타일대회 1위를 달성해야 모든 의상 획득 가능"
+    }
+  ],
+
+  parts: [
+    { part: "헤어", code: 491 },
+    { part: "원피스", code: 337 },
+    { part: "신발", code: 478 },
+    { part: "장식 - 머리 - 베일", code: 433 },
+    { part: "장식 - 귀", code: 434 },
+    { part: "장식 - 목 - 목걸이", code: 435 },
+    { part: "장식 - 손 - 장갑", code: 436 },
+    { part: "뷰티", code: 11 }
+  ]
+},
+{
+  id: "dream_sail",
+
+  name_cn: "梦想起航",
+  name_en: "Dream Sail",
+  name_jp: "夢の入口",
+  name_kr: "여고시절",
+
+  desc: "",
+
+  thumb: "https://drive.google.com/thumbnail?id=1pm3qjuj8ZgMNWQYn05-px6L0Ot4opBeL&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1pm3qjuj8ZgMNWQYn05-px6L0Ot4opBeL&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "shop",
+      label: "옷가게 구매",
+      desc: ""
+    }
+  ],
+
+  parts: [
+    { part: "헤어", code: 496 },
+    { part: "상의", code: 339 },
+    { part: "하의", code: 318 },
+    { part: "신발", code: 483 },
+    { part: "장식 - 소품 - 소품(좌)", code: 457 },
+    { part: "장식 - 특수 - 얼굴", code: 456 }
+  ]
+},
+{
+  id: "detective_girl",
+
+  name_cn: "侦探少女",
+  name_en: "Detective Girl",
+  name_jp: "少女探偵",
+  name_kr: "소녀탐정",
+
+  desc: "어느 날, 실종 사건을 조사하기 위해 떠난 소녀탐정은 미지의 땅에서 기념품을 사며 작은 추억을 남겼다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1y-hUUjHFUg-ag9KChHUm5t4j26jGnv4L&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1y-hUUjHFUg-ag9KChHUm5t4j26jGnv4L&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "shop",
+      label: "상점",
+      desc: "오디션 상점 구매"
+    }
+  ],
+
+  parts: [
+    { part: "헤어", code: 502 },
+    { part: "상의", code: 345 },
+    { part: "하의", code: 326 },
+    { part: "아우터", code: 204 },
+    { part: "양말", code: 206 },
+    { part: "신발", code: 487 },
+    { part: "장식 - 머리 - 머리", code: 474 },
+    { part: "장식 - 목 - 목도리", code: 476 },
+    { part: "장식 - 손 - 팔찌(우)", code: 475 }
+  ]
+},
+{
+  id: "star_sea",
+
+  name_cn: "星之海",
+  name_en: "Star Sea",
+  name_jp: "星の海",
+  name_kr: "별빛바다",
+
+  desc: "두 손을 펼친 순간, 별들이 천천히 흩어지며 밤하늘이 그녀 주위를 감싼다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=110X09qEC2IYCQ7NO-6MxJ5T4Y2tlnUj6&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=110X09qEC2IYCQ7NO-6MxJ5T4Y2tlnUj6&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "craft",
+      label: "도안제작",
+      desc: ""
+    }
+  ],
+
+  parts: [
+    { part: "헤어", code: 125 },
+    { part: "원피스", code: 80 },
+    { part: "신발", code: 82 },
+    { part: "장식 - 머리 - 머리", code: 125 },
+    { part: "장식 - 목 - 목걸이", code: 126 },
+    { part: "장식 - 손 - 장갑", code: 127 }
+  ]
+},
+{
+  id: "winter_miracle",
+
+  name_cn: "冬恋奇迹",
+  name_en: "Winter Miracle",
+  name_jp: "ウィンター・ラブ",
+  name_kr: "겨울의 기적",
+
+  desc: "미라클왕국에서의 모든 순간은 마치 기적처럼 아름답고, 그 기억들은 언제나 마음에 따스하게 남을 것이다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1_g6xWKmJLpheR0sTjDZE64MJwr-diHpV&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1_g6xWKmJLpheR0sTjDZE64MJwr-diHpV&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "신데렐라",
+      label: "신데렐라의 비밀",
+      desc: ""
+    }
+  ],
+
+  // ✅ 최종 구성
+  parts: [
+    { part: "헤어", code: 215 },
+    { part: "상의", code: 274 },
+    { part: "하의", code: 264 },
+    { part: "양말", code: 182 },
+    { part: "신발", code: 402 },
+    { part: "장식 - 머리 - 머리", code: 306 }
+  ],
+
+  variants: [
+    {
+      type: "recolor",
+      label: "리폼 I",
+      items: [
+        { base_code: 215, part: "헤어", code: 217 },
+        { base_code: 274, part: "상의", code: 325 },
+        { base_code: 264, part: "하의", code: 261 },
+        { base_code: 402, part: "신발", code: 403 }
+      ]
+    },
+    {
+      type: "recolor",
+      label: "리폼 II",
+      items: [
+        { base_code: 274, part: "상의", code: 326 },
+        { base_code: 264, part: "하의", code: 262 },
+        { base_code: 402, part: "신발", code: 403 }
+      ]
+    },
+    {
+      type: "recolor",
+      label: "리폼 III",
+      items: [
+        { base_code: 264, part: "하의", code: 263 },
+        { base_code: 402, part: "신발", code: 405 }
+      ]
+    }
+  ]
+},
+{
+  id: "winter_angel",
+
+  name_cn: "慕冬天使",
+  name_en: "Winter Angel",
+  name_jp: "ウィンター・エンジェル",
+  name_kr: "따뜻한 천사",
+
+  desc: "눈 속을 걷는 천사처럼 순수하고 따스한 그녀의 모습은, 차가운 겨울에 따뜻함을 선사한다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1Vty2Pfbcffq5z7ZMea8OSYXPw7DQPa8_&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1Vty2Pfbcffq5z7ZMea8OSYXPw7DQPa8_&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "package",
+      label: "패키지 구매",
+      desc: "첫충전 패키지 구매"
+    }
+  ],
+
+  // ✅ 최종 구성
+  parts: [
+    { part: "헤어", code: 214 },
+    { part: "원피스", code: 249 },
+    { part: "양말", code: 175 },
+    { part: "신발", code: 398 },
+    { part: "장식 - 머리 - 머리", code: 288 },
+    { part: "장식 - 특수 - 가슴", code: 292 },
+    { part: "장식 - 손 - 장갑", code: 296 }
+  ],
+
+  variants: [
+    {
+      type: "recolor",
+      label: "리폼",
+      items: [
+        { base_code: 249, part: "원피스", code: 251 },
+        { base_code: 175, part: "양말", code: 176 },
+        { base_code: 175, part: "양말", code: 177 },
+        { base_code: 398, part: "신발", code: 400 },
+        { base_code: 398, part: "신발", code: 401 }
+      ]
+    }
+  ]
+},
+{
+  id: "wilds_flower",
+
+  name_cn: "荒原的花",
+  name_en: "Wilds Flower",
+  name_jp: "野に咲く花",
+  name_kr: "사막의 꽃",
+
+  desc: "애플 왕국에 있으면서도 자연의 사자처럼 순수하고, 그 아름다움은 주변을 밝히는 꽃처럼 피어난다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1utmSbjK2cReLNIA9Rgaak2ecAfpd5-pU&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1utmSbjK2cReLNIA9Rgaak2ecAfpd5-pU&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "craft",
+      label: "도안제작",
+      desc: ""
+    }
+  ],
+
+  // ✅ 최종 구성
+  parts: [
+    { part: "헤어", code: 70 },
+    { part: "원피스", code: 246 },
+    { part: "신발", code: 394 },
+    { part: "장식 - 머리 - 머리", code: 271 },
+    { part: "장식 - 목 - 목걸이", code: 272 },
+    { part: "장식 - 소품 - 소품(우)", code: 273 }
+  ],
+
+  variants: [
+    {
+      type: "evolve",
+      label: "진화 I",
+      items: [
+        { base_code: 70, part: "헤어", code: 68 }
+      ]
+    },
+    {
+      type: "evolve",
+      label: "진화 II",
+      items: [
+        { base_code: 70, part: "헤어", code: 69 }
+      ]
+    },
+    {
+      type: "evolve",
+      label: "진화 III",
+      items: [
+        { base_code: 70, part: "헤어", code: 70 }
+      ]
+    },
+    {
+      type: "recolor",
+      label: "리폼",
+      items: [
+        { base_code: 70, part: "헤어", code: 258 },
+        { base_code: 70, part: "헤어", code: 260 },
+        { base_code: 70, part: "헤어", code: 261 },
+        { base_code: 70, part: "헤어", code: 262 }
+      ]
+    }
+  ]
+},
+{
+  id: "seal_sailor",
+
+  name_cn: "海豹小水手",
+  name_en: "Seal Sailor",
+  name_jp: "あざらしセーラー",
+  name_kr: "물범 마린룩",
+
+  desc: "바람 부는 갑판 위, 머리 위에서 말랑하게 누워 있는 작은 물범이 함께한다면 오늘의 항해는 그 자체로 귀여움 가득한 모험이야.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1irnbaiz317rZiOqjsbsMbjr497WG2ir2&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1irnbaiz317rZiOqjsbsMbjr497WG2ir2&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "신데렐라",
+      label: "신데렐라의 비밀",
+      desc: ""
+    }
+  ],
+
+  parts: [
+    { part: "헤어", code: 168 },
+    { part: "상의", code: 129 },
+    { part: "하의", code: 150 },
+    { part: "양말", code: 139 },
+    { part: "신발", code: 354 },
+    { part: "장식 - 머리 - 머리", code: 210 },
+    { part: "장식 - 머리 - 베일", code: 209 }
+  ]
+},
+{
+  id: "blossom_season",
+
+  name_cn: "甜美花季",
+  name_en: "Blossom Season",
+  name_jp: "花咲く頃",
+  name_kr: "달콤한 시절",
+
+  desc: "아직 어리고 순수한 그 시절, 어떤 화장도 어떤 옷도 흉내낼 수 없는 특별한 빛이 소녀에게 피어난다. 그 자체가 ‘꽃피는 순간’이야.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1OfYfBW3znJEdRQO1U8WsaZkmPjmGloOg&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1OfYfBW3znJEdRQO1U8WsaZkmPjmGloOg&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "achievement",
+      label: "업적달성",
+      desc: ""
+    }
+  ],
+
+  parts: [
+    { part: "헤어", code: 170 },
+    { part: "상의", code: 131 },
+    { part: "하의", code: 152 },
+    { part: "양말", code: 141 },
+    { part: "신발", code: 356 },
+    { part: "장식 - 머리 - 머리", code: 213 },
+    { part: "장식 - 손 - 팔찌(우)", code: 214 },
+    { part: "장식 - 소품 - 소품(우)", code: 215 }
+  ]
+},
+{
+  id: "bright_galaxy",
+
+  name_cn: "璀璨星河",
+  name_en: "Bright Galaxy",
+  name_jp: "スターリー ナイト",
+  name_kr: "빛나는 은하수",
+
+  desc: "밤하늘 아래, 그녀의 하얀 발목은 끝없이 펼쳐진 은하 속으로 스며들고, 수많은 별빛이 조용히 내려앉아 그녀를 감싸는 순간, 한 편의 우주가 완성된다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1-enfEKPtzOmM5Ao-XpyeHr1qbNi3rh2b&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1-enfEKPtzOmM5Ao-XpyeHr1qbNi3rh2b&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "event",
+      label: "로그인 이벤트",
+      desc: "로그인 시 순차 의상 지급"
+    }
+  ],
+
+  parts: [
+    { part: "헤어", code: 164 },
+    { part: "원피스", code: 166 },
+    { part: "양말장식", code: 174 },
+    { part: "신발", code: 349 },
+    { part: "장식 - 귀", code: 285 },
+    { part: "장식 - 목 - 목걸이", code: 286 },
+    { part: "장식 - 소품 - 소품(우)", code: 287 }
+  ]
+},
+{
+  id: "dancing_queen",
+
+  name_cn: "舞会皇后",
+  name_en: "Dancing Queen",
+  name_jp: "舞踏会の女王",
+  name_kr: "무도회 여왕",
+
+  desc: "무도회의 조명이 켜지는 순간, 헤일리와 함께 있는 프린시스가 직접 완성한 드레스는 그녀를 무대 위의 진짜 여왕으로 만들어준다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1QCrmTL90rW8H3HZIif19GyLECf_WdvOd&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1QCrmTL90rW8H3HZIif19GyLECf_WdvOd&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "vip",
+      label: "VIP 달성",
+      desc: "VIP 5 달성 시 지급"
+    }
+  ],
+
+  parts: [
+    { part: "헤어", code: 122 },
+    { part: "원피스", code: 76 },
+    { part: "신발", code: 79 },
+    { part: "장식 - 머리 - 머리", code: 114 },
+    { part: "장식 - 목 - 목걸이", code: 115 },
+    { part: "장식 - 손 - 장갑", code: 116 }
+  ]
+},
+{
+  id: "panda_dreamland",
+
+  name_cn: "熊猫梦乡",
+  name_en: "Panda Dreamland",
+  name_jp: "パンダと夢の国",
+  name_kr: "팬더의 꿈나라",
+
+  desc: "잘자, 팬더!",
+
+  thumb: "https://drive.google.com/thumbnail?id=1bf-g0_NNQ4X8qq4BjGgMkzfiP1LvNMJi&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1bf-g0_NNQ4X8qq4BjGgMkzfiP1LvNMJi&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "craft",
+      label: "도안제작",
+      desc: ""
+    }
+  ],
+
+  // ✅ 최종 구성
+  parts: [
+    { part: "헤어", code: 120 },
+    { part: "상의", code: 80 },
+    { part: "하의", code: 91 },
+    { part: "신발", code: 76 },
+    { part: "장식 - 머리 - 머리", code: 110 }
+  ],
+
+  variants: [
+    {
+      type: "recolor",
+      label: "리폼",
+      items: [
+        { base_code: 120, part: "헤어", code: 120 },
+        { base_code: 80, part: "상의", code: 81 },
+        { base_code: 91, part: "하의", code: 92 },
+        { base_code: 76, part: "신발", code: 77 },
+        { base_code: 110, part: "장식 - 머리 - 머리", code: 111 }
+      ]
+    }
+  ]
+},
+{
+  id: "cowboy_style",
+
+  name_cn: "牛仔风情",
+  name_en: "Cowboy Style",
+  name_jp: "セクシーデニム",
+  name_kr: "바람의 카우걸",
+
+  desc: "붉게 물든 하늘 아래, 사막의 끝에서 무리와 함께 달리며 바람과 함께 자유를 느낀다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1clM2YFaYQk-BiEkhr1b1fPJVT6jFo-fw&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1clM2YFaYQk-BiEkhr1b1fPJVT6jFo-fw&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "evolve",
+      label: "진화",
+      desc: "공주급 스테이지에서 의상 획득 후 진화"
+    }
+  ],
+
+  // ✅ 최종 구성
+  parts: [
+    { part: "헤어", code: 112 },
+    { part: "상의", code: 77 },
+    { part: "하의", code: 87 },
+    { part: "아우터", code: 37 },
+    { part: "신발", code: 68 },
+    { part: "장식 - 머리 - 머리", code: 78 },
+    { part: "장식 - 귀", code: 76 },
+    { part: "장식 - 목 - 목도리", code: 80 }
+  ],
+
+  variants: [
+    {
+      type: "evolve",
+      label: "진화",
+      items: [
+        { base_code: 112, part: "헤어", code: 111 },
+        { base_code: 77, part: "상의", code: 77 },
+        { base_code: 87, part: "하의", code: 86 },
+        { base_code: 37, part: "아우터", code: 36 },
+        { base_code: 68, part: "신발", code: 68 },
+        { base_code: 78, part: "장식 - 머리 - 머리", code: 77 },
+        { base_code: 76, part: "장식 - 귀", code: 75 },
+        { base_code: 80, part: "장식 - 목 - 목도리", code: 79 }
+      ]
+    },
+    {
+      type: "recolor",
+      label: "리폼",
+      items: [
+        { base_code: 80, part: "장식 - 목 - 목도리", code: 374 },
+        { base_code: 80, part: "장식 - 목 - 목도리", code: 375 },
+        { base_code: 80, part: "장식 - 목 - 목도리", code: 376 }
+      ]
+    }
+  ]
+},
+{
+  id: "chocolate_housemaid",
+
+  name_cn: "巧克力女仆",
+  name_en: "Chocolate Housemaid",
+  name_jp: "メイド・ショコラ",
+  name_kr: "초코 메이드",
+
+  desc: "카페에서 서빙된 달콤한 케이크와 함께, 초코 메이드는 그윽한 노래로 시간을 더욱 특별하게 만든다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1S_m7eRTKlNH0AF8pyr7K4oSNQO2ldVar&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1S_m7eRTKlNH0AF8pyr7K4oSNQO2ldVar&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "evolve",
+      label: "진화",
+      desc: "공주급 스테이지에서 의상 획득 후 진화"
+    }
+  ],
+
+  // ✅ 최종 구성
+  parts: [
+    { part: "헤어", code: 115 },
+    { part: "원피스", code: 70 },
+    { part: "양말", code: 42 },
+    { part: "신발", code: 71 },
+    { part: "장식 - 머리 - 머리", code: 83 },
+    { part: "장식 - 목 - 목걸이", code: 86 },
+    { part: "장식 - 손 - 장갑", code: 89 }
+  ],
+
+  variants: [
+    {
+      type: "evolve",
+      label: "진화 I",
+      items: [
+        { base_code: 115, part: "헤어", code: 113 },
+        { base_code: 70, part: "원피스", code: 68 },
+        { base_code: 42, part: "양말", code: 40 },
+        { base_code: 71, part: "신발", code: 69 },
+        { base_code: 83, part: "장식 - 머리 - 머리", code: 81 },
+        { base_code: 86, part: "장식 - 목 - 목걸이", code: 84 },
+        { base_code: 89, part: "장식 - 손 - 장갑", code: 87 }
+      ]
+    },
+    {
+      type: "evolve",
+      label: "진화 II",
+      items: [
+        { base_code: 115, part: "헤어", code: 114 },
+        { base_code: 70, part: "원피스", code: 69 },
+        { base_code: 42, part: "양말", code: 41 },
+        { base_code: 71, part: "신발", code: 70 },
+        { base_code: 83, part: "장식 - 머리 - 머리", code: 82 },
+        { base_code: 86, part: "장식 - 목 - 목걸이", code: 85 },
+        { base_code: 89, part: "장식 - 손 - 장갑", code: 88 }
+      ]
+    },
+    {
+      type: "evolve",
+      label: "진화 III",
+      items: [
+        { base_code: 115, part: "헤어", code: 115 },
+        { base_code: 70, part: "원피스", code: 70 },
+        { base_code: 42, part: "양말", code: 42 },
+        { base_code: 71, part: "신발", code: 71 },
+        { base_code: 83, part: "장식 - 머리 - 머리", code: 83 },
+        { base_code: 86, part: "장식 - 목 - 목걸이", code: 86 },
+        { base_code: 89, part: "장식 - 손 - 장갑", code: 89 }
+      ]
+    }
+  ]
+},
+{
+  id: "mori_girl_and_reindeer",
+
+  name_cn: "森女与麋鹿",
+  name_en: "Mori Girl and Reindeer",
+  name_jp: "トナカイガール",
+  name_kr: "순록의 계절",
+
+  desc: "순록처럼 조용히 기다리는 그녀는, 차가운 겨울을 지나 봄을 맞이할 날을 꿈꾸며 시간을 보낸다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1mVqbWJclECUkdnV0rVWyuGwsU510BsLY&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1mVqbWJclECUkdnV0rVWyuGwsU510BsLY&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "evolve",
+      label: "진화",
+      desc: "공주급 스테이지에서 의상 획득 후 진화"
+    }
+  ],
+
+  // ✅ 최종 구성
+  parts: [
+    { part: "헤어", code: 124 },
+    { part: "원피스", code: 79 },
+    { part: "아우터", code: 42 },
+    { part: "양말장식", code: 47 },
+    { part: "양말", code: 48 },
+    { part: "신발", code: 81 },
+    { part: "장식 - 머리 - 머리", code: 123 },
+    { part: "장식 - 목 - 목도리", code: 124 }
+  ],
+
+  variants: [
+    {
+      type: "evolve",
+      label: "진화 I",
+      items: [
+        { base_code: 124, part: "헤어", code: 124 },
+        { base_code: 79, part: "원피스", code: 78 },
+        { base_code: 42, part: "아우터", code: 41 },
+        { base_code: 47, part: "양말장식", code: 47 },
+        { base_code: 48, part: "양말", code: 48 },
+        { base_code: 81, part: "신발", code: 81 },
+        { base_code: 123, part: "장식 - 머리 - 머리", code: 122 },
+        { base_code: 124, part: "장식 - 목 - 목도리", code: 124 }
+      ]
+    },
+    {
+      type: "evolve",
+      label: "진화 II",
+      items: [
+        { base_code: 124, part: "헤어", code: 124 },
+        { base_code: 79, part: "원피스", code: 79 },
+        { base_code: 42, part: "아우터", code: 42 },
+        { base_code: 47, part: "양말장식", code: 47 },
+        { base_code: 48, part: "양말", code: 48 },
+        { base_code: 81, part: "신발", code: 81 },
+        { base_code: 123, part: "장식 - 머리 - 머리", code: 123 },
+        { base_code: 124, part: "장식 - 목 - 목도리", code: 124 }
+      ]
+    }
+  ]
+},
+{
+  id: "realized_dream",
+
+  name_cn: "美梦成真",
+  name_en: "Realized Dream",
+  name_jp: "永遠の誓い",
+  name_kr: "순백의 로망",
+
+  desc: "이건 그녀의 가장 달콤한 순간이다. 그녀의 운명의 남자가 이제 베일을 들어 올릴 것이다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1a7F2cFnTznokirAdsYPblgVD1XQBb08a&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1a7F2cFnTznokirAdsYPblgVD1XQBb08a&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "craft",
+      label: "도안제작",
+      desc: ""
+    }
+  ],
+
+  parts: [
+    { part: "헤어", code: 123 },
+    { part: "원피스", code: 77 },
+    { part: "신발", code: 80 },
+    { part: "장식 - 머리 - 머리", code: 118 },
+    { part: "장식 - 머리 - 베일", code: 117 },
+    { part: "장식 - 귀", code: 119 },
+    { part: "장식 - 목 - 목걸이", code: 120 },
+    { part: "장식 - 소품 - 소품(우)", code: 121 }
+  ]
+},
+{
+  id: "beautiful_agent",
+
+  name_cn: "最美特工",
+  name_en: "Beautiful Agent",
+  name_jp: "美しきスパイ",
+  name_kr: "특수요원",
+
+  desc: "그녀는 특수 작전 부대에서 일하며, 그들의 랭킹 최상위에 있는 슈퍼 요원이다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1cHU_jrgwWJqxm47vbFrY_S6FA3i_z2r4&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1cHU_jrgwWJqxm47vbFrY_S6FA3i_z2r4&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "craft",
+      label: "도안제작",
+      desc: ""
+    }
+  ],
+
+  parts: [
+    { part: "헤어", code: 206 },
+    { part: "상의", code: 243 },
+    { part: "하의", code: 247 },
+    { part: "신발", code: 395 },
+    { part: "장식 - 목 - 목걸이", code: 274 },
+    { part: "장식 - 손 - 장갑", code: 275 }
+  ]
+},
+{
+  id: "sweet_pastry_cook",
+
+  name_cn: "甜甜糕点师",
+  name_en: "Sweet Pastry Cook",
+  name_jp: "スイートなパティシエ",
+  name_kr: "스위트 파티쉐",
+
+  desc: "니키는 온갖 맛있는 페이스트리를 먹는 걸 좋아한다. 너도 그렇다고 생각해.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1sP2UGgsKDlhUQO1XGjz6P-fm5-TJq0Xq&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1sP2UGgsKDlhUQO1XGjz6P-fm5-TJq0Xq&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "shop",
+      label: "상점",
+      desc: "옷가게 구매"
+    }
+  ],
+
+  // ✅ 최종 구성
+  parts: [
+    { part: "헤어", code: 155 },
+    { part: "상의", code: 113 },
+    { part: "하의", code: 135 },
+    { part: "아우터", code: 70 },
+    { part: "양말", code: 132 },
+    { part: "신발", code: 340 },
+    { part: "장식 - 머리 - 머리", code: 200 }
+  ],
+
+  variants: [
+    {
+      type: "recolor",
+      label: "리폼 I",
+      items: [
+        { base_code: 155, part: "헤어", code: 156 },
+        { base_code: 113, part: "상의", code: 116 },
+        { base_code: 135, part: "하의", code: 136 },
+        { base_code: 340, part: "신발", code: 341 }
+      ]
+    },
+    {
+      type: "recolor",
+      label: "리폼 II",
+      items: [
+        { base_code: 155, part: "헤어", code: 156 },
+        { base_code: 113, part: "상의", code: 115 },
+        { base_code: 135, part: "하의", code: 137 },
+        { base_code: 132, part: "양말", code: 134 },
+        { base_code: 340, part: "신발", code: 343 }
+      ]
+    },
+    {
+      type: "recolor",
+      label: "리폼 III",
+      items: [
+        { base_code: 155, part: "헤어", code: 155 },
+        { base_code: 113, part: "상의", code: 114 },
+        { base_code: 135, part: "하의", code: 138 },
+        { base_code: 132, part: "양말", code: 135 },
+        { base_code: 340, part: "신발", code: 342 }
+      ]
+    }
+  ]
+},
+{
+  id: "sexy_bad_girl",
+
+  name_cn: "性愿不良",
+  name_en: "Sexy Bad Girl",
+  name_jp: "セクシーギャル",
+  name_kr: "무서운 언니",
+
+  desc: "오토바이를 타고, 사냥하고, 사격하고, 캠핑까지… 노스왕국의 이 소녀는 애플 왕국에서 특히 눈에 띈다.",
+
+  thumb: "https://drive.google.com/thumbnail?id=1tOCXQa_46B56FS92cfhmoRgySQMcrkC8&sz=w1000",
+  images: [
+    "https://drive.google.com/thumbnail?id=1tOCXQa_46B56FS92cfhmoRgySQMcrkC8&sz=w1000"
+  ],
+
+  sources: [
+    {
+      type: "craft",
+      label: "도안제작",
+      desc: ""
+    }
+  ],
+
+  // ✅ 최종 구성
+  parts: [
+    { part: "헤어", code: 121 },
+    { part: "상의", code: 78 },
+    { part: "하의", code: 93 },
+    { part: "아우터", code: 40 },
+    { part: "양말", code: 46 },
+    { part: "신발", code: 78 },
+    { part: "장식 - 귀", code: 112 },
+    { part: "장식 - 목 - 목걸이", code: 113 }
+  ],
+
+  variants: [
+    {
+      type: "evolve",
+      label: "진화 I",
+      items: [
+        { base_code: 121, part: "헤어", code: 78 }
+      ]
+    },
+    {
+      type: "evolve",
+      label: "진화 II",
+      items: [
+        { base_code: 121, part: "헤어", code: 79 }
+      ]
+    },
+    {
+      type: "evolve",
+      label: "진화 III",
+      items: [
+        { base_code: 121, part: "헤어", code: 121 }
+      ]
     },
 
-    // 세트 구성 (부위/코드만 넣어도 됨)
-    parts: [
-      { part:"헤어", code: 1 }
-    ]
-  }
+    {
+      type: "recolor",
+      label: "리폼 I",
+      items: [
+        { base_code: 121, part: "헤어", code: 341 },
+        { base_code: 121, part: "헤어", code: 342 }
+      ]
+    },
+    {
+      type: "recolor",
+      label: "리폼 II",
+      items: [
+        { base_code: 121, part: "헤어", code: 335 },
+        { base_code: 121, part: "헤어", code: 336 }
+      ]
+    },
+    {
+      type: "recolor",
+      label: "리폼 III",
+      items: [
+        { base_code: 121, part: "헤어", code: 337 },
+        { base_code: 121, part: "헤어", code: 338 },
+        { base_code: 121, part: "헤어", code: 340 }
+      ]
+    }
+  ]
+},
+
+
 ];
 
 try{
-  parent.postMessage({__splitData:true, key:"sets", data: window.SETS}, "*");
+  parent.postMessage({__splitData:true, key:"sets", data: [...window.SETS].reverse()}, "*");
 }catch(e){}
 </script>

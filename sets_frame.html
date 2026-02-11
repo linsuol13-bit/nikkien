@@ -22,6 +22,13 @@
   .pillrow{display:flex;gap:6px;flex-wrap:wrap}
   .pill{font-size:11px;border:1px solid #eee;padding:3px 8px;border-radius:999px;background:#fafafa}
   .empty{padding:22px 6px;color:#666}
+  .pager{display:flex;gap:6px;justify-content:center;align-items:center;flex-wrap:wrap;margin:14px 0 6px}
+  .pbtn{border:1px solid #ddd;background:#fff;border-radius:10px;padding:6px 10px;font-size:12px;cursor:pointer}
+  .pbtn:hover{background:#fafafa}
+  .pbtn[disabled]{opacity:.45;cursor:default}
+  .pbtn[disabled]:hover{background:#fff}
+  .pbtn.active{background:#2b115f;color:#fff;border-color:#2b115f}
+  .pdots{color:#777;font-size:12px;padding:0 4px}
   dialog{border:0;padding:0;border-radius:18px;max-width:min(980px,96vw);width:980px;box-shadow:0 20px 70px rgba(0,0,0,.22)}
   dialog::backdrop{background:rgba(0,0,0,.35)}
   .dlg{display:flex;flex-direction:column;max-height:88vh;background:#fff;border-radius:18px;overflow:hidden}
@@ -80,6 +87,35 @@
   .zoomDlg{max-width:min(980px,96vw);width:980px}
   .zoomBox{background:#000;border-radius:18px;overflow:hidden}
   .zoomImg{width:100%;height:auto;display:block}
+
+  .setDesc{
+    margin-top:10px;
+    padding:12px 14px;
+    border-radius:14px;
+    background:#f3f4ff;
+    border:1px solid #e3e6ff;
+    font-size:13px;
+    line-height:1.7;
+    color:#2b2f55;
+  }
+
+
+  /* --- evolve variants --- */
+  .evoStage{margin-top:14px}
+  .evoHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px 0}
+  .evoTitle{font-weight:1000;font-size:13px;color:#2b115f}
+  .evoSub{font-weight:900;font-size:12px;color:#666;margin:8px 0}
+
+  /* variants */
+  .vgroup{margin-top:10px}
+  .vtitle{font-weight:1000;font-size:13px;margin:0 0 8px 0;color:#2b115f}
+  .vlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+
+  /* evolve variants */
+  .evoStage{margin-top:14px}
+  .evoTitle{font-weight:1000;font-size:13px;color:#2b115f;margin:6px 0}
+  .evoSub{font-weight:900;font-size:12px;color:#666;margin:8px 0}
+
 </style>
 </head>
 <body>
@@ -92,6 +128,7 @@
 
   <div id="grid" class="grid"></div>
   <div id="empty" class="empty" style="display:none">세트 데이터가 비어있어. (sets_data.html에 세트 추가해줘)</div>
+  <div id="pager" class="pager" style="display:none"></div>
 </div>
 
 <dialog id="dlg">
@@ -107,6 +144,7 @@
       <div class="section">
         <h3>세트사진</h3>
         <div class="gallery" id="gallery"></div>
+        <div id="setDesc" class="setDesc" style="display:none"></div>
       </div>
 
       <div class="section acqSection" id="acqSection">
@@ -126,6 +164,13 @@
         <div class="muted" style="margin-bottom:8px">부위를 클릭하면 해당 의상 상세페이지가 열려.</div>
         <div class="parts" id="parts"></div>
       </div>
+
+      <div class="section" id="variantsSection" style="display:none">
+        <h3>리폼 · 진화 · 포즈</h3>
+        <div class="muted" style="margin-bottom:8px">파생 의상을 클릭하면 해당 아이템 상세페이지가 열려.</div>
+        <div class="vlist" id="variants"></div>
+      </div>
+
     </div>
   </div>
 </dialog>
@@ -147,14 +192,49 @@
   const empty = $("empty");
   const status = $("status");
   const q = $("q");
+  const pager = $("pager");
+
+  // pagination
+  const PER_PAGE = 20;
+  let currentPage = 1;
+
+  // --- iframe auto-resize (monotonic: never report smaller height) ---
+  let __ph_raf = 0;
+  let __ph_max = 0;
+
+  function __measureHeight(){
+    return Math.max(
+      document.body.scrollHeight || 0,
+      document.documentElement.scrollHeight || 0
+    );
+  }
+
+  function postHeightMonotonic(force=false){
+    try{
+      const h = Math.floor(__measureHeight());
+      if(force) __ph_max = Math.max(__ph_max, h);
+      else if(h > __ph_max) __ph_max = h;
+      else return; // ✅ never send smaller height
+      parent.postMessage({__iframeHeight: __ph_max, __frame:"sets"}, "*");
+    }catch(e){}
+  }
+
+  function schedulePostHeight(force=false){
+    if(__ph_raf) cancelAnimationFrame(__ph_raf);
+    __ph_raf = requestAnimationFrame(()=>postHeightMonotonic(force));
+  }
+
 
   const dlg = $("dlg");
   const closeBtn = $("closeBtn");
   const dlgMain = $("dlgMain");
   const dlgNames = $("dlgNames");
   const gallery = $("gallery");
+  const setDesc = $("setDesc");
   const sources = $("sources");
   const parts = $("parts");
+  const variantsSection = $("variantsSection");
+  const variants = $("variants");
   const eventSection = $("eventSection");
   const eventInfo = $("eventInfo");
 
@@ -166,7 +246,13 @@
   let BYKEY = Object.create(null);
 
   function norm(s){ return (s==null) ? "" : String(s); }
-  function trim(s){ return norm(s).trim(); }
+  function hasVariantType(set, type){
+    const v = Array.isArray(set && set.variants) ? set.variants : [];
+    const t = String(type||"").toLowerCase();
+    return v.some(x => String((x && x.type)||"").toLowerCase() === t);
+  }
+
+function trim(s){ return norm(s).trim(); }
 
   function itemKey(part, code){
     return trim(part) + "||" + String(code);
@@ -218,22 +304,51 @@
   }
 
   function matchesQuery(set, query){
+    query = trim(query);
     if(!query) return true;
+
+    const ql = query.toLowerCase();
+
+    // sources 텍스트 합치기
+    const srcText = Array.isArray(set.sources)
+      ? set.sources.map(s => [s.label, s.type, s.desc, s.text, s.value].map(x=>trim(x)).join(" ")).join(" ")
+      : "";
+
+    // event 텍스트 합치기
+    const ev = set.event || null;
+    const evText = ev
+      ? [ev.title, ev.desc, ev.guide].map(x=>trim(x)).join(" ")
+      : "";
+
     const hay = [
-      set.name_kr, set.name_cn, set.name_en, set.name_na, set.name,
-      set.id
+      set.name_kr, set.name_cn, set.name_en, set.name_na, set.name_jp, set.name,
+      set.id,
+      srcText,
+      evText
     ].map(x=>trim(x).toLowerCase()).join(" ");
-    return hay.includes(query.toLowerCase());
+
+    return hay.includes(ql);
   }
 
   function renderList(){
     const query = trim(q.value);
-    const list = SETS.filter(s=>matchesQuery(s, query));
+    const full = SETS.filter(s=>matchesQuery(s, query));
+    const total = full.length;
+
+    // empty + normalize page
+    empty.style.display = (total===0) ? "block" : "none";
+
+    const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
+    if(currentPage > totalPages) currentPage = totalPages;
+    if(currentPage < 1) currentPage = 1;
+
+    const start = (currentPage - 1) * PER_PAGE;
+    const pageList = full.slice(start, start + PER_PAGE);
+
     grid.innerHTML = "";
-    empty.style.display = (list.length===0) ? "block" : "none";
 
     const frag = document.createDocumentFragment();
-    for(const s of list){
+    for(const s of pageList){
       const card = document.createElement("div");
       card.className = "card";
       const img = trim(s.thumb) || (Array.isArray(s.images) && s.images[0]) || "";
@@ -254,8 +369,70 @@
     }
     grid.appendChild(frag);
 
-    status.textContent = `세트 ${list.length} / 전체 ${SETS.length}`;
+    // pager
+    renderPager(totalPages, total);
+
+    const end = Math.min(total, start + PER_PAGE);
+    const range = (total===0) ? "" : ` · ${start+1}-${end}`;
+    const pageInfo = (totalPages>1) ? ` · ${currentPage}/${totalPages}` : "";
+    status.textContent = `세트 ${total} / 전체 ${SETS.length}${pageInfo}${range}`;
+
+    schedulePostHeight(true);
   }
+
+  function setPage(n){
+    const next = Math.max(1, Math.min(n, Math.max(1, Math.ceil((SETS.filter(s=>matchesQuery(s, trim(q.value))).length) / PER_PAGE))));
+    if(next === currentPage) return;
+    currentPage = next;
+    renderList();
+    try{ window.scrollTo({top:0, behavior:"smooth"}); }catch(e){ try{ window.scrollTo(0,0);}catch(_e){} }
+  }
+
+  function renderPager(totalPages, totalItems){
+    if(!pager) return;
+    if(totalItems<=0 || totalPages<=1){
+      pager.style.display = "none";
+      pager.innerHTML = "";
+      return;
+    }
+    pager.style.display = "flex";
+    pager.innerHTML = "";
+
+    const makeBtn = (label, page, disabled=false, active=false)=>{
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "pbtn" + (active ? " active" : "");
+      b.textContent = label;
+      if(disabled) b.disabled = true;
+      if(!disabled){
+        b.addEventListener("click", ()=>setPage(page));
+      }
+      return b;
+    };
+
+    pager.appendChild(makeBtn("«", 1, currentPage===1));
+    pager.appendChild(makeBtn("‹", currentPage-1, currentPage===1));
+
+    // pages with ellipsis
+    const pages = new Set([1, totalPages, currentPage, currentPage-1, currentPage+1, currentPage-2, currentPage+2]);
+    const sorted = [...pages].filter(p=>p>=1 && p<=totalPages).sort((a,b)=>a-b);
+
+    let prev = 0;
+    for(const p of sorted){
+      if(prev && p - prev > 1){
+        const dots = document.createElement("span");
+        dots.className = "pdots";
+        dots.textContent = "…";
+        pager.appendChild(dots);
+      }
+      pager.appendChild(makeBtn(String(p), p, false, p===currentPage));
+      prev = p;
+    }
+
+    pager.appendChild(makeBtn("›", currentPage+1, currentPage===totalPages));
+    pager.appendChild(makeBtn("»", totalPages, currentPage===totalPages));
+  }
+
 
   function openSet(set){
     if(!set) return;
@@ -288,6 +465,15 @@
       }
     }else{
       gallery.innerHTML = `<div class="muted">사진 데이터가 없어.</div>`;
+    }
+
+    // ✅ 세트 설명 (한국어)
+    const desc = trim(set.desc);
+    if(desc){
+      setDesc.textContent = desc;
+      setDesc.style.display = "block";
+    }else{
+      setDesc.style.display = "none";
     }
 
     // sources
@@ -385,20 +571,127 @@
       parts.innerHTML = `<div class="muted">세트 부위 데이터가 없어.</div>`;
     }
 
+        // variants
+    renderVariants(set);
+
     if(dlg && dlg.showModal) dlg.showModal();
   }
 
+
+
+
+  
+  function renderVariants(set){
+    if(!variantsSection || !variants) return;
+
+    variants.innerHTML = "";
+    const vlist = Array.isArray(set && set.variants) ? set.variants : [];
+    if(!vlist.length){
+      variantsSection.style.display = "none";
+      return;
+    }
+    variantsSection.style.display = "block";
+
+    const frag = document.createDocumentFragment();
+
+    for(const v of vlist){
+      if(!v || typeof v !== "object") continue;
+      const vtype = String(v.type||"").toLowerCase();
+
+      const group = document.createElement("div");
+      group.className = "vgroup";
+
+      const vt = document.createElement("div");
+      vt.className = "vtitle";
+      vt.textContent = trim(v.label) || trim(v.type) || "파생";
+      group.appendChild(vt);
+
+      // --- evolve: stages -> items + reform per stage
+      if(vtype === "evolve" && Array.isArray(v.stages)){
+        // ✅ "리폼처럼" 단계별로 아래로 쌓기 (스크롤/진화결과/완료 문구 없음)
+        v.stages.forEach(stg=>{
+          const stageGroup = document.createElement("div");
+          stageGroup.className = "vgroup";
+
+          const st = document.createElement("div");
+          st.className = "vtitle";
+          st.textContent = trim(stg.label) || (`진화 ${stg.stage || ""}단계`).trim();
+          stageGroup.appendChild(st);
+
+          const wrap = document.createElement("div");
+          wrap.className = "vlist";
+
+          const items = Array.isArray(stg.items) ? stg.items : [];
+          items.forEach(it => wrap.appendChild(makeVariantCard(it)));
+
+          const reforms = Array.isArray(stg.reform) ? stg.reform : [];
+          reforms.forEach(it => wrap.appendChild(makeVariantCard(it)));
+
+          stageGroup.appendChild(wrap);
+          frag.appendChild(stageGroup);
+        });
+
+        continue;
+      }
+
+      // default: v.items list
+      const wrap = document.createElement("div");
+      wrap.className = "vlist";
+      const items = Array.isArray(v.items) ? v.items : [];
+      for(const it of items){
+        wrap.appendChild(makeVariantCard(it));
+      }
+      group.appendChild(wrap);
+      frag.appendChild(group);
+    }
+
+    variants.appendChild(frag);
+  }
+
+  function makeVariantCard(it){
+    const part = trim(it.part);
+    const code = (it.code==null) ? "" : it.code;
+    if(!part || code==="") return document.createElement("span");
+
+    const fromItems = BYKEY[itemKey(part, code)] || null;
+    const img = trim(it.img) || trim(fromItems && fromItems.img) || "";
+    const name = trim(it.name) || trim(fromItems && fromItems.name) || "-";
+
+    const base = (it.base_code!=null && it.base_code!=="") ? ` / base:${it.base_code}` : "";
+    const chain = (it.chain_from!=null && it.chain_from!=="") ? ` / from:${it.chain_from}` : "";
+    const color = trim(it.color) ? ` / ${trim(it.color)}` : "";
+
+    const div = document.createElement("div");
+    div.className = "pitem";
+    div.innerHTML = `
+      ${img ? `<img class="pimg" src="${img}" alt="">` : `<div class="pimg"></div>`}
+      <div class="pmeta">
+        <div class="pname">${escapeHtml(name)}</div>
+        <div class="ppart">${escapeHtml(part || "-")}</div>
+        <div class="code">code: ${escapeHtml(String(code||"-"))}${escapeHtml(color)}${escapeHtml(base)}${escapeHtml(chain)}</div>
+      </div>
+    `;
+    div.addEventListener("click", ()=>openItemDetail({part, code}));
+    return div;
+  }
+
   function openItemDetail(ref){
-    const part = trim(ref && ref.part);
-    const code = ref && ref.code;
+    const part = trim(ref && (ref.part || ref.category || ''));
+    const code = ref && (ref.code ?? ref.itemCode ?? ref.id);
     if(!part || code==null || code==="") return;
 
-    // Same convention as sources_frame.html
-    const safePart = part.replace(/[\\/]/g,'_');
-    const file = `${code}_${safePart}-${code}.html`;
-    const url = encodeURI(file);
+    const url = `item_detail.html?code=${encodeURIComponent(String(code))}&part=${encodeURIComponent(String(part))}`;
 
-    // Open in new tab (popup inside popup is messy)
+    const dlg2 = document.getElementById('itemDetailDialog');
+    const frame2 = document.getElementById('itemDetailFrame');
+    if(dlg2 && frame2){
+      frame2.src = url;
+      if (typeof dlg2.showModal === 'function') dlg2.showModal();
+      else dlg2.setAttribute('open','open');
+      return;
+    }
+
+    // fallback
     window.open(url, "_blank");
   }
 
@@ -409,6 +702,20 @@
   }
 
   closeBtn.addEventListener("click", ()=>{ try{ dlg.close(); }catch(e){} });
+
+  // ✅ 빈 화면(다이얼로그 바깥 영역) 클릭 시 닫기
+  // dialog는 backdrop 자체에 이벤트가 안 잡히므로,
+  // dialog 요소 자체를 클릭했을 때(target이 dialog일 때) 닫도록 처리
+  if(dlg){
+    dlg.addEventListener("click", (e)=>{
+      if(e.target === dlg){
+        try{ dlg.close(); }catch(err){}
+      }
+    });
+    // ESC는 기본 cancel 이벤트로 들어오는데, 기본 동작 유지(닫힘) + 혹시 막혀있을 때 대비
+    dlg.addEventListener("cancel", ()=>{ try{ dlg.close(); }catch(err){} });
+  }
+
   if(dlg){
     dlg.addEventListener("close", ()=>{ /* noop */ });
     dlg.addEventListener("cancel", ()=>{ /* noop */ });
@@ -418,7 +725,7 @@
     zoomDlg.addEventListener("cancel", ()=>{ try{ zoomDlg.close(); }catch(e){} });
   }
 
-  q.addEventListener("input", ()=>renderList());
+  q.addEventListener("input", ()=>{ currentPage = 1; renderList(); });
 
   // receive data from iframes
   window.addEventListener("message", (ev)=>{
@@ -429,6 +736,7 @@
       SETS = msg.data.filter(x=>x && typeof x === "object");
       status.textContent = SETS.length ? ("세트 로드 완료: " + SETS.length + "개") : "세트 데이터가 비어있어.";
       renderList();
+  schedulePostHeight(true);
       return;
     }
 
@@ -444,6 +752,43 @@
   // initial render
   renderList();
 })();
+
+  function hookImages(){
+    document.querySelectorAll("img").forEach(img=>{
+      if(img.__ph_hooked) return;
+      img.__ph_hooked = true;
+      img.addEventListener("load", ()=>schedulePostHeight(true));
+      img.addEventListener("error", ()=>schedulePostHeight(true));
+    });
+  }
+  window.addEventListener("load", ()=>{ hookImages(); schedulePostHeight(true); });
+  window.addEventListener("resize", ()=>schedulePostHeight(true));
+
 </script>
+
+<!-- ✅ Item detail tab (dialog) -->
+<dialog id="itemDetailDialog" style="width:min(980px,92vw);height:min(86vh,900px);padding:0;border:0;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.25);">
+  
+<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #eee;">
+  <div style="font-weight:700;">아이템 상세</div>
+  <div style="display:flex;gap:6px;align-items:center;">
+    <button type="button" id="itemDetailBackBtn" title="뒤로가기"
+      style="border:0;background:transparent;font-size:18px;line-height:1;cursor:pointer;padding:4px 8px;border-radius:6px;">←</button>
+    <button type="button" id="itemDetailCloseBtn" title="닫기"
+      style="border:0;background:transparent;font-size:22px;line-height:1;cursor:pointer;padding:2px 8px;border-radius:6px;">×</button>
+  </div>
+</div>
+
+  <iframe id="itemDetailFrame" style="width:100%;height:calc(86vh - 46px);border:0;display:block;" loading="eager"></iframe>
+</dialog>
+<script>
+  (function(){
+    const dlg = document.getElementById('itemDetailDialog');
+    const btn = document.getElementById('itemDetailCloseBtn');
+    if(btn && dlg) btn.addEventListener('click', ()=>{ try{ dlg.close(); }catch(e){ dlg.removeAttribute('open'); }});
+    if(dlg) dlg.addEventListener('cancel', (e)=>{ e.preventDefault(); try{ dlg.close(); }catch(err){} });
+  })();
+</script>
+
 </body>
 </html>

@@ -133,38 +133,63 @@
 
 
 <!-- sources_data.html 안에서 SOURCE_MAP을 parent.postMessage로 전달함 -->
-<iframe id="sourceDataLoader" src="sources_data.html" style="display:none"></iframe>
-<iframe id="itemsLoader" src="items.html" style="display:none"></iframe>
+<iframe id="sourceDataLoader" src="./sources_data.html" style="display:none"></iframe>
+<iframe id="itemsLoader" src="./items.html" style="display:none"></iframe>
+
+<script>
+(function(){
+  // Fallback: if postMessage doesn't arrive (e.g., file:// iframe message timing), try direct read onload.
+  const srcIf = document.getElementById('sourceDataLoader');
+  if (srcIf){
+    srcIf.addEventListener('load', () => {
+      try{
+        const m = srcIf.contentWindow && srcIf.contentWindow.SOURCE_MAP;
+        if (Array.isArray(m) && m.length){
+          try{ window.postMessage({__splitData:true, key:"source_map", data:m}, "*"); }catch(e){}
+        }
+      }catch(e){}
+    });
+  }
+})();
+</script>
+
 <script>
 (function(){
   // ====== SOURCES 목록(id는 sources_data.html의 sources 배열에 넣는 값) ======
   const SOURCES = [
     {id:"all", label:"전체"},
+    {id:"vip", label:"VIP"},
+    {id:"attendance", label:"출석보상"},
+    {id:"first_charge", label:"첫충전"},
     {id:"stage_girl", label:"소녀급 스테이지"},
     {id:"stage_princess", label:"공주급 스테이지"},
+    {id:"evolution", label:"진화"},
     {id:"shop_dia", label:"상점 다이아"},
     {id:"shop_gold", label:"상점 골드"},
     {id:"blueprint", label:"도안제작"},
     {id:"blueprint_evo", label:"도안제작 진화"},
     {id:"reforge", label:"리폼"},
-    {id:"evolution", label:"진화"},
     {id:"club_shop", label:"클럽상점"},
     {id:"club_war", label:"클럽대전"},
     {id:"club_exchange", label:"클럽교환"},
-    {id:"event", label:"이벤트"},
-    {id:"dream_academy", label:"꿈의학회"},
-    {id:"secret_shop", label:"시크릿샵"},
+    {id:"cloud_tower", label:"구름천탑"},
+    {id:"cloud_exchange", label:"구름천탑교환"},
+    {id:"moon_night", label:"달밤의비밀"},
+    {id:"moon_exchange", label:"달밤의비밀교환"},
+    {id:"secret", label:"운명의비밀"},
+    {id:"secret_exchange", label:"운명의비밀교환"},
+    {id:"Garden", label:"달빛의정원"},
+    {id:"Garden_exchange", label:"달빛의정원교환"},
     {id:"cinderella_secret", label:"신데렐라의비밀"},
     {id:"cinderella_dream", label:"신데렐라의꿈"},
     {id:"cinderella_exchange", label:"신데렐라교환"},
+    {id:"dream_academy", label:"꿈의학회"},
+    {id:"event", label:"이벤트"},
+    {id:"Lucky_Bags", label:"복주머니"},
+    {id:"secret_shop", label:"시크릿샵"},
     {id:"mysterious_island", label:"신비한섬"},
     {id:"achievement", label:"업적"},
     {id:"audition_shop", label:"오디션상점"},
-    {id:"attendance", label:"출석보상"},
-    {id:"vip", label:"VIP"},
-    {id:"first_charge", label:"첫충전"},
-    {id:"cloud_tower", label:"구름천탑"},
-    {id:"moon_night", label:"달밤의비밀"},
     {id:"wish_gate", label:"소원의문"},
     {id:"item_exchange", label:"아이템교환"},
     {id:"decompose_evo", label:"분해진화"},
@@ -323,24 +348,19 @@
   
   function openDetail(it){
     if (!it) return;
-    const code = it.code ?? it.itemCode ?? '';
-    const part = it.part ?? '';
+    const code = it.code ?? it.itemCode ?? it.id ?? '';
+    const part = it.part ?? it.category ?? '';
     if (code === '' || code === null || code === undefined) return;
 
-    const safePart = String(part||'').trim().replace(/[\\/]/g,'_');
-    const file = `${code}_${safePart}-${code}.html`;
-    const url = encodeURI(file);
+    // ✅ 통합 아이템 상세페이지
+    const url = `item_detail.html?code=${encodeURIComponent(String(code))}&part=${encodeURIComponent(String(part||''))}`;
 
     const dlg = document.getElementById('detailDialog');
     const frame = document.getElementById('detailFrame');
     if (!dlg || !frame) return;
 
     frame.src = url;
-    if (typeof dlg.showModal === 'function'){
-      dlg.showModal();
-    }else{
-      frame.style.display = 'block';
-    }
+    if (typeof dlg.showModal === 'function') dlg.showModal();
   }
 
   (function(){
@@ -379,6 +399,21 @@
   renderSidebar();
   renderTable();
 })();
+
+  // ✅ dialog 빈 화면 클릭 시 닫기 (backdrop)
+  (function(){
+    const dlg = document.getElementById('detailDialog');
+    if(!dlg) return;
+    dlg.addEventListener('click', (e)=>{
+      if(e.target === dlg){
+        try{ dlg.close(); }catch(err){}
+      }
+    });
+    dlg.addEventListener('cancel', ()=>{
+      try{ dlg.close(); }catch(err){}
+    });
+  })();
+
 </script>
 </body>
 </html>

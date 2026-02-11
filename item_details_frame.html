@@ -1,93 +1,1142 @@
 <!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>item_details_frame_v1</title>
-  <style>
-    body{margin:0;font-family:system-ui,AppleSDGothicNeo,Segoe UI,Roboto,sans-serif;background:#f7f7fb;color:#222}
-    .wrap{padding:10px;font-size:13px;color:#555}
-    code{background:#fff;border:1px solid #eee;border-radius:8px;padding:2px 6px}
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    item_details_frame_v1 loaded — <code id="len">0</code> items
-  </div>
+<meta charset="utf-8">
+<title>Item Details (Merged)</title>
 
 <script>
-(function(){
-  /**
-   * ✅ 상세 데이터 전용 (무거운 데이터는 여기로)
-   * key = "code" (문자열)
-   *
-   * 필드 예시:
-   * {
-   *   desc: "아이템 설명",
-   *   imgs: ["아이템이미지1", "아이템이미지2"], // 2장 권장, 더 많아도 OK
-   *   sources: ["획득경로1", "획득경로2"],     // 문자열/배열 둘 다 OK
-   *   dye: {
-   *     enabled: true,
-   *     costume: "염색가능한 의상 이름(선택)", // 또는 배열도 OK
-   *     images: ["염색이미지1", "염색이미지2"]
-   *   }
-   * }
-   */
-  const ITEM_DETAILS = {
-    "1": {
-        "part": "헤어",
-        "heart": 2,
-        "names": {
-            "ko": "기본핑크헤어",
-            "en": "Nikki's Pinky",
-            "zh": "默认粉毛",
-            "ja": "薄紅色ロング"
+/**
+ * window.ITEM_DETAILS
+ * - code(string) -> detail object
+ * - 개별 상세 HTML에서 item-data(JSON)만 추출해 합친 버전
+ */
+window.ITEM_DETAILS = {
+
+  "1": {
+    code: 1,
+    part: "헤어",
+    heart: 2,
+
+    names: {
+      ko: "기본핑크헤어",
+      en: "Nikki's Pinky",
+      zh: "默认粉毛",
+      ja: "薄紅色ロング"
+    },
+
+    desc: {
+      ko: "니키가 가장 좋아하는 헤어. 언제 어디서나 주목받는 스타일",
+      zh: "暖暖最喜欢的招牌发型，走到哪里都光芒四射！(니키가 가장 좋아하는 대표 헤어. 어디서나 눈부신 빛을 낸다.)",
+      ja: "ニキのいつものヘアスタイル。なんだか落ち着くね。 (니키의 평소 헤어스타일. 왠지 마음이 편안해지네.)",
+      en: "Nikki's favorite hairstyle. It shines wherever she goes! (니키가 제일 좋아하는 헤어. 어디를 가도 빛이 나는 스타일이야.)"
+    },
+
+    imgs: [
+      "https://drive.google.com/thumbnail?id=1MXJSVznrCvtsJEn7pBgTU7bAvpHZFiro&sz=w1000",
+      "https://drive.google.com/thumbnail?id=1NJ_si_2uE3SBXyfkHD8lC7xCPUPliHMp&sz=w1000"
+    ],
+
+    statCards: [
+      { text: "심플 / 简约 / シンプル / Simple [S]" },
+      { text: "활발 / 清纯 / アクティブ / Lively [A]" },
+      { text: "큐티 / 活泼 / キュート / Cute [A]" },
+      { text: "청순 / 保暖 / ピュア / Pure [A]" },
+      { text: "따뜻 / 可爱 / ウォーム / Warm [A]" }
+    ]
+  },
+
+  "17": {
+    code: 17,
+    part: "헤어",
+    heart: 3,
+
+    names: {
+      ko: "게으름뱅이",
+      en: "Shallow Laziness",
+      zh: "浅慵",
+      ja: "うっかりさん"
+    },
+
+    desc: {
+      ko: "어깨까지 오는 브라운 헤어의 소유자. 낮잠으로 헤어스타일이 망가져도 신경 쓰지 않는다.\n\n마음껏 잘 수만 있다면 소원이 없다.",
+      zh: "棕色的发梢懒懒垂在肩上，喵咪可不在乎午觉会破坏毛发的柔滑，能睡上美美的一觉最重要。\n\n갈색 머리끝이 어깨 위로 느슨하게 흘러내린다.\n\n머리가 엉켜도 상관없다.\n\n포근하게 잘 수 있다면, 그것만으로 충분하니까.",
+      ja: "肩もとにハネた茶色の毛先。もしかして、お昼寝で寝グセが付いちゃった！？\n\n어깨에 닿은 갈색 머리가 살짝 삐죽 튀어나와 있다.\n\n혹시 낮잠 자서 그렇게 된 걸까?",
+      en: "The cat is enjoying its nap, not caring whether it will ruin the smoothness of her hair.\n\n머리카락이 조금 흐트러져도 괜찮다.\n\n지금은 이 낮잠이 가장 소중하니까."
+    },
+
+    imgs: [
+      "https://drive.google.com/thumbnail?id=1zpXmsZJr9tYFBo1iz3XzpWaNG7AyxQAM&sz=w1000",
+      "https://drive.google.com/thumbnail?id=1vNmimFVSsEPJPhxmPDTE6obTjNeOOHq4&sz=w1000"
+    ],
+
+    tags: [],
+
+    sources: [
+      "도안제작"
+    ],
+
+    statCards: [
+      { name: "심플", grade: "A" },
+      { name: "우아", grade: "B" },
+      { name: "큐티", grade: "S" },
+      { name: "청순", grade: "S" },
+      { name: "시원", grade: "A" }
+    ],
+
+    reform: {
+      enabled: true,
+      materials: [
+        {
+          img: "https://drive.google.com/thumbnail?id=1HFBNGNSNkg9VXBwdZtvWokQVed9IXkvd&sz=w1000",
+          qty: 3
         },
-        "desc": {
-            "ko": "니키가 가장 좋아하는 헤어. 언제 어디서나 주목받는 스타일",
-            "zh": "暖暖最喜欢的招牌发型，走到哪里都光芒四射！",
-            "ja": "ニキのいつものヘアスタイル。なんだか落ち着くね。",
-            "en": "Nikki's favorite hairstyle. It shines wherever she goes!"
-        },
-        "imgs": [
-            "https://drive.google.com/thumbnail?id=1MXJSVznrCvtsJEn7pBgTU7bAvpHZFiro&sz=w1000",
-            "https://drive.google.com/thumbnail?id=1NJ_si_2uE3SBXyfkHD8lC7xCPUPliHMp&sz=w1000"
-        ],
-        "statCards": [
-            {
-                "text": "심플 / 简约 / シンプル / Simple [S]"
-            },
-            {
-                "text": "활발 / 清纯 / アクティブ / Lively [A]"
-            },
-            {
-                "text": "큐티 / 活泼 / キュート / Cute [A]"
-            },
-            {
-                "text": "청순 / 保暖 / ピュア / Pure [A]"
-            },
-            {
-                "text": "따뜻 / 可爱 / ウォーム / Warm [A]"
-            }
-        ]
+        {
+          img: "https://drive.google.com/thumbnail?id=1ifJwttsoD3v-tMYoBTvhvxEL3JXHhAsg&sz=w1000",
+          qty: 4
+        }
+      ]
+    },
+
+    dye: {
+      enabled: true,
+      images: [
+        "https://drive.google.com/thumbnail?id=11SJhmsuRzvMk3IANGwitaXGq2Oj_Zsd0&sz=w1000",
+        "https://drive.google.com/thumbnail?id=1uzpT06qLBML42gJEEr4_wGcMEsO_EOW0&sz=w1000"
+      ],
+      pages: [
+        "1_헤어-18.html",
+        "1_헤어-19.html"
+      ]
     }
-  };
+  },
 
-  // iframe 전역
-  window.ITEM_DETAILS = ITEM_DETAILS;
-  window.itemDetails  = ITEM_DETAILS;
+  "4": {
+    code: 4,
+    part: "헤어",
+    heart: 3,
 
-  // 부모(index)에 전역으로도 주입 (same-origin)
-  try { parent.ITEM_DETAILS = ITEM_DETAILS; } catch(e){}
-  try { parent.itemDetails  = ITEM_DETAILS; } catch(e){}
+    names: {
+      ko: "체육소년",
+      en: "Sporty Teenager",
+      zh: "运动少年",
+      ja: "スポーツ少年"
+    },
 
-  // (옵션) postMessage도 같이 쏨
-  try { parent.postMessage({ __splitData:true, key:'itemDetails', data: ITEM_DETAILS }, '*'); } catch(e){}
+    desc: {
+      ko: "운동이라면 뭐든지 잘하는 그 아이는 힘든 일도 마다하지 않는 강인한 소년이다.",
+      zh: "他几乎擅长所有的运动，他在赛场上耀眼夺目，他从不轻易言败也从不吝啬汗水，他是拼搏，也是坚韧。\n\n他在任何项目上都充满自信，只要站在赛场上，就比任何人都耀眼。\n\n不知放弃的热情，与无尽的坚持，他的每一刻都是“挑战”本身。",
+      ja: "活動的でボーイッシュに。どんなスポーツにも全力投球する姿に誰もがキュン！\n\n활기차고 보이시하게 어떤 스포츠든 전력투구하는 모습에 모두 반해버려!",
+      en: "He is good at almost every sport. He never quits and he is the symbol of persistence.\n\n그는 거의 모든 스포츠에 능하다. 절대 포기하지 않는 끈기의 상징이야."
+    },
 
-  // 화면 표시용
-  const el = document.getElementById('len');
-  if (el) el.textContent = String(Object.keys(ITEM_DETAILS).length);
+    imgs: [
+      "https://drive.google.com/thumbnail?id=1K4jr_czjlTNi1ASrAVJpR62f6umk4_8S&sz=w1000",
+      "https://drive.google.com/thumbnail?id=1feav-RrUVM5q3DShvFQFm1cbzCxORGHn&sz=w1000"
+    ],
+
+    tags: [
+      "보이시룩",
+      "中性风",
+      "unisex",
+      "中性風"
+    ],
+
+    sources: [
+      "신데렐라의비밀",
+      "신데렐라의꿈",
+      "옷가게"
+    ],
+
+    statCards: [
+      { name: "심플", grade: "S" },
+      { name: "활발", grade: "A" },
+      { name: "큐티", grade: "A" },
+      { name: "청순", grade: "S" },
+      { name: "시원", grade: "A" }
+    ],
+
+    reform: {
+      enabled: false
+    },
+
+    dye: {
+      enabled: true,
+      images: [
+        "https://drive.google.com/thumbnail?id=1SqUP0T3vpd68MG1noBomO_iHJ4H1qCkj&sz=w1000",
+        "https://drive.google.com/thumbnail?id=1wOaJne7Ci_b5Cf6cHUtjaThMb5EvOM6u&sz=w1000"
+      ],
+      pages: [
+        "1_헤어-5.html",
+        "1_헤어-6.html"
+      ]
+    }
+  },
+"5": {
+  code: 5,
+  part: "헤어",
+  heart: 3,
+
+  names: {
+    ko: "자유소년",
+    en: "Untamed Heart",
+    zh: "不羁",
+    ja: "自由人"
+  },
+
+  desc: {
+    ko: "사람들의 시선을 한 몸에 받지만 전혀 아랑곳 하지 않는다. 진정한 사랑을 이해하는 자유소년",
+    zh: "永远都是引来全场瞩目的那个人，但他的眼神却总是漫不经心。或许被真爱驯服后，不羁就能变成深情。\n\n他是 언제나 모두의 시선을 받는 사람. 하지만 그의 눈빛엔 언제나 무심함이 깃들어 있다.\n\n어쩌면 진정한 사랑을 만난다면, 그의 자유로움도, 깊은 사랑으로 바뀔지 몰라.",
+    ja: "誰もが注目する存在なのに、眼差しはいつも遠くを見ている。いつか出会う本当の愛を待っているのかも。\n\n언제나 주목받는 존재이지만, 그의 시선은 늘 먼 곳을 향해 있다.\n\n언젠가 만나게 될 진짜 사랑을 기다리고 있는 걸지도 몰라。",
+    en: "He is always the center of attention but his eyes seem to gaze aimlessly into the crowds.\n\n그는 언제나 모두의 시선을 받지만, 그의 눈은 어딘가 멍하니 사람들 사이를 바라본다"
+  },
+
+  imgs: [
+    "https://drive.google.com/thumbnail?id=1SqUP0T3vpd68MG1noBomO_iHJ4H1qCkj&sz=w1000"
+  ],
+
+  tags: [
+    "보이시룩",
+    "中性风",
+    "unisex",
+    "中性風"
+  ],
+
+  sources: [
+    "신데렐라의비밀",
+    "신데렐라의꿈",
+    "옷가게"
+  ],
+
+  statCards: [
+    { name: "심플", grade: "S" },
+    { name: "활발", grade: "A" },
+    { name: "큐티", grade: "A" },
+    { name: "청순", grade: "A" },
+    { name: "시원", grade: "S" }
+  ],
+
+  reform: {
+    enabled: true,
+    materials: [
+      {
+        img: "https://drive.google.com/thumbnail?id=1LSQx7JhGyH9exdng7C8mVeokbIIhyEyU&sz=w1000",
+        qty: 1
+      },
+      {
+        img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000",
+        qty: 3
+      }
+    ]
+  },
+
+  dye: {
+    enabled: true,
+    images: [
+      "https://drive.google.com/thumbnail?id=1K4jr_czjlTNi1ASrAVJpR62f6umk4_8S&sz=w1000",
+      "https://drive.google.com/thumbnail?id=1wOaJne7Ci_b5Cf6cHUtjaThMb5EvOM6u&sz=w1000"
+    ],
+    pages: [
+      "1_헤어-4.html",
+      "1_헤어-6.html"
+    ]
+    }
+  },
+"6": {
+  code: 6,
+  part: "헤어",
+  heart: 3,
+
+  names: {
+    ko: "국민아이돌",
+    en: "Rising Star",
+    zh: "全民偶像",
+    ja: "国民的アイドル"
+  },
+
+  desc: {
+    ko: "무대의 스포라이트를 받고 모든 사람이 좋아하는, 급속도로 스타의 길을 걷는 국민 아이돌",
+    zh: "耀眼的舞台聚光灯只对准一人，全场的尖叫呐喊只呼唤一人，冉冉升起的新星正朝着时代天王极速前进。\n\n눈부신 무대의 조명이 그에게만 집중되고, 관중들의 함성은 오직 그를 부른다。\n\n새롭게 떠오르는 별은, 시대의 왕을 향해 빠르게 나아간다。",
+    ja: "スポットライトの下で歌って踊って歓声を浴びる。目指すはもちろん、トップ・アイドル！\n\n스포트라이트 아래에서 노래하고 춤추며 환호를 받는다。\n\n그가 향하는 곳은, 바로 톱 아이돌！",
+    en: "The bright spotlight only follows him and the screaming crowds cry only for him.\n\n눈부신 스포트라이트는 오직 그에게만 비추고, 관중들의 함성은 오직 그를 향해 울려 퍼진다."
+  },
+
+  imgs: [
+    "https://drive.google.com/thumbnail?id=1wOaJne7Ci_b5Cf6cHUtjaThMb5EvOM6u&sz=w1000",
+    "https://drive.google.com/thumbnail?id=1rISESW0-_9Y7ng6m4zSLvvi1i478fdOo&sz=w1000"
+  ],
+
+  tags: [
+    "보이시룩",
+    "中性风",
+    "unisex",
+    "中性風"
+  ],
+
+  sources: [
+    "리폼"
+  ],
+
+  statCards: [
+    { name: "심플", grade: "A" },
+    { name: "활발", grade: "S" },
+    { name: "큐티", grade: "S" },
+    { name: "청순", grade: "B" },
+    { name: "시원", grade: "S" }
+  ],
+
+  reform: {
+    enabled: true,
+    materials: [
+      {
+        img: "https://drive.google.com/thumbnail?id=1wyp64JiAn7u8xh0zuO4sYgvaEvx7g2b5&sz=w1000",
+        qty: 1
+      },
+      {
+        img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000",
+        qty: 3
+      }
+    ]
+  },
+
+  dye: {
+    enabled: true,
+    images: [
+      "https://drive.google.com/thumbnail?id=1K4jr_czjlTNi1ASrAVJpR62f6umk4_8S&sz=w1000",
+      "https://drive.google.com/thumbnail?id=1SqUP0T3vpd68MG1noBomO_iHJ4H1qCkj&sz=w1000"
+    ],
+    pages: [
+      "1_헤어-4.html",
+      "1_헤어-5.html"
+    ]
+  }
+},
+"7": {
+  code: 7,
+  part: "헤어",
+  heart: 3,
+
+  names: {
+    ko: "도련님헤어",
+    en: "Elegant Nobleman",
+    zh: "眷雅公子",
+    ja: "貴公子"
+  },
+
+  desc: {
+    ko: "자상하고 다정하지만, 영원히 곁에 있어주진 않을 귀공자.\n\n헌신하면 헌식짝이 된다는 말이 있다.",
+    zh: "温润体贴的贵公子并不该永远是默默守护的陪衬，正是因为专注，所以才会沉沦。\n\n온화하고 세심한 귀공자는, 영원히 침묵 속에서 지키는 역할에 갇혀선 안 된다.\n\n집중할수록, 점점 더 깊은 함정에 빠져든다.",
+    ja: "いつだってそっと見守ってくれる心優しき貴公子。一途な気持ちはこれからもずっと変わらない。\n\n언제나 조용히 지켜봐주는 마음 따뜻한 귀공자.\n\n그의 변치 않는 마음은 앞으로도 변함없이 계속될 것이다.",
+    en: "A gentle, thoughtful nobleman is not supposed to be the foil who guards silently forever.\n\n온화하고 사려 깊은 귀족은, 영원히 침묵 속에서 지키는 존재로 남아서는 안 된다."
+  },
+
+  imgs: [
+    "https://drive.google.com/thumbnail?id=1zxxZzu3_WnznpxhzyWPKGbjxND2JVGet&sz=w1000",
+    "https://drive.google.com/thumbnail?id=1ig5mLJg-PqHBVujvQBi8UVn9YkJRFC4H&sz=w1000"
+  ],
+
+  tags: [
+    "보이시룩",
+    "中性风",
+    "unisex",
+    "中性風"
+  ],
+
+  sources: [
+    "신데렐라의비밀",
+    "스테이지 1장 3-12"
+  ],
+
+  statCards: [
+    { name: "심플", grade: "B" },
+    { name: "활발", grade: "A" },
+    { name: "큐티", grade: "S" },
+    { name: "청순", grade: "B" },
+    { name: "시원", grade: "S" }
+  ],
+
+  reform: {
+    enabled: false
+  },
+
+  dye: {
+    enabled: true,
+    images: [
+      "https://drive.google.com/thumbnail?id=1uWBCKdzV9UYGL0py8dVBFkwdyTYR94o-&sz=w1000",
+      "https://drive.google.com/thumbnail?id=1tVNc6_o4ubmLGYW1olxMpoY0JTqbXb_g&sz=w1000"
+    ],
+    pages: [
+      "1_헤어-8.html",
+      "1_헤어-9.html"
+    ]
+  }
+},
+"8": {
+  code: 8,
+  part: "헤어",
+  heart: 2,
+
+  names: {
+    ko: "옆집오빠",
+    en: "Brother Next Door",
+    zh: "邻家哥哥",
+    ja: "近所のお兄ちゃん"
+  },
+
+  desc: {
+    ko: "공부도 도와주고, 서로의 집을 방문하여 함께 만화책도 볼 수 있는 사이. 눈에 띄진 않지만 항상 곁에 있는 존재.",
+    zh: "为你辅导功课，陪你一起看家，帮你偷藏漫画，护你上学回家……他可能不出挑，但他是无可替代的存在。\n\n숙제를 함께 봐주고, 집에 함께 있어주고, 몰래 만화를 숨겨주고, 학교 갈 때도, 돌아올 때도 함께해줬다。\n\n눈에 띄는 사람은 아니지만, 그는 누구도 대신할 수 없는 존재다。",
+    ja: "一緒に登下校したり、宿題を見てくれたり……誰よりも大好きなお兄ちゃん。\n\n함께 등하교하고, 숙제도 봐주는……\n\n누구보다 소중한 오빠。",
+    en: "He helps you with homework, looks after your house... Ordinary he may be, but he is irreplaceable.\n\n숙제를 도와주고, 집에서도 함께 시간을 보내준다.\n\n평범해 보일지 몰라도, 그는 누구도 대신할 수 없는 존재다."
+  },
+
+  imgs: [
+    "https://drive.google.com/thumbnail?id=1uWBCKdzV9UYGL0py8dVBFkwdyTYR94o-&sz=w1000",
+    "https://drive.google.com/thumbnail?id=1776X127iv4suhSibKbDQ6KeyYocIh9FV&sz=w1000"
+  ],
+
+  tags: [
+    "보이시룩",
+    "中性风",
+    "unisex",
+    "中性風"
+  ],
+
+  sources: [
+    "리폼"
+  ],
+
+  statCards: [
+    { name: "심플", grade: "S" },
+    { name: "활발", grade: "S" },
+    { name: "성숙", grade: "A" },
+    { name: "청순", grade: "C" },
+    { name: "시원", grade: "A" }
+  ],
+
+  reform: {
+    enabled: true,
+    materials: [
+      {
+        img: "https://drive.google.com/thumbnail?id=1LSQx7JhGyH9exdng7C8mVeokbIIhyEyU&sz=w1000",
+        qty: 1
+      },
+      {
+        img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000",
+        qty: 3
+      }
+    ]
+  },
+
+  dye: {
+    enabled: true,
+    images: [
+      "https://drive.google.com/thumbnail?id=1zxxZzu3_WnznpxhzyWPKGbjxND2JVGet&sz=w1000",
+      "https://drive.google.com/thumbnail?id=1tVNc6_o4ubmLGYW1olxMpoY0JTqbXb_g&sz=w1000"
+    ],
+    pages: [
+      "1_헤어-7.html",
+      "1_헤어-9.html"
+    ]
+  }
+},
+"9": {
+  code: 9,
+  part: "헤어",
+  heart: 2,
+
+  names: {
+    ko: "눈꽃울프",
+    en: "Snow Wolf",
+    zh: "雪狼",
+    ja: "孤独な狼"
+  },
+
+  desc: {
+    ko: "과묵한 얼음왕자. 언제나 감정을 억누르는 것처럼 보인다. 그와 친한 사람이 없지만, 모든 건 시간이 해결해주는 법.",
+    zh: "他孤僻清冷，他沉默寡言，他似乎在隐忍克制，又像在蛰伏蓄力，没人知道他的来历，相信时间会给出答案。\n\n그는 고요하고 냉정하다. 말이 적고, 감정을 쉽게 드러내지 않는다。\n\n마치 무언가를 참으며, 때를 기다리는 사람처럼, 그의 정체를 아는 이는 아무도 없다。\n\n시간만이 그 답을 밝혀줄 것이다。",
+    ja: "雪原にたたずむ寡黙な一匹狼。抑えきれない力を内に秘め、何かを待っている。その素性は誰も知らない。\n\n설원에 홀로 선 침묵의 늑대. 억누를 수 없는 힘을 마음속에 숨긴 채, 무언가를 기다리고 있다。\n\n그의 정체를 아는 이는 아무도 없다。",
+    en: "No one knows where he is from. Only time will reveal the answer.\n\n그가 어디에서 왔는지는 아무도 모른다. 시간만이, 그 비밀의 답을 알고 있다."
+  },
+
+  imgs: [
+    "https://drive.google.com/thumbnail?id=1tVNc6_o4ubmLGYW1olxMpoY0JTqbXb_g&sz=w1000",
+    "https://drive.google.com/thumbnail?id=1nnyZSKDQbuSUzJHRHOx_tOtXDt_qPNep&sz=w1000"
+  ],
+
+  tags: [
+    "보이시룩",
+    "中性风",
+    "unisex",
+    "中性風"
+  ],
+
+  sources: [
+    "리폼"
+  ],
+
+  statCards: [
+    { name: "심플", grade: "A" },
+    { name: "활발", grade: "A" },
+    { name: "성숙", grade: "C" },
+    { name: "청순", grade: "S" },
+    { name: "시원", grade: "A" }
+  ],
+
+  reform: {
+    enabled: true,
+    materials: [
+      {
+        img: "https://drive.google.com/thumbnail?id=1OkKMsEUxaPAAAZGJ41nOb1D6EVSRX6N2&sz=w1000",
+        qty: 1
+      },
+      {
+        img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000",
+        qty: 3
+      }
+    ]
+  },
+
+  dye: {
+    enabled: true,
+    images: [
+      "https://drive.google.com/thumbnail?id=1zxxZzu3_WnznpxhzyWPKGbjxND2JVGet&sz=w1000",
+      "https://drive.google.com/thumbnail?id=1uWBCKdzV9UYGL0py8dVBFkwdyTYR94o-&sz=w1000"
+    ],
+    pages: [
+      "1_헤어-7.html",
+      "1_헤어-8.html"
+    ]
+  }
+},
+"10": {
+  code: 10,
+  part: "헤어",
+  heart: 2,
+
+  names: {
+    ko: "완벽한선배",
+    en: "Perfect Senior",
+    zh: "完美学长",
+    ja: "憧れの先輩"
+  },
+
+  desc: {
+    ko: "전교 1등 학생회장. 언제나 여학생들이 따라다니지만 본인은 무관심하다. 언젠간 용기 내서 선배 곁에 있을 수 있겠지?",
+    zh: "科目全能的学生主席，却总是对其他女生的大献殷勤视若无睹，什么时候他才会鼓起勇气走到你身边呢？\n\n모든 과목에 완벽한 학생회장. 다른 여자들의 관심엔 언제나 무심한 그.\n\n그가 용기를 내어, 너에게 다가오는 날은 언제일까?",
+    ja: "成績優秀な生徒会長。ミーハーな女子にはモテるけど、本当に好きな子には気持ちを伝えられないまま。\n\n성적도 뛰어난 학생회장.\n\n많은 여자들에게 인기가 있지만, 정작 진심은 아직 전하지 못했다.",
+    en: "As the straight-A president of the student union, he always rejects the advances of fawning girls.\n\n모든 과목에 완벽한 학생회장. 여자들의 다정한 시선에도 쉽게 흔들리지 않는다."
+  },
+
+  imgs: [
+    "https://drive.google.com/thumbnail?id=1N3s1OlCCn3onTN4Tp7LxlbnEafXHQMEI&sz=w1000",
+    "https://drive.google.com/thumbnail?id=1PVHJH7sGsk5PnVjhL5BRbeKj1P_lKgUc&sz=w1000"
+  ],
+
+  tags: [
+    "보이시룩",
+    "中性风",
+    "unisex",
+    "中性風"
+  ],
+
+  sources: [
+    "신데렐라의비밀",
+    "옷가게"
+  ],
+
+  statCards: [
+    { name: "심플", grade: "S" },
+    { name: "활발", grade: "B" },
+    { name: "큐티", grade: "A" },
+    { name: "청순", grade: "A" },
+    { name: "시원", grade: "A" }
+  ],
+
+  reform: {
+    enabled: false
+  },
+
+  dye: {
+    enabled: true,
+    images: [
+      "https://drive.google.com/thumbnail?id=1eS3tck3-TOInGTJEr9xgywIxySUvFB1X&sz=w1000",
+      "https://drive.google.com/thumbnail?id=1oCOX9pM1QnyPOdpWDi8remJeouEYZF5O&sz=w1000"
+    ],
+    pages: [
+      "1_헤어-11.html",
+      "1_헤어-12.html"
+    ]
+  }
+},
+"11": {
+  code: 11,
+  part: "헤어",
+  heart: 2,
+
+  names: {
+    ko: "신비한손님",
+    en: "Mysterious Guest",
+    zh: "神秘来客",
+    ja: "謎の訪問者"
+  },
+
+  desc: {
+    ko: "한밤중에 나타났다 인사도 없이 사라진다. 신비한 눈동자에 많은 비밀을 담고 있는 듯하다.",
+    zh: "午夜时分悄然出现，匆匆邂逅又不告而别，神秘莫测的眼眸中藏有多少秘密，遥不可及的心里又是谁的姓名。\n\n한밤중에 조용히 나타나, 잠시 마주쳤다가 아무 말 없이 사라진다.\n\n그 신비로운 눈빛 속엔 어떤 비밀들이 숨겨져 있을까? 손이 닿을 듯한 그 마음속에는, 누구의 이름이 있을까?",
+    ja: "夜更けにふっと現れ、何も告げずに去っていく。その眼差しは、何を伝えようとしているの......？\n\n한밤중에 불쑥 나타나, 아무 말 없이 사라진다.\n\n그 눈빛 속엔, 무언가를 전하려는 마음이 담겨 있는 걸까...？",
+    en: "He shows up quietly at midnight and leaves without saying goodbye after a hasty encounter.\n\n한밤중에 조용히 나타나, 잠시 마주친 뒤 아무 말 없이 떠난다.\n\n그의 눈빛 속에는 무엇을 숨기고 있는 걸까?"
+  },
+
+  imgs: [
+    "https://drive.google.com/thumbnail?id=1eS3tck3-TOInGTJEr9xgywIxySUvFB1X&sz=w1000",
+    "https://drive.google.com/thumbnail?id=1Ucmnt3GMpRDntmigI28OBcJnWqHH_s0a&sz=w1000"
+  ],
+
+  tags: [
+    "보이시룩",
+    "中性风",
+    "unisex",
+    "中性風"
+  ],
+
+  sources: [
+    "리폼"
+  ],
+
+  statCards: [
+    { name: "심플", grade: "S" },
+    { name: "우아", grade: "A" },
+    { name: "성숙", grade: "A" },
+    { name: "청순", grade: "A" },
+    { name: "시원", grade: "A" }
+  ],
+
+  reform: {
+    enabled: true,
+    materials: [
+      {
+        img: "https://drive.google.com/thumbnail?id=1Dgs4j21oACBY-GwFKqj-MyVEx3Mjksc-&sz=w1000",
+        qty: 1
+      },
+      {
+        img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000",
+        qty: 3
+      }
+    ]
+  },
+
+  dye: {
+    enabled: true,
+    images: [
+      "https://drive.google.com/thumbnail?id=1N3s1OlCCn3onTN4Tp7LxlbnEafXHQMEI&sz=w1000",
+      "https://drive.google.com/thumbnail?id=1oCOX9pM1QnyPOdpWDi8remJeouEYZF5O&sz=w1000"
+    ],
+    pages: [
+      "1_헤어-10.html",
+      "1_헤어-12.html"
+    ]
+  }
+},
+"12": {
+  code: 12,
+  part: "헤어",
+  heart: 2,
+
+  names: {
+    ko: "모험가",
+    en: "Fantasy Emissary",
+    zh: "奇幻使者",
+    ja: "不思議な使者"
+  },
+
+  desc: {
+    ko: "충동적인 성격에 마법도 부릴 수 있다고 한다. 이상한 매력에 끌려 자꾸 그와 모험을 하고 싶어진다.",
+    zh: "冲动迷糊的性格配上驾驭魔法的能力，实在是奇怪又有趣。和他去闯祸，和他去冒险，和他去尽情玩乐吧！\n\n충동적이고 어리숙한 성격에 마법까지 다룰 수 있다니, 정말 신기하고 재미있는 조합이다.\n\n그와 함께라면 사고도 치고, 모험도 떠나고, 마음껏 즐기고 싶어진다!",
+    ja: "トラブルメーカーな魔法使い。でも、一緒に冒険に出かければきっと楽しいよね！\n\n트러블 메이커인 마법사. 그래도 그와 함께 모험을 떠나면 분명 재미있을 거야!",
+    en: "With an impulsive character and the ability to control magic, he is both weird and funny.\n\n충동적인 성격에 마법까지 다룰 수 있다니, 그야말로 이상하고도 재미있는 사람이다."
+  },
+
+  imgs: [
+    "https://drive.google.com/thumbnail?id=1oCOX9pM1QnyPOdpWDi8remJeouEYZF5O&sz=w1000",
+    "https://drive.google.com/thumbnail?id=1tGQySn5pdIfuEnCq4S9_7qjd6zFklQW8&sz=w1000"
+  ],
+
+  tags: [
+    "보이시룩",
+    "中性风",
+    "unisex",
+    "中性風"
+  ],
+
+  sources: [
+    "리폼"
+  ],
+
+  statCards: [
+    { name: "심플", grade: "S" },
+    { name: "활발", grade: "S" },
+    { name: "큐티", grade: "A" },
+    { name: "청순", grade: "C" },
+    { name: "시원", grade: "A" }
+  ],
+
+  reform: {
+    enabled: true,
+    materials: [
+      {
+        img: "https://drive.google.com/thumbnail?id=1wyp64JiAn7u8xh0zuO4sYgvaEvx7g2b5&sz=w1000",
+        qty: 1
+      },
+      {
+        img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000",
+        qty: 3
+      }
+    ]
+  },
+
+  dye: {
+    enabled: true,
+    images: [
+      "https://drive.google.com/thumbnail?id=1N3s1OlCCn3onTN4Tp7LxlbnEafXHQMEI&sz=w1000",
+      "https://drive.google.com/thumbnail?id=1eS3tck3-TOInGTJEr9xgywIxySUvFB1X&sz=w1000"
+    ],
+    pages: [
+      "1_헤어-10.html",
+      "1_헤어-11.html"
+    ]
+  }
+},
+"13": {
+  code: 13,
+  part: "헤어",
+  heart: 2,
+
+  names: {
+    ko: "과학자",
+    en: "Scientist",
+    zh: "科学家",
+    ja: "科学者"
+  },
+
+  desc: {
+    ko: "애플왕국의 물리학자 라이언의 헤어스타일. 이 이상한 과학자는 타인의 마음을 읽을 수 있는 듯하니 좀 더 뻔뻔해질 필요가 있다.",
+    zh: "苹果联邦的物理学家莱恩布莱斯的发型，这个诡异的男人似乎可以看透人心，只能先硬着头皮小心相处下去了。\n\n애플 연방의 물리학자 라이언 브라이스, 그의 헤어는 정말 독특하다.\n\n이 기이한 남자는 사람의 마음을 꿰뚫어볼 수 있는 듯한 느낌이다.\n\n그와는 조심스럽게, 하지만 어쩔 수 없이 가까워져야 할 것 같다.",
+    ja: "パテール連邦の物理学者、ライアン・ブラスのヘアスタイル。人の心を見透かすような妖しいムード。\n\n애플 연방의 물리학자 라이언 브라이스, 그의 헤어스타일은 독특하고 매력적이다.\n\n사람의 마음을 읽는 듯한, 묘한 분위기가 느껴진다.",
+    en: "It seems that this weird man can read minds. You need to be careful of him.\n\n이 이상한 남자는 사람의 마음을 읽을 수 있는 것 같다.\n\n그에게는 신중하게 대해야 할 것 같다."
+  },
+
+  imgs: [
+    "https://drive.google.com/thumbnail?id=1ifJwttsoD3v-tMYoBTvhvxEL3JXHhAsg&sz=w1000",
+    "https://drive.google.com/thumbnail?id=10o85oDE2elshWPavIl9E2XAuIckM6JeS&sz=w1000"
+  ],
+
+  tags: [
+    "보이시룩",
+    "中性风",
+    "unisex",
+    "中性風"
+  ],
+
+  sources: [
+    "신데렐라의비밀",
+    "옷가게"
+  ],
+
+  statCards: [
+    { name: "심플", grade: "S" },
+    { name: "우아", grade: "B" },
+    { name: "큐티", grade: "A" },
+    { name: "청순", grade: "C" },
+    { name: "시원", grade: "S" }
+  ],
+
+  reform: {
+    enabled: false
+  },
+
+  dye: {
+    enabled: true,
+    images: [
+      "https://drive.google.com/thumbnail?id=138Ro3IJ7LSccNegnSjwwyXBe9Py_effW&sz=w1000"
+    ],
+    pages: [
+      "1_헤어-14.html"
+    ]
+  }
+},
+"14": {
+  code: 14,
+  part: "헤어",
+  heart: 2,
+
+  names: {
+    ko: "카페점장",
+    en: "Coffee Shop Owner",
+    zh: "咖啡店主",
+    ja: "カフェ店主"
+  },
+
+  desc: {
+    ko: "언제나 진한 커피향기를 뿜고 다니기 때문에, 나도 모르게 향기를 맡으려고 다가가게 된다.",
+    zh: "整个人身上散发着好闻的咖啡香气，就像一杯浓浓的醇厚拿铁，让人不由自主得想要靠近品味。\n\n그의 몸에서는 향긋한 커피 향이 난다.\n\n진하고 고소한 라떼처럼, 그 향에 끌려 다가가고 싶어진다.",
+    ja: "コーヒーの豊かな香りが漂ってくるみたい。甘くてまろやかなカフェラテはいかが？\n\n커피의 진한 향기가 퍼져오는 듯하다.\n\n부드럽고 달콤한 카페라떼, 한 모금 어떨까?",
+    en: "Smelling of coffee, he is like a cup of mellow latte. Everyone wants to have a taste of him.\n\n커피 향에 젖은 그는 마치 고소하고 부드러운 라떼 같다.\n\n모든 이가 그의 매력을 느끼고 싶어 한다."
+  },
+
+  imgs: [],
+
+  tags: [
+    "보이시룩",
+    "中性风",
+    "unisex",
+    "中性風"
+  ],
+
+  sources: [
+    "리폼"
+  ],
+
+  statCards: [
+    { name: "심플", grade: "S" },
+    { name: "우아", grade: "S" },
+    { name: "큐티", grade: "A" },
+    { name: "청순", grade: "C" },
+    { name: "시원", grade: "A" }
+  ],
+
+  reform: {
+    enabled: true,
+    materials: [
+      {
+        img: "https://drive.google.com/thumbnail?id=1LSQx7JhGyH9exdng7C8mVeokbIIhyEyU&sz=w1000",
+        qty: 1
+      },
+      {
+        img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000",
+        qty: 3
+      }
+    ]
+  },
+
+  dye: {
+    enabled: true,
+    images: [
+      "https://drive.google.com/thumbnail?id=1ifJwttsoD3v-tMYoBTvhvxEL3JXHhAsg&sz=w1000"
+    ],
+    pages: [
+      "1_헤어-13.html"
+    ]
+  }
+},
+"16": {
+  code: 16,
+  part: "헤어",
+  heart: 3,
+
+  names: {
+    ko: "은빛사도",
+    en: "Silver·wings Hero",
+    zh: "银翼侠",
+    ja: "銀翼の剣士"
+  },
+
+  desc: {
+    ko: "불의를 보면 참지 못하는 정의의 사도. 특유의 은발헤어 때문에 사람들에게 은빛의 사도라고 불린다.",
+    zh: "爱练武还爱打抱不平，叹为观止的好身手和令人过目不忘的银发，少年已然成为人们心中的银翼侠客。\n\n무술을 사랑하고 정의를 위해 싸우는 그.\n\n눈을 뗄 수 없는 실력과, 누구나 기억하는 은발.\n\n그는 이미 사람들의 마음속에서 은날개 기사로 자리잡았다.",
+    ja: "俊敏な身のこなしと人目を惹く銀髪。その強い正義感から銀翼の剣士と呼ばれてるんだって。\n\n빠르고 민첩한 몸놀림, 그리고 사람들의 시선을 사로잡는 은발.\n\n그의 강한 정의감이 그를 은날개 검객으로 불린다고 한다.",
+    en: "The boy has become the silver-wings hero in the hearts of the general public.\n\n그 소년은 이제 사람들의 마음 속에서 은날개 영웅으로 자리잡았다."
+  },
+
+  imgs: [
+    "https://drive.google.com/thumbnail?id=1_IIQqoohV4cTBuiuCc6kvITNpAGAxQLs&sz=w1000",
+    "https://drive.google.com/thumbnail?id=1B-Co3sLJNyZ95NEpl-YzSDLrV587G5SI&sz=w1000"
+  ],
+
+  tags: [
+    "보이시룩",
+    "中性风",
+    "unisex",
+    "中性風"
+  ],
+
+  sources: [
+    "신데렐라의꿈",
+    "신데렐라의비밀",
+    "옷가게"
+  ],
+
+  statCards: [
+    { name: "화려", grade: "A" },
+    { name: "활발", grade: "S" },
+    { name: "성숙", grade: "S" },
+    { name: "섹시", grade: "A" },
+    { name: "시원", grade: "S" }
+  ]
+},
+"18": {
+  code: 18,
+  part: "헤어",
+  heart: 3,
+
+  names: {
+    ko: "반짝골드",
+    en: "Golden Glow",
+    zh: "金灿",
+    ja: "ゴールドキャット"
+  },
+
+  desc: {
+    ko: "자신의 소중한 간식을 빼앗긴다면 분노로 폭발해 버린다.",
+    zh: "如果你夺走了她心爱的食物，喵星人可是会炸毛的哟！\n\n그녀의 아끼는 음식을 빼앗으면 안 돼.\n\n순식간에 발끈해 버릴 테니까!",
+    ja: "大好物を横取りされたら、猫パンチをお見舞いするぞ！\n\n내가 아끼는 걸 빼앗으면, 바로 한 대 맞을 거야!",
+    en: "The cat will bristle if you take away her favorite food!\n\n그녀가 사랑하는 음식을 빼앗는다면 살짝 화를 낼지도 몰라!"
+  },
+
+  imgs: [
+    "https://drive.google.com/thumbnail?id=11SJhmsuRzvMk3IANGwitaXGq2Oj_Zsd0&sz=w1000",
+    "https://drive.google.com/thumbnail?id=1EFRYPWZHh2Wfpy_oI4vM2mOFuiMFhyub&sz=w1000"
+  ],
+
+  sources: [
+    "리폼"
+  ],
+
+  statCards: [
+    { name: "화려", grade: "A" },
+    { name: "활발", grade: "A" },
+    { name: "큐티", grade: "S" },
+    { name: "섹시", grade: "A" },
+    { name: "시원", grade: "A" }
+  ],
+
+  reform: {
+    enabled: true,
+    materials: [
+      {
+        img: "https://drive.google.com/thumbnail?id=1wyp64JiAn7u8xh0zuO4sYgvaEvx7g2b5&sz=w1000",
+        qty: 1
+      },
+      {
+        img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000",
+        qty: 3
+      }
+    ]
+  },
+
+  dye: {
+    enabled: true,
+    images: [
+      "https://drive.google.com/thumbnail?id=1zpXmsZJr9tYFBo1iz3XzpWaNG7AyxQAM&sz=w1000",
+      "https://drive.google.com/thumbnail?id=1uzpT06qLBML42gJEEr4_wGcMEsO_EOW0&sz=w1000"
+    ],
+    pages: [
+      "1_헤어-17.html",
+      "1_헤어-19.html"
+    ]
+  }
+},
+"19": {
+  code: 19,
+  part: "헤어",
+  heart: 3,
+
+  names: {
+    ko: "와인",
+    en: "Wine Red",
+    zh: "酒红",
+    ja: "ワインレッド"
+  },
+
+  desc: {
+    ko: "와인색 중간기장 머리를 어깨에 늘어뜨리고, 머리를 빗겨주길 기다리고 있다.",
+    zh: "酒红色的中长发垂落在肩上，期待有位好心的主人为她静静梳理毛发。\n\n와인빛 중간 길이의 머리카락이 어깨 위로 살짝 흘러내린다.\n\n그녀는 언젠가 다정한 손길이, 조용히 머리카락을 빗어주길 꿈꾼다.",
+    ja: "肩先で揺れるワインレッドの髪。優しく手入れしてくれるご主人様を待っているみたい。\n\n어깨끝에서 부드럽게 흔들리는 와인빛 머리결.\n\n언젠가 다정한 손길이, 조용히 머리카락을 빗어줄 것만 같아.",
+    en: "Wine-red middle-length hair hang down the shoulders, expecting a kind master to comb her gently.\n\n와인빛 머리카락이 어깨에 닿으며 고요히 흘러내린다.\n\n그녀는 다정한 손길이 천천히, 머리카락을 빗어주길 꿈꾸고 있다."
+  },
+
+  imgs: [
+    "https://drive.google.com/thumbnail?id=1uzpT06qLBML42gJEEr4_wGcMEsO_EOW0&sz=w1000",
+    "https://drive.google.com/thumbnail?id=1ESUoMcGB80QJzJiOgTYazfJkMuvW-Izf&sz=w1000"
+  ],
+
+  sources: [
+    "리폼"
+  ],
+
+  statCards: [
+    { name: "화려", grade: "S" },
+    { name: "우아", grade: "C" },
+    { name: "큐티", grade: "S" },
+    { name: "섹시", grade: "A" },
+    { name: "시원", grade: "S" }
+  ],
+
+  reform: {
+    enabled: true,
+    materials: [
+      {
+        img: "https://drive.google.com/thumbnail?id=1AMu4VvEpA010CMpcMDOVCCqEiXvzJdH9&sz=w1000",
+        qty: 1
+      },
+      {
+        img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000",
+        qty: 3
+      }
+    ]
+  },
+
+  dye: {
+    enabled: true,
+    images: [
+      "https://drive.google.com/thumbnail?id=1zpXmsZJr9tYFBo1iz3XzpWaNG7AyxQAM&sz=w1000",
+      "https://drive.google.com/thumbnail?id=11SJhmsuRzvMk3IANGwitaXGq2Oj_Zsd0&sz=w1000"
+    ],
+    pages: [
+      "1_헤어-17.html",
+      "1_헤어-18.html"
+    ]
+  }
+},
+"20": {
+  code: 20,
+  part: "헤어",
+  heart: 5,
+
+  names: {
+    ko: "핑크웨이브",
+    en: "Pinky·white Curls",
+    zh: "粉白卷发",
+    ja: "桃白カール"
+  },
+
+  desc: {
+    ko: "공주도 요정이 될 수 있다. 절반은 핑크색 꿈, 절반은 하얀 용기! 소녀의 꿈을 이루자!",
+    zh: "谁说公主不能成为精灵，一缕粉色幻想，一缕纯白勇气，去追寻少女的梦想吧！\n\n누가 말했을까, 공주는 요정이 될 수 없다고?\n\n분홍빛 환상과 순백의 용기를 안고, 이제 소녀의 꿈을 향해 달려가자!",
+    ja: "女の子は妖精になれるんだ。ピンクは夢の色、白は勇気の色！さあ、メルヘンの世界へ！\n\n소녀라면 누구나 요정이 될 수 있는걸.\n\n핑크는 꿈의 색, 흰색은 용기의 색이야!\n\n자, 반짝이는 동화의 세계로 가보자!",
+    en: "Who says a princess can't be an elf! With a wisp of fantasy, you can follow the maiden's dreams!\n\n누가 그런 말을 해! 공주는 요정이 될 수 있어!\n\n한 줄기 환상만 있다면, 소녀의 꿈을 향해 갈 수 있어!"
+  },
+
+  imgs: [
+    "https://drive.google.com/thumbnail?id=1LKeJrJ2NbivFKTCGlyyrxsw6JETmacVJ&sz=w1000",
+    "https://drive.google.com/thumbnail?id=1duQ6FMYFuRZxhhocnW4o7n_WqZUvotvJ&sz=w1000"
+  ],
+
+  sources: [
+    "신데렐라의비밀"
+  ],
+
+  statCards: [
+    { name: "화려", grade: "SS" },
+    { name: "활발", grade: "S" },
+    { name: "큐티", grade: "A" },
+    { name: "섹시", grade: "B" },
+    { name: "따뜻", grade: "SS" }
+  ],
+
+  reform: {
+    enabled: false
+  },
+
+  dye: {
+    enabled: true,
+    images: [
+      "https://drive.google.com/thumbnail?id=1le3T0bKzKByaClQu1aFKAjr3tfmrjSI5&sz=w1000",
+      "https://drive.google.com/thumbnail?id=1mYzBz0pr78EqvKX-o2s-5ffwtczzPItF&sz=w1000"
+    ],
+    pages: [
+      "1_헤어-21.html",
+      "1_헤어-22.html"
+    ]
+  }
+},
+"21": {
+  code: 21,
+  part: "헤어",
+  heart: 5,
+
+  names: {
+    ko: "베이지웨이브",
+    en: "Golden·beige Curls",
+    zh: "金米卷发",
+    ja: "金銀カール"
+  },
+
+  desc: {
+    ko: "전설 속의 한 송이 백합 같다. 동심의 세계와 고귀함이 그녀의 대명사다…",
+    zh: "她就像风谷中盛开的一朵百合，童心与高贵都是她的代名词…\n\n그녀는 바람의 골짜기에 피어난 한 송이 백합 같다.\n\n순수함과 고귀함, 그 모든 게 그녀를 말해준다……",
+    ja: "その純真さと気高さは、まるでウィンドデールの谷間に咲く百合のよう…\n\n그녀의 순수함과 고귀함은, 마치 바람의 계곡에 피어난 백합처럼 고요해…",
+    en: "She is like a blooming lily in the Wind Valley, the embodiment of innocence and elegance...\n\n그녀는 바람의 계곡에서 피어난 한 송이 백합 같아.\n\n순수함과 우아함, 그 모든 것을 품은 존재야…"
+  },
+
+  imgs: [
+    "https://drive.google.com/thumbnail?id=1le3T0bKzKByaClQu1aFKAjr3tfmrjSI5&sz=w1000",
+    "https://drive.google.com/thumbnail?id=1cRhcr1Yl7AEA7reb9Ngefts599tCqj9_&sz=w1000"
+  ],
+
+  sources: [
+    "리폼"
+  ],
+
+  statCards: [
+    { name: "화려", grade: "S" },
+    { name: "우아", grade: "S" },
+    { name: "큐티", grade: "A" },
+    { name: "청순", grade: "A" },
+    { name: "따뜻", grade: "S" }
+  ],
+
+  reform: {
+    enabled: true,
+    materials: [
+      {
+        img: "https://drive.google.com/thumbnail?id=1h1w9cSABiBZ6MLkh-ZaD2_cGi86gMVzr&sz=w1000",
+        qty: 2
+      },
+      {
+        img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000",
+        qty: 3
+      }
+    ]
+  },
+
+  dye: {
+    enabled: true,
+    images: [
+      "https://drive.google.com/thumbnail?id=1LKeJrJ2NbivFKTCGlyyrxsw6JETmacVJ&sz=w1000",
+      "https://drive.google.com/thumbnail?id=1mYzBz0pr78EqvKX-o2s-5ffwtczzPItF&sz=w1000"
+    ],
+    pages: [
+      "1_헤어-20.html",
+      "1_헤어-22.html"
+    ]
+  }
+}
+
+};
+
+// ---- postMessage API (cross-origin/file:// safe) ----
+(function(){
+  function sendReady(){
+    try {
+      (window.parent || window.opener || window).postMessage(
+        { type: "ITEM_DETAILS_LOADED" },
+        "*"
+      );
+    } catch(e) {}
+  }
+
+  window.addEventListener("message", function(ev){
+    var d = ev.data || {};
+    if (d.type === "GET_ITEM_DETAIL") {
+      var code = String(d.code ?? "");
+      var detail = window.ITEM_DETAILS[code] || null;
+      try {
+        ev.source && ev.source.postMessage(
+          { type: "ITEM_DETAIL", code: code, detail: detail },
+          "*"
+        );
+      } catch(e) {}
+    }
+  });
+
+  sendReady();
 })();
 </script>
-</body>
-</html>

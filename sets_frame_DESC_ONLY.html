@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>세트정보</title>
+<style>
+body{margin:0;font-family:system-ui,AppleSDGothicNeo,sans-serif;background:#f7f7fb}
+.wrap{padding:12px}
+.section{background:#fff;border:1px solid #eee;border-radius:16px;padding:12px}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.gimg{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;border:1px solid #eee}
+.setDesc{margin-top:10px;padding:12px 14px;border-radius:14px;background:#f3f4ff;border:1px solid #e3e6ff;font-size:13px;line-height:1.7;color:#2b2f55}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="section">
+    <h3>세트사진</h3>
+    <div class="gallery" id="gallery"></div>
+    <div id="setDesc" class="setDesc" style="display:none"></div>
+  </div>
+</div>
+
+<iframe src="sets_data.html" style="display:none"></iframe>
+
+<script>
+(function(){
+  const gallery = document.getElementById("gallery");
+  const setDesc = document.getElementById("setDesc");
+
+  window.addEventListener("message", (ev)=>{
+    if(ev.data && ev.data.__splitData && ev.data.key==="sets"){
+      const set = ev.data.data[0];
+      gallery.innerHTML="";
+      for(const u of set.images){
+        const img=document.createElement("img");
+        img.className="gimg";
+        img.src=u;
+        gallery.appendChild(img);
+      }
+      if(set.desc){
+        setDesc.textContent=set.desc;
+        setDesc.style.display="block";
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>
