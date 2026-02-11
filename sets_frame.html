@@ -29,14 +29,8 @@
   .pbtn[disabled]:hover{background:#fff}
   .pbtn.active{background:#2b115f;color:#fff;border-color:#2b115f}
   .pdots{color:#777;font-size:12px;padding:0 4px}
-  dialog{border:0;padding:0;border-radius:18px;max-width:min(980px,96vw);width:980px;box-shadow:0 20px 70px rgba(0,0,0,.22);position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);margin:0}
+  dialog{border:0;padding:0;border-radius:18px;max-width:min(980px,96vw);width:980px;box-shadow:0 20px 70px rgba(0,0,0,.22)}
   dialog::backdrop{background:rgba(0,0,0,.35)}
-  /* modal fix (prevent dialog appearing below viewport on mobile) */
-  @media (max-width: 520px){
-    dialog{width:96vw;max-width:96vw;}
-    .dlg{max-height:92vh;}
-  }
-
   .dlg{display:flex;flex-direction:column;max-height:88vh;background:#fff;border-radius:18px;overflow:hidden}
   .dlgHead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:14px 16px;border-bottom:1px solid #eee;background:#fff}
   .dlgTitle{display:flex;flex-direction:column;gap:4px}
@@ -580,17 +574,8 @@ function trim(s){ return norm(s).trim(); }
         // variants
     renderVariants(set);
 
-    // ✅ keep current scroll position when opening modal (mobile Safari/Chrome can jump to <dialog>)
-     const __sx = (window.pageXOffset||0);
-     const __sy = (window.pageYOffset||0);
-     if(dlg && typeof dlg.showModal === "function") dlg.showModal();
-     else if(dlg) dlg.setAttribute("open","open");
-     // restore scroll (next frame) + focus without scrolling if possible
-     requestAnimationFrame(()=>{
-       try{ window.scrollTo(__sx, __sy); }catch(e){}
-       try{ closeBtn && closeBtn.focus && closeBtn.focus({preventScroll:true}); }catch(e){}
-     });
-     schedulePostHeight(true);
+    if(dlg && dlg.showModal) try{ parent && parent.postMessage && parent.postMessage({type:'SETS_DIALOG_OPEN'}, '*'); }catch(e){}
+    dlg.showModal();
   }
 
 
