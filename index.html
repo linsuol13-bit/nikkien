@@ -310,7 +310,7 @@ function displayShort(txt){
 <!-- === DATA FRAMES (hidden) === -->
 <iframe id="itemsFrame" src="items.html" style="display:none;width:0;height:0;border:0;"></iframe>
 <iframe id="stagesFrame" src="stages.html" style="display:none;width:0;height:0;border:0;"></iframe>
-<iframe id="setsFrame" src="sets_frame_fixed.html" style="display:none;width:0;height:0;border:0;"></iframe>
+<iframe id="setsFrame" src="sets_frame_data_bridge.html" style="display:none;width:0;height:0;border:0;"></iframe>
 <iframe id="sourcesFrame" src="sources_frame.html" style="display:none;width:0;height:0;border:0;"></iframe>
 
 <iframe id="itemDetailsFrame" src="item_details_frame.html" style="display:none;width:0;height:0;border:0;"></iframe>
@@ -10303,6 +10303,23 @@ document.addEventListener('DOMContentLoaded', function(){
     if(raf) cancelAnimationFrame(raf);
     raf = requestAnimationFrame(()=>apply(target));
   });
+})();
+</script>
+
+
+<script>
+/* ✅ When a set dialog opens inside sets iframe, ensure the iframe is in view (mobile scroll fix) */
+(function(){
+  window.addEventListener('message', function(ev){
+    var msg = ev && ev.data;
+    if(!msg) return;
+    if(msg.type === 'SETS_DIALOG_OPEN'){
+      var fr = document.getElementById('setsViewFrame');
+      if(fr && fr.scrollIntoView){
+        try{ fr.scrollIntoView({behavior:'smooth', block:'center'}); }catch(e){ try{ fr.scrollIntoView(); }catch(_e){} }
+      }
+    }
+  }, false);
 })();
 </script>
 
