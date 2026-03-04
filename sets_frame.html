@@ -244,6 +244,7 @@
   let SETS = [];
   let ITEMS = [];
   let BYKEY = Object.create(null);
+let BYCODE = Object.create(null);
 
   function norm(s){ return (s==null) ? "" : String(s); }
   function hasVariantType(set, type){
@@ -260,13 +261,47 @@ function trim(s){ return norm(s).trim(); }
 
   function buildItemIndex(){
     const by = Object.create(null);
+    const byCode = Object.create(null);
+
     for(const it of ITEMS){
       const part = trim(it.part);
       const code = it.code;
       if(!part || code==null) continue;
+
       by[itemKey(part, code)] = it;
+
+      const ckey = String(code);
+      // ✅ Only index codes for 장식/특수 to avoid matching 헤어/원피스 etc.
+      if(part.startsWith("장식") || part.startsWith("특수")){
+        if(!(ckey in byCode)) byCode[ckey] = it; // keep first if duplicates
+      }
     }
     BYKEY = by;
+    BYCODE = byCode;
+  }
+
+  // Auto-resolve part for simplified set data: allow part="장식" or part="특수" (or empty)
+  function resolvePartAndItem(rawPart, code){
+    const p0 = trim(rawPart);
+    const c0 = (code==null) ? "" : String(code);
+    let part = p0;
+    let item = (part && c0!=="") ? (BYKEY[itemKey(part, c0)] || null) : null;
+
+    if(!item && c0!==""){
+      const itByCode = BYCODE[c0] || null;
+      if(itByCode){
+        const ip = trim(itByCode.part);
+        const wantAuto = (!part || part==="장식" || part==="특수");
+        if(wantAuto){
+          // ✅ Safety: only accept resolved parts that are also 장식/특수
+          if(ip.startsWith("장식") || ip.startsWith("특수")){
+            part = ip;
+            item = itByCode;
+          }
+        }
+      }
+    }
+    return { part, item };
   }
 
   // ✅ 리스트 화면에서는 중국어를 보여주지 않음 (영어/일본어 우선)
@@ -546,9 +581,11 @@ function trim(s){ return norm(s).trim(); }
     if(plist.length){
       const frag = document.createDocumentFragment();
       for(const p of plist){
-        const part = trim(p.part);
         const code = (p.code==null) ? "" : p.code;
-        const fromItems = BYKEY[itemKey(part, code)] || null;
+
+        const resolved = resolvePartAndItem(p.part, code);
+        const part = resolved.part;
+        const fromItems = resolved.item;
 
         const img = trim(p.img) || trim(fromItems && fromItems.img) || "";
         const name = trim(p.name) || trim(fromItems && fromItems.name) || "-";
@@ -650,11 +687,13 @@ function trim(s){ return norm(s).trim(); }
   }
 
   function makeVariantCard(it){
-    const part = trim(it.part);
     const code = (it.code==null) ? "" : it.code;
-    if(!part || code==="") return document.createElement("span");
+    if(code==="") return document.createElement("span");
 
-    const fromItems = BYKEY[itemKey(part, code)] || null;
+    const resolved = resolvePartAndItem(it.part, code);
+    const part = resolved.part;
+    const fromItems = resolved.item;
+    if(!part) return document.createElement("span");
     const img = trim(it.img) || trim(fromItems && fromItems.img) || "";
     const name = trim(it.name) || trim(fromItems && fromItems.name) || "-";
 
