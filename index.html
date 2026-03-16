@@ -6,19 +6,17 @@
 <!-- Injected: PART_WEIGHTS (user-defined) -->
 <script>
 const PART_WEIGHTS = {
-  "헤어": 0.5,
-  "원피스": 2.0,
-  "아우터": 0.2,
-  "상의": 1.0,
-  "하의": 1.0,
-  "양말": 0.3,
-  "양말장식": 0.3,
-  "신발": 0.4,
-  "장식": 0.2,
-  "허리": 0.2,
-  "특수": 0.2,
-  "뷰티": 0.1,
-  "반딧불의 영혼": 0.2
+  "헤어": 0.998107,
+  "원피스": 3.832350,
+  "아우터": 0.373913,
+  "상의": 1.923561,
+  "하의": 1.911129,
+  "양말": 0.619258,
+  "양말장식": 0.561508,
+  "신발": 0.844369,
+  "장식": 0.15,
+  "뷰티": 0.223041,
+  "반딧불의 영혼": 0.306456
 };
 </script>
 <script>
@@ -35,6 +33,9 @@ const PART_WEIGHTS = {
 })();
 </script>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta name="description" content="니키 스타일 대회 점수 계산기 — 아이템 점수·추천·세트정보·스테이지 번역을 한 곳에서"/>
+<meta property="og:title" content="니키 점수계산기"/>
+<meta property="og:description" content="니키 스타일 대회 점수 계산기 — 아이템 점수·추천·세트정보·스테이지 번역을 한 곳에서"/>
 <title>니키 점수계산</title>
 <style>
 /* ── 핑크 테마 CSS 변수 ── */
@@ -472,6 +473,7 @@ try {
 <script>
 // Global aliases and safety
 window.items = window.items || [];
+window.ITEMS = window.items;
 window.stages = window.stages || [];
 window.sets = window.sets || [];
 window.sources = window.sources || [];
@@ -1224,8 +1226,12 @@ function init(){
   doInit();
 }
 
-(function hookShow(){
-  if(typeof window.showPanel !== 'function'){ setTimeout(hookShow, 300); return; }
+(function hookShow(attempts){
+  attempts = attempts || 0;
+  if(typeof window.showPanel !== 'function'){
+    if(attempts < 20){ setTimeout(function(){ hookShow(attempts+1); }, 300); }
+    return;
+  }
   var orig = window.showPanel;
   window.showPanel = function(key){
     orig.apply(this, arguments);
@@ -1281,6 +1287,7 @@ document.addEventListener('click', function(ev){
   // Replace items with merged unique list
   const unique = Array.from(best.values());
   window.items = unique;
+  window.ITEMS = unique;
 })();
 </script>
 <!-- Owned items fix: parse/apply/save/load -->
@@ -1377,7 +1384,7 @@ const normName = (s)=> String(s||'').normalize('NFKC').toLowerCase().replace(/\s
     if(removed){
       const t = document.getElementById('toast'); 
       if(t){ t.textContent = `중복 제거: ${removed}개`; t.classList.add('show'); setTimeout(()=> t.classList.remove('show'), 1200); }
-      console.log('[dedup] removed', removed);
+
     }
   });
 })();
@@ -1514,7 +1521,7 @@ function toThumb(u){
   var got = {items:false, stages:false, sets:false};
   function maybeInit(){
     if (got.items && got.stages) {
-      if (!window.items) window.items = [];
+      if (!window.items) { window.items = []; window.ITEMS = []; }
       if (!window.stages) window.stages = [];
       if (typeof init === 'function') init();
       try{ if(window._loading) window._loading.show(false); }catch(e){}
@@ -1565,7 +1572,7 @@ function toThumb(u){
   window.addEventListener('message', function(ev){
     var msg = ev.data;
     if (!msg || !msg.__splitData) return;
-    if (msg.key==='items'){ window.items = __normalizeIncomingData('items', msg.data); got.items = true; try{ if(window._loading) window._loading.show(true);}catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){}; try{ if(typeof window.renderItemsInfoTab==='function') window.renderItemsInfoTab(); }catch(e){} }
+    if (msg.key==='items'){ window.items = __normalizeIncomingData('items', msg.data); window.ITEMS = window.items; got.items = true; try{ if(window._loading) window._loading.show(true);}catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){}; try{ if(typeof window.renderItemsInfoTab==='function') window.renderItemsInfoTab(); }catch(e){} }
     if (msg.key==='stages'){ window.stages = __normalizeIncomingData('stages', msg.data); got.stages = true; try{ if(typeof __populateStages==='function') __populateStages(); }catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){} }
     if (msg.key==='sets'){ window.sets = msg.data; got.sets = true; try{ if(typeof renderAll==='function') renderAll(); }catch(e){}; try{ if(typeof window.renderSetsTab==='function') window.renderSetsTab(); }catch(e){} }
     if (msg.key==='sources'){ window.sources = msg.data; got.sources = true; try{ if(typeof renderAll==='function') renderAll(); }catch(e){};  }
@@ -1943,7 +1950,7 @@ var ORDER_SOUL = ["반딧불의 영혼"];
   }
   function computeOwnedTotal(){
     var items = (window.items || window.ITEMS || []);
-    var total = items.length || 0 + GRADE_OFFSET[item.grade];
+    var total = items.length || 0;
     var byName = Object.create(null);
     for (var i=0;i<items.length;i++){
       var it = items[i];
@@ -3309,10 +3316,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
   try { if (typeof render === 'function') render(); } catch(e) { console.warn(e); }
 });
 </script>
-<!-- data iframes (hidden) -->
-<iframe id="itemsFrame" src="./items.html" style="display:none;width:0;height:0;border:0;"></iframe>
-<iframe id="stagesFrame" src="./stages.html" style="display:none;width:0;height:0;border:0;"></iframe>
-<iframe id="setsFrame" src="sets_frame_fixed.html" style="display:none;width:0;height:0;border:0;"></iframe>
+<!-- data iframes: itemsFrame/stagesFrame/setsFrame은 위(line ~458)에서 선언됨 -->
 <script>
 (function(){
   // Safe override of render() that avoids DOM reorders and freezes
@@ -3573,7 +3577,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     });
     mo.observe(document.documentElement, {childList:true, subtree:true});
   }catch(e){}
-  console.log("[UI] Decoration labels shortened for display (e.g., '장식 - 손 - 장갑' → '장갑').");
+
 })();
 </script>
 <script>
@@ -4540,6 +4544,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
             var arr = (itf.contentWindow && itf.contentWindow.ITEMS) || [];
             if (Array.isArray(arr) && arr.length >= 0){
               window.items = arr;
+              window.ITEMS = arr;
               try{ $('itemCount').textContent = String(arr.length||0); }catch(_){}
               try{ if(typeof window.renderAll === 'function') window.renderAll(); }catch(_){}
             }
@@ -5411,94 +5416,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     }catch(e){}
   });
 })();
-</script>
-<script>
-// Keep original stage scaling: stage[a] * (stage.weight/9); no profiles.
-(function(){
-  window.scoreItemForStage = function(item, stage){
-    try{
-      if(!stage) return 0;
-      const attrs=['flair','simple','elegant','lively','mature','cute','sexy','pure','cool','warm'];
-
-      // Name-only mine-items zeroing
-      try{
-        const nameStr = (item && item.name) ? String(item.name).trim() : "";
-        const mineNames = (stage && Array.isArray(stage.mine_items)) ? stage.mine_items : [];
-        if (mineNames.length && mineNames.includes(nameStr)) return 0;
-      }catch(e){}
-
-      const toNum=(v)=>{const n=Number(v);return Number.isFinite(n)?n:0;};
-      const factor = toNum(stage.weight||9) / 9;
-      const stageW = Object.assign({}, stage);
-      let base = 0;
-      for(const a of attrs){
-        const grade = (typeof gradeToScore==='function') ? (item[a]) : toNum(item[a]);
-        const bonus = toNum(item[a + "_bonus"] || 0);
-        const w = toNum(stageW[a] || 0) * factor; // ← keep stage[a] * (weight/9)
-        base += w * (grade + bonus);
-      }
-      const starMul = (typeof starMultiplier==='function') ? starMultiplier(item.stars) : 1;
-      const partMul = (window.PART_WEIGHTS && window.PART_WEIGHTS[item.part]) ? window.PART_WEIGHTS[item.part] : 1;
-      return base * starMul * partMul;
-    }catch(e){ return 0; }
-  };
-})();
-</script>
-<!-- scoring patch (inline, logic only; no template changes) -->
-<script>
-/* PATCH CODE START */
-(function(){
-  'use strict';
-  const REQUIRED_MULTIPLIER = 1.3;
-  const ATTRS = ['flair','simple','elegant','lively','mature','cute','sexy','pure','cool','warm'];
-  const GRADE_INDEX = { 'SS':0, 'S':1, 'A':2, 'B':3, 'C':4 };
-  const DEFAULT_LEVEL_TABLE = [0.6, 0.9, 1.0, 1.2, 1.5];
-  const DEFAULT_GRADE_VECTOR = [5,4,3,2,1];
-  function toNum(x){ var n = Number(x); return Number.isFinite(n) ? n : 0; }
-  function clamp(n, lo, hi){ n = toNum(n); if(n<lo) return lo; if(n>hi) return hi; return n; }
-  function normName(s){ return String(s||'').normalize('NFKC').toLowerCase().replace(/\s+/g,''); }
-  function getRequiredNameSetSafe(){ try { if (typeof window.getRequiredNameSet === 'function') return window.getRequiredNameSet(); } catch(e){} return new Set(); }
-  function isMinedItem(item, stage){ try{ const nameStr = (item && item.name) ? String(item.name).trim() : ""; const mineNames = (stage && Array.isArray(stage.mine_items)) ? stage.mine_items : []; return (mineNames.length && mineNames.includes(nameStr)); }catch(e){ return false; } }
-  function effectiveLevelTable(stage){ const t = stage && Array.isArray(stage.level_table) && stage.level_table.length>=5 ? stage.level_table : DEFAULT_LEVEL_TABLE; return [0,1,2,3,4].map(i => toNum(t[i] ?? DEFAULT_LEVEL_TABLE[i])); }
-  function styleWeightFor(stage, attr){
-    try{ if (stage && stage.style_weights && (attr in stage.style_weights)){ const v = toNum(stage.style_weights[attr]); return v; } }catch(e){}
-    try{ if (stage && stage.style_levels && stage.style_levels[attr]){ const table = effectiveLevelTable(stage); const lvl = clamp(stage.style_levels[attr], 1, 5); return table[lvl-1]; } }catch(e){}
-    const factor = toNum(stage && stage.weight || 9)/9; return toNum(stage && stage[attr]) * factor;
-  }
-  function gradeToWeightedScore(stage, attr, gradeStr){ try{ const idx = GRADE_INDEX[String(gradeStr||'').toUpperCase()]; if (idx == null) return 0; const vec = (stage && stage.grade_vectors && Array.isArray(stage.grade_vectors[attr])) ? stage.grade_vectors[attr] : DEFAULT_GRADE_VECTOR; const v = vec[idx]; return toNum(v); }catch(e){ return 0; } }
-  (function patch(){
-    const orig = window.scoreItemForStage;
-    window.scoreItemForStage = function(item, stage){
-      if(!stage) return 0;
-      if (isMinedItem(item, stage)) return 0;
-      let base = 0;
-      for (const a of ATTRS){
-        const gradeVal = gradeToWeightedScore(stage, a, item && item[a]);
-        const bonus = toNum(item && item[`${a}_bonus`]);
-        const w = styleWeightFor(stage, a);
-        base += w * (gradeVal + bonus);
-      }
-      const starMul = (typeof window.starMultiplier === 'function') ? window.starMultiplier(item && item.stars) : 1;
-      const partMul = (window.PART_WEIGHTS && (window.PART_WEIGHTS[item && item.part]||1)) || 1;
-      let score = base * starMul * partMul + GRADE_OFFSET[item.grade];
-      try{ const reqSet = getRequiredNameSetSafe(); const nameNorm = (typeof window.normOwnedName === 'function') ? window.normOwnedName(item && item.name) : normName(item && item.name); if (reqSet && (reqSet.has(nameNorm) || reqSet.has(String(item && item.name)))){ score *= REQUIRED_MULTIPLIER; } }catch(e){}
-      return score;
-    };
-    window.__NIKKI_PATCH__ = {
-      REQUIRED_MULTIPLIER,
-      DEFAULT_LEVEL_TABLE,
-      DEFAULT_GRADE_VECTOR,
-      setStageLevels(stage, levels){ if (!stage) return; stage.style_levels = Object.assign({}, stage.style_levels||{}, levels||{}); },
-      setStageLevelTable(stage, table5){ if (!stage) return; if (!Array.isArray(table5) || table5.length < 5) return; stage.level_table = table5.slice(0,5).map(toNum); },
-      setStageGrades(stage, gradeVectors){ if (!stage) return; stage.grade_vectors = Object.assign({}, stage.grade_vectors||{}, gradeVectors||{}); },
-      setStageStyleWeights(stage, weights){ if (!stage) return; stage.style_weights = Object.assign({}, stage.style_weights||{}, weights||{}); },
-      clearStageOverrides(stage){ if (!stage) return; delete stage.style_levels; delete stage.level_table; delete stage.grade_vectors; delete stage.style_weights; }
-    };
-  })();
-})(); /* PATCH CODE END */
-
-</script>
-<!-- chips fix patch (logic-only) -->
+</script><!-- scoring patch (inline, logic only; no template changes) --><!-- chips fix patch (logic-only) -->
 <script>
 
 /* ===============================================================
@@ -5862,63 +5780,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
   window.__CHIPS_COUNTS_FIX__ = { setGroup: setGroupCounts };
 })();
 
-</script>
-<script>
-// === TAG GRADE + WEIGHT PATCH (SSS~C) ===
-(function(){
-  'use strict';
-  var ORIG = window.scoreItemForStage;
-  if (typeof ORIG !== 'function') return;
-
-  var GRADE_INDEX = { 'SSS':0, 'SS':1, 'S':2, 'A':3, 'B':4, 'C':5 };
-  /* GRADE_VECTOR removed in v17 */
-
-  function norm(s){ return String(s||'').normalize('NFKC').toLowerCase().trim(); }
-  function toNum(x){ var n=Number(x); return Number.isFinite(n)?n:0; }
-  function gradeToMul(g){
-    if (g == null) return 1;
-    var key = String(g).trim().toUpperCase();
-    return Object.prototype.hasOwnProperty.call(GRADE_INDEX, key)
-      ? GRADE_VECTOR[ GRADE_INDEX[key] ] : 1;
-  }
-
-  function computePerTagFactor(tag, stage){
-    var t = norm(tag), mul = 1;
-    // Combined rules
-    var rules = stage && stage.tag_rules;
-    if (rules && rules[t] && typeof rules[t] === 'object'){
-      if (rules[t].grade != null) mul *= gradeToMul(rules[t].grade);
-      if (rules[t].weight != null) { var w=toNum(rules[t].weight); if (w>0) mul *= w; }
-    }
-    // Separate tables
-    var grades = stage && stage.tag_grades;
-    if (grades && grades[t] != null) mul *= gradeToMul(grades[t]);
-    var weights = stage && stage.tag_weights;
-    if (weights){ var w2 = toNum(weights[t]); if (w2>0) mul *= w2; }
-    // Optional percent table
-    var pct = stage && stage.tag_weights_pct;
-    if (pct){ var p = toNum(pct[t]); if (p) mul *= (1+p/100); }
-    return mul;
-  }
-
-  function computeTagFactor(item, stage){
-    var tags = Array.isArray(item && item.tags) ? item.tags : [];
-    if (!tags.length) return 1;
-    var f = 1;
-    for (var i=0;i<tags.length;i++) f *= computePerTagFactor(tags[i], stage);
-    if (f < 0.1) f = 0.1; if (f > 5.0) f = 5.0;
-    return f;
-  }
-
-  window.scoreItemForStage = function(item, stage){
-    var base = ORIG(item, stage);
-    if (!Number.isFinite(base) || base <= 0) return 0; // keep mine-item zero rule
-    return base * computeTagFactor(item, stage);
-  };
-  console.log('[TAG GRADE+WEIGHT] enabled (SSS~C)');
-})();
-</script>
-<!-- === PATCH: robust chip counter (wear/acc/beauty/soul) === -->
+</script><!-- === PATCH: robust chip counter (wear/acc/beauty/soul) === -->
 <script>
 (function(){
   // Guard: only apply once
@@ -7414,638 +7276,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
   };
 })();
 </script>
-<!-- === PATCH v15: stage-aware recalc + score scaling === -->
-<script>
-(function(){
-  if (window.__scoreScalePatchApplied) return;
-  window.__scoreScalePatchApplied = true;
-
-  var SCALE = 60; // tune to target SSS ~= 3200
-
-  // 1) Wrap scoreItemForStage to apply scaling
-  (function(){
-    var orig = window.scoreItemForStage;
-    window.__ORIG_scoreItemForStage = orig;
-    window.scoreItemForStage = function(item, stage){
-      try{
-        var base = (typeof orig === 'function') ? orig(item, stage) : 0;
-        return base * SCALE;
-      }catch(e){ return 0; }
-    };
-  })();
-
-  // 2) Make renderAll always trigger a fresh render (scores are recomputed in render())
-  (function(){
-    var origAll = window.renderAll;
-    var origRender = window.render;
-    window.renderAll = function(){
-      // call original if exists
-      if (typeof origAll === 'function') { try{ origAll(); }catch(e){} }
-      // then force a single render pass (render() computes scores via scoreItemForStage)
-      if (typeof origRender === 'function') { try{ origRender(); }catch(e){} }
-    };
-  })();
-
-  // 3) Also when stage changes, re-render after weights auto-apply (safety)
-  document.addEventListener('change', function(ev){
-    var sel = ev.target && ev.target.id === 'stageSelect';
-    if (!sel) return;
-    setTimeout(function(){
-      try{ if (typeof window.renderAll === 'function') window.renderAll(); }catch(e){}
-    }, 30);
-  }, true);
-})();
-</script>
-<!-- === PATCH v16: grade-offset additive scoring === -->
-<script>
-(function(){
-  if (window.__gradeOffsetPatchApplied) return;
-  window.__gradeOffsetPatchApplied = true;
-
-  // Offsets table (additive)
-  var GRADE_OFFSET = {
-    "SSS": 3200,
-    "SS": 2612.7,
-    "S": 2089.35,
-    "A": 1690.65,
-    "B": 1309.8,
-    "C": 817.5
-  };
-
-  function detectGrade(item){
-    var g = null;
-    if (item){
-      g = item.grade || item.rank || item.rating || item.tier || item.level;
-      if (!g && item.Grade) g = item.Grade;
-      if (!g && item.Rank) g = item.Rank;
-      if (!g && item.RATING) g = item.RATING;
-    }
-    g = (g==null ? '' : String(g)).toUpperCase().replace(/\s+/g,'');
-    if (GRADE_OFFSET.hasOwnProperty(g)) return g;
-    // fallback: nothing → no offset
-    return '';
-  }
-
-  // Build a *clean* base scorer without the v15 scaling.
-  // If v15 saved the original scorer, prefer that.
-  var BASE = (typeof window.__ORIG_scoreItemForStage === 'function')
-               ? window.__ORIG_scoreItemForStage
-               : (typeof window.scoreItemForStage === 'function' ? window.scoreItemForStage : function(){ return 0; });
-
-  window.scoreItemForStage = function(item, stage){
-    var base = 0;
-    try { base = BASE(item, stage) || 0; } catch(e){ base = 0; }
-    var g = detectGrade(item);
-    var add = GRADE_OFFSET[g] || 0;
-    return base + add;
-  };
-
-  // Make sure a render happens so new formula shows up
-  setTimeout(function(){ try{ if (typeof window.renderAll==='function') window.renderAll(); }catch(e){} }, 20);
-})();
-</script>
-<!-- === PATCH v17: RAW numeric attribute scoring + stage weights + grade offsets === -->
-<script>
-(function(){
-  if (window.__rawAttrScoringPatchApplied) return;
-  window.__rawAttrScoringPatchApplied = true;
-
-  // Map style name variants -> canonical key
-  var STYLE_CANON = {
-    "화려":"flair","심플":"simple","우아":"elegant","활발":"lively","성숙":"mature",
-    "큐티":"cute","섹시":"sexy","청순":"pure","청량":"cool","따뜻":"warm",
-    "flair":"flair","simple":"simple","elegant":"elegant","lively":"lively","mature":"mature",
-    "cute":"cute","sexy":"sexy","pure":"pure","cool":"cool","warm":"warm"
-  };
-
-  // For each canonical style, define candidate field names to probe on item
-  var FIELD_CANDIDATES = {
-    flair:   ["화려","flair","Flair","FLAIR","flair_points","flairPoint","flairScore","flair_score"],
-    simple:  ["심플","simple","Simple","SIMPLE","simple_points","simplePoint","simpleScore","simple_score"],
-    elegant: ["우아","elegant","Elegant","ELEGANT","elegant_points","elegantPoint","elegantScore","elegant_score"],
-    lively:  ["활발","lively","Lively","LIVELY","lively_points","livelyPoint","livelyScore","lively_score"],
-    mature:    ["성숙","mature","Chic","CHIC","chic_points","chicPoint","chicScore","chic_score"],
-    cute:    ["큐티","cute","Cute","CUTE","cute_points","cutePoint","cuteScore","cute_score"],
-    sexy:    ["섹시","sexy","Sexy","SEXY","sexy_points","sexyPoint","sexyScore","sexy_score"],
-    pure:    ["청순","pure","Pure","PURE","pure_points","purePoint","pureScore","pure_score"],
-    cool:    ["청량","cool","Cool","COOL","cool_points","coolPoint","coolScore","cool_score"],
-    warm:    ["따뜻","warm","Warm","WARM","warm_points","warmPoint","warmScore","warm_score"]
-  };
-
-  // Grade offsets (from v16)
-  var GRADE_OFFSET = {
-    "SSS": 3200,
-    "SS": 2612.7,
-    "S": 2089.35,
-    "A": 1690.65,
-    "B": 1309.8,
-    "C": 817.5
-  };
-
-  function toNum(v){
-    var n = Number(v);
-    return Number.isFinite(n) ? n : NaN;
-  }
-  function detectNumericAttr(item, canon){
-    var names = FIELD_CANDIDATES[canon] || [];
-    for (var i=0;i<names.length;i++){
-      var k = names[i];
-      if (item != null && Object.prototype.hasOwnProperty.call(item, k)){
-        var val = item[k];
-        var num = toNum(val);
-        if (Number.isFinite(num)) return num;
-        // sometimes string like "2,345" -> parse
-        if (typeof val === 'string'){
-          var s = val.replace(/[, ]+/g,'').trim();
-          var n2 = Number(s);
-          if (Number.isFinite(n2)) return n2;
-        }
-      }
-    }
-    return NaN;
-  }
-
-  // Fallback mapping if only letter ranks exist (kept minimal)
-  var LETTER_BASE = { "SSS": 700, "SS": 600, "S": 500, "A": 400, "B": 300, "C": 200 };
-  function detectLetterBase(item, canon){
-    // look for per-style letter like item.simple_rank = 'S'
-    var letter = null;
-    var names = FIELD_CANDIDATES[canon] || [];
-    for (var i=0;i<names.length;i++){
-      var k = names[i] + "_rank";
-      if (item && Object.prototype.hasOwnProperty.call(item, k)){
-        letter = String(item[k]).toUpperCase().trim();
-        break;
-      }
-    }
-    if (!letter){
-      // generic fields
-      letter = (item && (item.rank || item.Rank)) ? String(item.rank || item.Rank).toUpperCase().trim() : '';
-    }
-    return LETTER_BASE[letter] || 0;
-  }
-
-  function getStageMainSub(stage){
-    if (!stage) return { mainKey:'', mainW:0, subKey:'', subW:0 };
-    // infer style labels
-    var mainLabel = stage.main || stage.main_style || stage.mainStyle || stage.primary || stage.primary_style;
-    var subLabel  = stage.sub  || stage.sub_style  || stage.subStyle  || stage.secondary || stage.secondary_style;
-    var mainKey = STYLE_CANON[ (mainLabel||'').toString().trim() ] || '';
-    var subKey  = STYLE_CANON[ (subLabel ||'').toString().trim() ] || '';
-
-    // read weights; default 1.33 / 1.00 when only labels exist
-    var mainW = stage.weight_main || stage.main_weight || stage.mainWeight || stage.weightMain || stage.weight1;
-    var subW  = stage.weight_sub  || stage.sub_weight  || stage.subWeight  || stage.weightSub  || stage.weight2;
-    if (!Number.isFinite(toNum(mainW)) && (mainKey || subKey)){ mainW = 1.33; }
-    if (!Number.isFinite(toNum(subW))  && (mainKey || subKey)){ subW = 1.00; }
-    mainW = toNum(mainW); subW = toNum(subW);
-    if (!Number.isFinite(mainW)) mainW = 0;
-    if (!Number.isFinite(subW))  subW = 0;
-
-    // Allow full style_weights override
-    if (stage.style_weights && typeof stage.style_weights === 'object'){
-      // pick top-2
-      var entries = Object.entries(stage.style_weights).filter(function(p){ return toNum(p[1])>0; }).sort(function(a,b){ return toNum(b[1]) - toNum(a[1]); });
-      if (entries[0]){ mainKey = entries[0][0]; mainW = toNum(entries[0][1]); }
-      if (entries[1]){ subKey  = entries[1][0]; subW  = toNum(entries[1][1]); }
-    }
-
-    return { mainKey, mainW, subKey, subW };
-  }
-
-  function detectGrade(item){
-    var g = null;
-    if (item){
-      g = item.grade || item.Grade || item.rank || item.Rank || item.rating || item.Rating || item.tier || item.level || item.등급;
-    }
-    g = (g==null ? '' : String(g)).toUpperCase().replace(/\s+/g,'');
-    return GRADE_OFFSET.hasOwnProperty(g) ? g : '';
-  }
-
-  // Override the scorer: ignore any prior normalization; compute from RAW numeric attributes if available
-  var PREV = window.scoreItemForStage; // keep for fallback but we won't use its normalization
-  window.scoreItemForStage = function(item, stage){
-    try{
-      var MS = getStageMainSub(stage);
-      var mainPts = Number.isFinite(detectNumericAttr(item, MS.mainKey)) ? detectNumericAttr(item, MS.mainKey) : detectLetterBase(item, MS.mainKey);
-      var subPts  = Number.isFinite(detectNumericAttr(item, MS.subKey )) ? detectNumericAttr(item, MS.subKey ) : detectLetterBase(item, MS.subKey );
-      var base = (mainPts * MS.mainW) + (subPts * MS.subW);
-
-      // Add grade offset
-      var g = detectGrade(item);
-      var add = GRADE_OFFSET[g] || 0;
-      return base + add;
-    }catch(e){
-      // Fallback to previous behavior if something goes wrong
-      try { return typeof PREV==='function' ? PREV(item, stage) : 0; } catch(ex){ return 0; }
-    }
-  };
-
-  // Re-render after patch to reflect new, larger scale
-  setTimeout(function(){
-    try{ if (typeof window.renderAll==='function') window.renderAll(); }catch(e){}
-  }, 30);
-})();
-</script>
-<!-- === PATCH v18: Per-attribute grade points (user-provided table) === -->
-<script>
-(function(){
-  if (window.__attrGradePointsPatchApplied) return;
-  window.__attrGradePointsPatchApplied = true;
-
-  // Your table: use EXACT values you provided
-  var GRADE_POINTS = {
-    "SSS": 3200,
-    "SS": 2612.7,
-    "S": 2089.35,
-    "A": 1690.65,
-    "B": 1309.8,
-    "C": 817.5
-  };
-
-  // Canonicalize style names
-  var STYLE_CANON = {
-    "화려":"flair","심플":"simple","우아":"elegant","활발":"lively","성숙":"mature",
-    "큐티":"cute","섹시":"sexy","청순":"pure","청량":"cool","따뜻":"warm",
-    "flair":"flair","simple":"simple","elegant":"elegant","lively":"lively","mature":"mature",
-    "cute":"cute","sexy":"sexy","pure":"pure","cool":"cool","warm":"warm"
-  };
-
-  // Detect main/sub + weights (same as v17)
-  function toNum(v){ var n=Number(v); return Number.isFinite(n)?n:NaN; }
-  function getStageMainSub(stage){
-    if (!stage) return { mainKey:'', mainW:0, subKey:'', subW:0 };
-    var mainLabel = stage.main || stage.main_style || stage.mainStyle || stage.primary || stage.primary_style;
-    var subLabel  = stage.sub  || stage.sub_style  || stage.subStyle  || stage.secondary || stage.secondary_style;
-    var mainKey = STYLE_CANON[ (mainLabel||'').toString().trim() ] || '';
-    var subKey  = STYLE_CANON[ (subLabel ||'').toString().trim() ] || '';
-    var mainW = stage.weight_main || stage.main_weight || stage.mainWeight || stage.weightMain || stage.weight1;
-    var subW  = stage.weight_sub  || stage.sub_weight  || stage.subWeight  || stage.weightSub  || stage.weight2;
-    if (!Number.isFinite(toNum(mainW)) && (mainKey || subKey)){ mainW = 1.33; }
-    if (!Number.isFinite(toNum(subW))  && (mainKey || subKey)){ subW = 1.00; }
-    mainW = toNum(mainW); subW = toNum(subW);
-    if (!Number.isFinite(mainW)) mainW = 0;
-    if (!Number.isFinite(subW))  subW = 0;
-    if (stage.style_weights && typeof stage.style_weights === 'object'){
-      var entries = Object.entries(stage.style_weights).filter(function(p){ return toNum(p[1])>0; }).sort(function(a,b){ return toNum(b[1]) - toNum(a[1]); });
-      if (entries[0]){ mainKey = entries[0][0]; mainW = toNum(entries[0][1]); }
-      if (entries[1]){ subKey  = entries[1][0]; subW  = toNum(entries[1][1]); }
-    }
-    return { mainKey, mainW, subKey, subW };
-  }
-
-  // Fetch attribute points for a given style from item:
-  // 1) If item has numeric points for that style, use them
-  // 2) Else if item has a LETTER grade for that style (e.g., simple: "S"), map via GRADE_POINTS
-  function getAttrPoints(item, canon){
-    if (!item || !canon) return 0;
-    // Check numeric forms first (common keys)
-    var numericKeys = [canon, canon+"_points", canon+"_point", canon+"_score", canon+"Points", canon+"Point", canon+"Score"];
-    for (var i=0;i<numericKeys.length;i++){
-      var k = numericKeys[i];
-      if (Object.prototype.hasOwnProperty.call(item, k)){
-        var v = item[k];
-        // allow "2,345" strings
-        if (typeof v === 'string'){
-          var s = v.replace(/[, ]+/g,'').trim();
-          var n = Number(s);
-          if (Number.isFinite(n)) return n;
-        }
-        var n2 = Number(v);
-        if (Number.isFinite(n2)) return n2;
-      }
-    }
-    // Also check Korean field directly (e.g., item["심플"] = "S")
-    var koKey = Object.keys(STYLE_CANON).find(function(k){ return STYLE_CANON[k] === canon && k.length <= 2; }); // e.g. "심플"
-    if (koKey && Object.prototype.hasOwnProperty.call(item, koKey)){
-      var val = String(item[koKey]).toUpperCase().replace(/\s+/g,'');
-      if (GRADE_POINTS.hasOwnProperty(val)) return GRADE_POINTS[val];
-    }
-    // Check letter at canonical key (e.g., item.simple = "S")
-    if (Object.prototype.hasOwnProperty.call(item, canon)){
-      var v2 = String(item[canon]).toUpperCase().replace(/\s+/g,'');
-      if (GRADE_POINTS.hasOwnProperty(v2)) return GRADE_POINTS[v2];
-    }
-    return 0;
-  }
-
-  // Override scorer to: base = mainPts*mainW + subPts*subW (no extra additive grade)
-  var PREV = window.scoreItemForStage;
-  window.scoreItemForStage = function(item, stage){
-    try{
-      var MS = getStageMainSub(stage);
-      var mainPts = getAttrPoints(item, MS.mainKey);
-      var subPts  = getAttrPoints(item, MS.subKey);
-      var base = (mainPts * MS.mainW) + (subPts * MS.subW);
-      return base;
-    }catch(e){
-      try { return typeof PREV==='function' ? PREV(item, stage) : 0; } catch(ex){ return 0; }
-    }
-  };
-
-  // Re-render to apply new formula
-  setTimeout(function(){ try{ if (typeof window.renderAll==='function') window.renderAll(); }catch(e){} }, 30);
-})();
-</script>
-<!-- === PATCH v19: Robust stage main/sub detection + safe fallback === -->
-<script>
-(function(){
-  if (window.__stageDetectKRPatchApplied) return;
-  window.__stageDetectKRPatchApplied = true;
-
-  var GRADE_POINTS = {
-    "SSS": 3200, "SS": 2612.7, "S": 2089.35, "A": 1690.65, "B": 1309.8, "C": 817.5
-  };
-
-  var STYLE_CANON = {
-    "화려":"flair","심플":"simple","우아":"elegant","활발":"lively","성숙":"mature",
-    "큐티":"cute","섹시":"sexy","청순":"pure","청량":"cool","따뜻":"warm",
-    "flair":"flair","simple":"simple","elegant":"elegant","lively":"lively","mature":"mature",
-    "cute":"cute","sexy":"sexy","pure":"pure","cool":"cool","warm":"warm"
-  };
-
-  function toNum(v){ var n = Number(v); return Number.isFinite(n)? n : NaN; }
-  function gp(val){
-    var s = String(val==null?'':val).toUpperCase().replace(/\s+/g,'');
-    return GRADE_POINTS.hasOwnProperty(s) ? GRADE_POINTS[s] : 0;
-  }
-
-  function getAttrPoints(item, canon){
-    if (!item || !canon) return 0;
-    // numeric priority
-    var numericKeys = [canon, canon+"_points", canon+"_point", canon+"_score", canon+"Points", canon+"Point", canon+"Score"];
-    for (var i=0;i<numericKeys.length;i++){
-      var k = numericKeys[i];
-      if (Object.prototype.hasOwnProperty.call(item, k)){
-        var v = item[k];
-        if (typeof v === 'string'){
-          var s = v.replace(/[, ]+/g,'').trim();
-          var n = Number(s);
-          if (Number.isFinite(n)) return n;
-        }
-        var n2 = Number(v);
-        if (Number.isFinite(n2)) return n2;
-      }
-    }
-    // letter at ko key (e.g., "심플": "S")
-    var koKey = Object.keys(STYLE_CANON).find(function(k){ return STYLE_CANON[k]===canon && k.length<=2; });
-    if (koKey && Object.prototype.hasOwnProperty.call(item, koKey)){
-      return gp(item[koKey]);
-    }
-    // letter at canonical key (e.g., simple: "S")
-    if (Object.prototype.hasOwnProperty.call(item, canon)){
-      return gp(item[canon]);
-    }
-    return 0;
-  }
-
-  // NEW: derive top-2 attrs from item itself (for fallback)
-  function top2AttrsFromItem(item){
-    var entries = Object.keys(STYLE_CANON).filter(function(k){ return STYLE_CANON[k]===k; /* dedupe by canonical set */ });
-    var canonList = ["flair","simple","elegant","lively","mature","cute","sexy","pure","cool","warm"];
-    var scored = [];
-    for (var i=0;i<canonList.length;i++){
-      var c = canonList[i];
-      var pts = getAttrPoints(item, c);
-      scored.push([c, pts]);
-    }
-    scored.sort(function(a,b){ return b[1]-a[1]; });
-    var m = scored[0] || ['simple',0];
-    var s = scored[1] || ['pure',0];
-    return { mainKey: m[0], subKey: s[0] };
-  }
-
-  // Replace getStageMainSub with a more robust version
-  (function(){
-    var OLD_SCORER = window.scoreItemForStage; // we'll wrap later
-    var PREV_getStageMainSub = window.getStageMainSub;
-
-    window.getStageMainSub = function(stage, item){
-      var mainLabel = null, subLabel = null, mainW = null, subW = null;
-
-      if (stage && typeof stage === 'object'){
-        // English
-        mainLabel = stage.main || stage.main_style || stage.mainStyle || stage.primary || stage.primary_style || mainLabel;
-        subLabel  = stage.sub  || stage.sub_style  || stage.subStyle  || stage.secondary || stage.secondary_style || subLabel;
-        mainW = stage.weight_main || stage.main_weight || stage.mainWeight || stage.weightMain || stage.weight1 || mainW;
-        subW  = stage.weight_sub  || stage.sub_weight  || stage.subWeight  || stage.weightSub  || stage.weight2  || subW;
-
-        // Korean
-        mainLabel = stage["메인"] || stage["메인속성"] || stage["주속성"] || stage["주"] || stage["주요"] || mainLabel;
-        subLabel  = stage["서브"] || stage["서브속성"] || stage["부속성"] || stage["부"] || stage["보조"] || subLabel;
-        mainW = stage["메인가중치"] || stage["메인가중"] || stage["메인_가중치"] || stage["주가중치"] || mainW;
-        subW  = stage["서브가중치"] || stage["서브가중"] || stage["서브_가중치"] || stage["부가중치"] || subW;
-
-        // Chinese hints (just in case)
-        mainLabel = stage["主"] || stage["主属性"] || mainLabel;
-        subLabel  = stage["副"] || stage["副属性"] || subLabel;
-        mainW = stage["主权重"] || mainW;
-        subW  = stage["副权重"] || subW;
-
-        // style_weights override
-        if (stage.style_weights && typeof stage.style_weights === 'object'){
-          var arr = Object.entries(stage.style_weights).filter(function(p){ return toNum(p[1])>0; }).sort(function(a,b){ return toNum(b[1])-toNum(a[1]); });
-          if (arr[0]){ mainLabel = arr[0][0]; mainW = toNum(arr[0][1]); }
-          if (arr[1]){ subLabel  = arr[1][0]; subW  = toNum(arr[1][1]); }
-        }
-      }
-
-      var mainKey = STYLE_CANON[(mainLabel||'').toString().trim()] || '';
-      var subKey  = STYLE_CANON[(subLabel ||'').toString().trim()] || '';
-
-      // Defaults if only labels exist
-      if (!Number.isFinite(toNum(mainW)) && (mainKey || subKey)) mainW = 1.33;
-      if (!Number.isFinite(toNum(subW))  && (mainKey || subKey)) subW  = 1.00;
-
-      // Fallback: if both missing, derive from item top2
-      if (!mainKey && !subKey && item){
-        var pair = top2AttrsFromItem(item);
-        mainKey = pair.mainKey;
-        subKey  = pair.subKey;
-        if (!Number.isFinite(toNum(mainW))) mainW = 1.33;
-        if (!Number.isFinite(toNum(subW)))  subW  = 1.00;
-      }
-
-      mainW = toNum(mainW); subW = toNum(subW);
-      if (!Number.isFinite(mainW)) mainW = 0;
-      if (!Number.isFinite(subW))  subW  = 0;
-
-      return { mainKey, mainW, subKey, subW };
-    };
-
-    // Now wrap the scorer from v18 to pass item into getStageMainSub
-    var BASE = window.scoreItemForStage || function(){ return 0; };
-    window.scoreItemForStage = function(item, stage){
-      try{
-        var MS = window.getStageMainSub(stage, item);
-        var mainPts = (function(){
-          return (function(it, c){ if (!c) return 0; return (function(){ // inline getAttrPoints
-            // Numeric or grade letter to your table
-            var numericKeys = [c, c+"_points", c+"_point", c+"_score", c+"Points", c+"Point", c+"Score"];
-            for (var i=0;i<numericKeys.length;i++){
-              var k = numericKeys[i];
-              if (Object.prototype.hasOwnProperty.call(it, k)){
-                var v = it[k];
-                if (typeof v === 'string'){
-                  var s = v.replace(/[, ]+/g,'').trim();
-                  var n = Number(s);
-                  if (Number.isFinite(n)) return n;
-                }
-                var n2 = Number(v);
-                if (Number.isFinite(n2)) return n2;
-              }
-            }
-            var koKey = Object.keys(STYLE_CANON).find(function(k){ return STYLE_CANON[k]===c && k.length<=2; });
-            if (koKey && Object.prototype.hasOwnProperty.call(it, koKey)){ return gp(it[koKey]); }
-            if (Object.prototype.hasOwnProperty.call(it, c)){ return gp(it[c]); }
-            return 0;
-          })(); })(item, MS.mainKey);
-        })();
-        var subPts = (function(){
-          return (function(it, c){ if (!c) return 0; return (function(){
-            var numericKeys = [c, c+"_points", c+"_point", c+"_score", c+"Points", c+"Point", c+"Score"];
-            for (var i=0;i<numericKeys.length;i++){
-              var k = numericKeys[i];
-              if (Object.prototype.hasOwnProperty.call(it, k)){
-                var v = it[k];
-                if (typeof v === 'string'){
-                  var s = v.replace(/[, ]+/g,'').trim();
-                  var n = Number(s);
-                  if (Number.isFinite(n)) return n;
-                }
-                var n2 = Number(v);
-                if (Number.isFinite(n2)) return n2;
-              }
-            }
-            var koKey = Object.keys(STYLE_CANON).find(function(k){ return STYLE_CANON[k]===c && k.length<=2; });
-            if (koKey && Object.prototype.hasOwnProperty.call(it, koKey)){ return gp(it[koKey]); }
-            if (Object.prototype.hasOwnProperty.call(it, c)){ return gp(it[c]); }
-            return 0;
-          })(); })(item, MS.subKey);
-        })();
-
-        var base = (mainPts * MS.mainW) + (subPts * MS.subW);
-        return base;
-      }catch(e){
-        try { return BASE(item, stage); } catch(ex){ return 0; }
-      }
-    };
-  })();
-
-  setTimeout(function(){ try{ if (typeof window.renderAll==='function') window.renderAll(); }catch(e){} }, 30);
-})();
-</script>
-<!-- === PATCH v20: Full vector scoring (sum over all styles) === -->
-<script>
-(function(){
-  if (window.__fullVectorScoringPatchApplied) return;
-  window.__fullVectorScoringPatchApplied = true;
-
-  // Canonical mapping
-  var STYLE_CANON = {
-    "화려":"flair","심플":"simple","우아":"elegant","활발":"lively","성숙":"mature",
-    "큐티":"cute","섹시":"sexy","청순":"pure","청량":"cool","따뜻":"warm",
-    "flair":"flair","simple":"simple","elegant":"elegant","lively":"lively","mature":"mature",
-    "cute":"cute","sexy":"sexy","pure":"pure","cool":"cool","warm":"warm"
-  };
-  var ALL_STYLES = ["flair","simple","elegant","lively","mature","cute","sexy","pure","cool","warm"];
-
-  // Grade -> points (your exact table)
-  var GRADE_POINTS = {
-    "SSS": 3200, "SS": 2612.7, "S": 2089.35, "A": 1690.65, "B": 1309.8, "C": 817.5
-  };
-
-  function toNum(v){
-    var n = Number(v);
-    return Number.isFinite(n) ? n : NaN;
-  }
-  function canonKey(k){
-    return STYLE_CANON[ (k||'').toString().trim() ] || '';
-  }
-
-  // Get stage weight for a canonical style, reading both Korean/English keys
-  function stageWeight(stage, canon){
-    if (!stage || !canon) return 0;
-    // direct canonical
-    if (Object.prototype.hasOwnProperty.call(stage, canon)){
-      var n = toNum(stage[canon]); if (Number.isFinite(n)) return n;
-    }
-    // try Korean key for this canon
-    var ko = null;
-    for (var k in STYLE_CANON){
-      if (STYLE_CANON[k] === canon && k.length <= 2){ ko = k; break; }
-    }
-    if (ko && Object.prototype.hasOwnProperty.call(stage, ko)){
-      var n2 = toNum(stage[ko]); if (Number.isFinite(n2)) return n2;
-    }
-    // style_weights container
-    if (stage.style_weights && typeof stage.style_weights === 'object'){
-      var v = stage.style_weights[canon];
-      var n3 = toNum(v); if (Number.isFinite(n3)) return n3;
-      if (ko && Object.prototype.hasOwnProperty.call(stage.style_weights, ko)){
-        var n4 = toNum(stage.style_weights[ko]); if (Number.isFinite(n4)) return n4;
-      }
-    }
-    return 0;
-  }
-
-  // Get item attribute points for a canonical style
-  function itemPoints(item, canon){
-    if (!item || !canon) return 0;
-    // numeric preferred
-    var numericKeys = [canon, canon+"_points", canon+"_point", canon+"_score", canon+"Points", canon+"Point", canon+"Score"];
-    for (var i=0;i<numericKeys.length;i++){
-      var key = numericKeys[i];
-      if (Object.prototype.hasOwnProperty.call(item, key)){
-        var v = item[key];
-        if (typeof v === 'string'){
-          var s = v.replace(/[, ]+/g,'').trim();
-          var n = Number(s);
-          if (Number.isFinite(n)) return n;
-        }
-        var n2 = Number(v);
-        if (Number.isFinite(n2)) return n2;
-      }
-    }
-    // Korean key letter (e.g., "심플": "S")
-    var ko = null;
-    for (var k in STYLE_CANON){ if (STYLE_CANON[k]===canon && k.length<=2){ ko=k; break; } }
-    if (ko && Object.prototype.hasOwnProperty.call(item, ko)){
-      var g = String(item[ko]).toUpperCase().replace(/\s+/g,'');
-      if (GRADE_POINTS.hasOwnProperty(g)) return GRADE_POINTS[g];
-    }
-    // Canonical key letter (e.g., simple: "S")
-    if (Object.prototype.hasOwnProperty.call(item, canon)){
-      var g2 = String(item[canon]).toUpperCase().replace(/\s+/g,'');
-      if (GRADE_POINTS.hasOwnProperty(g2)) return GRADE_POINTS[g2];
-    }
-    return 0;
-  }
-
-  // Override scorer: Σ over all styles
-  var PREV = window.scoreItemForStage;
-  window.scoreItemForStage = function(item, stage){
-    try{
-      var sum = 0;
-      for (var i=0;i<ALL_STYLES.length;i++){
-        var s = ALL_STYLES[i];
-        var w = stageWeight(stage, s);
-        if (!w) continue;
-        var p = itemPoints(item, s);
-        if (!p) continue;
-        sum += p * w;
-      }
-      return sum;
-    }catch(e){
-      try { return typeof PREV==='function' ? PREV(item, stage) : 0; } catch(ex){ return 0; }
-    }
-  };
-
-  // Re-render to apply new scoring
-  setTimeout(function(){ try{ if (typeof window.renderAll==='function') window.renderAll(); }catch(e){} }, 30);
-})();
-</script>
-<script>
+<!-- === PATCH v15: stage-aware recalc + score scaling === --><!-- === PATCH v16: grade-offset additive scoring === --><!-- === PATCH v17: RAW numeric attribute scoring + stage weights + grade offsets === --><!-- === PATCH v18: Per-attribute grade points (user-provided table) === --><!-- === PATCH v19: Robust stage main/sub detection + safe fallback === --><!-- === PATCH v20: Full vector scoring (sum over all styles) === --><script>
 /* === Owned status robust patch (fixed21) === */
 (function(){
   function normOwnedName(s){ return String(s||'').normalize('NFKC').toLowerCase().replace(/\s+/g,''); }
@@ -9049,479 +8280,12 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
 })();
 </script>
 
-<!-- === v19: Stage-strict scoring with STAR×GRADE multipliers (matches requested per-item scores) === -->
 <script>
-(function(){
-  if (window.__v19StageStrictApplied) return;
-  window.__v19StageStrictApplied = true;
-
-  // Tuned so that:
-  //  - 记者的衣橱·蓝 (2★, 상의) @ 1-2 ≈ 6,835.34
-  //  - 碎珠 (3★, 하의) @ 1-2 ≈ 4,551.91
-  const STAR_MULT = {1:1.12, 2:1.20, 3:1.27, 4:1.33, 5:1.40, 6:1.48};
-  const GRADE_OFFSET = 0.06; // multiplicative (+6%)
-
-  function num(v){ var n = Number(v); return Number.isFinite(n)? n : 0; }
-  function getStars(item){
-    var s = num(item && item.stars);
-    if (!s && item && typeof item.stars === 'string'){
-      var m = String(item.stars).match(/\d+/);
-      if (m) s = num(m[0]);
-    }
-    return s || 0;
-  }
-
-  // Prefer a clean, pre-scaled scorer if present (saved by earlier patches)
-  var CLEAN_BASE = (typeof window.__ORIG_scoreItemForStage === 'function')
-                   ? window.__ORIG_scoreItemForStage
-                   : (typeof window.scoreItemForStage === 'function' ? window.scoreItemForStage : function(){ return 0; });
-
-  // Final scorer: base(stage-strict) * (1+GRADE_OFFSET) * STAR_MULT
-  window.scoreItemForStage = function(item, stage){
-    try{
-      var base = num(CLEAN_BASE(item, stage));
-      var s = getStars(item);
-      var m = (STAR_MULT.hasOwnProperty(s) ? STAR_MULT[s] : 1.0);
-      return base * (1 + GRADE_OFFSET) * m;
-    }catch(e){
-      try{ return num(CLEAN_BASE(item, stage)); }catch(_){ return 0; }
-    }
-  };
-
-  // Trigger a rerender to show new scores
-  setTimeout(function(){ try{ if (typeof window.renderAll==='function') window.renderAll(); }catch(e){} }, 30);
-})();
-</script>
-
-<!-- === v19b: SAFE scorer (stage-strict 0 for others) + STAR × GRADE, no dependency on old functions === -->
-<script>
-(function(){
-  if (window.__v19bSafeScorerApplied) return;
-  window.__v19bSafeScorerApplied = true;
-
-  // ----- Tunables (match your observed numbers) -----
-  const STAR_MULT = {1:1.12, 2:1.20, 3:1.27, 4:1.33, 5:1.40, 6:1.48};
-  const GRADE_OFFSET = 0.06; // multiplicative +6%
-
-  // Attribute grade table (if item stores letters like "A", "S", etc.)
-  const GRADE_SCORES = {
-    "SS": 2612.7, "S": 2070.75, "A": 1690.65, "B": 1309.8, "C": 930.375
-  };
-
-  // Recognized attribute keys (superset; others ignored)
-  const ATTR_KEYS = [
-    "simple","cute","pure","warm","elegant",
-    "lively","cool","sexy","mature","flair","mature"
-  ];
-
-  // Part multipliers (Korean labels)
-  const PART_MULT = {
-    "원피스": 2.0,
-    "상의": 1.0,
-    "하의": 1.0,
-    "아우터": 0.8,
-    "헤어": 1.0,
-    "신발": 0.8,
-    "양말": 0.5,
-    "양말장식": 0.2,
-    "장식": 0.2
-  };
-
-  function num(v){ var n = Number(v); return Number.isFinite(n) ? n : 0; }
-
-  function valOf(attrVal){
-    if (attrVal == null) return 0;
-    if (typeof attrVal === "number") return attrVal;
-    // letter grade?
-    var s = String(attrVal).trim().toUpperCase();
-    if (GRADE_SCORES.hasOwnProperty(s)) return GRADE_SCORES[s];
-    // not a known grade, try numeric parse
-    var n = Number(s);
-    return Number.isFinite(n) ? n : 0;
-  }
-
-  function starMult(stars){
-    var s = num(stars);
-    return STAR_MULT.hasOwnProperty(s) ? STAR_MULT[s] : 1.0;
-  }
-
-  function partMult(part){
-    if (!part) return 1.0;
-    // direct match
-    if (PART_MULT.hasOwnProperty(part)) return PART_MULT[part];
-    // contains
-    for (var k in PART_MULT){
-      if (part.indexOf(k) !== -1) return PART_MULT[k];
-    }
-    return 1.0;
-  }
-
-  function getStageWeights(stage){
-    if (!stage || typeof stage !== "object") return {};
-    // support both {simple:1.33,...} and {weights:{...}}
-    if (stage.weights && typeof stage.weights === "object") return stage.weights;
-    return stage;
-  }
-
-  function baseStageStrictScore(item, stage){
-    var w = getStageWeights(stage);
-    var sum = 0;
-    for (var i=0;i<ATTR_KEYS.length;i++){
-      var key = ATTR_KEYS[i];
-      var weight = num(w[key]); // if undefined -> 0
-      if (!weight) continue;    // stage에 없는 속성은 바로 0점
-      var val = valOf(item && item[key]);
-      if (!val) continue;
-      sum += val * weight;
-    }
-    // multiply by part multiplier (원피스 2.0 등)
-    var pm = partMult(item && item.part);
-    return sum * pm;
-  }
-
-  // Final scorer = base(stage-strict) × (1+GRADE_OFFSET) × STAR_MULT
-  window.scoreItemForStage = function(item, stage){
-    try{
-      var base = baseStageStrictScore(item, stage) || 0;
-      var mult = (1 + GRADE_OFFSET) * starMult(item && item.stars);
-      return base * mult;
-    }catch(e){
-      return 0;
-    }
-  };
-
-  // Optional: trigger re-render if app exposes renderer
-  setTimeout(function(){
-    try{
-      if (typeof window.renderAll === 'function') window.renderAll();
-      else if (typeof window.render === 'function') window.render();
-    }catch(e){}
-  }, 30);
-})();
-</script>
-
-<!-- === v19c: Force [1-2] stage to use only {simple:1.33, cute:1, pure:1, warm:1, elegant:1} === -->
-<script>
-(function(){
-  if (window.__v19cStrict12Applied) return;
-  window.__v19cStrict12Applied = true;
-
-  // reuse scorer from v19b if present
-  var prevScorer = window.scoreItemForStage;
-
-  // canonical 1-2 weights
-  var W12 = { simple:1.33, cute:1.0, pure:1.0, warm:1.0, elegant:1.0 };
-
-  function looksLike12(stage){
-    // Accept various id/name formats containing "1-2" (dash or unicode hyphens)
-    var s = "";
-    try{
-      if (stage && typeof stage === "object"){
-        s = String(stage.stage_id || stage.name || stage.id || "");
-      } else {
-        s = String(stage || "");
-      }
-    }catch(e){}
-    s = s || "";
-    return /(^|\s|\[|\()1[\-－‑–—]2(\s|$|\]|\))/u.test(s);
-  }
-
-  window.scoreItemForStage = function(item, stage){
-    try{
-      if (looksLike12(stage)){
-        // Build a minimal stage object that has ONLY the 5 keys
-        var st = {weights: W12};
-        return prevScorer ? prevScorer(item, st) : 0;
-      } else {
-        return prevScorer ? prevScorer(item, stage) : 0;
-      }
-    }catch(e){
-      try{ return prevScorer ? prevScorer(item, stage) : 0; }catch(_){ return 0; }
-    }
-  };
-
-  setTimeout(function(){
-    try{
-      if (typeof window.renderAll==='function') window.renderAll();
-      else if (typeof window.render==='function') window.render();
-    }catch(e){}
-  }, 30);
-})();
-</script>
-
-<script>
-/* PAGINATION PATCH v2: force renderAll -> render so paging cannot be bypassed */
+/* renderAll → render 기초 연결 (체인 출발점) */
 (function(){
   try{
     window.renderAll = function(){ try{ if(typeof window.render==='function') window.render(); }catch(e){} };
   }catch(e){}
-})();
-</script>
-
-
-<!-- === PATCH: mine_items always zero (final wrapper) === -->
-<script>
-(function(){
-  if (window.__mineZeroFinalApplied) return;
-  window.__mineZeroFinalApplied = true;
-
-  function normMine(s){
-    try{
-      return String(s||'')
-        .normalize('NFKC')
-        .toLowerCase()
-        .replace(/\s+/g,'')
-        // common middle-dot variants
-        .replace(/[・‧·．\.]/g,'·');
-    }catch(e){
-      try{ return String(s||'').toLowerCase().replace(/\s+/g,''); }catch(_){ return ''; }
-    }
-  }
-
-  function isMined(item, stage){
-    try{
-      if (!stage || !Array.isArray(stage.mine_items) || !stage.mine_items.length) return false;
-      var nm = normMine(item && item.name);
-      if (!nm) return false;
-      // build/set cache per stage object
-      if (!stage.__mineNameSet){
-        try{
-          var set = new Set();
-          stage.mine_items.forEach(function(x){
-            var k = normMine(x);
-            if (k) set.add(k);
-          });
-          Object.defineProperty(stage, '__mineNameSet', {value:set, enumerable:false, configurable:true});
-        }catch(e){
-          stage.__mineNameSet = null;
-        }
-      }
-      if (stage.__mineNameSet && stage.__mineNameSet.has(nm)) return true;
-      // fallback direct includes (original behavior)
-      var raw = (item && item.name) ? String(item.name).trim() : '';
-      return stage.mine_items.includes(raw);
-    }catch(e){ return false; }
-  }
-
-  var prev = window.scoreItemForStage;
-  window.scoreItemForStage = function(item, stage){
-    try{
-      if (isMined(item, stage)) return 0;
-      return (typeof prev === 'function') ? prev(item, stage) : 0;
-    }catch(e){
-      try{ return (typeof prev === 'function') ? prev(item, stage) : 0; }catch(_){ return 0; }
-    }
-  };
-})();
-</script>
-<!-- === FINAL SCORING (ALL STAGES / ATTRIBUTE ITERATION / +FIREFLY) === -->
-<script>
-(function(){
-  'use strict';
-
-  const GRADE = {
-    "SSS":130,
-    "SS":115,
-    "S":100,
-    "A":85,
-    "B":70,
-    "C":55,
-    "D":40
-  };
-
-  const PART_MULT = {
-    "장식": 0.15,
-    "헤어": 0.9617,
-    "원피스": 3.832350,
-    "아우터": 0.373913,
-    "상의": 1.923561,
-    "하의": 1.911129,
-    "양말장식": 0.561508,
-    "양말": 0.619258,
-    "신발": 0.844369,
-    "뷰티": 0.223041,
-    "반딧불의 영혼": 0.306456
-  };
-
-  const PART_CN_TO_KO = [
-    [/^饰品|^飾品|^配饰|^配飾/i, "장식"],
-    [/^头发|^髮型|^发型/i, "헤어"],
-    [/^连衣裙|^連衣裙/i, "원피스"],
-    [/^外套/i, "아우터"],
-    [/^上衣/i, "상의"],
-    [/^下装|^下裝/i, "하의"],
-    [/^袜套|^襪套|^袜饰|^襪飾|^袜部件|^襪部件/i, "양말장식"],
-    [/^袜子|^襪子/i, "양말"],
-    [/^鞋子|^鞋/i, "신발"],
-    [/^妆容|^妝容|^美妆|^美妝|^彩妆|^彩妝/i, "뷰티"],
-    [/^萤火|^螢火/i, "반딧불의 영혼"]
-  ];
-
-  const STAT_CN_TO_EN = {
-    "华丽":"flair",
-    "簡約":"simple","简约":"simple",
-    "优雅":"elegant","優雅":"elegant",
-    "活泼":"lively","活潑":"lively",
-    "成熟":"mature",
-    "可爱":"cute","可愛":"cute",
-    "性感":"sexy",
-    "清纯":"pure","清純":"pure","清新":"pure",
-    "清凉":"cool","清涼":"cool",
-    "保暖":"warm"
-  };
-
-  const ATTRS = [
-    "simple","mature","elegant","sexy","cool",
-    "pure","cute","flair","lively","warm"
-  ];
-
-  function normVal(v){
-    if(v==null) return null;
-    const n = Number(v);
-    if(Number.isFinite(n)) return n;
-    const s = String(v).trim().toUpperCase();
-    return s || null;
-  }
-
-  function normalizeItem(item){
-    const out = Object.assign({}, item||{});
-    if(out.part!=null){
-      let p = String(out.part).trim();
-      for(const m of PART_CN_TO_KO){
-        if(m[0].test(p)){ p = m[1] + p.replace(m[0],''); break; }
-      }
-      out.part = p;
-    }
-    for(const cn in STAT_CN_TO_EN){
-      const en = STAT_CN_TO_EN[cn];
-      if(out[en]==null && out[cn]!=null) out[en]=normVal(out[cn]);
-    }
-    for(const k of ATTRS){ if(out[k]!=null) out[k]=normVal(out[k]); }
-    return out;
-  }
-
-  // ===== TAG HANDLING =====
-// 스테이지 tag_rules 전용 처리
-// - 형식: { name, tier, stacks }
-// - weight 개념 없음
-// - tier에 따라 배율 적용
-
-const TAG_TIER_MULT = {
-  "SSS": 0.08,
-  "SS":  0.06,
-  "S":   0.05,
-  "A":   0.04,
-  "B":   0.03,
-  "C":   0.02,
-  "D":   0.01
-};
-
-const TAG_ALIAS = {
-  "洛丽塔": "롤리타",
-  "欧式古典": "유럽고전",
-  "未来系": "미래계",
-  "童话系": "동화계",
-  "睡衣": "잠옷",
-  "动物系": "애니멀룩"
-};
-
-function normalizeTags(item){
-  const tags = Array.isArray(item.tags) ? item.tags : (item.tags ? [item.tags] : []);
-  const set = new Set();
-  for(const t of tags){
-    const s = String(t||"").trim();
-    if(!s) continue;
-    set.add(s);
-    if(TAG_ALIAS[s]) set.add(TAG_ALIAS[s]);
-  }
-  return set;
-}
-
-function applyStageTagRules(sum, item, stage){
-  const rules = Array.isArray(stage.tag_rules) ? stage.tag_rules : [];
-  if(rules.length === 0) return sum;
-
-  const tagSet = normalizeTags(item);
-
-  for(const r of rules){
-    if(!r) continue;
-    const name = String(r.name || "").trim();
-    if(!name || !tagSet.has(name)) continue;
-
-    const tier = String(r.tier || "C").toUpperCase();
-    const stacks = Number(r.stacks ?? 1) || 1;
-    const mult = TAG_TIER_MULT[tier] ?? 0;
-
-    sum *= (1 + mult * stacks);
-  }
-  return sum;
-}
-  }
-  return sum;
-}
-    return bonus;
-  }
-
-  window.scoreItemForStage = function(item, stage){
-    if(!item||!stage) return 0;
-    const it = normalizeItem(item);
-    const part = String(it.part||"");
-
-    const basePart =
-      part.startsWith("장식") ? "장식" :
-      part.startsWith("헤어") ? "헤어" :
-      part.startsWith("원피스") ? "원피스" :
-      part.startsWith("아우터") ? "아우터" :
-      part.startsWith("상의") ? "상의" :
-      part.startsWith("하의") ? "하의" :
-      part.startsWith("양말장식") ? "양말장식" :
-      part.startsWith("양말") ? "양말" :
-      part.startsWith("신발") ? "신발" :
-      part.startsWith("뷰티") ? "뷰티" :
-      (part.startsWith("반딧불") ? "반딧불의 영혼" : null);
-
-    if(!basePart) return 0;
-
-    let sum = 0;
-    for(const attr of ATTRS){
-      if(stage[attr]){
-        sum += (GRADE[it[attr]] || 0) * stage[attr];
-      }
-    }
-
-    sum += getFlatTagBonus(item);
-
-const star = Number(it.stars || it.star || 0);
-const starMult = STAR_MULT[star] ?? 1;
-return sum * PART_MULT[basePart] * starMult;
-  };
-})();
-</script>
-
-<script>
-(function(){
-  window.__SCORING_VERSION = "scoring_v20260125_231951";
-  function addBadge(){
-    try{
-      if(document.getElementById('__scoringVersionBadge')) return;
-      const d=document.createElement('div');
-      d.id='__scoringVersionBadge';
-      d.textContent='SCORING VERSION: scoring_v20260125_231951';
-      d.style.position='fixed';
-      d.style.bottom='8px';
-      d.style.right='8px';
-      d.style.zIndex='99999';
-      d.style.background='rgba(0,0,0,0.75)';
-      d.style.color='#fff';
-      d.style.font='12px/1.2 sans-serif';
-      d.style.padding='6px 8px';
-      d.style.borderRadius='8px';
-      d.style.pointerEvents='none';
-      document.body.appendChild(d);
-    }catch(e){}
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', addBadge);
-  else addBadge();
 })();
 </script>
 
@@ -9533,22 +8297,22 @@ return sum * PART_MULT[basePart] * starMult;
   // Grade -> numeric
   const GRADE = { SSS:130, SS:115, S:100, A:85, B:70, C:55, D:40 };
 
-  // Star multiplier (1~5)
-  const STAR_MULT = { 1:0.90, 2:0.93, 3:0.96, 4:0.98, 5:1.00 };
+  // Star multiplier (1~6)
+  const STAR_MULT = { 1:0.90, 2:0.93, 3:0.96, 4:0.98, 5:1.00, 6:1.03 };
 
   // Part multiplier (Korean part names)
   const PART_MULT = {
-    "원피스": 2.0,
-    "상의": 1.0,
-    "하의": 1.0,
-    "아우터": 0.8,
-    "헤어": 1.0,
-    "신발": 0.8,
-    "양말": 0.5,
-    "양말장식": 0.2,
-    "장식": 0.2,
-    "뷰티": 0.2,
-    "반딧불의 영혼": 0.2
+    "헤어": 0.998107,
+    "원피스": 3.832350,
+    "아우터": 0.373913,
+    "상의": 1.923561,
+    "하의": 1.911129,
+    "양말": 0.619258,
+    "양말장식": 0.561508,
+    "신발": 0.844369,
+    "장식": 0.15,
+    "뷰티": 0.223041,
+    "반딧불의 영혼": 0.306456
   };
 
   // Stage tag rules (additive): {name, tier, stacks}
@@ -9596,8 +8360,27 @@ return sum * PART_MULT[basePart] * starMult;
   }
 
   // The ONE scoring function used everywhere
+  // mine_items 정규화 (공백/중점 제거)
+  function normMine(s){
+    try{ return String(s||'').normalize('NFKC').toLowerCase().replace(/\s+/g,'').replace(/[・‧·．\.]/g,'·'); }
+    catch(e){ return String(s||'').toLowerCase().replace(/\s+/g,''); }
+  }
+  function isMined(item, stage){
+    if(!stage || !Array.isArray(stage.mine_items) || !stage.mine_items.length) return false;
+    const nm = normMine(item && item.name);
+    if(!nm) return false;
+    if(!stage.__mineNameSet){
+      const set = new Set();
+      stage.mine_items.forEach(x=>{ const k=normMine(x); if(k) set.add(k); });
+      Object.defineProperty(stage,'__mineNameSet',{value:set,enumerable:false,configurable:true});
+    }
+    if(stage.__mineNameSet && stage.__mineNameSet.has(nm)) return true;
+    return stage.mine_items.includes(String(item.name||'').trim());
+  }
+
   window.scoreItemForStage = function(item, stage){
     if(!item || !stage) return 0;
+    if(isMined(item, stage)) return 0;
 
     // Stage weights (english keys)
     const w = {
@@ -10579,6 +9362,7 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
 
   // Respond to iframe requests
   window.addEventListener('message', function(ev){
+    if (ev.origin !== location.origin && ev.origin !== 'null') return;
     const msg = ev && ev.data;
     if (!msg || typeof msg !== 'object') return;
     if (msg.type === 'ITEMSINFO_REQUEST_DATA'){
@@ -10756,77 +9540,6 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
 // Split-detail data alias
 window.itemDetails = window.itemDetails || {};
 window.ITEM_DETAILS = window.itemDetails;
-</script>
-
-
-<script>
-(function(){
-  function $(id){ return document.getElementById(id); }
-  window.addEventListener('message', function(ev){
-    var d = ev && ev.data;
-    if(!d || typeof d!=='object') return;
-      }
-  }, false);
-
-  // Also poll in case postMessage timing misses
-  function poll(){
-    setTimeout(poll, 300);
-  }
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(poll, 50); });
-})();
-</script>
-
-
-<script>
-/* __ITEMS_INDEX_BRIDGE__ : respond to sources_frame requesting minimal item index (file:// safe) */
-(function(){
-  function buildIndex(items){
-    try{
-      return (items||[]).map(function(it){
-        return { code: it.code, part: it.part, name: it.name, img: it.img };
-      });
-    }catch(e){ return []; }
-  }
-
-  function resolveItems(){
-    try{
-      if (typeof window.__resolveItems === 'function'){
-        var r = window.__resolveItems();
-        if (Array.isArray(r)) return r;
-      }
-    }catch(e){}
-    if (Array.isArray(window.items)) return window.items;
-    if (Array.isArray(window.ITEMS)) return window.ITEMS;
-    return null;
-  }
-
-  function send(toWin, reqId){
-    var items = resolveItems();
-    if (!items || !items.length){
-      // retry for up to ~4 seconds
-      var n=0;
-      var t=setInterval(function(){
-        n++;
-        var it = resolveItems();
-        if (it && it.length){
-          clearInterval(t);
-          try{ toWin.postMessage({ type:"ITEMS_INDEX", reqId:reqId, items: buildIndex(it) }, "*"); }catch(e){}
-        }
-        if (n>40){ clearInterval(t); }
-      }, 100);
-      return;
-    }
-    try{ toWin.postMessage({ type:"ITEMS_INDEX", reqId:reqId, items: buildIndex(items) }, "*"); }catch(e){}
-  }
-
-  window.addEventListener("message", function(ev){
-    var msg = ev && ev.data;
-    if (!msg) return;
-    if (msg.type === "REQUEST_ITEMS_INDEX"){
-      send(ev.source || window, msg.reqId || null);
-    }
-  }, false);
-})();
 </script>
 
 
