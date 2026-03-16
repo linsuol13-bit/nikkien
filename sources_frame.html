@@ -98,6 +98,7 @@
   <main class="main">
     <div class="toolbar toolbar-left">
       <span class="pill" id="activeLabel">전체</span>
+      <input id="sourceNameSearch" type="text" placeholder="이름 검색…" style="padding:6px 10px;border:1px solid #ddd;border-radius:10px;font-size:13px;width:160px"/>
       <span class="muted" id="statusText">아이템 데이터 요청중…</span>
     </div>
 
@@ -208,11 +209,16 @@
   let SOURCE_MAP_DATA = []; // from sources_data.html
   let active = "all";
 
+  // XSS 방지용 이스케이프 함수
+  function esc(s){
+    const d = document.createElement('div');
+    d.textContent = (s === null || s === undefined) ? '' : String(s);
+    return d.innerHTML;
+  }
+
   function normSourceMap(sm){
     if(!sm) return [];
-    // array form expected: [{part,code,sources:[...]}]
     if(Array.isArray(sm)) return sm.filter(x=>x && typeof x === "object");
-    // object form: {sourceId:[{part,code}...]} -> convert to array
     const out = [];
     for(const sid of Object.keys(sm)){
       const arr = Array.isArray(sm[sid]) ? sm[sid] : [sm[sid]];
@@ -223,7 +229,10 @@
     return out;
   }
 
-  function buildIndex(){
+  // buildIndex 캐싱 — ITEMS 변경 시에만 재빌드
+  let _indexCache = null;
+  function getIndex(){
+    if(_indexCache) return _indexCache;
     const byKey = Object.create(null);
     for(const it of ITEMS){
       const part = String(it.part||"");
@@ -231,7 +240,8 @@
       if(code === null || code === undefined) continue;
       byKey[part + "||" + code] = it;
     }
-    return byKey;
+    _indexCache = byKey;
+    return _indexCache;
   }
 
   function buildCounts(map, byKey){
@@ -271,7 +281,7 @@
 
   function renderSidebar(){
     const map = normSourceMap(SOURCE_MAP_DATA);
-    const byKey = buildIndex();
+    const byKey = getIndex();
     const counts = buildCounts(map, byKey);
 
     const uniq = new Set();
@@ -303,7 +313,8 @@
 
   function renderTable(){
     const map = normSourceMap(SOURCE_MAP_DATA);
-    const byKey = buildIndex();
+    const byKey = getIndex();
+    const q = (document.getElementById('sourceNameSearch')?.value || '').trim().toLowerCase();
 
     const wants = [];
     if(active === "all"){
@@ -318,10 +329,15 @@
       }
     }
 
-    const out = [];
+    let out = [];
     for(const w of wants){
       const it = byKey[String(w.part)+"||"+String(w.code)];
       if(it) out.push(it);
+    }
+
+    // 이름 검색 필터
+    if(q){
+      out = out.filter(it => String(it.name||'').toLowerCase().includes(q));
     }
 
     rows.innerHTML = "";
@@ -330,16 +346,29 @@
     const frag = document.createDocumentFragment();
     for(const it of out){
       const tr = document.createElement("tr");
-      const img = it.img ? String(it.img) : "";
-      const safeImg = img && !img.startsWith("data:") ? img : "";
-      tr.innerHTML = ""
-        + "<td>" + (safeImg ? "<img loading='lazy' decoding='async' fetchpriority='low' class='thumb' src='"+safeImg+"' alt=''>" : "") + "</td>"
-        + "<td>" + (it.code ?? "") + "</td>"
-        + "<td>" + (it.name ?? "") + "</td>"
-        + "<td>" + (it.part ?? "") + "</td>";
       tr.style.cursor = 'pointer';
       tr.title = '클릭하면 아이템 상세가 열려.';
       tr.addEventListener('click', ()=> openDetail(it));
+
+      // XSS 방지: DOM API로 셀 구성
+      const img = it.img ? String(it.img) : "";
+      const safeImg = img && !img.startsWith("data:") ? img : "";
+
+      const tdImg = document.createElement("td");
+      if(safeImg){
+        const imgEl = document.createElement("img");
+        imgEl.loading = 'lazy'; imgEl.decoding = 'async'; imgEl.fetchPriority = 'low';
+        imgEl.className = 'thumb'; imgEl.src = safeImg; imgEl.alt = '';
+        tdImg.appendChild(imgEl);
+      }
+      const tdCode = document.createElement("td");
+      tdCode.textContent = it.code ?? "";
+      const tdName = document.createElement("td");
+      tdName.textContent = it.name ?? "";
+      const tdPart = document.createElement("td");
+      tdPart.textContent = it.part ?? "";
+
+      tr.append(tdImg, tdCode, tdName, tdPart);
       frag.appendChild(tr);
     }
     rows.appendChild(frag);
@@ -352,7 +381,6 @@
     const part = it.part ?? it.category ?? '';
     if (code === '' || code === null || code === undefined) return;
 
-    // ✅ 통합 아이템 상세페이지
     const url = `item_detail.html?code=${encodeURIComponent(String(code))}&part=${encodeURIComponent(String(part||''))}`;
 
     const dlg = document.getElementById('detailDialog');
@@ -363,57 +391,47 @@
     if (typeof dlg.showModal === 'function') dlg.showModal();
   }
 
+  // dialog 닫힘/취소/backdrop 클릭 — 한 곳에서 통합 관리
   (function(){
     const dlg = document.getElementById('detailDialog');
     const frame = document.getElementById('detailFrame');
     if (!dlg || !frame) return;
-    dlg.addEventListener('close', ()=>{ frame.src = ''; });
-    dlg.addEventListener('cancel', ()=>{ frame.src = ''; });
+    const resetFrame = () => { frame.src = ''; };
+    dlg.addEventListener('close', resetFrame);
+    dlg.addEventListener('cancel', (e) => { e.preventDefault(); dlg.close(); });
+    dlg.addEventListener('click', (e) => { if(e.target === dlg) dlg.close(); });
   })();
 
-
+  // postMessage origin 검증 추가
   window.addEventListener("message", (ev)=>{
+    if (ev.origin !== location.origin && ev.origin !== 'null') return;
     const msg = ev && ev.data;
     if(!msg || typeof msg !== "object") return;
     if(msg.__splitData === true && msg.key === "source_map"){
       const arr = Array.isArray(msg.data) ? msg.data : [];
       SOURCE_MAP_DATA = arr.filter(x => x && typeof x === "object");
-      // source_map이 먼저 오든 items가 먼저 오든, 둘 다 들어오면 화면 갱신
       renderSidebar();
       renderTable();
       return;
     }
     if(msg.__splitData === true && msg.key === "items" && Array.isArray(msg.data)){
-      const arr = Array.isArray(msg.data) ? msg.data : [];
-      ITEMS = arr.filter(x => x && typeof x === "object");
+      ITEMS = msg.data.filter(x => x && typeof x === "object");
+      _indexCache = null; // 캐시 무효화
       statusText.textContent = ITEMS.length ? ("아이템 로드 완료: " + ITEMS.length + "개") : "아이템 데이터가 비어있어.";
       renderSidebar();
       renderTable();
     }
   });
 
-  try{
-    
-  }catch(e){}
-
   renderSidebar();
   renderTable();
+
+  // 이름 검색 실시간 필터
+  const searchInput = document.getElementById('sourceNameSearch');
+  if(searchInput){
+    searchInput.addEventListener('input', ()=> renderTable());
+  }
 })();
-
-  // ✅ dialog 빈 화면 클릭 시 닫기 (backdrop)
-  (function(){
-    const dlg = document.getElementById('detailDialog');
-    if(!dlg) return;
-    dlg.addEventListener('click', (e)=>{
-      if(e.target === dlg){
-        try{ dlg.close(); }catch(err){}
-      }
-    });
-    dlg.addEventListener('cancel', ()=>{
-      try{ dlg.close(); }catch(err){}
-    });
-  })();
-
 </script>
 </body>
 </html>

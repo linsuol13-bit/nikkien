@@ -62,6 +62,7 @@
   .materials{display:flex; flex-wrap:wrap; gap:12px;}
   .mat{width:62px; text-align:center;}
   .mat .mimg{width:56px; height:56px; border-radius:12px; border:1px solid var(--border); background:#fff; object-fit:cover;}
+  .matname{font-size:12px;margin-top:4px;color:#444;text-align:center;line-height:1.2;}
   .qty{margin-top:6px; font-size:12px; color:var(--muted);}
   .rowline{height:1px; background:var(--border); margin:0 16px;}
 
@@ -196,11 +197,12 @@
 
       function request(){
         try{
-          frame.contentWindow.postMessage({type:"GET_ITEM_DETAIL", code}, "*");
+          frame.contentWindow.postMessage({ type:"GET_ITEM_DETAIL", code, part }, "*");
         }catch(e){}
       }
 
       function onMsg(ev){
+        if(ev.origin !== location.origin && ev.origin !== 'null') return;
         const d = ev.data || {};
         if (d.type === "ITEM_DETAIL" && String(d.code) === code){
           if (done) return;
@@ -315,21 +317,33 @@
       `);
     }
 
-    // Reform / materials (도안 재료)
-    if (detail.reform && detail.reform.enabled){
-      const mats = Array.isArray(detail.reform.materials) ? detail.reform.materials : [];
-      const matsHtml = mats.length ? mats.map(m=>{
-        const img = esc(m.img || "");
-        const qty = esc(m.qty || "");
-        return `<div class="mat"><button class="matbtn" type="button" data-img="${img}"><img class="mimg" src="${img}" alt=""><div class="qty">× ${qty}</div></button></div>`;
-      }).join("") : `<div class="muted">재료 정보가 없어.</div>`;
-      sections.push(`
-        <div class="sec-title">도안 재료</div>
-        <div class="box box-plain">
-          <div class="materials">${matsHtml}</div>
-        </div>
-      `);
-    }
+    
+// Reform / materials (도안 재료)
+if (detail.reform && detail.reform.enabled){
+  const mats = Array.isArray(detail.reform.materials) ? detail.reform.materials : [];
+  const matsHtml = mats.length ? mats.map(m=>{
+    const img = esc(m.img || "");
+    const qty = esc(m.qty || "");
+    const codeVal = esc(m.code ?? m.itemCode ?? "");
+    // Always render placeholder; name will be hydrated after render (async-safe)
+    return `<div class="mat">
+      <button class="matbtn" type="button"
+              data-img="${img}"
+              ${codeVal ? ` data-code="${codeVal}"` : ``}
+              ${m.part ? ` data-part="${esc(m.part)}"` : ``}>
+        <img class="mimg" src="${img}" alt="">
+        <div class="matname" data-mimg="${img}" data-mcode="${codeVal}"></div>
+        <div class="qty">× ${qty}</div>
+      </button>
+    </div>`;
+  }).join("") : `<div class="muted">재료 정보가 없어.</div>`;
+  sections.push(`
+    <div class="sec-title">도안 재료</div>
+    <div class="box box-plain">
+      <div class="materials">${matsHtml}</div>
+    </div>
+  `);
+}
 
     // Dye
     if (detail.dye && detail.dye.enabled){
@@ -354,6 +368,9 @@
 
     elContent.className = "";
     elContent.innerHTML = sections.join("");
+
+    // Fill reform material names (async)
+    try{ __hydrateReformNames(); }catch(e){}
   }
 
   
@@ -365,7 +382,7 @@
         try{
           if (w && w.document){
             const fr = w.document.getElementById("itemsFrame");
-            if (fr && fr.contentWindow && fr.contentWindow.ITEMS) return fr.contentWindow.ITEMS;
+            if (fr && fr.contentWindow && (fr.contentWindow.ITEMS || fr.contentWindow.items)) return (fr.contentWindow.ITEMS || fr.contentWindow.items);
           }
         }catch(e){}
         if (!w || w === w.parent) break;
@@ -378,17 +395,17 @@
         try{
           if (o.document){
             const fr = o.document.getElementById("itemsFrame");
-            if (fr && fr.contentWindow && fr.contentWindow.ITEMS) return fr.contentWindow.ITEMS;
+            if (fr && fr.contentWindow && (fr.contentWindow.ITEMS || fr.contentWindow.items)) return (fr.contentWindow.ITEMS || fr.contentWindow.items);
           }
         }catch(e){}
         try{ if (o === o.parent) break; o = o.parent; }catch(e){ break; }
       }
 
       // Fallbacks (in case someone already mirrored ITEMS onto a parent)
-      try{ if (window.ITEMS) return window.ITEMS; }catch(e){}
-      try{ if (window.parent && window.parent.ITEMS) return window.parent.ITEMS; }catch(e){}
-      try{ if (window.top && window.top.ITEMS) return window.top.ITEMS; }catch(e){}
-      try{ if (window.opener && window.opener.ITEMS) return window.opener.ITEMS; }catch(e){}
+      try{ if (window.ITEMS || window.items) return (window.ITEMS || window.items); }catch(e){}
+      try{ if (window.parent && (window.parent.ITEMS || window.parent.items)) return (window.parent.ITEMS || window.parent.items); }catch(e){}
+      try{ if (window.top && (window.top.ITEMS || window.top.items)) return (window.top.ITEMS || window.top.items); }catch(e){}
+      try{ if (window.opener && (window.opener.ITEMS || window.opener.items)) return (window.opener.ITEMS || window.opener.items); }catch(e){}
       return null;
     }catch(e){
       return null;
@@ -396,7 +413,106 @@
   }
 
   
-  function requestTargetByImg(imgUrl){
+  
+
+// --- Resolve names for reform materials (async-safe) ---
+let __DETAILS_MAP = null;
+let __DETAILS_LOADING = false;
+let __DETAILS_WAITERS = [];
+
+function __ensureDetailsMap(cb){
+  try{
+    if (__DETAILS_MAP){ cb && cb(__DETAILS_MAP); return; }
+    if (cb) __DETAILS_WAITERS.push(cb);
+    if (__DETAILS_LOADING) return;
+    __DETAILS_LOADING = true;
+
+    const frame = document.createElement("iframe");
+    frame.style.display = "none";
+    frame.src = "./item_details_frame.html";
+    document.body.appendChild(frame);
+
+    frame.addEventListener("load", ()=>{
+      try{
+        __DETAILS_MAP = frame.contentWindow && frame.contentWindow.ITEM_DETAILS ? frame.contentWindow.ITEM_DETAILS : null;
+      }catch(e){ __DETAILS_MAP = null; }
+      __DETAILS_LOADING = false;
+      const ws = __DETAILS_WAITERS.slice(); __DETAILS_WAITERS = [];
+      ws.forEach(fn=>{ try{ fn(__DETAILS_MAP); }catch(e){} });
+    });
+  }catch(e){
+    __DETAILS_LOADING = false;
+    cb && cb(null);
+  }
+}
+
+function __getNameByCode(code){
+  const c = Number(code);
+  if (!Number.isFinite(c)) return "";
+  // 1) ITEM_DETAILS
+  try{
+    if (__DETAILS_MAP){
+      const d = __DETAILS_MAP[String(c)] || __DETAILS_MAP[c];
+      if (d && d.names){
+        return d.names.ko || d.names.zh || d.names.en || d.names.ja || "";
+      }
+    }
+  }catch(e){}
+  // 2) ITEMS list (fallback)
+  try{
+    const items = getParentItems();
+    if (items && Array.isArray(items)){
+      const it = items.find(x => Number(x.code ?? x.itemCode) === c);
+      if (it) return it.name || (it.names && (it.names.ko||it.names.zh||it.names.en||it.names.ja)) || "";
+    }
+  }catch(e){}
+  return "";
+}
+
+function __hydrateReformNames(){
+  const nodes = document.querySelectorAll(".matname[data-mimg]");
+  if (!nodes.length) return;
+
+  __ensureDetailsMap(()=>{}); // start loading early
+
+  nodes.forEach(node=>{
+    if (node.textContent && node.textContent.trim()) return;
+
+    const code = node.getAttribute("data-mcode");
+    let name = code ? __getNameByCode(code) : "";
+
+    if (name){
+      node.textContent = name;
+      return;
+    }
+
+    // Fallback: ask index relay (same path that makes click-navigation work)
+    const img = node.getAttribute("data-mimg") || "";
+    if (!img) return;
+
+    requestTargetByImg(img).then(t=>{
+        if (!t) return;
+        if (t.name && !(node.textContent && node.textContent.trim())) { node.textContent = String(t.name); }
+        if (!t.code) return;
+      // attach code/part onto the button so click navigation uses it too
+      try{
+        const btn = node.closest("button");
+        if (btn){
+          btn.setAttribute("data-code", String(t.code));
+          if (t.part) btn.setAttribute("data-part", String(t.part));
+        }
+        node.setAttribute("data-mcode", String(t.code));
+      }catch(e){}
+      // ensure details map then fill name
+      __ensureDetailsMap(()=>{
+        const nm = __getNameByCode(t.code);
+        if (nm) node.textContent = nm;
+      });
+    });
+  });
+}
+
+function requestTargetByImg(imgUrl){
     return new Promise((resolve) => {
       const reqId = "req_" + Math.random().toString(36).slice(2) + Date.now();
       let done = false;
@@ -404,6 +520,7 @@
         window.removeEventListener('message', onMsg);
       }
       function onMsg(ev){
+        if(ev.origin !== location.origin && ev.origin !== 'null') return;
         const m = ev.data || {};
         if (m.type === 'FIND_ITEM_BY_IMG_RESPONSE' && m.reqId === reqId){
           done = true;

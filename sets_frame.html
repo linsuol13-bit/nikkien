@@ -17,6 +17,17 @@
   .card{background:#fff;border:1px solid #eee;border-radius:16px;overflow:hidden;cursor:pointer;box-shadow:0 1px 0 rgba(0,0,0,.02)}
   .thumb{width:100%;height:220px;object-fit:cover;background:#fafafa;display:block}
   .card .meta{padding:10px 10px 12px 10px;display:flex;flex-direction:column;gap:6px}
+  /* 완성도 배지 */
+  .completion-bar-wrap{margin-top:4px}
+  .completion-bar-bg{height:5px;border-radius:999px;background:#f0f0f0;overflow:hidden}
+  .completion-bar-fill{height:100%;border-radius:999px;transition:width .3s}
+  .completion-text{font-size:11px;font-weight:700;margin-bottom:3px}
+  /* 아이템 보유 여부 */
+  .pitem.owned-yes{border-color:#bbf7d0;background:#f0fdf4}
+  .pitem.owned-no{border-color:#fecaca;background:#fff5f5}
+  .owned-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;margin-left:auto;flex-shrink:0}
+  .owned-badge.yes{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0}
+  .owned-badge.no{background:#fee2e2;color:#dc2626;border:1px solid #fecaca}
   .name{font-weight:800;font-size:14px;line-height:1.2}
   .sub{font-size:12px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .pillrow{display:flex;gap:6px;flex-wrap:wrap}
@@ -137,6 +148,7 @@
       <div class="dlgTitle">
         <div class="main" id="dlgMain">-</div>
         <div class="names" id="dlgNames"></div>
+        <div id="dlgCompletion" style="margin-top:6px;display:none"></div>
       </div>
       <button class="close" id="closeBtn" type="button">닫기</button>
     </div>
@@ -243,6 +255,18 @@
 
   let SETS = [];
   let ITEMS = [];
+  let OWNED_NAMES = new Set(); // 보유 의상 이름 목록
+
+  // 이름 정규화 (공백·특수문자 제거, 소문자)
+  function normName(s){ return String(s||'').replace(/[\s\-·・''`]/g,'').toLowerCase(); }
+  function isOwned(name){ return OWNED_NAMES.has(normName(name)); }
+
+  // 보유 목록 업데이트
+  function updateOwned(names){
+    OWNED_NAMES = new Set((names||[]).map(normName).filter(Boolean));
+    // 열려있는 세트 상세 새로고침
+    renderList();
+  }
   let BYKEY = Object.create(null);
 let BYCODE = Object.create(null);
 
@@ -388,6 +412,24 @@ function trim(s){ return norm(s).trim(); }
       card.className = "card";
       const img = trim(s.thumb) || (Array.isArray(s.images) && s.images[0]) || "";
       const sub = listSubName(s);
+
+      // 완성도 계산
+      const parts = Array.isArray(s.parts) ? s.parts : [];
+      let ownedCount = 0;
+      parts.forEach(p => {
+        const resolved = resolvePartAndItem(p.part, (p.code==null)?"":(p.code));
+        const name = trim(p.name) || trim(resolved.item && resolved.item.name) || "";
+        if(name && isOwned(name)) ownedCount++;
+      });
+      const total = parts.length;
+      const pct = total > 0 ? Math.round(ownedCount / total * 100) : 0;
+      const barColor = pct === 100 ? '#22c55e' : pct >= 50 ? '#f59e0b' : '#f43f5e';
+      const completionHtml = total > 0 ? `
+        <div class="completion-bar-wrap">
+          <div class="completion-text" style="color:${barColor}">${ownedCount}/${total} 보유 (${pct}%)</div>
+          <div class="completion-bar-bg"><div class="completion-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+        </div>` : '';
+
       card.innerHTML = `
         ${img ? `<img class="thumb" loading="lazy" decoding="async" src="${img}" alt="">` : `<div class="thumb"></div>`}
         <div class="meta">
@@ -397,6 +439,7 @@ function trim(s){ return norm(s).trim(); }
             ${Array.isArray(s.parts) ? `<span class="pill">부위 ${s.parts.length}</span>` : ``}
             ${Array.isArray(s.images) ? `<span class="pill">사진 ${s.images.length}</span>` : ``}
           </div>
+          ${completionHtml}
         </div>
       `;
       card.addEventListener("click", ()=>openSet(s));
@@ -478,6 +521,33 @@ function trim(s){ return norm(s).trim(); }
       const div = document.createElement("div");
       div.textContent = line;
       dlgNames.appendChild(div);
+    }
+
+    // 완성도 요약
+    const dlgCompletion = document.getElementById('dlgCompletion');
+    if(dlgCompletion){
+      const plist2 = Array.isArray(set.parts) ? set.parts : [];
+      let owned2 = 0;
+      plist2.forEach(p => {
+        const r = resolvePartAndItem(p.part, (p.code==null)?"":(p.code));
+        const n = trim(p.name) || trim(r.item && r.item.name) || "";
+        if(n && isOwned(n)) owned2++;
+      });
+      const tot2 = plist2.length;
+      const pct2 = tot2 > 0 ? Math.round(owned2/tot2*100) : 0;
+      const col2 = pct2===100 ? '#22c55e' : pct2>=50 ? '#f59e0b' : '#f43f5e';
+      if(tot2 > 0){
+        dlgCompletion.style.display = 'flex';
+        dlgCompletion.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:6px';
+        dlgCompletion.innerHTML = `
+          <div style="flex:1;height:6px;border-radius:999px;background:#f0f0f0;overflow:hidden">
+            <div style="height:100%;border-radius:999px;width:${pct2}%;background:${col2};transition:width .4s"></div>
+          </div>
+          <span style="font-size:12px;font-weight:800;color:${col2};white-space:nowrap">${owned2}/${tot2} 보유 (${pct2}%)</span>
+        `;
+      } else {
+        dlgCompletion.style.display = 'none';
+      }
     }
 
     // gallery
@@ -579,6 +649,27 @@ function trim(s){ return norm(s).trim(); }
     parts.innerHTML = "";
     const plist = Array.isArray(set.parts) ? set.parts : [];
     if(plist.length){
+
+      // 부위 표시 순서 정의
+      const PART_ORDER = [
+        "헤어","원피스","상의","하의","아우터","양말","양말장식","신발","뷰티","반딧불의 영혼",
+        "장식 - 머리 - 머리","장식 - 머리 - 베일","장식 - 머리 - 헤어핀","장식 - 머리 - 귀",
+        "장식 - 귀",
+        "장식 - 목 - 목도리","장식 - 목 - 목걸이",
+        "장식 - 손 - 팔찌(우)","장식 - 손 - 팔찌(좌)","장식 - 손 - 장갑",
+        "장식 - 소품 - 소품(우)","장식 - 소품 - 소품(좌)","장식 - 소품 - 양손",
+        "장식 - 허리",
+        "장식 - 특수 - 얼굴","장식 - 특수 - 가슴","장식 - 특수 - 문신",
+        "장식 - 특수 - 날개","장식 - 특수 - 꼬리",
+        "장식 - 특수 - 전경","장식 - 특수 - 배경",
+        "장식 - 특수 - 상단","장식 - 특수 - 하단","장식 - 특수 - 스킨",
+      ];
+      const partRank = (part) => {
+        const idx = PART_ORDER.indexOf(String(part||""));
+        return idx === -1 ? PART_ORDER.length : idx;
+      };
+      plist.sort((a, b) => partRank(a.part) - partRank(b.part));
+
       const frag = document.createDocumentFragment();
       for(const p of plist){
         const code = (p.code==null) ? "" : p.code;
@@ -591,7 +682,8 @@ function trim(s){ return norm(s).trim(); }
         const name = trim(p.name) || trim(fromItems && fromItems.name) || "-";
 
         const div = document.createElement("div");
-        div.className = "pitem";
+        const ownedFlag = name && name !== '-' ? isOwned(name) : null;
+        div.className = "pitem" + (ownedFlag === true ? " owned-yes" : ownedFlag === false ? " owned-no" : "");
         div.innerHTML = `
           ${img ? `<img class="pimg" src="${img}" alt="">` : `<div class="pimg"></div>`}
           <div class="pmeta">
@@ -599,6 +691,7 @@ function trim(s){ return norm(s).trim(); }
             <div class="ppart">${escapeHtml(part || "-")}</div>
             <div class="code">code: ${escapeHtml(String(code||"-"))}</div>
           </div>
+          ${ownedFlag !== null ? `<span class="owned-badge ${ownedFlag ? 'yes' : 'no'}">${ownedFlag ? '✓ 보유' : '✗ 미보유'}</span>` : ''}
         `;
         div.addEventListener("click", ()=>openItemDetail({part, code}));
         frag.appendChild(div);
@@ -785,6 +878,11 @@ function trim(s){ return norm(s).trim(); }
       buildItemIndex();
       // keep status if sets already loaded
       renderList();
+      return;
+    }
+
+    if(msg.type === 'SETS_OWNED_UPDATE' && Array.isArray(msg.owned)){
+      updateOwned(msg.owned);
       return;
     }
   });

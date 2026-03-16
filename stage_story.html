@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  stage_story.html — 스테이지 스토리 번역 데이터
+  =====================================================
+  이 파일에 데이터를 추가한 뒤,
+  build_story.py 또는 아래 방법으로 index.html에 반영하세요.
+
+  ★ 새 스테이지 추가 방법:
+  1. 이 파일에 <stage> 블록 추가
+  2. index.html 열기
+  3. "★★★ 스테이지 스토리 데이터 시작 ★★★" 찾기
+  4. window.STAGE_STORY = { ... } 부분에 새 데이터 추가
+
+  형식:
+  <stage id="제 N장 X-Y">
+    <title lang="kr">한국어 제목</title>
+    <title lang="en">English title</title>
+    <title lang="zh">中文标题</title>
+    <title lang="ja">日本語タイトル</title>
+
+    <line>
+      <speaker lang="kr">니키</speaker>
+      <text lang="kr">대사</text>
+      <speaker lang="en">Nikki</speaker>
+      <text lang="en">Line</text>
+      <speaker lang="zh">暖暖</speaker>
+      <text lang="zh">台词</text>
+      <speaker lang="ja">ニキ</speaker>
+      <text lang="ja">セリフ</text>
+    </line>
+  </stage>
+  =====================================================
+-->
+<stories>
+
+<!-- ==================== 제 1장 ==================== -->
+
+<stage id="제 1장 1-1">
+  <title lang="kr">헬스걸 에이미 (1)</title>
+  <title lang="en">Sporty Girl Amy (1)</title>
+  <title lang="zh">运动少女奥梦（1）</title>
+  <title lang="ja">スポーツ少女アウラ（1）</title>
+
+  <line>
+    <speaker lang="kr">니키</speaker>
+    <text lang="kr">여왕님이 사라져버렸어...... 대체 무슨 일인 걸까.</text>
+    <speaker lang="en">Nikki</speaker>
+    <text lang="en">The queen disappeared just like that, but I still don&apos;t understand…</text>
+    <speaker lang="zh">暖暖</speaker>
+    <text lang="zh">女王就这么消失了呀，可我还是听不懂……</text>
+    <speaker lang="ja">ニキ</speaker>
+    <text lang="ja">女王様、いなくなっちゃった･･…………一体どういうことなんだろう。</text>
+  </line>
+
+  <!-- 나머지 대사는 index.html 안에 직접 포함되어 있어요 -->
+</stage>
+
+<!-- 여기 아래에 계속 추가하세요 -->
+
+</stories>

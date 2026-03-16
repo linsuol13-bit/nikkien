@@ -30,6 +30,7 @@ body{margin:0;font-family:system-ui,AppleSDGothicNeo,sans-serif;background:#f7f7
   const setDesc = document.getElementById("setDesc");
 
   window.addEventListener("message", (ev)=>{
+    if(ev.origin !== location.origin && ev.origin !== 'null') return;
     if(ev.data && ev.data.__splitData && ev.data.key==="sets"){
       const set = ev.data.data[0];
       gallery.innerHTML="";

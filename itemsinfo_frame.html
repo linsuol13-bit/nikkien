@@ -28,7 +28,8 @@
   th,td{padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:left;font-size:13px}
   th{background:#fafafa;font-weight:700}
   .muted{color:#777;font-size:12px}
-  .empty{padding:20px;text-align:center;color:#666}
+  .badge-owned{font-size:11px;background:#eaffea;border:1px solid #cdeccc;border-radius:999px;padding:2px 7px;color:#1a6b1a;margin-left:4px;white-space:nowrap}
+  .itembtn.owned-only-on{background:#eaffea;border-color:#cdeccc}
 
 /* ===== 아이템 상세 팝업(dialog) ===== */
 .detailDialog{
@@ -90,12 +91,22 @@
   <main class="main">
     <div class="toolbar">
       <input id="q" type="text" placeholder="이름/태그 검색" />
+      <select id="starFilter">
+        <option value="">별★ 전체</option>
+        <option value="6">6★</option>
+        <option value="5">5★</option>
+        <option value="4">4★</option>
+        <option value="3">3★</option>
+        <option value="2">2★</option>
+        <option value="1">1★</option>
+      </select>
       <select id="sort">
         <option value="part_code" selected>부위→코드</option>
         <option value="code">코드순</option>
         <option value="name">이름순</option>
         <option value="stars">별순</option>
       </select>
+      <button id="ownedOnlyBtn" type="button" title="보유 아이템만 보기">보유만</button>
       <button id="clear">지우기</button>
     </div>
 
@@ -137,14 +148,19 @@
 
 <script>
 (function(){
-  const DETAIL_BASE = '.';
+  // XSS 방지용 이스케이프 함수
+  function esc(s){
+    const d = document.createElement('div');
+    d.textContent = (s === null || s === undefined) ? '' : String(s);
+    return d.innerHTML;
+  }
+
   function openDetail(it){
     if (!it) return;
     const code = it.code ?? it.itemCode ?? '';
     const part = it.part ?? '';
     if (code === '' || code === null || code === undefined) return;
 
-    // ✅ 통합 상세: item_detail.html 로 열기 (개별 1_헤어-1.html 파일 방식은 사용 안 함)
     const url = `item_detail.html?code=${encodeURIComponent(code)}&part=${encodeURIComponent(part)}`;
 
     const dlg = document.getElementById('detailDialog');
@@ -155,19 +171,19 @@
     if (typeof dlg.showModal === 'function'){
       dlg.showModal();
     }else{
-      // 구형 대체
       dlg.setAttribute('open','open');
     }
   }
 
-
-  // dialog 닫힐 때 iframe 초기화(메모리/스크롤 유지 방지)
+  // dialog 닫힐 때 iframe 초기화 + backdrop 클릭 닫기 (한 곳에서 통합 관리)
   (function(){
     const dlg = document.getElementById('detailDialog');
     const frame = document.getElementById('detailFrame');
     if (!dlg || !frame) return;
-    dlg.addEventListener('close', ()=>{ try{ frame.src=''; }catch(e){} });
-    dlg.addEventListener('cancel', ()=>{ try{ frame.src=''; }catch(e){} });
+    const resetFrame = () => { try{ frame.src=''; }catch(e){} };
+    dlg.addEventListener('close', resetFrame);
+    dlg.addEventListener('cancel', (e)=>{ e.preventDefault(); dlg.close(); });
+    dlg.addEventListener('click', (e)=>{ if(e.target === dlg) dlg.close(); });
   })();
 
   const PARTS = [
@@ -212,6 +228,8 @@
 
   let ITEMS = [];
   let active = 0;
+  let ownedOnly = false;
+  let OWNED_SET = new Set(); // 보유 이름 집합 (parent에서 수신)
   const PAGE_SIZE = 100;
   let page = 1;
 
@@ -267,11 +285,16 @@
   function getFiltered(){
     const q = $('q').value.trim().toLowerCase();
     const sort = $('sort').value;
+    const starF = $('starFilter').value;
 
     let list = ITEMS.slice();
     const p = PARTS[active];
     if (p && p.parts){
       list = list.filter(it => p.parts.includes(String(it.part||'')));
+    }
+
+    if (starF !== ''){
+      list = list.filter(it => Number(it.stars||0) === Number(starF));
     }
 
     if (q){
@@ -280,6 +303,10 @@
         const tags = normTags(it.tags).join(' ').toLowerCase();
         return name.includes(q) || tags.includes(q);
       });
+    }
+
+    if (ownedOnly){
+      list = list.filter(it => it._owned === true);
     }
 
     if (sort === 'stars'){
@@ -324,19 +351,35 @@
       const tr = document.createElement('tr');
       tr.classList.add('clickable');
       tr.addEventListener('click', ()=> openDetail(it));
+
+      // XSS 방지: innerHTML 대신 DOM API로 셀 구성
       const img = it.img ? String(it.img) : '';
       const safeImg = img && !img.startsWith('data:') ? img : '';
-      tr.innerHTML = `
-        <td>${safeImg ? `<img loading="lazy" decoding="async" fetchpriority="low" class="thumb" src="${safeImg}" alt="">` : ''}</td>
-        <td>${it.code ?? ''}</td>
-        <td>${(it.name ?? '')}</td>
-        <td>${it.stars ?? ''}</td>
-        <td>${it.part ?? ''}</td>
-      `;
-      const timg = tr.querySelector('.thumb');
-      if (timg){
-        timg.addEventListener('click', (e)=>{ e.stopPropagation(); openDetail(it); });
+
+      const tdImg = document.createElement('td');
+      if (safeImg){
+        const imgEl = document.createElement('img');
+        imgEl.loading = 'lazy'; imgEl.decoding = 'async'; imgEl.fetchPriority = 'low';
+        imgEl.className = 'thumb'; imgEl.src = safeImg; imgEl.alt = '';
+        imgEl.addEventListener('click', (e)=>{ e.stopPropagation(); openDetail(it); });
+        tdImg.appendChild(imgEl);
       }
+      const tdCode = document.createElement('td');
+      tdCode.textContent = it.code ?? '';
+      const tdName = document.createElement('td');
+      tdName.textContent = it.name ?? '';
+      if (it._owned){
+        const badge = document.createElement('span');
+        badge.className = 'badge-owned';
+        badge.textContent = '보유';
+        tdName.appendChild(badge);
+      }
+      const tdStars = document.createElement('td');
+      tdStars.textContent = it.stars ?? '';
+      const tdPart = document.createElement('td');
+      tdPart.textContent = it.part ?? '';
+
+      tr.append(tdImg, tdCode, tdName, tdStars, tdPart);
       frag.appendChild(tr);
     }
     rows.appendChild(frag);
@@ -349,63 +392,73 @@
 
     if (pager) pager.style.display = (total > PAGE_SIZE) ? 'flex' : 'none';
     if (info) info.textContent = total ? `${page}/${totalPages} 페이지 · ${total}개` : '';
-    if (prev){
-      prev.disabled = (page <= 1);
-      if (!prev.__bind){
-        prev.__bind = true;
-        prev.addEventListener('click', ()=>{ if (page > 1){ page--; render(); } });
-      }
-    }
-    if (next){
-      next.disabled = (page >= totalPages);
-      if (!next.__bind){
-        next.__bind = true;
-        next.addEventListener('click', ()=>{ if (page < totalPages){ page++; render(); } });
-      }
-    }
+    if (prev) prev.disabled = (page <= 1);
+    if (next) next.disabled = (page >= totalPages);
   }
 
   $('clear').addEventListener('click', ()=>{
     $('q').value = '';
     $('sort').value = 'part_code';
+    $('starFilter').value = '';
+    ownedOnly = false;
+    const ob = $('ownedOnlyBtn');
+    if(ob) ob.classList.remove('owned-only-on');
     active = 0;
     buildSidebar();
     render();
   });
   $('q').addEventListener('input', ()=>{ page = 1; render(); });
   $('sort').addEventListener('change', ()=>{ page = 1; render(); });
+  $('starFilter').addEventListener('change', ()=>{ page = 1; render(); });
 
-  // Message bridge
+  const ownedOnlyBtn = $('ownedOnlyBtn');
+  if(ownedOnlyBtn){
+    ownedOnlyBtn.addEventListener('click', ()=>{
+      ownedOnly = !ownedOnly;
+      ownedOnlyBtn.classList.toggle('owned-only-on', ownedOnly);
+      page = 1; render();
+    });
+  }
+
+  // Message bridge — origin 검증 추가
   window.addEventListener('message', (ev)=>{
+    if (ev.origin !== location.origin && ev.origin !== 'null') return;
     const msg = ev && ev.data;
     if (!msg || typeof msg !== 'object') return;
     if (msg.type === 'ITEMSINFO_DATA'){
       const arr = Array.isArray(msg.items) ? msg.items : [];
-      ITEMS = arr.filter(x => x && typeof x === 'object');
+      // owned 이름 셋 업데이트
+      if (Array.isArray(msg.ownedNames)){
+        OWNED_SET = new Set(msg.ownedNames.map(n => String(n||'').trim().toLowerCase()));
+      }
+      ITEMS = arr.filter(x => x && typeof x === 'object').map(it => ({
+        ...it,
+        _owned: OWNED_SET.size > 0
+          ? OWNED_SET.has(String(it.name||'').trim().toLowerCase())
+          : (it._owned === true)
+      }));
       page = 1;
       buildSidebar();
       render();
     }
+    // 보유 목록만 별도로 업데이트 (ownedInput 변경 시)
+    if (msg.type === 'ITEMSINFO_OWNED_UPDATE' && Array.isArray(msg.ownedNames)){
+      OWNED_SET = new Set(msg.ownedNames.map(n => String(n||'').trim().toLowerCase()));
+      ITEMS = ITEMS.map(it => ({
+        ...it,
+        _owned: OWNED_SET.has(String(it.name||'').trim().toLowerCase())
+      }));
+      render();
+    }
   });
+
+  // 페이지네이션 리스너 — 초기화 시 한 번만 등록 (__bind 패턴 제거)
+  document.getElementById('prevPage').addEventListener('click', ()=>{ page--; render(); });
+  document.getElementById('nextPage').addEventListener('click', ()=>{ page++; render(); });
 
   // Request data on load
   window.parent && window.parent.postMessage({type:'ITEMSINFO_REQUEST_DATA'}, '*');
 })();
-
-  // ✅ dialog 빈 화면 클릭 시 닫기 (backdrop)
-  (function(){
-    const dlg = document.getElementById('detailDialog');
-    if(!dlg) return;
-    dlg.addEventListener('click', (e)=>{
-      if(e.target === dlg){
-        try{ dlg.close(); }catch(err){}
-      }
-    });
-    dlg.addEventListener('cancel', ()=>{
-      try{ dlg.close(); }catch(err){}
-    });
-  })();
-
 </script>
 </body>
 </html>
