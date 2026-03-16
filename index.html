@@ -439,6 +439,9 @@ body.dark .cmp-best{background:#14532d}
 .req-table{width:100%;border-collapse:collapse;font-size:13px}
 .req-table th,.req-table td{border:1px solid #f1c9c9;padding:6px 8px;text-align:left}
 .req-table th{background:#ffe3e3}
+
+body.dark .top-item-row{border-color:#3a1a28}
+body.dark .top-item-name{color:#f0e4ec}
 </style>
 <script>
 // Display helper: shorten hierarchical labels like "장식 - 머리 - 베일" -> "베일"
@@ -701,6 +704,7 @@ var stages = window.stages;
   <span style="font-size:12px;color:#888;white-space:nowrap">필요 스탯</span>
   <div id="styleStatChips" style="display:flex;gap:6px;flex-wrap:wrap"></div>
 </div>
+
 <section id="tips"></section><section id="skills"></section>
 <div id="reqUnownedBanner" style="display:none;margin:6px 20px;padding:10px 14px;background:#fff3f3;border:1px solid #ffc9c9;border-radius:10px;font-size:13px;color:#a30000;display:flex;align-items:center;gap:10px">
   <span style="font-size:16px">⚠</span>
@@ -1573,7 +1577,7 @@ function toThumb(u){
     var msg = ev.data;
     if (!msg || !msg.__splitData) return;
     if (msg.key==='items'){ window.items = __normalizeIncomingData('items', msg.data); window.ITEMS = window.items; got.items = true; try{ if(window._loading) window._loading.show(true);}catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){}; try{ if(typeof window.renderItemsInfoTab==='function') window.renderItemsInfoTab(); }catch(e){} }
-    if (msg.key==='stages'){ window.stages = __normalizeIncomingData('stages', msg.data); got.stages = true; try{ if(typeof __populateStages==='function') __populateStages(); }catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){} }
+    if (msg.key==='stages'){ window.stages = __normalizeIncomingData('stages', msg.data); window.__stagesDedup = null; got.stages = true; try{ if(typeof __populateStages==='function') __populateStages(); }catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){} }
     if (msg.key==='sets'){ window.sets = msg.data; got.sets = true; try{ if(typeof renderAll==='function') renderAll(); }catch(e){}; try{ if(typeof window.renderSetsTab==='function') window.renderSetsTab(); }catch(e){} }
     if (msg.key==='sources'){ window.sources = msg.data; got.sources = true; try{ if(typeof renderAll==='function') renderAll(); }catch(e){};  }
     maybeInit();
@@ -9455,7 +9459,8 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
     const stageSel = document.getElementById('stageSelect');
     if (!stageSel) return;
 
-    const all = window.__stagesDedup || ensureDedupStages();
+    const all = ensureDedupStages();
+    window.__stagesDedup = all;
     const g = groupSel ? groupSel.value : '';
     const q = search ? String(search.value||'').trim().toLowerCase() : '';
 
@@ -9488,7 +9493,8 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
     const groupSel = document.getElementById('stageGroupSelect');
     if (!groupSel) return;
 
-    const all = window.__stagesDedup || ensureDedupStages();
+    const all = ensureDedupStages();
+    window.__stagesDedup = all;
     const groups = new Set();
     all.forEach(s=> groups.add(stageCategory(s.stage_id)));
     const arr = Array.from(groups);
@@ -10704,3 +10710,7 @@ body.dark .sc-desc{color:#f0e4ec}
 })();
 </script>
 </body>
+(function(){
+  'use strict';
+
+
