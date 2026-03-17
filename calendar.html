@@ -40,6 +40,8 @@ select:focus{outline:none;border-color:var(--p2)}
 .cgrid>.cell:nth-child(7n+1) .dn{color:#e53935}
 .cgrid>.cell:nth-child(7n) .dn{color:#1976d2}
 .evrow{height:20px;margin-bottom:2px;display:flex;align-items:center;gap:0}
+.ev-flex{display:block}
+.ev-dots{display:none}
 .evbtn{height:18px;border:none;cursor:pointer;display:flex;align-items:center;overflow:hidden;flex:1;transition:opacity .12s;padding:0}
 .evbtn:hover{opacity:.8}
 .evbtn.s{border-radius:0;clip-path:polygon(0 0, calc(100% - 7px) 0, 100% 50%, calc(100% - 7px) 100%, 0 100%)}
@@ -132,6 +134,7 @@ select:focus{outline:none;border-color:var(--p2)}
 
   /* 이벤트 카드는 숨기고 점(dot)으로 대체 */
   .cell .ev-flex{display:none !important}
+  .ev-dots{display:flex !important}
 
   /* dot 컨테이너 */
   .ev-dots{display:flex;flex-wrap:wrap;gap:2px;margin-top:3px;padding:0 1px}
@@ -454,8 +457,20 @@ function renderCal(){
     
     
 
-    html+='<div class="cell'+(isToday?' td':'')+'"><span class="dn">'+d+'</span>'+evHtml+'</div>';
+    // 모바일용 dot 렌더
+    var dotHtml = '';
+    var dotEvs = cel.slice(0,5);
+    dotEvs.forEach(function(evDot){ dotHtml += '<span class="ev-dot" style="background:'+(evDot.color||'#f06292')+'"></span>'; });
+    if(cel.length>5) dotHtml += '<span class="ev-dot-more">+</span>';
+    var dotsWrap = dotHtml ? '<div class="ev-dots">'+dotHtml+'</div>' : '';
+
+    html+='<div class="cell'+(isToday?' td':'')+'" data-ds="'+ds+'">'
+      +'<span class="dn">'+d+'</span>'
+      +'<div class="ev-flex">'+evHtml+'</div>'
+      +dotsWrap
+      +'</div>';
   }
+
 
   var remain = (first+dim)%7===0?0:7-(first+dim)%7;
   for(var i=1;i<=remain;i++) html+='<div class="cell om"><span class="dn">'+i+'</span></div>';
@@ -506,7 +521,7 @@ function renderMobileDayPanel(ds, evs){
   list.innerHTML = evs.map(function(ev){
     var col = ev.color||'#f06292';
     var thumb = ev.img
-      ? '<img class="mdp-img" src="'+esc(ev.img)+'" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">'
+      ? '<img class="mdp-img" src="'+esc(ev.img)+'" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
         +'<div class="mdp-ph" style="display:none">🌸</div>'
       : '<div class="mdp-ph" style="background:'+col+'22">🌸</div>';
     var dateStr = fmt(ev.start)+(ev.start!==ev.end?' ~ '+fmt(ev.end):'');
