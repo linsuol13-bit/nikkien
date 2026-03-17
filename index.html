@@ -34,7 +34,7 @@ const PART_WEIGHTS = {
   window.__tagsFromItem = function(it){ return window.getItemTags(it); };
 })();
 </script>
-<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1, minimum-scale=0.5, maximum-scale=5, user-scalable=yes" name="viewport"/>
 <title>니키 점수계산</title>
 <style>
   ::-webkit-scrollbar{width:7px;height:7px}
@@ -333,25 +333,7 @@ tbody tr:hover{background:#fff5f8}
   .tab{padding:6px 8px;font-size:12px}
   #darkModeBtn{padding:5px 8px;font-size:12px}
   #controls{padding:8px 10px;gap:6px;top:auto;position:relative}
-  #controls .filter-row{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:6px;
-    flex-wrap:unset;
-  }
-  /* 스테이지 검색창은 전체 너비 */
-  #controls .filter-row label[for="stageSearchInput"],
-  #controls .filter-row #stageSearchInput{grid-column:1/-1}
-  /* 보유만 보기 + CSV 버튼은 같은 행에 나란히 */
-  #controls .filter-row .checkbox-inline{
-    display:flex;align-items:center;gap:6px;
-    background:var(--pk-5);border:1.5px solid var(--pk-border);
-    border-radius:10px;padding:6px 10px;font-size:13px;
-    cursor:pointer;width:100%;
-  }
-  #controls .filter-row #exportCsvBtn{font-size:12px;padding:6px 8px}
-  /* label 텍스트는 숨기고 select/input만 */
-  #controls .filter-row>label:not(.checkbox-inline):not([for]){display:none}
+  #controls .filter-row{flex-wrap:wrap;gap:4px}
   #list{padding:6px 10px;grid-template-columns:1fr}
   .card{padding:10px}
   #ownedBox{padding:0 10px 8px}
@@ -372,10 +354,6 @@ tbody tr:hover{background:#fff5f8}
   #list{grid-template-columns:1fr}
   select,input[type=text],button{font-size:13px;padding:6px}
   .tab{font-size:11px;padding:5px 7px}
-  #controls .filter-row{grid-template-columns:1fr 1fr}
-  #controls .filter-row #stageSearchInput,
-  #controls .filter-row #stageSelect{grid-column:1/-1}
-  #controls .filter-row #ownedOnly{width:18px;height:18px}
 }
 body.dark{background:#1a1018;color:#f0e4ec}
 body.dark nav.tabs,body.dark #controls,body.dark .card,body.dark .group,body.dark table,body.dark th{background:#27202a;border-color:#4a2d3a;color:#f0e4ec}
@@ -580,12 +558,15 @@ var stages = window.stages;
 <section id="controls">
 <div><label>
 <div class="filter-row">
-<select id="stageGroupSelect" title="스테이지 분류" aria-label="스테이지 분류"><option value="">📂 분류 전체</option></select>
-<input id="stageSearchInput" type="text" placeholder="🔍 스테이지 검색" style="grid-column:1/-1"/>
-<select id="stageSelect" title="하위 스테이지" aria-label="하위 스테이지" style="grid-column:1/-1"></select>
+<label for="stageGroupSelect">스테이지 분류</label>
+<select id="stageGroupSelect"><option value="">전체</option></select>
+<label for="stageSearchInput">검색</label>
+<input id="stageSearchInput" type="text" placeholder="하위 스테이지 검색"/>
+<label for="stageSelect">하위 스테이지</label>
+<select id="stageSelect"></select>
 <button id="stageFavBtn" type="button" title="즐겨찾기 추가/제거" style="padding:6px 10px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:16px">☆</button>
 <select id="stageFavSelect" style="display:none;min-width:160px;border-color:#f5c842"><option value="">⭐ 즐겨찾기</option></select>
-<select id="partFilter" title="부위 필터" aria-label="부위 필터"><option value="">👗 부위 전체</option>
+<label>부위 필터 (그룹)</label><select id="partFilter"><option value="">전체</option>
 <optgroup label="의상">
 <option value="헤어">헤어</option>
 <option value="원피스">원피스</option>
@@ -637,9 +618,9 @@ var stages = window.stages;
 <option value="특수">스킨</option>
 </optgroup>
 </select>
-<select id="sortBy" title="정렬" aria-label="정렬"><option value="score">📊 점수순</option><option value="name">🔤 이름순</option></select>
-<label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><span class="checkbox-inline"><input id="ownedOnly" type="checkbox"/> 보유만 보기</span></label>
-<button id="exportCsvBtn" type="button" title="현재 결과를 CSV로 저장">CSV</button>
+<label>정렬</label><select id="sortBy"><option value="score">점수순</option><option value="name">이름순</option></select>
+<label><span class="checkbox-inline"><input id="ownedOnly" type="checkbox"/> 보유만 보기</span></label>
+<button id="exportCsvBtn" type="button" title="현재 결과를 CSV로 저장">CSV 내보내기</button>
 </div>
 </label><div>
 </div></div>
@@ -766,7 +747,7 @@ var stages = window.stages;
 <section class="panel" id="panel-itemsinfo">
   <div style="padding:0; height: calc(100vh - 170px); min-height: 520px;">
     <iframe id="itemsInfoFrame" src="itemsinfo_frame.html"
-            style="width:100%; height:100%; border:0; background:transparent;"
+            style="width:100%; height:100%; border:0; background:transparent; touch-action:pan-x pan-y pinch-zoom;"
             loading="eager"></iframe>
   </div>
 </section>
@@ -775,7 +756,7 @@ var stages = window.stages;
   <!-- 세트정보: 아이템정보 탭처럼 '내부 스크롤(iframe)'로 고정 높이 -->
   <div style="padding:0; height: calc(100vh - 170px); min-height: 520px;">
     <iframe id="setsViewFrame" src="sets_frame.html"
-            style="width:100%; height:100%; border:0; background:transparent;"
+            style="width:100%; height:100%; border:0; background:transparent; touch-action:pan-x pan-y pinch-zoom;"
             loading="eager"></iframe>
   </div>
 </section>
@@ -1083,7 +1064,7 @@ body.dark .tl-act-btn:hover{background:#3f3f46}
 
 
 <section class="panel" id="panel-calendar">
-  <iframe id="calendarFrame" src="calendar.html" style="width:100%;height:80vh;border:none;display:block"></iframe>
+  <iframe id="calendarFrame" src="calendar.html" style="width:100%;height:80vh;border:none;display:block;touch-action:pan-x pan-y pinch-zoom;"></iframe>
 </section>
 
 <script>
@@ -12112,5 +12093,29 @@ document.addEventListener('DOMContentLoaded', function(){
   var setsTab = document.querySelector('[data-tab="sets"]');
   if(setsTab) setsTab.addEventListener('click', function(){ if(calBar) calBar.style.display='none'; });
 });
+</script>
+
+<script>
+/* 모바일 iframe 핀치줌 지원 */
+(function(){
+  function allowIframeZoom(){
+    document.querySelectorAll('iframe').forEach(function(f){
+      f.style.touchAction = 'pan-x pan-y pinch-zoom';
+    });
+  }
+  document.addEventListener('DOMContentLoaded', allowIframeZoom);
+  // iframe load 후에도 적용
+  document.querySelectorAll('iframe').forEach(function(f){
+    f.addEventListener('load', function(){
+      try{
+        var d = f.contentDocument || f.contentWindow.document;
+        var meta = d.querySelector('meta[name=viewport]');
+        if(meta){
+          meta.setAttribute('content','width=device-width,initial-scale=1,minimum-scale=0.5,maximum-scale=5,user-scalable=yes');
+        }
+      }catch(e){}
+    });
+  });
+})();
 </script>
 </body>
