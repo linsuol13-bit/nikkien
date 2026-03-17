@@ -103,6 +103,16 @@ select:focus{outline:none;border-color:var(--p2)}
 .cc{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .1s;display:inline-block}
 .cc:hover,.cc.on{transform:scale(1.25);border-color:#333}
 @media(max-width:600px){.cell{min-height:75px}.ev-name{display:none}.fr{grid-template-columns:1fr}}
+/* 라이트박스 */
+.lbox{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;cursor:zoom-out;opacity:0;transition:opacity .2s}
+.lbox.show{opacity:1}
+.lbox.h{display:none}
+.lbox img{max-width:100%;max-height:90vh;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.6);cursor:default;transform:scale(.92);transition:transform .2s}
+.lbox.show img{transform:scale(1)}
+.lbox-cls{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .13s}
+.lbox-cls:hover{background:rgba(255,255,255,.3)}
+.mimg{cursor:zoom-in}
+.mimg:hover{opacity:.88}
 </style>
 
 <div class="bar">
@@ -132,6 +142,12 @@ select:focus{outline:none;border-color:var(--p2)}
     <div class="cgrid" id="cgrid"></div>
   </div>
   <div class="lv" id="lv"><div id="litems"></div></div>
+</div>
+
+<!-- 라이트박스 -->
+<div class="lbox h" id="lbox" role="dialog" aria-modal="true" aria-label="이미지 크게 보기">
+  <button class="lbox-cls" id="lboxCls" aria-label="닫기">✕</button>
+  <img id="lboxImg" src="" alt="이벤트 이미지">
 </div>
 
 <!-- 상세 모달 -->
@@ -477,6 +493,33 @@ function delEv(id){if(!confirm('삭제할까요?'))return;EVENTS=EVENTS.filter(f
 
 function showCal(){document.getElementById('cv').classList.remove('off');document.getElementById('lv').classList.remove('on');document.getElementById('bCal').classList.add('on');document.getElementById('bList').classList.remove('on');}
 function showList(){document.getElementById('cv').classList.add('off');document.getElementById('lv').classList.add('on');document.getElementById('bList').classList.add('on');document.getElementById('bCal').classList.remove('on');renderList();}
+
+// 라이트박스
+(function(){
+  var lbox = document.getElementById('lbox');
+  var lboxImg = document.getElementById('lboxImg');
+  var lboxCls = document.getElementById('lboxCls');
+
+  function openLbox(src){
+    if(!src) return;
+    lboxImg.src = src;
+    lbox.classList.remove('h');
+    requestAnimationFrame(function(){ lbox.classList.add('show'); });
+  }
+  function closeLbox(){
+    lbox.classList.remove('show');
+    setTimeout(function(){ lbox.classList.add('h'); lboxImg.src=''; }, 200);
+  }
+
+  // 상세 모달 이미지 클릭
+  document.getElementById('dimg').addEventListener('click', function(){
+    if(this.src && this.style.display !== 'none') openLbox(this.src);
+  });
+
+  lboxCls.addEventListener('click', closeLbox);
+  lbox.addEventListener('click', function(e){ if(e.target === lbox) closeLbox(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && !lbox.classList.contains('h')) closeLbox(); });
+})();
 
 // 초기화
 renderCal();
