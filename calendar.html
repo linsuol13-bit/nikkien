@@ -102,7 +102,93 @@ select:focus{outline:none;border-color:var(--p2)}
 .cchips{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
 .cc{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .1s;display:inline-block}
 .cc:hover,.cc.on{transform:scale(1.25);border-color:#333}
-@media(max-width:600px){.cell{min-height:75px}.ev-name{display:none}.fr{grid-template-columns:1fr}}
+/* ===== 모바일 최적화 ===== */
+@media(max-width:600px){
+  /* 상단 바 2줄 정리 */
+  .bar{gap:6px;padding:7px 10px;flex-wrap:wrap}
+  .bar h2{font-size:13px;width:100%}
+  .mnav{flex:1}
+  .mlbl{font-size:12px;min-width:76px}
+  .addbtn{padding:5px 10px;font-size:11px}
+  .vtog button{padding:4px 8px;font-size:13px}
+  select{font-size:11px;padding:4px 20px 4px 6px}
+
+  /* 달력 전체 패딩 축소 */
+  .wrap{padding:6px 6px}
+
+  /* 요일 헤더 */
+  .chdr div{font-size:10px;padding:2px 0}
+
+  /* 셀: 날짜 숫자 + 이벤트 점(dot)만 표시 */
+  .cell{
+    min-height:52px;
+    padding:3px 2px;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  .cell.td{border-width:2px}
+  .dn{font-size:12px;width:22px;height:22px;font-weight:800}
+  .cell.td .dn{font-size:12px}
+
+  /* 이벤트 카드는 숨기고 점(dot)으로 대체 */
+  .cell .ev-flex{display:none !important}
+
+  /* dot 컨테이너 */
+  .ev-dots{display:flex;flex-wrap:wrap;gap:2px;margin-top:3px;padding:0 1px}
+  .ev-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+  .ev-dot-more{font-size:8px;color:var(--pm);line-height:1;align-self:center}
+
+  /* 모바일 선택된 날짜 이벤트 패널 */
+  #mobileDayPanel{
+    display:block;
+    background:#fff;
+    border:1.5px solid var(--pb);
+    border-radius:14px;
+    margin:6px 0 0 0;
+    overflow:hidden;
+  }
+  #mobileDayPanel.empty-panel{display:none}
+  .mdp-head{
+    padding:8px 12px;
+    background:linear-gradient(135deg,#fff5f8,#fce4ec);
+    border-bottom:1px solid var(--pb);
+    font-size:13px;font-weight:800;color:var(--p1);
+  }
+  .mdp-list{padding:8px}
+  .mdp-item{
+    display:flex;align-items:center;gap:10px;
+    padding:8px 10px;border-radius:10px;
+    border:1.5px solid var(--pb);background:#fff;
+    margin-bottom:6px;cursor:pointer;
+    transition:border-color .13s,box-shadow .13s;
+  }
+  .mdp-item:last-child{margin-bottom:0}
+  .mdp-item:hover{border-color:var(--p2);box-shadow:0 2px 8px rgba(233,30,140,.1)}
+  .mdp-color{width:8px;height:36px;border-radius:4px;flex-shrink:0}
+  .mdp-img{width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid var(--pb);flex-shrink:0}
+  .mdp-ph{width:44px;height:44px;border-radius:8px;background:var(--p4);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+  .mdp-info{flex:1;min-width:0}
+  .mdp-name{font-size:13px;font-weight:700;color:#2d1a22;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mdp-date{font-size:11px;color:var(--pm);margin-top:2px}
+  .mdp-empty{padding:16px;text-align:center;color:var(--pm);font-size:12px}
+
+  /* 폼 */
+  .fr{grid-template-columns:1fr}
+
+  /* 리스트 뷰 */
+  .litem{padding:8px 10px;gap:8px}
+  .lth,.lph{width:40px;height:40px}
+}
+
+@media(max-width:380px){
+  .dn{font-size:11px;width:18px;height:18px}
+  .cell{min-height:44px}
+}
+@media(max-width:600px){
+  .cell.sel{border-color:var(--p1);border-width:2px;background:var(--p5)}
+  .cell.sel .dn{background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff}
+}
+
 /* 라이트박스 */
 .lbox{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;cursor:zoom-out;opacity:0;transition:opacity .2s}
 .lbox.show{opacity:1}
@@ -140,6 +226,11 @@ select:focus{outline:none;border-color:var(--p2)}
   <div class="cv" id="cv">
     <div class="chdr"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
     <div class="cgrid" id="cgrid"></div>
+  </div>
+  <!-- 모바일: 선택된 날짜의 이벤트 패널 -->
+  <div id="mobileDayPanel" class="empty-panel">
+    <div class="mdp-head" id="mdpHead">날짜를 선택하세요</div>
+    <div class="mdp-list" id="mdpList"></div>
   </div>
   <div class="lv" id="lv"><div id="litems"></div></div>
 </div>
@@ -379,6 +470,62 @@ function renderCal(){
   grid.querySelectorAll('[data-id]').forEach(function(b){
     b.addEventListener('click',function(ev2){ ev2.stopPropagation(); openDetail(b.dataset.id); });
   });
+
+  // 모바일: 셀 클릭 → 하단 패널
+  grid.querySelectorAll('.cell:not(.om)').forEach(function(cell){
+    cell.addEventListener('click', function(e){
+      if(window.innerWidth > 600) return;
+      var ds = cell.dataset.ds;
+      if(!ds) return;
+      renderMobileDayPanel(ds, dem[ds]||[]);
+      // 선택 표시
+      grid.querySelectorAll('.cell').forEach(function(c){ c.classList.remove('sel'); });
+      cell.classList.add('sel');
+    });
+  });
+}
+
+function renderMobileDayPanel(ds, evs){
+  var panel = document.getElementById('mobileDayPanel');
+  var head  = document.getElementById('mdpHead');
+  var list  = document.getElementById('mdpList');
+  if(!panel||!head||!list) return;
+
+  var p = ds.split('-');
+  head.textContent = p[0]+'년 '+parseInt(p[1])+'월 '+parseInt(p[2])+'일';
+
+  if(!evs||!evs.length){
+    list.innerHTML = '<div class="mdp-empty">이 날은 이벤트가 없어요 🌸</div>';
+    panel.classList.add('empty-panel');
+    // 빈 날도 패널 보여줌 (날짜 확인용)
+    panel.classList.remove('empty-panel');
+    return;
+  }
+
+  panel.classList.remove('empty-panel');
+  list.innerHTML = evs.map(function(ev){
+    var col = ev.color||'#f06292';
+    var thumb = ev.img
+      ? '<img class="mdp-img" src="'+esc(ev.img)+'" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">'
+        +'<div class="mdp-ph" style="display:none">🌸</div>'
+      : '<div class="mdp-ph" style="background:'+col+'22">🌸</div>';
+    var dateStr = fmt(ev.start)+(ev.start!==ev.end?' ~ '+fmt(ev.end):'');
+    return '<div class="mdp-item" data-id="'+ev.id+'">'
+      +'<div class="mdp-color" style="background:'+col+'"></div>'
+      +thumb
+      +'<div class="mdp-info">'
+        +'<div class="mdp-name">'+esc(ev.name)+'</div>'
+        +'<div class="mdp-date">'+dateStr+'</div>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+
+  list.querySelectorAll('.mdp-item').forEach(function(item){
+    item.addEventListener('click', function(){ openDetail(item.dataset.id); });
+  });
+
+  // 패널로 스크롤
+  setTimeout(function(){ panel.scrollIntoView({behavior:'smooth', block:'nearest'}); }, 80);
 }
 
 function renderList(){
@@ -499,26 +646,12 @@ function showList(){document.getElementById('cv').classList.add('off');document.
   var lbox = document.getElementById('lbox');
   var lboxImg = document.getElementById('lboxImg');
   var lboxCls = document.getElementById('lboxCls');
-
-  function openLbox(src){
-    if(!src) return;
-    lboxImg.src = src;
-    lbox.classList.remove('h');
-    requestAnimationFrame(function(){ lbox.classList.add('show'); });
-  }
-  function closeLbox(){
-    lbox.classList.remove('show');
-    setTimeout(function(){ lbox.classList.add('h'); lboxImg.src=''; }, 200);
-  }
-
-  // 상세 모달 이미지 클릭
-  document.getElementById('dimg').addEventListener('click', function(){
-    if(this.src && this.style.display !== 'none') openLbox(this.src);
-  });
-
+  function openLbox(src){ if(!src) return; lboxImg.src=src; lbox.classList.remove('h'); requestAnimationFrame(function(){ lbox.classList.add('show'); }); }
+  function closeLbox(){ lbox.classList.remove('show'); setTimeout(function(){ lbox.classList.add('h'); lboxImg.src=''; },200); }
+  document.getElementById('dimg').addEventListener('click', function(){ if(this.src&&this.style.display!=='none') openLbox(this.src); });
   lboxCls.addEventListener('click', closeLbox);
-  lbox.addEventListener('click', function(e){ if(e.target === lbox) closeLbox(); });
-  document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && !lbox.classList.contains('h')) closeLbox(); });
+  lbox.addEventListener('click', function(e){ if(e.target===lbox) closeLbox(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape'&&!lbox.classList.contains('h')) closeLbox(); });
 })();
 
 // 초기화
