@@ -12098,4 +12098,15 @@ document.addEventListener('DOMContentLoaded', function(){
   if(setsTab) setsTab.addEventListener('click', function(){ if(calBar) calBar.style.display='none'; });
 });
 </script>
+
+<script>
+/* itemsinfo_frame 페이지 이동 시 해당 iframe 위치로 스크롤 */
+window.addEventListener('message', function(ev){
+  if(!ev.data || ev.data.type !== 'ITEMSINFO_SCROLL_TOP') return;
+  var frame = document.getElementById('itemsInfoFrame');
+  if(!frame) return;
+  var top = frame.getBoundingClientRect().top + window.pageYOffset - 10;
+  window.scrollTo({top: Math.max(0, top), behavior: 'smooth'});
+});
+</script>
 </body>

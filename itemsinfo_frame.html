@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=0.5, maximum-scale=5, user-scalable=yes"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>아이템 정보</title>
 <style>
   :root{--pk-1:#e91e8c;--pk-2:#f06292;--pk-3:#f48fb1;--pk-4:#fce4ec;--pk-5:#fff5f8;--pk-border:#f8bbd0;--pk-grad:linear-gradient(135deg,#e91e8c,#f06292);--pk-muted:#a06080;--pk-shadow:0 2px 12px rgba(233,30,140,.12);--pk-text:#2d1a22}
@@ -68,11 +68,11 @@
   .itembtn.group-btn .toggle-arrow{font-size:10px;margin-left:2px;transition:transform .2s}
   .itembtn.group-btn.open .toggle-arrow{display:inline-block;transform:rotate(90deg)}
   .itembtn.group-btn.open.active .toggle-arrow{color:rgba(255,255,255,.8)}
+
   /* ===== 모바일 최적화 ===== */
   @media(max-width:600px){
     .wrap{flex-direction:column;gap:8px;padding:8px}
-
-    /* 사이드바: 가로 스크롤 탭형 */
+    /* 사이드바 → 가로 스크롤 탭형 */
     .sidebar{width:100%;max-width:100%;position:static;border-radius:12px;overflow:hidden}
     .side-head{padding:8px 10px 6px}
     .list{display:flex;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;padding:6px;gap:5px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
@@ -80,37 +80,26 @@
     .itembtn{white-space:nowrap;flex-shrink:0;width:auto;padding:5px 10px;font-size:11px;border-radius:999px;border:1.5px solid var(--pk-border)}
     .itembtn .badge{display:none}
     .itembtn.sub-item{display:none}
-
     /* 툴바 */
     .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:6px;justify-content:unset}
     .toolbar input#q{grid-column:1/-1}
     .toolbar button{padding:7px 8px;font-size:12px}
-
-    /* 테이블: PC 리스트 유지, 별·부위 컬럼 숨김 */
-    .card{overflow-x:hidden}
-    table{min-width:0;width:100%;table-layout:fixed}
+    /* 테이블: PC 리스트 그대로, 별·부위만 숨김 */
+    .card{overflow-x:hidden !important;background:#fff !important;border:1.5px solid var(--pk-border) !important;box-shadow:var(--pk-shadow) !important}
+    table{min-width:0 !important;width:100% !important;table-layout:fixed !important}
     th,td{padding:6px 5px;font-size:12px;overflow:hidden}
-    /* 이미지 */
     th:nth-child(1),td:nth-child(1){width:46px}
     .thumb{width:40px;height:40px;border-radius:8px}
-    /* 코드 */
-    th:nth-child(2),td:nth-child(2){width:48px;font-size:11px;color:var(--pk-1);font-weight:700}
-    /* 이름 (남은 공간 전부) */
+    th:nth-child(2),td:nth-child(2){width:50px;font-size:11px;color:var(--pk-1);font-weight:700}
     th:nth-child(3),td:nth-child(3){width:auto}
     td:nth-child(3){white-space:normal;word-break:break-all;font-size:12px}
-    /* 별 숨김 */
-    th:nth-child(4),td:nth-child(4){display:none}
-    /* 부위 숨김 */
-    th:nth-child(5),td:nth-child(5){display:none}
-    /* + 버튼 */
+    th:nth-child(4),td:nth-child(4){display:none !important}
+    th:nth-child(5),td:nth-child(5){display:none !important}
     th:nth-child(6),td:nth-child(6){width:44px;text-align:center}
     .own-btn{width:34px;height:34px;font-size:20px}
     .own-btn.is-owned{font-size:16px}
-
-    #cardGrid{display:none!important}
     #pager{justify-content:center}
   }
-  @media(min-width:601px){#cardGrid{display:none!important}}
 </style>
 </head>
 <body>
@@ -166,8 +155,6 @@
       <button id="prevPage" type="button">이전</button>
       <button id="nextPage" type="button">다음</button>
     </div>
-    <!-- 모바일 카드 그리드 -->
-    <div id="cardGrid"></div>
     <div class="muted" style="padding:8px 2px">※ 이 탭은 스테이지/추천 필터와 완전히 분리되어 있어.</div>
 
     <!-- ✅ 아이템 상세 팝업: 새 창 없이 여기서만 뜸 -->
@@ -505,101 +492,6 @@ function getItemTags(it){
     if (info) info.textContent = total ? `${page}/${totalPages} 페이지 · ${total}개` : '';
     if (prev) prev.disabled = (page <= 1);
     if (next) next.disabled = (page >= totalPages);
-
-    // 모바일 카드 렌더
-    renderCards(view);
-  }
-
-  function toggleOwned(it, cardEl){
-    const name = String((window.NIKKI_SERVER==='jp' ? (it.name_jp||it.name) : (it.name||it.name_jp))||'').trim();
-    const key  = name.toLowerCase();
-    const nowOwned = !OWNED_SET.has(key);
-    if(nowOwned) OWNED_SET.add(key); else OWNED_SET.delete(key);
-    it._owned = nowOwned;
-    ITEMS = ITEMS.map(x=>({...x, _owned: window.NIKKI_SERVER==='jp' ? (x.name_jp ? OWNED_SET.has(String(x.name_jp||'').trim().toLowerCase()) : false) : OWNED_SET.has(String(x.name||'').trim().toLowerCase())}));
-    // 카드 버튼 갱신
-    if(cardEl){
-      const btn = cardEl.querySelector('.m-own-btn');
-      if(btn){
-        btn.className = 'm-own-btn' + (nowOwned ? ' is-owned' : '');
-        btn.textContent = nowOwned ? '✓' : '+';
-        btn.title = nowOwned ? '보유 해제' : '보유 추가';
-      }
-      const badge = cardEl.querySelector('.badge-owned');
-      if(nowOwned && !badge){ const b=document.createElement('span'); b.className='badge-owned'; b.style.cssText='margin-left:3px'; b.textContent='보유'; const nm=cardEl.querySelector('.m-card-name'); if(nm)nm.appendChild(b); }
-      else if(!nowOwned && badge){ badge.remove(); }
-    }
-    try{ window.parent.postMessage({type:'ITEMSINFO_OWNED_TOGGLE', name, owned: nowOwned}, '*'); }catch(e){}
-  }
-
-  function renderCards(view){
-    const grid = document.getElementById('cardGrid');
-    if(!grid) return;
-    grid.innerHTML = '';
-    if(!view || !view.length){ return; }
-    const frag = document.createDocumentFragment();
-    for(const it of view){
-      const card = document.createElement('div');
-      card.className = 'm-card';
-
-      // 이미지
-      const img = it.img ? String(it.img) : '';
-      if(img && !img.startsWith('data:')){
-        const imgEl = document.createElement('img');
-        imgEl.className = 'm-card-img';
-        imgEl.src = img; imgEl.alt = ''; imgEl.loading = 'lazy'; imgEl.decoding = 'async';
-        card.appendChild(imgEl);
-      } else {
-        const ph = document.createElement('div');
-        ph.className = 'm-card-img-ph';
-        ph.textContent = '👗';
-        card.appendChild(ph);
-      }
-
-      // 보유 버튼 (+/✓) - 이미지 위 오른쪽
-      const ownBtn = document.createElement('button');
-      ownBtn.className = 'm-own-btn' + (it._owned ? ' is-owned' : '');
-      ownBtn.textContent = it._owned ? '✓' : '+';
-      ownBtn.title = it._owned ? '보유 해제' : '보유 추가';
-      ownBtn.addEventListener('click', function(e){
-        e.stopPropagation();
-        toggleOwned(it, card);
-      });
-      card.appendChild(ownBtn);
-
-      // 카드 바디
-      const body = document.createElement('div');
-      body.className = 'm-card-body';
-      const nameEl = document.createElement('div');
-      nameEl.className = 'm-card-name';
-      nameEl.textContent = getItemName(it) || '';
-      if(it._owned){
-        const b=document.createElement('span'); b.className='badge-owned'; b.style.cssText='margin-left:3px'; b.textContent='보유'; nameEl.appendChild(b);
-      }
-      // 코드 번호 뱃지 (이미지 위 왼쪽 오버레이)
-      if(it.code != null && it.code !== ''){
-        const codeEl = document.createElement('div');
-        codeEl.className = 'm-card-code';
-        codeEl.textContent = '#' + it.code;
-        card.appendChild(codeEl);
-      }
-      // 카드 바디
-      const sub = document.createElement('div');
-      sub.className = 'm-card-sub';
-      const partEl = document.createElement('span');
-      partEl.textContent = it.part || '';
-      const starsEl = document.createElement('span');
-      starsEl.className = 'm-card-stars';
-      starsEl.textContent = it.stars ? '★'.repeat(Math.min(it.stars, 5)) : '';
-      sub.append(partEl, starsEl);
-      body.append(nameEl, sub);
-      card.appendChild(body);
-
-      // 카드 클릭 → 상세
-      card.addEventListener('click', ()=> openDetail(it));
-      frag.appendChild(card);
-    }
-    grid.appendChild(frag);
   }
 
   $('clear').addEventListener('click', ()=>{
@@ -676,8 +568,15 @@ function getItemTags(it){
   });
 
   // 페이지네이션 리스너 — 초기화 시 한 번만 등록 (__bind 패턴 제거)
-  document.getElementById('prevPage').addEventListener('click', ()=>{ page--; render(); });
-  document.getElementById('nextPage').addEventListener('click', ()=>{ page++; render(); });
+  function scrollToTop(){
+    // iframe 자체 스크롤
+    try{ window.scrollTo({top:0, behavior:'smooth'}); }catch(e){}
+    // 부모(index.html)에도 요청
+    try{ window.parent.postMessage({type:'ITEMSINFO_SCROLL_TOP'}, '*'); }catch(e){}
+  }
+
+  document.getElementById('prevPage').addEventListener('click', ()=>{ page--; render(); scrollToTop(); });
+  document.getElementById('nextPage').addEventListener('click', ()=>{ page++; render(); scrollToTop(); });
 
   // Request data on load
   window.parent && window.parent.postMessage({type:'ITEMSINFO_REQUEST_DATA'}, '*');
