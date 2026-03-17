@@ -6,17 +6,19 @@
 <!-- Injected: PART_WEIGHTS (user-defined) -->
 <script>
 const PART_WEIGHTS = {
-  "헤어": 0.998107,
-  "원피스": 3.832350,
-  "아우터": 0.373913,
-  "상의": 1.923561,
-  "하의": 1.911129,
-  "양말": 0.619258,
-  "양말장식": 0.561508,
-  "신발": 0.844369,
-  "장식": 0.15,
-  "뷰티": 0.223041,
-  "반딧불의 영혼": 0.306456
+  "헤어": 0.5,
+  "원피스": 2.0,
+  "아우터": 0.2,
+  "상의": 1.0,
+  "하의": 1.0,
+  "양말": 0.3,
+  "양말장식": 0.3,
+  "신발": 0.4,
+  "장식": 0.2,
+  "허리": 0.2,
+  "특수": 0.2,
+  "뷰티": 0.1,
+  "반딧불의 영혼": 0.2
 };
 </script>
 <script>
@@ -25,7 +27,7 @@ const PART_WEIGHTS = {
   function ensureArray(x){ if(!x) return []; if(Array.isArray(x)) return x; return String(x).split(/[,\s#]+/).filter(Boolean); }
   window.parseTags = window.parseTags || function(str){ return ensureArray(str); };
   window.getItemTags = function(it){
-    try { return ensureArray((it && it.tags) ? it.tags : ''); }
+    try { return ensureArray((it && getItemTags(it)) ? getItemTags(it) : ''); }
     catch(e){ return []; }
   };
   // Back-compat: provide tgs helper if templates expect it
@@ -33,11 +35,13 @@ const PART_WEIGHTS = {
 })();
 </script>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta name="description" content="니키 스타일 대회 점수 계산기 — 아이템 점수·추천·세트정보·스테이지 번역을 한 곳에서"/>
-<meta property="og:title" content="니키 점수계산기"/>
-<meta property="og:description" content="니키 스타일 대회 점수 계산기 — 아이템 점수·추천·세트정보·스테이지 번역을 한 곳에서"/>
 <title>니키 점수계산</title>
 <style>
+  ::-webkit-scrollbar{width:7px;height:7px}
+  ::-webkit-scrollbar-track{background:var(--pk-5,#fff5f8);border-radius:999px}
+  ::-webkit-scrollbar-thumb{background:var(--pk-3,#f48fb1);border-radius:999px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--pk-2,#f06292)}
+  *{scrollbar-width:thin;scrollbar-color:var(--pk-3,#f48fb1) var(--pk-5,#fff5f8)}
 /* ── 핑크 테마 CSS 변수 ── */
 :root{
   --pk-1:#e91e8c;
@@ -299,7 +303,7 @@ tbody tr:hover{background:#fff5f8}
           var hasSet = (window.ownedNameSet instanceof Set) && (typeof window.normOwnedName === 'function');
           if (hasSet){
             list = list.filter(function(it){
-              var key = window.normOwnedName(it && it.name);
+              var key = window.normOwnedName(it && getItemName(it));
               return window.ownedNameSet.has(key);
             });
           } else {
@@ -315,9 +319,9 @@ tbody tr:hover{background:#fff5f8}
 </script>
 <style>
 .req-badge{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:6px;border:1px solid #ff9b9b;background:#ffecec;color:#d40000;font-weight:600;font-size:12px}
-.stat-card{background:#f7f7fb;border:1px solid #eee;border-radius:10px;padding:6px 12px;text-align:center;min-width:60px}
-.sc-lbl{font-size:11px;color:#888;margin-bottom:2px}
-.sc-num{font-size:18px;font-weight:700;color:#222}
+.stat-card{background:#fff;border:1.5px solid #f8bbd0;border-radius:12px;padding:6px 14px;text-align:center;min-width:64px;box-shadow:0 2px 8px rgba(233,30,140,.07)}
+.sc-lbl{font-size:11px;color:#a06080;font-weight:600;margin-bottom:2px}
+.sc-num{font-size:18px;font-weight:800;color:#e91e8c;line-height:1.1}
 .card.req-unowned{border:1.5px solid #ff9b9b !important;background:#fff8f8}
 .card.req-unowned .req-badge{background:#ff4444;color:#fff;border-color:#ff4444}
 .contrib-row{display:flex;align-items:center;gap:6px;font-size:12px;min-width:180px}
@@ -335,7 +339,7 @@ tbody tr:hover{background:#fff5f8}
   #ownedBox{padding:0 10px 8px}
   #ownedStatsBar{gap:6px}
   .stat-card{padding:4px 8px;min-width:50px}
-  .sc-num{font-size:15px}
+  .sc-num{font-size:18px;font-weight:800;color:#e91e8c;line-height:1.1}
   #ownedProgressWrap{min-width:80px}
   #partSummaryTable{min-width:0 !important;width:100%}
   #compareBar{padding:8px 10px}
@@ -361,8 +365,8 @@ body.dark td{border-color:#4a2d3a}
 body.dark .badge{background:#3a1a2a;border-color:#4a2d3a;color:#f48fb1}
 body.dark .badge.owned{background:#14532d;border-color:#166534;color:#bbf7d0}
 body.dark .stat-card{background:#27202a;border-color:#4a2d3a}
-body.dark .sc-num{color:#f0e4ec}
-body.dark .sc-lbl{color:#c0849c}
+body.dark .sc-num{font-size:18px;font-weight:800;color:#e91e8c;line-height:1.1}
+body.dark .sc-lbl{font-size:11px;color:#a06080;font-weight:600;margin-bottom:2px}
 body.dark #ownedProgressWrap>div:first-child{color:#c0849c}
 body.dark .muted{color:#c0849c}
 body.dark #darkModeBtn{background:#27202a;border-color:#4a2d3a;color:#f48fb1}
@@ -439,9 +443,6 @@ body.dark .cmp-best{background:#14532d}
 .req-table{width:100%;border-collapse:collapse;font-size:13px}
 .req-table th,.req-table td{border:1px solid #f1c9c9;padding:6px 8px;text-align:left}
 .req-table th{background:#ffe3e3}
-
-body.dark .top-item-row{border-color:#3a1a28}
-body.dark .top-item-name{color:#f0e4ec}
 </style>
 <script>
 // Display helper: shorten hierarchical labels like "장식 - 머리 - 베일" -> "베일"
@@ -476,7 +477,6 @@ try {
 <script>
 // Global aliases and safety
 window.items = window.items || [];
-window.ITEMS = window.items;
 window.stages = window.stages || [];
 window.sets = window.sets || [];
 window.sources = window.sources || [];
@@ -503,6 +503,8 @@ var stages = window.stages;
   <button class="tab" data-tab="sets">세트정보</button>
   <button class="tab" data-tab="quiz">퀴즈 이벤트</button>
   <button class="tab" data-tab="translate">스테이지 번역</button>
+  <button class="tab" data-tab="calendar">이벤트 달력</button>
+  <button id="serverToggleBtn" onclick="toggleServer()" style="margin-left:4px;padding:4px 10px;border-radius:20px;border:1.5px solid #f8bbd0;background:#fff;cursor:pointer;font-size:13px;font-weight:700;color:#e91e8c">🌎 북미</button>
   <button id="darkModeBtn" type="button" style="margin-left:auto;padding:6px 12px;border:1px solid #ddd;border-radius:10px;background:#fff;cursor:pointer;font-size:13px" title="다크모드 전환">🌙 다크</button>
   <button id="shortcutHelpBtn" type="button" title="단축키 도움말" style="padding:5px 11px;border-radius:999px;border:1.5px solid var(--pk-border,#f8bbd0);background:#fff;cursor:pointer;font-size:14px;font-weight:800;color:var(--pk-1,#e91e8c)">?</button>
 </nav>
@@ -630,16 +632,16 @@ var stages = window.stages;
 <div class="tag-bar" id="activeTags"></div>
 <section class="panel active" id="panel-calc">
 <section id="ownedBox">
-<span class="badge" id="ownedSummary" style="margin-left:8px">보유 0 / 전체 0</span>
-<div id="ownedStatsBar" style="display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 2px 0;align-items:center">
+<span class="badge" id="ownedSummary" style="margin-left:8px;background:#fce4ec;border:1.5px solid #f8bbd0;border-radius:999px;padding:3px 12px;font-size:12px;font-weight:700;color:#e91e8c">보유 0 / 전체 0</span>
+<div id="ownedStatsBar" style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 4px 0;align-items:center">
   <div class="stat-card" id="sc-owned"><div class="sc-lbl">보유</div><div class="sc-num" id="sc-owned-n">0</div></div>
   <div class="stat-card" id="sc-total"><div class="sc-lbl">전체</div><div class="sc-num" id="sc-total-n">0</div></div>
   <div class="stat-card" id="sc-pct"><div class="sc-lbl">보유율</div><div class="sc-num" id="sc-pct-n">0%</div></div>
   <div class="stat-card" id="sc-miss"><div class="sc-lbl">미보유</div><div class="sc-num" id="sc-miss-n">0</div></div>
-  <div id="ownedProgressWrap" style="flex:1;min-width:120px;max-width:260px">
+  <div id="ownedProgressWrap" style="flex:1;min-width:120px;max-width:260px" style="flex:1;min-width:120px;max-width:260px">
     <div style="font-size:11px;color:#888;margin-bottom:3px" id="progressLabel">0%</div>
-    <div style="height:8px;background:#eee;border-radius:999px;overflow:hidden">
-      <div id="ownedProgressBar" style="height:100%;width:0%;background:#4caf82;border-radius:999px;transition:width .4s"></div>
+    <div style="height:8px;background:#fce4ec;border-radius:999px;overflow:hidden">
+      <div id="ownedProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#e91e8c,#f06292);border-radius:999px;transition:width .4s"></div>
     </div>
   </div>
 </div>
@@ -704,7 +706,6 @@ var stages = window.stages;
   <span style="font-size:12px;color:#888;white-space:nowrap">필요 스탯</span>
   <div id="styleStatChips" style="display:flex;gap:6px;flex-wrap:wrap"></div>
 </div>
-
 <section id="tips"></section><section id="skills"></section>
 <div id="reqUnownedBanner" style="display:none;margin:6px 20px;padding:10px 14px;background:#fff3f3;border:1px solid #ffc9c9;border-radius:10px;font-size:13px;color:#a30000;display:flex;align-items:center;gap:10px">
   <span style="font-size:16px">⚠</span>
@@ -1061,6 +1062,11 @@ body.dark .tl-act-btn:hover{background:#3f3f46}
   </div>
 </section>
 
+
+<section class="panel" id="panel-calendar">
+  <iframe id="calendarFrame" src="calendar.html" style="width:100%;height:80vh;border:none;display:block"></iframe>
+</section>
+
 <script>
 (function(){
 'use strict';
@@ -1230,12 +1236,8 @@ function init(){
   doInit();
 }
 
-(function hookShow(attempts){
-  attempts = attempts || 0;
-  if(typeof window.showPanel !== 'function'){
-    if(attempts < 20){ setTimeout(function(){ hookShow(attempts+1); }, 300); }
-    return;
-  }
+(function hookShow(){
+  if(typeof window.showPanel !== 'function'){ setTimeout(hookShow, 300); return; }
   var orig = window.showPanel;
   window.showPanel = function(key){
     orig.apply(this, arguments);
@@ -1260,7 +1262,7 @@ document.addEventListener('click', function(ev){
     .replace(/[ \t\r\n._-]+/g,"")
     .replace(/[의와과]/g,"") // drop common particles
     .toLowerCase();
-  const key = (it)=> String(it.part||"").trim()+"@@"+normName(it.name);
+  const key = (it)=> String(it.part||"").trim()+"@@"+normName(getItemName(it));
   const best = new Map();
   const merge = (a,b)=>{
     const out = {...a};
@@ -1291,7 +1293,6 @@ document.addEventListener('click', function(ev){
   // Replace items with merged unique list
   const unique = Array.from(best.values());
   window.items = unique;
-  window.ITEMS = unique;
 })();
 </script>
 <!-- Owned items fix: parse/apply/save/load -->
@@ -1349,7 +1350,7 @@ const normName = (s)=> String(s||'').normalize('NFKC').toLowerCase().replace(/\s
     const out = [];
     let removed = 0;
     for(const it of window.ITEMS){
-      const key = norm(it && it.name);
+      const key = norm(it && getItemName(it));
       if(!key){ out.push(it); continue; }
       if(seen.has(key)){ removed++; continue; }
       seen.add(key);
@@ -1388,7 +1389,7 @@ const normName = (s)=> String(s||'').normalize('NFKC').toLowerCase().replace(/\s
     if(removed){
       const t = document.getElementById('toast'); 
       if(t){ t.textContent = `중복 제거: ${removed}개`; t.classList.add('show'); setTimeout(()=> t.classList.remove('show'), 1200); }
-
+      console.log('[dedup] removed', removed);
     }
   });
 })();
@@ -1525,7 +1526,7 @@ function toThumb(u){
   var got = {items:false, stages:false, sets:false};
   function maybeInit(){
     if (got.items && got.stages) {
-      if (!window.items) { window.items = []; window.ITEMS = []; }
+      if (!window.items) window.items = [];
       if (!window.stages) window.stages = [];
       if (typeof init === 'function') init();
       try{ if(window._loading) window._loading.show(false); }catch(e){}
@@ -1576,8 +1577,8 @@ function toThumb(u){
   window.addEventListener('message', function(ev){
     var msg = ev.data;
     if (!msg || !msg.__splitData) return;
-    if (msg.key==='items'){ window.items = __normalizeIncomingData('items', msg.data); window.ITEMS = window.items; got.items = true; try{ if(window._loading) window._loading.show(true);}catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){}; try{ if(typeof window.renderItemsInfoTab==='function') window.renderItemsInfoTab(); }catch(e){} }
-    if (msg.key==='stages'){ window.stages = __normalizeIncomingData('stages', msg.data); window.__stagesDedup = null; got.stages = true; try{ if(typeof __populateStages==='function') __populateStages(); }catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){} }
+    if (msg.key==='items'){ window.items = __normalizeIncomingData('items', msg.data); got.items = true; try{ if(window._loading) window._loading.show(true);}catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){}; try{ if(typeof window.renderItemsInfoTab==='function') window.renderItemsInfoTab(); }catch(e){} }
+    if (msg.key==='stages'){ window.stages = __normalizeIncomingData('stages', msg.data); got.stages = true; try{ if(typeof __populateStages==='function') __populateStages(); }catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){} }
     if (msg.key==='sets'){ window.sets = msg.data; got.sets = true; try{ if(typeof renderAll==='function') renderAll(); }catch(e){}; try{ if(typeof window.renderSetsTab==='function') window.renderSetsTab(); }catch(e){} }
     if (msg.key==='sources'){ window.sources = msg.data; got.sources = true; try{ if(typeof renderAll==='function') renderAll(); }catch(e){};  }
     maybeInit();
@@ -1607,7 +1608,7 @@ function toThumb(u){
     var items = (window.items || window.ITEMS || []);
     var itemByName = Object.create(null);
     for (var it of items){
-      var key = window.normOwnedName(it && it.name);
+      var key = window.normOwnedName(it && getItemName(it));
       if (key && !(key in itemByName)) itemByName[key] = it;
     }
     // totals
@@ -1712,7 +1713,7 @@ function toThumb(u){
     for (var it of items){
       var p = it && it.part || '(기타)';
       totals[p] = (totals[p]||0)+1;
-      var key = window.normOwnedName(it && it.name);
+      var key = window.normOwnedName(it && getItemName(it));
       if (key && !(key in byName)) byName[key] = it;
     }
     var input = document.getElementById('ownedInput');
@@ -1817,7 +1818,7 @@ function toThumb(u){
     for (var it of items){
       var p = it && it.part || '(기타)';
       totals[p] = (totals[p]||0)+1;
-      var key = window.normOwnedName(it && it.name);
+      var key = window.normOwnedName(it && getItemName(it));
       if (key && !(key in byName)) byName[key] = it;
     }
     var input = document.getElementById('ownedInput');
@@ -1902,7 +1903,7 @@ var ORDER_SOUL = ["반딧불의 영혼"];
       var it = items[i];
       var p = (it && it.part) || '';
       totals[p] = (totals[p]||0)+1;
-      var key = window.normOwnedName(it && it.name);
+      var key = window.normOwnedName(it && getItemName(it));
       if (key && !(key in byName)) byName[key] = it;
     }
     var ownedPer = Object.create(null);
@@ -1958,7 +1959,7 @@ var ORDER_SOUL = ["반딧불의 영혼"];
     var byName = Object.create(null);
     for (var i=0;i<items.length;i++){
       var it = items[i];
-      var key = window.normOwnedName(it && it.name);
+      var key = window.normOwnedName(it && getItemName(it));
       if (key && !(key in byName)) byName[key] = true;
     }
     var ta = document.getElementById('ownedInput');
@@ -2036,7 +2037,7 @@ var ORDER_SOUL = ["반딧불의 영혼"];
       var it = items[i];
       var p = (it && it.part) || '';
       totals[p] = (totals[p]||0)+1;
-      var key = window.normOwnedName(it && it.name);
+      var key = window.normOwnedName(it && getItemName(it));
       if (key && !(key in byName)) byName[key] = it;
     }
     var ownedPer = Object.create(null);
@@ -2161,7 +2162,7 @@ try{ relabelDecorations(); }catch(e){};
       var it = items[i];
       var p = (it && it.part) || '';
       totals[p] = (totals[p]||0)+1;
-      var key = window.normOwnedName(it && it.name);
+      var key = window.normOwnedName(it && getItemName(it));
       if (key && !(key in byName)) byName[key] = it;
     }
     var ownedPer = Object.create(null);
@@ -2271,7 +2272,7 @@ try{ relabelDecorations(); }catch(e){};
       var it = items[i];
       var p = (it && it.part) || '';
       totals[p] = (totals[p]||0)+1;
-      var key = window.normOwnedName(it && it.name);
+      var key = window.normOwnedName(it && getItemName(it));
       if (key && !(key in byName)) byName[key] = it;
     }
     var ownedPer = Object.create(null);
@@ -2408,7 +2409,7 @@ try{ relabelDecorations(); }catch(e){};
       var it = items[i]; if (!it) continue;
       var p = it.part || '';
       totals[p] = (totals[p]||0) + 1;
-      var key = window.normOwnedName(it.name);
+      var key = window.normOwnedName(getItemName(it));
       if (key && !(key in byName)) byName[key] = it;
     }
     var ownedPer = Object.create(null);
@@ -2550,7 +2551,7 @@ var ACC_OTHER    = ["반딧불의 영혼"];
       var it = items[i]; if (!it) continue;
       var p = it.part || '';
       totals[p] = (totals[p]||0) + 1;
-      var key = window.normOwnedName(it.name);
+      var key = window.normOwnedName(getItemName(it));
       if (key && !(key in byName)) byName[key] = it;
     }
     var ownedPer = Object.create(null);
@@ -3320,7 +3321,10 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
   try { if (typeof render === 'function') render(); } catch(e) { console.warn(e); }
 });
 </script>
-<!-- data iframes: itemsFrame/stagesFrame/setsFrame은 위(line ~458)에서 선언됨 -->
+<!-- data iframes (hidden) -->
+<iframe id="itemsFrame" src="./items.html" style="display:none;width:0;height:0;border:0;"></iframe>
+<iframe id="stagesFrame" src="./stages.html" style="display:none;width:0;height:0;border:0;"></iframe>
+<iframe id="setsFrame" src="sets_frame_fixed.html" style="display:none;width:0;height:0;border:0;"></iframe>
 <script>
 (function(){
   // Safe override of render() that avoids DOM reorders and freezes
@@ -3361,11 +3365,11 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       let list=(Array.isArray(window.items)?window.items:[]).map(it=> ({...it, part:it.part, score:scoreItemForStageSafe(it, stage)}));
       const part=document.getElementById('partFilter')?.value || '';
       if(part) list=list.filter(it=> it.part===part);
-      if(ownedOnly && window.ownedNameSet && window.normOwnedName) list=list.filter(it=> window.ownedNameSet.has(window.normOwnedName(it.name)));
+      if(ownedOnly && window.ownedNameSet && window.normOwnedName) list=list.filter(it=> window.ownedNameSet.has(window.normOwnedName(getItemName(it))));
 
       // required-first sorting (data-level)
       const __reqSet = getRequiredNameSetSafe();
-      list = list.map(it=> ({...it, __req: __reqSet.has(ownNorm(it.name||''))}));
+      list = list.map(it=> ({...it, __req: __reqSet.has(ownNorm(getItemName(it)||''))}));
       if(sortBy==='score') list.sort((a,b)=> (b.__req - a.__req) || (b.score-a.score));
       else list.sort((a,b)=> (b.__req - a.__req) || by('name')(a,b));
 
@@ -3375,12 +3379,12 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
 
       listEl.innerHTML = list.map(it=>{
         const stars=Math.max(0, Math.min(6, Number(it.stars||0)));
-        const tgs = (window.getItemTags?window.parseTags((it && it.tags) ? it.tags : ''):(window.parseTags?window.parseTags(it.tags):[]));
-        const img = it.img ? `<img class="thumb" src="${it.img}" alt="${it.name}">` : '';
+        const tgs = (window.getItemTags?window.parseTags((it && getItemTags(it)) ? getItemTags(it) : ''):(window.parseTags?window.parseTags(getItemTags(it)):[]));
+        const img = it.img ? `<img class="thumb" src="${it.img}" alt="${getItemName(it)}">` : '';
         return `<div class="card">
           <div class="row thumbrow">${img}<h3 style="margin:0;flex:1;display:flex;justify-content:space-between;align-items:center">
-            <span>${it.name||'-'}</span>
-            <button class="copy-btn" onclick="copyText('${(it.name||'').replace(/'/g, "\'")}')">이름 복사</button>
+            <span>${getItemName(it)||'-'}</span>
+            <button class="copy-btn" onclick="copyText('${(getItemName(it)||'').replace(/'/g, "\'")}')">이름 복사</button>
           </h3></div>
           <div class="badges"><span class="badge">${(typeof displayShort==='function'?displayShort(it.part):it.part)||'-'}</span><span class="badge">${stars}★</span>${it._owned?'<span class="badge owned">보유</span>':''}</div>
           <div class="badges tags">${tgs.map(x=>`<span class='badge tag'>#${x}</span>`).join('')}</div>
@@ -3461,10 +3465,10 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       let list = src.map(it=> ({...it, score:scoreSafe(it, stage)}));
       if(part) list = list.filter(it=> it.part===part);
       if(ownedOnly && window.ownedNameSet && window.normOwnedName){
-        list = list.filter(it=> window.ownedNameSet.has(window.normOwnedName(it.name)));
+        list = list.filter(it=> window.ownedNameSet.has(window.normOwnedName(getItemName(it))));
       }
 
-      list = list.map(it=> ({...it, __req: reqSet.has(ownNorm(it.name||''))}));
+      list = list.map(it=> ({...it, __req: reqSet.has(ownNorm(getItemName(it)||''))}));
       if(sortBy==='score') list.sort((a,b)=> (b.__req - a.__req) || (b.score-a.score));
       else list.sort((a,b)=> (b.__req - a.__req) || by('name')(a,b));
 
@@ -3475,13 +3479,13 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
 
       listEl.innerHTML = list.map(it=>{
         const stars = Math.max(0, Math.min(6, Number(it.stars||0)));
-        const tgs = (window.getItemTags?window.parseTags((it && it.tags) ? it.tags : ''):(window.parseTags?window.parseTags(it.tags):[]));
-        const img = it.img ? `<img class="thumb" src="${it.img}" alt="${it.name}">` : '';
+        const tgs = (window.getItemTags?window.parseTags((it && getItemTags(it)) ? getItemTags(it) : ''):(window.parseTags?window.parseTags(getItemTags(it)):[]));
+        const img = it.img ? `<img class="thumb" src="${it.img}" alt="${getItemName(it)}">` : '';
         const reqBadge = it.__req ? `<span class="req-badge">추천</span>` : '';
         return `<div class="card">
           <div class="row thumbrow">${img}<h3 style="margin:0;flex:1;display:flex;justify-content:space-between;align-items:center">
-            <span>${it.name||'-'}</span>
-            <button class="copy-btn" onclick="copyText('${(it.name||'').replace(/'/g, "\\'")}')">이름 복사</button>
+            <span>${getItemName(it)||'-'}</span>
+            <button class="copy-btn" onclick="copyText('${(getItemName(it)||'').replace(/'/g, "\\'")}')">이름 복사</button>
           </h3>${reqBadge}</div>
           <div class="badges"><span class="badge">${(typeof displayShort==='function'?displayShort(it.part):it.part)||'-'}</span><span class="badge">${stars}★</span>${it._owned?'<span class="badge owned">보유</span>':''}</div>
           <div class="badges tags">${tgs.map(x=>`<span class='badge tag'>#${x}</span>`).join('')}</div>
@@ -3519,7 +3523,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
   }
   window.getItemTags = function(it){
     try{
-      let raw = it.tags ?? it.tag ?? it["태그"] ?? "";
+      let raw = getItemTags(it) ?? it.tag ?? it["태그"] ?? "";
       let list = Array.isArray(raw) ? raw.map(norm) : split(raw);
       if(list.length===0){
         if(it.tag_list) list = Array.isArray(it.tag_list) ? it.tag_list : split(it.tag_list);
@@ -3581,7 +3585,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     });
     mo.observe(document.documentElement, {childList:true, subtree:true});
   }catch(e){}
-
+  console.log("[UI] Decoration labels shortened for display (e.g., '장식 - 손 - 장갑' → '장갑').");
 })();
 </script>
 <script>
@@ -3846,14 +3850,14 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     // Build map name->item for owned matching
     var byName = Object.create(null);
     for (var it of items){
-      var k = normName(it && it.name);
+      var k = normName(it && getItemName(it));
       if (k && !(k in byName)) byName[k] = it;
     }
     for (var it of items){
       var p = it && it.part || '';
       if (!stats[p]) continue;
       stats[p].total++;
-      if (ownedSet.has(normName(it.name))) stats[p].owned++;
+      if (ownedSet.has(normName(getItemName(it)))) stats[p].owned++;
     }
     return stats;
   }
@@ -3932,7 +3936,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       var p = it && it.part || '';
       if (!(p in stats)) continue;
       stats[p].total++;
-      if (owned.has(normName(it.name))) stats[p].owned++;
+      if (owned.has(normName(getItemName(it)))) stats[p].owned++;
     }
     return stats;
   }
@@ -4035,7 +4039,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       var it = items[i];
       var p = (it && it.part) || '';
       totals[p] = (totals[p]||0)+1;
-      var key = norm(it && it.name);
+      var key = norm(it && getItemName(it));
       if (key && !(key in byName)) byName[key] = it;
     }
     var ownedPer = Object.create(null);
@@ -4468,12 +4472,12 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
         // Tag filter
         if(window.tagsInclude && window.parseTags){
           list=list.filter(function(it){
-            return window.tagsInclude(window.parseTags(it.tags), selectedTags, mode);
+            return window.tagsInclude(window.parseTags(getItemTags(it)), selectedTags, mode);
           });
         }
         // Owned marker
         return list.map(function(it){
-          var owned = (window.ownedNameSet && window.normOwnedName) ? window.ownedNameSet.has(window.normOwnedName(it.name)) : false;
+          var owned = (window.ownedNameSet && window.normOwnedName) ? window.ownedNameSet.has(window.normOwnedName(getItemName(it))) : false;
           return Object.assign({}, it, {_owned: owned});
         });
       }catch(e){
@@ -4548,7 +4552,6 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
             var arr = (itf.contentWindow && itf.contentWindow.ITEMS) || [];
             if (Array.isArray(arr) && arr.length >= 0){
               window.items = arr;
-              window.ITEMS = arr;
               try{ $('itemCount').textContent = String(arr.length||0); }catch(_){}
               try{ if(typeof window.renderAll === 'function') window.renderAll(); }catch(_){}
             }
@@ -4621,7 +4624,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     var sortSel = $('sortBy'); var sortKey = sortSel ? sortSel.value : 'score';
     list = list.slice();
     if(sortKey === 'name'){
-      list.sort(function(a,b){ return String(a.name||'').localeCompare(String(b.name||''),'ko'); });
+      list.sort(function(a,b){ return String(getItemName(a)||'').localeCompare(String(getItemName(b)||''),'ko'); });
     }else{ // score
       list.sort(function(a,b){ return toNum(b.score)-toNum(a.score); });
     }
@@ -4632,10 +4635,10 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       var src = imgSrc(it);
       tds.push('<td class="imgcol">'+ (src?('<img class="thumb" alt="" src="'+ esc(src) +'">'):'') +'</td>');
       tds.push('<td>'+ esc(shortPart(it.part)) +'</td>');
-      tds.push('<td>'+ esc(it.name||'') +'</td>');
+      tds.push('<td>'+ esc(getItemName(it)||'') +'</td>');
       tds.push('<td class="num">'+ esc(it.stars||'') +'</td>');
       for(var i=0;i<attrs.length;i++){ var v = it[attrs[i]]||''; tds.push('<td>'+ esc(v) +'</td>'); }
-      tds.push('<td>'+ esc((it.tags||'').toString()) +'</td>');
+      tds.push('<td>'+ esc((getItemTags(it)||'').toString()) +'</td>');
       tds.push('<td class="num">'+ (typeof it.score!=='undefined'? esc(Number(toNum(it.score)).toFixed(3)) : '') +'</td>');
       return '<tr>'+ tds.join('') +'</tr>';
     }).join('');
@@ -4672,7 +4675,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       var rows = list.map(function(it){
         return '<tr>'
           + '<td class="imgcol">'+ (imgSrc(it)?('<img class="thumb sm" alt="" src="'+ esc(imgSrc(it)) +'">'):'') +'</td>'
-          + '<td>'+ esc(it.name||'') +'</td>'
+          + '<td>'+ esc(getItemName(it)||'') +'</td>'
           + '<td class="num">'+ esc(it.stars||'') +'</td>'
           + '<td class="num">'+ esc(Number(toNum(it.score)).toFixed(3)) +'</td>'
           + '</tr>';
@@ -4830,7 +4833,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     for(var i=0;i<items.length;i++){
       var it = items[i];
       if(String(it.part||'')!==String(part)) continue;
-      var key = normName(it.name);
+      var key = normName(getItemName(it));
       if(key && !(key in map)) map[key] = it;
     }
     var updated = 0, missing = [];
@@ -4933,7 +4936,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       var sortSel = $('sortBy'); var sortKey = sortSel ? sortSel.value : 'score';
       list = list.slice();
       if(sortKey === 'name'){
-        list.sort(function(a,b){ return String(a.name||'').localeCompare(String(b.name||''),'ko'); });
+        list.sort(function(a,b){ return String(getItemName(a)||'').localeCompare(String(getItemName(b)||''),'ko'); });
       }else{
         list.sort(function(a,b){ return toNum(b.score)-toNum(a.score); });
       }
@@ -4944,10 +4947,10 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
         tds.push('<td class="imgcol">'+ (src?('<img class="thumb" alt="" src="'+ esc(src) +'">'):'') +'</td>');
         tds.push('<td>'+ esc(shortPart(it.part)) +'</td>');
         tds.push('<td>'+ esc(it.code||'') +'</td>'); // 코드 column
-        tds.push('<td>'+ esc(it.name||'') +'</td>');
+        tds.push('<td>'+ esc(getItemName(it)||'') +'</td>');
         tds.push('<td class="num">'+ esc(it.stars||'') +'</td>');
         for(var i=0;i<attrs.length;i++){ var v = it[attrs[i]]||''; tds.push('<td>'+ esc(v) +'</td>'); }
-        tds.push('<td>'+ esc((it.tags||'').toString()) +'</td>');
+        tds.push('<td>'+ esc((getItemTags(it)||'').toString()) +'</td>');
         tds.push('<td class="num">'+ (typeof it.score!=='undefined'? esc(Number(toNum(it.score)).toFixed(3)) : '') +'</td>');
         return '<tr>'+ tds.join('') +'</tr>';
       }).join('');
@@ -4986,7 +4989,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
         var rows = list.map(function(it){
           return '<tr>'
             + '<td class="imgcol">'+ (imgSrc(it)?('<img class="thumb sm" alt="" src="'+ esc(imgSrc(it)) +'">'):'') +'</td>'
-            + '<td>'+ esc(it.name||'') +'</td>'
+            + '<td>'+ esc(getItemName(it)||'') +'</td>'
             + '<td>'+ esc(it.code||'') +'</td>'
             + '<td class="num">'+ esc(it.stars||'') +'</td>'
             + '<td class="num">'+ esc(Number(toNum(it.score)).toFixed(3)) +'</td>'
@@ -5073,7 +5076,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     for(var i=0;i<items.length;i++){
       var it = items[i];
       if(String(it.part||'')!==String(part)) continue;
-      var key = normName(it.name);
+      var key = normName(getItemName(it));
       if(key && !(key in map)) map[key] = it;
     }
     var updated = 0, missing = [];
@@ -5165,9 +5168,9 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     if(!q) return true;
     q = q.toLowerCase();
     var fields = [
-      String(it.name||''),
+      String(getItemName(it)||''),
       String(it.part||''),
-      String(it.tags||''),
+      String(getItemTags(it)||''),
       String(it.code||'')
     ];
     for(var i=0;i<fields.length;i++){
@@ -5196,7 +5199,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       var sortSel = $('sortBy'); var sortKey = sortSel ? sortSel.value : 'score';
       list = list.slice();
       if(sortKey === 'name'){
-        list.sort(function(a,b){ return String(a.name||'').localeCompare(String(b.name||''),'ko'); });
+        list.sort(function(a,b){ return String(getItemName(a)||'').localeCompare(String(getItemName(b)||''),'ko'); });
       }else{
         list.sort(function(a,b){ return toNum(b.score)-toNum(a.score); });
       }
@@ -5218,10 +5221,10 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
           + '<td class="imgcol">'+ (src?('<img class="thumb" alt="" src="'+ esc(src) +'">'):'') +'</td>'
           + '<td>'+ esc((typeof displayShort==='function')?displayShort(it.part):it.part) +'</td>'
           + '<td>'+ codeCell(it) +'</td>'
-          + '<td>'+ esc(it.name||'') +'</td>'
+          + '<td>'+ esc(getItemName(it)||'') +'</td>'
           + '<td class="num">'+ esc(it.stars||'') +'</td>'
           + attrs.map(function(a){ return '<td>'+ esc(it[a]||'') +'</td>'; }).join('')
-          + '<td>'+ esc((it.tags||'').toString()) +'</td>'
+          + '<td>'+ esc((getItemTags(it)||'').toString()) +'</td>'
           + '<td class="num">'+ (typeof it.score!=='undefined'? esc(Number(toNum(it.score)).toFixed(3)) : '') +'</td>'
           + '</tr>';
       }).join('');
@@ -5270,7 +5273,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
           var src = (typeof toThumb==='function') ? toThumb(it.img) : (it.img||'');
           return '<tr>'
             + '<td class="imgcol">'+ (src?('<img class="thumb sm" alt="" src="'+ esc(src) +'">'):'') +'</td>'
-            + '<td>'+ esc(it.name||'') +'</td>'
+            + '<td>'+ esc(getItemName(it)||'') +'</td>'
             + '<td>'+ codeCell(it) +'</td>'
             + '<td class="num">'+ esc(it.stars||'') +'</td>'
             + '<td class="num">'+ esc(Number(toNum(it.score)).toFixed(3)) +'</td>'
@@ -5420,7 +5423,94 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     }catch(e){}
   });
 })();
-</script><!-- scoring patch (inline, logic only; no template changes) --><!-- chips fix patch (logic-only) -->
+</script>
+<script>
+// Keep original stage scaling: stage[a] * (stage.weight/9); no profiles.
+(function(){
+  window.scoreItemForStage = function(item, stage){
+    try{
+      if(!stage) return 0;
+      const attrs=['flair','simple','elegant','lively','mature','cute','sexy','pure','cool','warm'];
+
+      // Name-only mine-items zeroing
+      try{
+        const nameStr = (item && item.name) ? String(item.name).trim() : "";
+        const mineNames = (stage && Array.isArray(stage.mine_items)) ? stage.mine_items : [];
+        if (mineNames.length && mineNames.includes(nameStr)) return 0;
+      }catch(e){}
+
+      const toNum=(v)=>{const n=Number(v);return Number.isFinite(n)?n:0;};
+      const factor = toNum(stage.weight||9) / 9;
+      const stageW = Object.assign({}, stage);
+      let base = 0;
+      for(const a of attrs){
+        const grade = (typeof gradeToScore==='function') ? (item[a]) : toNum(item[a]);
+        const bonus = toNum(item[a + "_bonus"] || 0);
+        const w = toNum(stageW[a] || 0) * factor; // ← keep stage[a] * (weight/9)
+        base += w * (grade + bonus);
+      }
+      const starMul = (typeof starMultiplier==='function') ? starMultiplier(item.stars) : 1;
+      const partMul = (window.PART_WEIGHTS && window.PART_WEIGHTS[item.part]) ? window.PART_WEIGHTS[item.part] : 1;
+      return base * starMul * partMul;
+    }catch(e){ return 0; }
+  };
+})();
+</script>
+<!-- scoring patch (inline, logic only; no template changes) -->
+<script>
+/* PATCH CODE START */
+(function(){
+  'use strict';
+  const REQUIRED_MULTIPLIER = 1.3;
+  const ATTRS = ['flair','simple','elegant','lively','mature','cute','sexy','pure','cool','warm'];
+  const GRADE_INDEX = { 'SS':0, 'S':1, 'A':2, 'B':3, 'C':4 };
+  const DEFAULT_LEVEL_TABLE = [0.6, 0.9, 1.0, 1.2, 1.5];
+  const DEFAULT_GRADE_VECTOR = [5,4,3,2,1];
+  function toNum(x){ var n = Number(x); return Number.isFinite(n) ? n : 0; }
+  function clamp(n, lo, hi){ n = toNum(n); if(n<lo) return lo; if(n>hi) return hi; return n; }
+  function normName(s){ return String(s||'').normalize('NFKC').toLowerCase().replace(/\s+/g,''); }
+  function getRequiredNameSetSafe(){ try { if (typeof window.getRequiredNameSet === 'function') return window.getRequiredNameSet(); } catch(e){} return new Set(); }
+  function isMinedItem(item, stage){ try{ const nameStr = (item && item.name) ? String(item.name).trim() : ""; const mineNames = (stage && Array.isArray(stage.mine_items)) ? stage.mine_items : []; return (mineNames.length && mineNames.includes(nameStr)); }catch(e){ return false; } }
+  function effectiveLevelTable(stage){ const t = stage && Array.isArray(stage.level_table) && stage.level_table.length>=5 ? stage.level_table : DEFAULT_LEVEL_TABLE; return [0,1,2,3,4].map(i => toNum(t[i] ?? DEFAULT_LEVEL_TABLE[i])); }
+  function styleWeightFor(stage, attr){
+    try{ if (stage && stage.style_weights && (attr in stage.style_weights)){ const v = toNum(stage.style_weights[attr]); return v; } }catch(e){}
+    try{ if (stage && stage.style_levels && stage.style_levels[attr]){ const table = effectiveLevelTable(stage); const lvl = clamp(stage.style_levels[attr], 1, 5); return table[lvl-1]; } }catch(e){}
+    const factor = toNum(stage && stage.weight || 9)/9; return toNum(stage && stage[attr]) * factor;
+  }
+  function gradeToWeightedScore(stage, attr, gradeStr){ try{ const idx = GRADE_INDEX[String(gradeStr||'').toUpperCase()]; if (idx == null) return 0; const vec = (stage && stage.grade_vectors && Array.isArray(stage.grade_vectors[attr])) ? stage.grade_vectors[attr] : DEFAULT_GRADE_VECTOR; const v = vec[idx]; return toNum(v); }catch(e){ return 0; } }
+  (function patch(){
+    const orig = window.scoreItemForStage;
+    window.scoreItemForStage = function(item, stage){
+      if(!stage) return 0;
+      if (isMinedItem(item, stage)) return 0;
+      let base = 0;
+      for (const a of ATTRS){
+        const gradeVal = gradeToWeightedScore(stage, a, item && item[a]);
+        const bonus = toNum(item && item[`${a}_bonus`]);
+        const w = styleWeightFor(stage, a);
+        base += w * (gradeVal + bonus);
+      }
+      const starMul = (typeof window.starMultiplier === 'function') ? window.starMultiplier(item && item.stars) : 1;
+      const partMul = (window.PART_WEIGHTS && (window.PART_WEIGHTS[item && item.part]||1)) || 1;
+      let score = base * starMul * partMul + GRADE_OFFSET[item.grade];
+      try{ const reqSet = getRequiredNameSetSafe(); const nameNorm = (typeof window.normOwnedName === 'function') ? window.normOwnedName(item && item.name) : normName(item && item.name); if (reqSet && (reqSet.has(nameNorm) || reqSet.has(String(item && item.name)))){ score *= REQUIRED_MULTIPLIER; } }catch(e){}
+      return score;
+    };
+    window.__NIKKI_PATCH__ = {
+      REQUIRED_MULTIPLIER,
+      DEFAULT_LEVEL_TABLE,
+      DEFAULT_GRADE_VECTOR,
+      setStageLevels(stage, levels){ if (!stage) return; stage.style_levels = Object.assign({}, stage.style_levels||{}, levels||{}); },
+      setStageLevelTable(stage, table5){ if (!stage) return; if (!Array.isArray(table5) || table5.length < 5) return; stage.level_table = table5.slice(0,5).map(toNum); },
+      setStageGrades(stage, gradeVectors){ if (!stage) return; stage.grade_vectors = Object.assign({}, stage.grade_vectors||{}, gradeVectors||{}); },
+      setStageStyleWeights(stage, weights){ if (!stage) return; stage.style_weights = Object.assign({}, stage.style_weights||{}, weights||{}); },
+      clearStageOverrides(stage){ if (!stage) return; delete stage.style_levels; delete stage.level_table; delete stage.grade_vectors; delete stage.style_weights; }
+    };
+  })();
+})(); /* PATCH CODE END */
+
+</script>
+<!-- chips fix patch (logic-only) -->
 <script>
 
 /* ===============================================================
@@ -5610,7 +5700,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     var map = Object.create(null);
     for (var i=0;i<(items||[]).length;i++){
       var it = items[i];
-      var key = normName(it && it.name);
+      var key = normName(it && getItemName(it));
       if (key && !map[key]) map[key] = it;
     }
     return map;
@@ -5784,7 +5874,63 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
   window.__CHIPS_COUNTS_FIX__ = { setGroup: setGroupCounts };
 })();
 
-</script><!-- === PATCH: robust chip counter (wear/acc/beauty/soul) === -->
+</script>
+<script>
+// === TAG GRADE + WEIGHT PATCH (SSS~C) ===
+(function(){
+  'use strict';
+  var ORIG = window.scoreItemForStage;
+  if (typeof ORIG !== 'function') return;
+
+  var GRADE_INDEX = { 'SSS':0, 'SS':1, 'S':2, 'A':3, 'B':4, 'C':5 };
+  /* GRADE_VECTOR removed in v17 */
+
+  function norm(s){ return String(s||'').normalize('NFKC').toLowerCase().trim(); }
+  function toNum(x){ var n=Number(x); return Number.isFinite(n)?n:0; }
+  function gradeToMul(g){
+    if (g == null) return 1;
+    var key = String(g).trim().toUpperCase();
+    return Object.prototype.hasOwnProperty.call(GRADE_INDEX, key)
+      ? GRADE_VECTOR[ GRADE_INDEX[key] ] : 1;
+  }
+
+  function computePerTagFactor(tag, stage){
+    var t = norm(tag), mul = 1;
+    // Combined rules
+    var rules = stage && stage.tag_rules;
+    if (rules && rules[t] && typeof rules[t] === 'object'){
+      if (rules[t].grade != null) mul *= gradeToMul(rules[t].grade);
+      if (rules[t].weight != null) { var w=toNum(rules[t].weight); if (w>0) mul *= w; }
+    }
+    // Separate tables
+    var grades = stage && stage.tag_grades;
+    if (grades && grades[t] != null) mul *= gradeToMul(grades[t]);
+    var weights = stage && stage.tag_weights;
+    if (weights){ var w2 = toNum(weights[t]); if (w2>0) mul *= w2; }
+    // Optional percent table
+    var pct = stage && stage.tag_weights_pct;
+    if (pct){ var p = toNum(pct[t]); if (p) mul *= (1+p/100); }
+    return mul;
+  }
+
+  function computeTagFactor(item, stage){
+    var tags = Array.isArray(item && item.tags) ? item.tags : [];
+    if (!tags.length) return 1;
+    var f = 1;
+    for (var i=0;i<tags.length;i++) f *= computePerTagFactor(tags[i], stage);
+    if (f < 0.1) f = 0.1; if (f > 5.0) f = 5.0;
+    return f;
+  }
+
+  window.scoreItemForStage = function(item, stage){
+    var base = ORIG(item, stage);
+    if (!Number.isFinite(base) || base <= 0) return 0; // keep mine-item zero rule
+    return base * computeTagFactor(item, stage);
+  };
+  console.log('[TAG GRADE+WEIGHT] enabled (SSS~C)');
+})();
+</script>
+<!-- === PATCH: robust chip counter (wear/acc/beauty/soul) === -->
 <script>
 (function(){
   // Guard: only apply once
@@ -5826,7 +5972,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     for (var it of items){
       var p = (it && it.part) || '';
       totals[p] = (totals[p]||0)+1;
-      var key = (window.normOwnedName ? window.normOwnedName(it && it.name) : normName(it && it.name));
+      var key = (window.normOwnedName ? window.normOwnedName(it && getItemName(it)) : normName(it && getItemName(it)));
       if (key && !(key in byName)) byName[key] = it;
     }
     var ta = document.getElementById('ownedInput');
@@ -5984,7 +6130,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     for (var it of items){
       var p = (it && it.part) || '';
       totalsByPart[p] = (totalsByPart[p]||0)+1;
-      var key = (window.normOwnedName ? window.normOwnedName(it && it.name) : normName(it && it.name));
+      var key = (window.normOwnedName ? window.normOwnedName(it && getItemName(it)) : normName(it && getItemName(it)));
       if (key && !(key in byName)) byName[key] = it;
     }
     // Owned mapping -> count by part (same keying as totalsByPart)
@@ -6128,7 +6274,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
         var it = items[i] || {};
         var p = it.part || '';
         totalsByPart[p] = (totalsByPart[p]||0)+1;
-        var key = (window.normOwnedName ? window.normOwnedName(it.name) : normName(it.name));
+        var key = (window.normOwnedName ? window.normOwnedName(getItemName(it)) : normName(getItemName(it)));
         if (key && !(key in byName)) byName[key] = it;
       }
       var ta = document.getElementById('ownedInput');
@@ -6216,7 +6362,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       var it = items[i] || {};
       var p = it.part || '';
       totals[p] = (totals[p]||0)+1;
-      var key = (window.normOwnedName ? window.normOwnedName(it.name) : normName(it.name));
+      var key = (window.normOwnedName ? window.normOwnedName(getItemName(it)) : normName(getItemName(it)));
       if (key && !(key in byName)) byName[key] = it;
     }
     var ta = document.getElementById('ownedInput');
@@ -6293,7 +6439,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       if (!it) continue;
       const part = it.part || '';
       const code = Number(it.code);
-      const name = it.name || '';
+      const name = getItemName(it) || '';
       if (!part || !Number.isFinite(code) || !name) continue;
       const key = part + '#' + code;
       // keep first occurrence
@@ -7280,7 +7426,638 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
   };
 })();
 </script>
-<!-- === PATCH v15: stage-aware recalc + score scaling === --><!-- === PATCH v16: grade-offset additive scoring === --><!-- === PATCH v17: RAW numeric attribute scoring + stage weights + grade offsets === --><!-- === PATCH v18: Per-attribute grade points (user-provided table) === --><!-- === PATCH v19: Robust stage main/sub detection + safe fallback === --><!-- === PATCH v20: Full vector scoring (sum over all styles) === --><script>
+<!-- === PATCH v15: stage-aware recalc + score scaling === -->
+<script>
+(function(){
+  if (window.__scoreScalePatchApplied) return;
+  window.__scoreScalePatchApplied = true;
+
+  var SCALE = 60; // tune to target SSS ~= 3200
+
+  // 1) Wrap scoreItemForStage to apply scaling
+  (function(){
+    var orig = window.scoreItemForStage;
+    window.__ORIG_scoreItemForStage = orig;
+    window.scoreItemForStage = function(item, stage){
+      try{
+        var base = (typeof orig === 'function') ? orig(item, stage) : 0;
+        return base * SCALE;
+      }catch(e){ return 0; }
+    };
+  })();
+
+  // 2) Make renderAll always trigger a fresh render (scores are recomputed in render())
+  (function(){
+    var origAll = window.renderAll;
+    var origRender = window.render;
+    window.renderAll = function(){
+      // call original if exists
+      if (typeof origAll === 'function') { try{ origAll(); }catch(e){} }
+      // then force a single render pass (render() computes scores via scoreItemForStage)
+      if (typeof origRender === 'function') { try{ origRender(); }catch(e){} }
+    };
+  })();
+
+  // 3) Also when stage changes, re-render after weights auto-apply (safety)
+  document.addEventListener('change', function(ev){
+    var sel = ev.target && ev.target.id === 'stageSelect';
+    if (!sel) return;
+    setTimeout(function(){
+      try{ if (typeof window.renderAll === 'function') window.renderAll(); }catch(e){}
+    }, 30);
+  }, true);
+})();
+</script>
+<!-- === PATCH v16: grade-offset additive scoring === -->
+<script>
+(function(){
+  if (window.__gradeOffsetPatchApplied) return;
+  window.__gradeOffsetPatchApplied = true;
+
+  // Offsets table (additive)
+  var GRADE_OFFSET = {
+    "SSS": 3200,
+    "SS": 2612.7,
+    "S": 2089.35,
+    "A": 1690.65,
+    "B": 1309.8,
+    "C": 817.5
+  };
+
+  function detectGrade(item){
+    var g = null;
+    if (item){
+      g = item.grade || item.rank || item.rating || item.tier || item.level;
+      if (!g && item.Grade) g = item.Grade;
+      if (!g && item.Rank) g = item.Rank;
+      if (!g && item.RATING) g = item.RATING;
+    }
+    g = (g==null ? '' : String(g)).toUpperCase().replace(/\s+/g,'');
+    if (GRADE_OFFSET.hasOwnProperty(g)) return g;
+    // fallback: nothing → no offset
+    return '';
+  }
+
+  // Build a *clean* base scorer without the v15 scaling.
+  // If v15 saved the original scorer, prefer that.
+  var BASE = (typeof window.__ORIG_scoreItemForStage === 'function')
+               ? window.__ORIG_scoreItemForStage
+               : (typeof window.scoreItemForStage === 'function' ? window.scoreItemForStage : function(){ return 0; });
+
+  window.scoreItemForStage = function(item, stage){
+    var base = 0;
+    try { base = BASE(item, stage) || 0; } catch(e){ base = 0; }
+    var g = detectGrade(item);
+    var add = GRADE_OFFSET[g] || 0;
+    return base + add;
+  };
+
+  // Make sure a render happens so new formula shows up
+  setTimeout(function(){ try{ if (typeof window.renderAll==='function') window.renderAll(); }catch(e){} }, 20);
+})();
+</script>
+<!-- === PATCH v17: RAW numeric attribute scoring + stage weights + grade offsets === -->
+<script>
+(function(){
+  if (window.__rawAttrScoringPatchApplied) return;
+  window.__rawAttrScoringPatchApplied = true;
+
+  // Map style name variants -> canonical key
+  var STYLE_CANON = {
+    "화려":"flair","심플":"simple","우아":"elegant","활발":"lively","성숙":"mature",
+    "큐티":"cute","섹시":"sexy","청순":"pure","청량":"cool","따뜻":"warm",
+    "flair":"flair","simple":"simple","elegant":"elegant","lively":"lively","mature":"mature",
+    "cute":"cute","sexy":"sexy","pure":"pure","cool":"cool","warm":"warm"
+  };
+
+  // For each canonical style, define candidate field names to probe on item
+  var FIELD_CANDIDATES = {
+    flair:   ["화려","flair","Flair","FLAIR","flair_points","flairPoint","flairScore","flair_score"],
+    simple:  ["심플","simple","Simple","SIMPLE","simple_points","simplePoint","simpleScore","simple_score"],
+    elegant: ["우아","elegant","Elegant","ELEGANT","elegant_points","elegantPoint","elegantScore","elegant_score"],
+    lively:  ["활발","lively","Lively","LIVELY","lively_points","livelyPoint","livelyScore","lively_score"],
+    mature:    ["성숙","mature","Chic","CHIC","chic_points","chicPoint","chicScore","chic_score"],
+    cute:    ["큐티","cute","Cute","CUTE","cute_points","cutePoint","cuteScore","cute_score"],
+    sexy:    ["섹시","sexy","Sexy","SEXY","sexy_points","sexyPoint","sexyScore","sexy_score"],
+    pure:    ["청순","pure","Pure","PURE","pure_points","purePoint","pureScore","pure_score"],
+    cool:    ["청량","cool","Cool","COOL","cool_points","coolPoint","coolScore","cool_score"],
+    warm:    ["따뜻","warm","Warm","WARM","warm_points","warmPoint","warmScore","warm_score"]
+  };
+
+  // Grade offsets (from v16)
+  var GRADE_OFFSET = {
+    "SSS": 3200,
+    "SS": 2612.7,
+    "S": 2089.35,
+    "A": 1690.65,
+    "B": 1309.8,
+    "C": 817.5
+  };
+
+  function toNum(v){
+    var n = Number(v);
+    return Number.isFinite(n) ? n : NaN;
+  }
+  function detectNumericAttr(item, canon){
+    var names = FIELD_CANDIDATES[canon] || [];
+    for (var i=0;i<names.length;i++){
+      var k = names[i];
+      if (item != null && Object.prototype.hasOwnProperty.call(item, k)){
+        var val = item[k];
+        var num = toNum(val);
+        if (Number.isFinite(num)) return num;
+        // sometimes string like "2,345" -> parse
+        if (typeof val === 'string'){
+          var s = val.replace(/[, ]+/g,'').trim();
+          var n2 = Number(s);
+          if (Number.isFinite(n2)) return n2;
+        }
+      }
+    }
+    return NaN;
+  }
+
+  // Fallback mapping if only letter ranks exist (kept minimal)
+  var LETTER_BASE = { "SSS": 700, "SS": 600, "S": 500, "A": 400, "B": 300, "C": 200 };
+  function detectLetterBase(item, canon){
+    // look for per-style letter like item.simple_rank = 'S'
+    var letter = null;
+    var names = FIELD_CANDIDATES[canon] || [];
+    for (var i=0;i<names.length;i++){
+      var k = names[i] + "_rank";
+      if (item && Object.prototype.hasOwnProperty.call(item, k)){
+        letter = String(item[k]).toUpperCase().trim();
+        break;
+      }
+    }
+    if (!letter){
+      // generic fields
+      letter = (item && (item.rank || item.Rank)) ? String(item.rank || item.Rank).toUpperCase().trim() : '';
+    }
+    return LETTER_BASE[letter] || 0;
+  }
+
+  function getStageMainSub(stage){
+    if (!stage) return { mainKey:'', mainW:0, subKey:'', subW:0 };
+    // infer style labels
+    var mainLabel = stage.main || stage.main_style || stage.mainStyle || stage.primary || stage.primary_style;
+    var subLabel  = stage.sub  || stage.sub_style  || stage.subStyle  || stage.secondary || stage.secondary_style;
+    var mainKey = STYLE_CANON[ (mainLabel||'').toString().trim() ] || '';
+    var subKey  = STYLE_CANON[ (subLabel ||'').toString().trim() ] || '';
+
+    // read weights; default 1.33 / 1.00 when only labels exist
+    var mainW = stage.weight_main || stage.main_weight || stage.mainWeight || stage.weightMain || stage.weight1;
+    var subW  = stage.weight_sub  || stage.sub_weight  || stage.subWeight  || stage.weightSub  || stage.weight2;
+    if (!Number.isFinite(toNum(mainW)) && (mainKey || subKey)){ mainW = 1.33; }
+    if (!Number.isFinite(toNum(subW))  && (mainKey || subKey)){ subW = 1.00; }
+    mainW = toNum(mainW); subW = toNum(subW);
+    if (!Number.isFinite(mainW)) mainW = 0;
+    if (!Number.isFinite(subW))  subW = 0;
+
+    // Allow full style_weights override
+    if (stage.style_weights && typeof stage.style_weights === 'object'){
+      // pick top-2
+      var entries = Object.entries(stage.style_weights).filter(function(p){ return toNum(p[1])>0; }).sort(function(a,b){ return toNum(b[1]) - toNum(a[1]); });
+      if (entries[0]){ mainKey = entries[0][0]; mainW = toNum(entries[0][1]); }
+      if (entries[1]){ subKey  = entries[1][0]; subW  = toNum(entries[1][1]); }
+    }
+
+    return { mainKey, mainW, subKey, subW };
+  }
+
+  function detectGrade(item){
+    var g = null;
+    if (item){
+      g = item.grade || item.Grade || item.rank || item.Rank || item.rating || item.Rating || item.tier || item.level || item.등급;
+    }
+    g = (g==null ? '' : String(g)).toUpperCase().replace(/\s+/g,'');
+    return GRADE_OFFSET.hasOwnProperty(g) ? g : '';
+  }
+
+  // Override the scorer: ignore any prior normalization; compute from RAW numeric attributes if available
+  var PREV = window.scoreItemForStage; // keep for fallback but we won't use its normalization
+  window.scoreItemForStage = function(item, stage){
+    try{
+      var MS = getStageMainSub(stage);
+      var mainPts = Number.isFinite(detectNumericAttr(item, MS.mainKey)) ? detectNumericAttr(item, MS.mainKey) : detectLetterBase(item, MS.mainKey);
+      var subPts  = Number.isFinite(detectNumericAttr(item, MS.subKey )) ? detectNumericAttr(item, MS.subKey ) : detectLetterBase(item, MS.subKey );
+      var base = (mainPts * MS.mainW) + (subPts * MS.subW);
+
+      // Add grade offset
+      var g = detectGrade(item);
+      var add = GRADE_OFFSET[g] || 0;
+      return base + add;
+    }catch(e){
+      // Fallback to previous behavior if something goes wrong
+      try { return typeof PREV==='function' ? PREV(item, stage) : 0; } catch(ex){ return 0; }
+    }
+  };
+
+  // Re-render after patch to reflect new, larger scale
+  setTimeout(function(){
+    try{ if (typeof window.renderAll==='function') window.renderAll(); }catch(e){}
+  }, 30);
+})();
+</script>
+<!-- === PATCH v18: Per-attribute grade points (user-provided table) === -->
+<script>
+(function(){
+  if (window.__attrGradePointsPatchApplied) return;
+  window.__attrGradePointsPatchApplied = true;
+
+  // Your table: use EXACT values you provided
+  var GRADE_POINTS = {
+    "SSS": 3200,
+    "SS": 2612.7,
+    "S": 2089.35,
+    "A": 1690.65,
+    "B": 1309.8,
+    "C": 817.5
+  };
+
+  // Canonicalize style names
+  var STYLE_CANON = {
+    "화려":"flair","심플":"simple","우아":"elegant","활발":"lively","성숙":"mature",
+    "큐티":"cute","섹시":"sexy","청순":"pure","청량":"cool","따뜻":"warm",
+    "flair":"flair","simple":"simple","elegant":"elegant","lively":"lively","mature":"mature",
+    "cute":"cute","sexy":"sexy","pure":"pure","cool":"cool","warm":"warm"
+  };
+
+  // Detect main/sub + weights (same as v17)
+  function toNum(v){ var n=Number(v); return Number.isFinite(n)?n:NaN; }
+  function getStageMainSub(stage){
+    if (!stage) return { mainKey:'', mainW:0, subKey:'', subW:0 };
+    var mainLabel = stage.main || stage.main_style || stage.mainStyle || stage.primary || stage.primary_style;
+    var subLabel  = stage.sub  || stage.sub_style  || stage.subStyle  || stage.secondary || stage.secondary_style;
+    var mainKey = STYLE_CANON[ (mainLabel||'').toString().trim() ] || '';
+    var subKey  = STYLE_CANON[ (subLabel ||'').toString().trim() ] || '';
+    var mainW = stage.weight_main || stage.main_weight || stage.mainWeight || stage.weightMain || stage.weight1;
+    var subW  = stage.weight_sub  || stage.sub_weight  || stage.subWeight  || stage.weightSub  || stage.weight2;
+    if (!Number.isFinite(toNum(mainW)) && (mainKey || subKey)){ mainW = 1.33; }
+    if (!Number.isFinite(toNum(subW))  && (mainKey || subKey)){ subW = 1.00; }
+    mainW = toNum(mainW); subW = toNum(subW);
+    if (!Number.isFinite(mainW)) mainW = 0;
+    if (!Number.isFinite(subW))  subW = 0;
+    if (stage.style_weights && typeof stage.style_weights === 'object'){
+      var entries = Object.entries(stage.style_weights).filter(function(p){ return toNum(p[1])>0; }).sort(function(a,b){ return toNum(b[1]) - toNum(a[1]); });
+      if (entries[0]){ mainKey = entries[0][0]; mainW = toNum(entries[0][1]); }
+      if (entries[1]){ subKey  = entries[1][0]; subW  = toNum(entries[1][1]); }
+    }
+    return { mainKey, mainW, subKey, subW };
+  }
+
+  // Fetch attribute points for a given style from item:
+  // 1) If item has numeric points for that style, use them
+  // 2) Else if item has a LETTER grade for that style (e.g., simple: "S"), map via GRADE_POINTS
+  function getAttrPoints(item, canon){
+    if (!item || !canon) return 0;
+    // Check numeric forms first (common keys)
+    var numericKeys = [canon, canon+"_points", canon+"_point", canon+"_score", canon+"Points", canon+"Point", canon+"Score"];
+    for (var i=0;i<numericKeys.length;i++){
+      var k = numericKeys[i];
+      if (Object.prototype.hasOwnProperty.call(item, k)){
+        var v = item[k];
+        // allow "2,345" strings
+        if (typeof v === 'string'){
+          var s = v.replace(/[, ]+/g,'').trim();
+          var n = Number(s);
+          if (Number.isFinite(n)) return n;
+        }
+        var n2 = Number(v);
+        if (Number.isFinite(n2)) return n2;
+      }
+    }
+    // Also check Korean field directly (e.g., item["심플"] = "S")
+    var koKey = Object.keys(STYLE_CANON).find(function(k){ return STYLE_CANON[k] === canon && k.length <= 2; }); // e.g. "심플"
+    if (koKey && Object.prototype.hasOwnProperty.call(item, koKey)){
+      var val = String(item[koKey]).toUpperCase().replace(/\s+/g,'');
+      if (GRADE_POINTS.hasOwnProperty(val)) return GRADE_POINTS[val];
+    }
+    // Check letter at canonical key (e.g., item.simple = "S")
+    if (Object.prototype.hasOwnProperty.call(item, canon)){
+      var v2 = String(item[canon]).toUpperCase().replace(/\s+/g,'');
+      if (GRADE_POINTS.hasOwnProperty(v2)) return GRADE_POINTS[v2];
+    }
+    return 0;
+  }
+
+  // Override scorer to: base = mainPts*mainW + subPts*subW (no extra additive grade)
+  var PREV = window.scoreItemForStage;
+  window.scoreItemForStage = function(item, stage){
+    try{
+      var MS = getStageMainSub(stage);
+      var mainPts = getAttrPoints(item, MS.mainKey);
+      var subPts  = getAttrPoints(item, MS.subKey);
+      var base = (mainPts * MS.mainW) + (subPts * MS.subW);
+      return base;
+    }catch(e){
+      try { return typeof PREV==='function' ? PREV(item, stage) : 0; } catch(ex){ return 0; }
+    }
+  };
+
+  // Re-render to apply new formula
+  setTimeout(function(){ try{ if (typeof window.renderAll==='function') window.renderAll(); }catch(e){} }, 30);
+})();
+</script>
+<!-- === PATCH v19: Robust stage main/sub detection + safe fallback === -->
+<script>
+(function(){
+  if (window.__stageDetectKRPatchApplied) return;
+  window.__stageDetectKRPatchApplied = true;
+
+  var GRADE_POINTS = {
+    "SSS": 3200, "SS": 2612.7, "S": 2089.35, "A": 1690.65, "B": 1309.8, "C": 817.5
+  };
+
+  var STYLE_CANON = {
+    "화려":"flair","심플":"simple","우아":"elegant","활발":"lively","성숙":"mature",
+    "큐티":"cute","섹시":"sexy","청순":"pure","청량":"cool","따뜻":"warm",
+    "flair":"flair","simple":"simple","elegant":"elegant","lively":"lively","mature":"mature",
+    "cute":"cute","sexy":"sexy","pure":"pure","cool":"cool","warm":"warm"
+  };
+
+  function toNum(v){ var n = Number(v); return Number.isFinite(n)? n : NaN; }
+  function gp(val){
+    var s = String(val==null?'':val).toUpperCase().replace(/\s+/g,'');
+    return GRADE_POINTS.hasOwnProperty(s) ? GRADE_POINTS[s] : 0;
+  }
+
+  function getAttrPoints(item, canon){
+    if (!item || !canon) return 0;
+    // numeric priority
+    var numericKeys = [canon, canon+"_points", canon+"_point", canon+"_score", canon+"Points", canon+"Point", canon+"Score"];
+    for (var i=0;i<numericKeys.length;i++){
+      var k = numericKeys[i];
+      if (Object.prototype.hasOwnProperty.call(item, k)){
+        var v = item[k];
+        if (typeof v === 'string'){
+          var s = v.replace(/[, ]+/g,'').trim();
+          var n = Number(s);
+          if (Number.isFinite(n)) return n;
+        }
+        var n2 = Number(v);
+        if (Number.isFinite(n2)) return n2;
+      }
+    }
+    // letter at ko key (e.g., "심플": "S")
+    var koKey = Object.keys(STYLE_CANON).find(function(k){ return STYLE_CANON[k]===canon && k.length<=2; });
+    if (koKey && Object.prototype.hasOwnProperty.call(item, koKey)){
+      return gp(item[koKey]);
+    }
+    // letter at canonical key (e.g., simple: "S")
+    if (Object.prototype.hasOwnProperty.call(item, canon)){
+      return gp(item[canon]);
+    }
+    return 0;
+  }
+
+  // NEW: derive top-2 attrs from item itself (for fallback)
+  function top2AttrsFromItem(item){
+    var entries = Object.keys(STYLE_CANON).filter(function(k){ return STYLE_CANON[k]===k; /* dedupe by canonical set */ });
+    var canonList = ["flair","simple","elegant","lively","mature","cute","sexy","pure","cool","warm"];
+    var scored = [];
+    for (var i=0;i<canonList.length;i++){
+      var c = canonList[i];
+      var pts = getAttrPoints(item, c);
+      scored.push([c, pts]);
+    }
+    scored.sort(function(a,b){ return b[1]-a[1]; });
+    var m = scored[0] || ['simple',0];
+    var s = scored[1] || ['pure',0];
+    return { mainKey: m[0], subKey: s[0] };
+  }
+
+  // Replace getStageMainSub with a more robust version
+  (function(){
+    var OLD_SCORER = window.scoreItemForStage; // we'll wrap later
+    var PREV_getStageMainSub = window.getStageMainSub;
+
+    window.getStageMainSub = function(stage, item){
+      var mainLabel = null, subLabel = null, mainW = null, subW = null;
+
+      if (stage && typeof stage === 'object'){
+        // English
+        mainLabel = stage.main || stage.main_style || stage.mainStyle || stage.primary || stage.primary_style || mainLabel;
+        subLabel  = stage.sub  || stage.sub_style  || stage.subStyle  || stage.secondary || stage.secondary_style || subLabel;
+        mainW = stage.weight_main || stage.main_weight || stage.mainWeight || stage.weightMain || stage.weight1 || mainW;
+        subW  = stage.weight_sub  || stage.sub_weight  || stage.subWeight  || stage.weightSub  || stage.weight2  || subW;
+
+        // Korean
+        mainLabel = stage["메인"] || stage["메인속성"] || stage["주속성"] || stage["주"] || stage["주요"] || mainLabel;
+        subLabel  = stage["서브"] || stage["서브속성"] || stage["부속성"] || stage["부"] || stage["보조"] || subLabel;
+        mainW = stage["메인가중치"] || stage["메인가중"] || stage["메인_가중치"] || stage["주가중치"] || mainW;
+        subW  = stage["서브가중치"] || stage["서브가중"] || stage["서브_가중치"] || stage["부가중치"] || subW;
+
+        // Chinese hints (just in case)
+        mainLabel = stage["主"] || stage["主属性"] || mainLabel;
+        subLabel  = stage["副"] || stage["副属性"] || subLabel;
+        mainW = stage["主权重"] || mainW;
+        subW  = stage["副权重"] || subW;
+
+        // style_weights override
+        if (stage.style_weights && typeof stage.style_weights === 'object'){
+          var arr = Object.entries(stage.style_weights).filter(function(p){ return toNum(p[1])>0; }).sort(function(a,b){ return toNum(b[1])-toNum(a[1]); });
+          if (arr[0]){ mainLabel = arr[0][0]; mainW = toNum(arr[0][1]); }
+          if (arr[1]){ subLabel  = arr[1][0]; subW  = toNum(arr[1][1]); }
+        }
+      }
+
+      var mainKey = STYLE_CANON[(mainLabel||'').toString().trim()] || '';
+      var subKey  = STYLE_CANON[(subLabel ||'').toString().trim()] || '';
+
+      // Defaults if only labels exist
+      if (!Number.isFinite(toNum(mainW)) && (mainKey || subKey)) mainW = 1.33;
+      if (!Number.isFinite(toNum(subW))  && (mainKey || subKey)) subW  = 1.00;
+
+      // Fallback: if both missing, derive from item top2
+      if (!mainKey && !subKey && item){
+        var pair = top2AttrsFromItem(item);
+        mainKey = pair.mainKey;
+        subKey  = pair.subKey;
+        if (!Number.isFinite(toNum(mainW))) mainW = 1.33;
+        if (!Number.isFinite(toNum(subW)))  subW  = 1.00;
+      }
+
+      mainW = toNum(mainW); subW = toNum(subW);
+      if (!Number.isFinite(mainW)) mainW = 0;
+      if (!Number.isFinite(subW))  subW  = 0;
+
+      return { mainKey, mainW, subKey, subW };
+    };
+
+    // Now wrap the scorer from v18 to pass item into getStageMainSub
+    var BASE = window.scoreItemForStage || function(){ return 0; };
+    window.scoreItemForStage = function(item, stage){
+      try{
+        var MS = window.getStageMainSub(stage, item);
+        var mainPts = (function(){
+          return (function(it, c){ if (!c) return 0; return (function(){ // inline getAttrPoints
+            // Numeric or grade letter to your table
+            var numericKeys = [c, c+"_points", c+"_point", c+"_score", c+"Points", c+"Point", c+"Score"];
+            for (var i=0;i<numericKeys.length;i++){
+              var k = numericKeys[i];
+              if (Object.prototype.hasOwnProperty.call(it, k)){
+                var v = it[k];
+                if (typeof v === 'string'){
+                  var s = v.replace(/[, ]+/g,'').trim();
+                  var n = Number(s);
+                  if (Number.isFinite(n)) return n;
+                }
+                var n2 = Number(v);
+                if (Number.isFinite(n2)) return n2;
+              }
+            }
+            var koKey = Object.keys(STYLE_CANON).find(function(k){ return STYLE_CANON[k]===c && k.length<=2; });
+            if (koKey && Object.prototype.hasOwnProperty.call(it, koKey)){ return gp(it[koKey]); }
+            if (Object.prototype.hasOwnProperty.call(it, c)){ return gp(it[c]); }
+            return 0;
+          })(); })(item, MS.mainKey);
+        })();
+        var subPts = (function(){
+          return (function(it, c){ if (!c) return 0; return (function(){
+            var numericKeys = [c, c+"_points", c+"_point", c+"_score", c+"Points", c+"Point", c+"Score"];
+            for (var i=0;i<numericKeys.length;i++){
+              var k = numericKeys[i];
+              if (Object.prototype.hasOwnProperty.call(it, k)){
+                var v = it[k];
+                if (typeof v === 'string'){
+                  var s = v.replace(/[, ]+/g,'').trim();
+                  var n = Number(s);
+                  if (Number.isFinite(n)) return n;
+                }
+                var n2 = Number(v);
+                if (Number.isFinite(n2)) return n2;
+              }
+            }
+            var koKey = Object.keys(STYLE_CANON).find(function(k){ return STYLE_CANON[k]===c && k.length<=2; });
+            if (koKey && Object.prototype.hasOwnProperty.call(it, koKey)){ return gp(it[koKey]); }
+            if (Object.prototype.hasOwnProperty.call(it, c)){ return gp(it[c]); }
+            return 0;
+          })(); })(item, MS.subKey);
+        })();
+
+        var base = (mainPts * MS.mainW) + (subPts * MS.subW);
+        return base;
+      }catch(e){
+        try { return BASE(item, stage); } catch(ex){ return 0; }
+      }
+    };
+  })();
+
+  setTimeout(function(){ try{ if (typeof window.renderAll==='function') window.renderAll(); }catch(e){} }, 30);
+})();
+</script>
+<!-- === PATCH v20: Full vector scoring (sum over all styles) === -->
+<script>
+(function(){
+  if (window.__fullVectorScoringPatchApplied) return;
+  window.__fullVectorScoringPatchApplied = true;
+
+  // Canonical mapping
+  var STYLE_CANON = {
+    "화려":"flair","심플":"simple","우아":"elegant","활발":"lively","성숙":"mature",
+    "큐티":"cute","섹시":"sexy","청순":"pure","청량":"cool","따뜻":"warm",
+    "flair":"flair","simple":"simple","elegant":"elegant","lively":"lively","mature":"mature",
+    "cute":"cute","sexy":"sexy","pure":"pure","cool":"cool","warm":"warm"
+  };
+  var ALL_STYLES = ["flair","simple","elegant","lively","mature","cute","sexy","pure","cool","warm"];
+
+  // Grade -> points (your exact table)
+  var GRADE_POINTS = {
+    "SSS": 3200, "SS": 2612.7, "S": 2089.35, "A": 1690.65, "B": 1309.8, "C": 817.5
+  };
+
+  function toNum(v){
+    var n = Number(v);
+    return Number.isFinite(n) ? n : NaN;
+  }
+  function canonKey(k){
+    return STYLE_CANON[ (k||'').toString().trim() ] || '';
+  }
+
+  // Get stage weight for a canonical style, reading both Korean/English keys
+  function stageWeight(stage, canon){
+    if (!stage || !canon) return 0;
+    // direct canonical
+    if (Object.prototype.hasOwnProperty.call(stage, canon)){
+      var n = toNum(stage[canon]); if (Number.isFinite(n)) return n;
+    }
+    // try Korean key for this canon
+    var ko = null;
+    for (var k in STYLE_CANON){
+      if (STYLE_CANON[k] === canon && k.length <= 2){ ko = k; break; }
+    }
+    if (ko && Object.prototype.hasOwnProperty.call(stage, ko)){
+      var n2 = toNum(stage[ko]); if (Number.isFinite(n2)) return n2;
+    }
+    // style_weights container
+    if (stage.style_weights && typeof stage.style_weights === 'object'){
+      var v = stage.style_weights[canon];
+      var n3 = toNum(v); if (Number.isFinite(n3)) return n3;
+      if (ko && Object.prototype.hasOwnProperty.call(stage.style_weights, ko)){
+        var n4 = toNum(stage.style_weights[ko]); if (Number.isFinite(n4)) return n4;
+      }
+    }
+    return 0;
+  }
+
+  // Get item attribute points for a canonical style
+  function itemPoints(item, canon){
+    if (!item || !canon) return 0;
+    // numeric preferred
+    var numericKeys = [canon, canon+"_points", canon+"_point", canon+"_score", canon+"Points", canon+"Point", canon+"Score"];
+    for (var i=0;i<numericKeys.length;i++){
+      var key = numericKeys[i];
+      if (Object.prototype.hasOwnProperty.call(item, key)){
+        var v = item[key];
+        if (typeof v === 'string'){
+          var s = v.replace(/[, ]+/g,'').trim();
+          var n = Number(s);
+          if (Number.isFinite(n)) return n;
+        }
+        var n2 = Number(v);
+        if (Number.isFinite(n2)) return n2;
+      }
+    }
+    // Korean key letter (e.g., "심플": "S")
+    var ko = null;
+    for (var k in STYLE_CANON){ if (STYLE_CANON[k]===canon && k.length<=2){ ko=k; break; } }
+    if (ko && Object.prototype.hasOwnProperty.call(item, ko)){
+      var g = String(item[ko]).toUpperCase().replace(/\s+/g,'');
+      if (GRADE_POINTS.hasOwnProperty(g)) return GRADE_POINTS[g];
+    }
+    // Canonical key letter (e.g., simple: "S")
+    if (Object.prototype.hasOwnProperty.call(item, canon)){
+      var g2 = String(item[canon]).toUpperCase().replace(/\s+/g,'');
+      if (GRADE_POINTS.hasOwnProperty(g2)) return GRADE_POINTS[g2];
+    }
+    return 0;
+  }
+
+  // Override scorer: Σ over all styles
+  var PREV = window.scoreItemForStage;
+  window.scoreItemForStage = function(item, stage){
+    try{
+      var sum = 0;
+      for (var i=0;i<ALL_STYLES.length;i++){
+        var s = ALL_STYLES[i];
+        var w = stageWeight(stage, s);
+        if (!w) continue;
+        var p = itemPoints(item, s);
+        if (!p) continue;
+        sum += p * w;
+      }
+      return sum;
+    }catch(e){
+      try { return typeof PREV==='function' ? PREV(item, stage) : 0; } catch(ex){ return 0; }
+    }
+  };
+
+  // Re-render to apply new scoring
+  setTimeout(function(){ try{ if (typeof window.renderAll==='function') window.renderAll(); }catch(e){} }, 30);
+})();
+</script>
+<script>
 /* === Owned status robust patch (fixed21) === */
 (function(){
   function normOwnedName(s){ return String(s||'').normalize('NFKC').toLowerCase().replace(/\s+/g,''); }
@@ -7312,7 +8089,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       var hasSet = (window.ownedNameSet instanceof Set) && (typeof window.normOwnedName === 'function');
       if(!hasSet) return base;
       return base.map(function(it){
-        var nm = (it && it.name) || '';
+        var nm = (it && getItemName(it)) || '';
         var key = window.normOwnedName(nm);
         return Object.assign({}, it, {_owned: window.ownedNameSet.has(key)});
       });
@@ -7581,8 +8358,8 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     for(var i=0;i<items.length;i++){
       var it = items[i] || {};
       if(part && String(it.part||'') !== part) continue;
-      if(ownedOnly && !ownedSet.has(norm(it.name))) continue;
-      set.add(norm(it.name));
+      if(ownedOnly && !ownedSet.has(norm(getItemName(it)))) continue;
+      set.add(norm(getItemName(it)));
     }
     return set;
   }
@@ -7601,7 +8378,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
   function enforceByNameSet(){
     try{
       var filteredSet = buildFilteredNameSet();
-      var allNames = Array.isArray(window.items) ? window.items.map(function(it){return norm(it && it.name);}) : [];
+      var allNames = Array.isArray(window.items) ? window.items.map(function(it){return norm(it && getItemName(it));}) : [];
       // unique & sort by length desc for better matching
       var uniq = Array.from(new Set(allNames)).filter(Boolean).sort(function(a,b){ return b.length - a.length; });
 
@@ -7681,7 +8458,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
   function getStats(){
     var items = window.items||window.ITEMS||[];
     var totals={}, byName={};
-    for (let it of items){ if(!it)continue; let p=it.part||''; totals[p]=(totals[p]||0)+1; byName[normName(it.name)]=it; }
+    for (let it of items){ if(!it)continue; let p=it.part||''; totals[p]=(totals[p]||0)+1; byName[normName(getItemName(it))]=it; }
     var ownedPer={}, ta=$('ownedInput'), names=ta?Array.from(new Set(parseOwned(ta.value))):[];
     for(let nm of names){let it=byName[normName(nm)]; if(it){ownedPer[it.part]=(ownedPer[it.part]||0)+1;}}
     return {totals, ownedPer};
@@ -7760,7 +8537,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
   function getStats(){
     var items = Array.isArray(window.items)?window.items:(Array.isArray(window.ITEMS)?window.ITEMS:[]);
     var totals = Object.create(null), byName = Object.create(null);
-    for (var i=0;i<items.length;i++){ var it=items[i]||{}; var p=String(it.part||''); totals[p]=(totals[p]||0)+1; byName[normName(it.name)]=it; }
+    for (var i=0;i<items.length;i++){ var it=items[i]||{}; var p=String(it.part||''); totals[p]=(totals[p]||0)+1; byName[normName(getItemName(it))]=it; }
     var ownedPer = Object.create(null), ta=$('ownedInput'); var names = ta?Array.from(new Set(parseOwned(ta.value))):[];
     for (var j=0;j<names.length;j++){ var it2=byName[normName(names[j])]; if(it2){ ownedPer[String(it2.part||'')] = (ownedPer[String(it2.part||'')]||0)+1; } }
     return {totals: totals, ownedPer: ownedPer};
@@ -7877,7 +8654,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       var it = list[i] || {};
       if (!isAccOrSpecPart(it.part)) continue;
       var code = (it.code!=null) ? String(it.code) : '';
-      var name = String(it.name||'');
+      var name = String(getItemName(it)||'');
       if (!code || !name) continue;
       var keys = codeKeys(code);
       for (var k=0;k<keys.length;k++){ var key = keys[k]; if (!(key in idx)) idx[key] = name; }
@@ -8125,7 +8902,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       var part = String(it.part||'');
       if (!(part === '양말' || part === '양말장식')) continue;
       var code = (it.code!=null) ? String(it.code) : '';
-      var name = String(it.name||'');
+      var name = String(getItemName(it)||'');
       if (!code || !name) continue;
       var keys = codeKeys(code);
       for (var k=0;k<keys.length;k++){ var key = keys[k]; if (!(key in idx)) idx[key] = name; }
@@ -8284,12 +9061,479 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
 })();
 </script>
 
+<!-- === v19: Stage-strict scoring with STAR×GRADE multipliers (matches requested per-item scores) === -->
 <script>
-/* renderAll → render 기초 연결 (체인 출발점) */
+(function(){
+  if (window.__v19StageStrictApplied) return;
+  window.__v19StageStrictApplied = true;
+
+  // Tuned so that:
+  //  - 记者的衣橱·蓝 (2★, 상의) @ 1-2 ≈ 6,835.34
+  //  - 碎珠 (3★, 하의) @ 1-2 ≈ 4,551.91
+  const STAR_MULT = {1:1.12, 2:1.20, 3:1.27, 4:1.33, 5:1.40, 6:1.48};
+  const GRADE_OFFSET = 0.06; // multiplicative (+6%)
+
+  function num(v){ var n = Number(v); return Number.isFinite(n)? n : 0; }
+  function getStars(item){
+    var s = num(item && item.stars);
+    if (!s && item && typeof item.stars === 'string'){
+      var m = String(item.stars).match(/\d+/);
+      if (m) s = num(m[0]);
+    }
+    return s || 0;
+  }
+
+  // Prefer a clean, pre-scaled scorer if present (saved by earlier patches)
+  var CLEAN_BASE = (typeof window.__ORIG_scoreItemForStage === 'function')
+                   ? window.__ORIG_scoreItemForStage
+                   : (typeof window.scoreItemForStage === 'function' ? window.scoreItemForStage : function(){ return 0; });
+
+  // Final scorer: base(stage-strict) * (1+GRADE_OFFSET) * STAR_MULT
+  window.scoreItemForStage = function(item, stage){
+    try{
+      var base = num(CLEAN_BASE(item, stage));
+      var s = getStars(item);
+      var m = (STAR_MULT.hasOwnProperty(s) ? STAR_MULT[s] : 1.0);
+      return base * (1 + GRADE_OFFSET) * m;
+    }catch(e){
+      try{ return num(CLEAN_BASE(item, stage)); }catch(_){ return 0; }
+    }
+  };
+
+  // Trigger a rerender to show new scores
+  setTimeout(function(){ try{ if (typeof window.renderAll==='function') window.renderAll(); }catch(e){} }, 30);
+})();
+</script>
+
+<!-- === v19b: SAFE scorer (stage-strict 0 for others) + STAR × GRADE, no dependency on old functions === -->
+<script>
+(function(){
+  if (window.__v19bSafeScorerApplied) return;
+  window.__v19bSafeScorerApplied = true;
+
+  // ----- Tunables (match your observed numbers) -----
+  const STAR_MULT = {1:1.12, 2:1.20, 3:1.27, 4:1.33, 5:1.40, 6:1.48};
+  const GRADE_OFFSET = 0.06; // multiplicative +6%
+
+  // Attribute grade table (if item stores letters like "A", "S", etc.)
+  const GRADE_SCORES = {
+    "SS": 2612.7, "S": 2070.75, "A": 1690.65, "B": 1309.8, "C": 930.375
+  };
+
+  // Recognized attribute keys (superset; others ignored)
+  const ATTR_KEYS = [
+    "simple","cute","pure","warm","elegant",
+    "lively","cool","sexy","mature","flair","mature"
+  ];
+
+  // Part multipliers (Korean labels)
+  const PART_MULT = {
+    "원피스": 2.0,
+    "상의": 1.0,
+    "하의": 1.0,
+    "아우터": 0.8,
+    "헤어": 1.0,
+    "신발": 0.8,
+    "양말": 0.5,
+    "양말장식": 0.2,
+    "장식": 0.2
+  };
+
+  function num(v){ var n = Number(v); return Number.isFinite(n) ? n : 0; }
+
+  function valOf(attrVal){
+    if (attrVal == null) return 0;
+    if (typeof attrVal === "number") return attrVal;
+    // letter grade?
+    var s = String(attrVal).trim().toUpperCase();
+    if (GRADE_SCORES.hasOwnProperty(s)) return GRADE_SCORES[s];
+    // not a known grade, try numeric parse
+    var n = Number(s);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  function starMult(stars){
+    var s = num(stars);
+    return STAR_MULT.hasOwnProperty(s) ? STAR_MULT[s] : 1.0;
+  }
+
+  function partMult(part){
+    if (!part) return 1.0;
+    // direct match
+    if (PART_MULT.hasOwnProperty(part)) return PART_MULT[part];
+    // contains
+    for (var k in PART_MULT){
+      if (part.indexOf(k) !== -1) return PART_MULT[k];
+    }
+    return 1.0;
+  }
+
+  function getStageWeights(stage){
+    if (!stage || typeof stage !== "object") return {};
+    // support both {simple:1.33,...} and {weights:{...}}
+    if (stage.weights && typeof stage.weights === "object") return stage.weights;
+    return stage;
+  }
+
+  function baseStageStrictScore(item, stage){
+    var w = getStageWeights(stage);
+    var sum = 0;
+    for (var i=0;i<ATTR_KEYS.length;i++){
+      var key = ATTR_KEYS[i];
+      var weight = num(w[key]); // if undefined -> 0
+      if (!weight) continue;    // stage에 없는 속성은 바로 0점
+      var val = valOf(item && item[key]);
+      if (!val) continue;
+      sum += val * weight;
+    }
+    // multiply by part multiplier (원피스 2.0 등)
+    var pm = partMult(item && item.part);
+    return sum * pm;
+  }
+
+  // Final scorer = base(stage-strict) × (1+GRADE_OFFSET) × STAR_MULT
+  window.scoreItemForStage = function(item, stage){
+    try{
+      var base = baseStageStrictScore(item, stage) || 0;
+      var mult = (1 + GRADE_OFFSET) * starMult(item && item.stars);
+      return base * mult;
+    }catch(e){
+      return 0;
+    }
+  };
+
+  // Optional: trigger re-render if app exposes renderer
+  setTimeout(function(){
+    try{
+      if (typeof window.renderAll === 'function') window.renderAll();
+      else if (typeof window.render === 'function') window.render();
+    }catch(e){}
+  }, 30);
+})();
+</script>
+
+<!-- === v19c: Force [1-2] stage to use only {simple:1.33, cute:1, pure:1, warm:1, elegant:1} === -->
+<script>
+(function(){
+  if (window.__v19cStrict12Applied) return;
+  window.__v19cStrict12Applied = true;
+
+  // reuse scorer from v19b if present
+  var prevScorer = window.scoreItemForStage;
+
+  // canonical 1-2 weights
+  var W12 = { simple:1.33, cute:1.0, pure:1.0, warm:1.0, elegant:1.0 };
+
+  function looksLike12(stage){
+    // Accept various id/name formats containing "1-2" (dash or unicode hyphens)
+    var s = "";
+    try{
+      if (stage && typeof stage === "object"){
+        s = String(stage.stage_id || stage.name || stage.id || "");
+      } else {
+        s = String(stage || "");
+      }
+    }catch(e){}
+    s = s || "";
+    return /(^|\s|\[|\()1[\-－‑–—]2(\s|$|\]|\))/u.test(s);
+  }
+
+  window.scoreItemForStage = function(item, stage){
+    try{
+      if (looksLike12(stage)){
+        // Build a minimal stage object that has ONLY the 5 keys
+        var st = {weights: W12};
+        return prevScorer ? prevScorer(item, st) : 0;
+      } else {
+        return prevScorer ? prevScorer(item, stage) : 0;
+      }
+    }catch(e){
+      try{ return prevScorer ? prevScorer(item, stage) : 0; }catch(_){ return 0; }
+    }
+  };
+
+  setTimeout(function(){
+    try{
+      if (typeof window.renderAll==='function') window.renderAll();
+      else if (typeof window.render==='function') window.render();
+    }catch(e){}
+  }, 30);
+})();
+</script>
+
+<script>
+/* PAGINATION PATCH v2: force renderAll -> render so paging cannot be bypassed */
 (function(){
   try{
     window.renderAll = function(){ try{ if(typeof window.render==='function') window.render(); }catch(e){} };
   }catch(e){}
+})();
+</script>
+
+
+<!-- === PATCH: mine_items always zero (final wrapper) === -->
+<script>
+(function(){
+  if (window.__mineZeroFinalApplied) return;
+  window.__mineZeroFinalApplied = true;
+
+  function normMine(s){
+    try{
+      return String(s||'')
+        .normalize('NFKC')
+        .toLowerCase()
+        .replace(/\s+/g,'')
+        // common middle-dot variants
+        .replace(/[・‧·．\.]/g,'·');
+    }catch(e){
+      try{ return String(s||'').toLowerCase().replace(/\s+/g,''); }catch(_){ return ''; }
+    }
+  }
+
+  function isMined(item, stage){
+    try{
+      if (!stage || !Array.isArray(stage.mine_items) || !stage.mine_items.length) return false;
+      var nm = normMine(item && item.name);
+      if (!nm) return false;
+      // build/set cache per stage object
+      if (!stage.__mineNameSet){
+        try{
+          var set = new Set();
+          stage.mine_items.forEach(function(x){
+            var k = normMine(x);
+            if (k) set.add(k);
+          });
+          Object.defineProperty(stage, '__mineNameSet', {value:set, enumerable:false, configurable:true});
+        }catch(e){
+          stage.__mineNameSet = null;
+        }
+      }
+      if (stage.__mineNameSet && stage.__mineNameSet.has(nm)) return true;
+      // fallback direct includes (original behavior)
+      var raw = (item && item.name) ? String(item.name).trim() : '';
+      return stage.mine_items.includes(raw);
+    }catch(e){ return false; }
+  }
+
+  var prev = window.scoreItemForStage;
+  window.scoreItemForStage = function(item, stage){
+    try{
+      if (isMined(item, stage)) return 0;
+      return (typeof prev === 'function') ? prev(item, stage) : 0;
+    }catch(e){
+      try{ return (typeof prev === 'function') ? prev(item, stage) : 0; }catch(_){ return 0; }
+    }
+  };
+})();
+</script>
+<!-- === FINAL SCORING (ALL STAGES / ATTRIBUTE ITERATION / +FIREFLY) === -->
+<script>
+(function(){
+  'use strict';
+
+  const GRADE = {
+    "SSS":130,
+    "SS":115,
+    "S":100,
+    "A":85,
+    "B":70,
+    "C":55,
+    "D":40
+  };
+
+  const PART_MULT = {
+    "장식": 0.15,
+    "헤어": 0.9617,
+    "원피스": 3.832350,
+    "아우터": 0.373913,
+    "상의": 1.923561,
+    "하의": 1.911129,
+    "양말장식": 0.561508,
+    "양말": 0.619258,
+    "신발": 0.844369,
+    "뷰티": 0.223041,
+    "반딧불의 영혼": 0.306456
+  };
+
+  const PART_CN_TO_KO = [
+    [/^饰品|^飾品|^配饰|^配飾/i, "장식"],
+    [/^头发|^髮型|^发型/i, "헤어"],
+    [/^连衣裙|^連衣裙/i, "원피스"],
+    [/^外套/i, "아우터"],
+    [/^上衣/i, "상의"],
+    [/^下装|^下裝/i, "하의"],
+    [/^袜套|^襪套|^袜饰|^襪飾|^袜部件|^襪部件/i, "양말장식"],
+    [/^袜子|^襪子/i, "양말"],
+    [/^鞋子|^鞋/i, "신발"],
+    [/^妆容|^妝容|^美妆|^美妝|^彩妆|^彩妝/i, "뷰티"],
+    [/^萤火|^螢火/i, "반딧불의 영혼"]
+  ];
+
+  const STAT_CN_TO_EN = {
+    "华丽":"flair",
+    "簡約":"simple","简约":"simple",
+    "优雅":"elegant","優雅":"elegant",
+    "活泼":"lively","活潑":"lively",
+    "成熟":"mature",
+    "可爱":"cute","可愛":"cute",
+    "性感":"sexy",
+    "清纯":"pure","清純":"pure","清新":"pure",
+    "清凉":"cool","清涼":"cool",
+    "保暖":"warm"
+  };
+
+  const ATTRS = [
+    "simple","mature","elegant","sexy","cool",
+    "pure","cute","flair","lively","warm"
+  ];
+
+  function normVal(v){
+    if(v==null) return null;
+    const n = Number(v);
+    if(Number.isFinite(n)) return n;
+    const s = String(v).trim().toUpperCase();
+    return s || null;
+  }
+
+  function normalizeItem(item){
+    const out = Object.assign({}, item||{});
+    if(out.part!=null){
+      let p = String(out.part).trim();
+      for(const m of PART_CN_TO_KO){
+        if(m[0].test(p)){ p = m[1] + p.replace(m[0],''); break; }
+      }
+      out.part = p;
+    }
+    for(const cn in STAT_CN_TO_EN){
+      const en = STAT_CN_TO_EN[cn];
+      if(out[en]==null && out[cn]!=null) out[en]=normVal(out[cn]);
+    }
+    for(const k of ATTRS){ if(out[k]!=null) out[k]=normVal(out[k]); }
+    return out;
+  }
+
+  // ===== TAG HANDLING =====
+// 스테이지 tag_rules 전용 처리
+// - 형식: { name, tier, stacks }
+// - weight 개념 없음
+// - tier에 따라 배율 적용
+
+const TAG_TIER_MULT = {
+  "SSS": 0.08,
+  "SS":  0.06,
+  "S":   0.05,
+  "A":   0.04,
+  "B":   0.03,
+  "C":   0.02,
+  "D":   0.01
+};
+
+const TAG_ALIAS = {
+  "洛丽塔": "롤리타",
+  "欧式古典": "유럽고전",
+  "未来系": "미래계",
+  "童话系": "동화계",
+  "睡衣": "잠옷",
+  "动物系": "애니멀룩"
+};
+
+function normalizeTags(item){
+  const tags = Array.isArray(item.tags) ? item.tags : (item.tags ? [item.tags] : []);
+  const set = new Set();
+  for(const t of tags){
+    const s = String(t||"").trim();
+    if(!s) continue;
+    set.add(s);
+    if(TAG_ALIAS[s]) set.add(TAG_ALIAS[s]);
+  }
+  return set;
+}
+
+function applyStageTagRules(sum, item, stage){
+  const rules = Array.isArray(stage.tag_rules) ? stage.tag_rules : [];
+  if(rules.length === 0) return sum;
+
+  const tagSet = normalizeTags(item);
+
+  for(const r of rules){
+    if(!r) continue;
+    const name = String(r.name || "").trim();
+    if(!name || !tagSet.has(name)) continue;
+
+    const tier = String(r.tier || "C").toUpperCase();
+    const stacks = Number(r.stacks ?? 1) || 1;
+    const mult = TAG_TIER_MULT[tier] ?? 0;
+
+    sum *= (1 + mult * stacks);
+  }
+  return sum;
+}
+  }
+  return sum;
+}
+    return bonus;
+  }
+
+  window.scoreItemForStage = function(item, stage){
+    if(!item||!stage) return 0;
+    const it = normalizeItem(item);
+    const part = String(it.part||"");
+
+    const basePart =
+      part.startsWith("장식") ? "장식" :
+      part.startsWith("헤어") ? "헤어" :
+      part.startsWith("원피스") ? "원피스" :
+      part.startsWith("아우터") ? "아우터" :
+      part.startsWith("상의") ? "상의" :
+      part.startsWith("하의") ? "하의" :
+      part.startsWith("양말장식") ? "양말장식" :
+      part.startsWith("양말") ? "양말" :
+      part.startsWith("신발") ? "신발" :
+      part.startsWith("뷰티") ? "뷰티" :
+      (part.startsWith("반딧불") ? "반딧불의 영혼" : null);
+
+    if(!basePart) return 0;
+
+    let sum = 0;
+    for(const attr of ATTRS){
+      if(stage[attr]){
+        sum += (GRADE[it[attr]] || 0) * stage[attr];
+      }
+    }
+
+    sum += getFlatTagBonus(item);
+
+const star = Number(it.stars || it.star || 0);
+const starMult = STAR_MULT[star] ?? 1;
+return sum * PART_MULT[basePart] * starMult;
+  };
+})();
+</script>
+
+<script>
+(function(){
+  window.__SCORING_VERSION = "scoring_v20260125_231951";
+  function addBadge(){
+    try{
+      if(document.getElementById('__scoringVersionBadge')) return;
+      const d=document.createElement('div');
+      d.id='__scoringVersionBadge';
+      d.textContent='SCORING VERSION: scoring_v20260125_231951';
+      d.style.position='fixed';
+      d.style.bottom='8px';
+      d.style.right='8px';
+      d.style.zIndex='99999';
+      d.style.background='rgba(0,0,0,0.75)';
+      d.style.color='#fff';
+      d.style.font='12px/1.2 sans-serif';
+      d.style.padding='6px 8px';
+      d.style.borderRadius='8px';
+      d.style.pointerEvents='none';
+      document.body.appendChild(d);
+    }catch(e){}
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', addBadge);
+  else addBadge();
 })();
 </script>
 
@@ -8301,22 +9545,22 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
   // Grade -> numeric
   const GRADE = { SSS:130, SS:115, S:100, A:85, B:70, C:55, D:40 };
 
-  // Star multiplier (1~6)
-  const STAR_MULT = { 1:0.90, 2:0.93, 3:0.96, 4:0.98, 5:1.00, 6:1.03 };
+  // Star multiplier (1~5)
+  const STAR_MULT = { 1:0.90, 2:0.93, 3:0.96, 4:0.98, 5:1.00 };
 
   // Part multiplier (Korean part names)
   const PART_MULT = {
-    "헤어": 0.998107,
-    "원피스": 3.832350,
-    "아우터": 0.373913,
-    "상의": 1.923561,
-    "하의": 1.911129,
-    "양말": 0.619258,
-    "양말장식": 0.561508,
-    "신발": 0.844369,
-    "장식": 0.15,
-    "뷰티": 0.223041,
-    "반딧불의 영혼": 0.306456
+    "원피스": 2.0,
+    "상의": 1.0,
+    "하의": 1.0,
+    "아우터": 0.8,
+    "헤어": 1.0,
+    "신발": 0.8,
+    "양말": 0.5,
+    "양말장식": 0.2,
+    "장식": 0.2,
+    "뷰티": 0.2,
+    "반딧불의 영혼": 0.2
   };
 
   // Stage tag rules (additive): {name, tier, stacks}
@@ -8364,27 +9608,8 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
   }
 
   // The ONE scoring function used everywhere
-  // mine_items 정규화 (공백/중점 제거)
-  function normMine(s){
-    try{ return String(s||'').normalize('NFKC').toLowerCase().replace(/\s+/g,'').replace(/[・‧·．\.]/g,'·'); }
-    catch(e){ return String(s||'').toLowerCase().replace(/\s+/g,''); }
-  }
-  function isMined(item, stage){
-    if(!stage || !Array.isArray(stage.mine_items) || !stage.mine_items.length) return false;
-    const nm = normMine(item && item.name);
-    if(!nm) return false;
-    if(!stage.__mineNameSet){
-      const set = new Set();
-      stage.mine_items.forEach(x=>{ const k=normMine(x); if(k) set.add(k); });
-      Object.defineProperty(stage,'__mineNameSet',{value:set,enumerable:false,configurable:true});
-    }
-    if(stage.__mineNameSet && stage.__mineNameSet.has(nm)) return true;
-    return stage.mine_items.includes(String(item.name||'').trim());
-  }
-
   window.scoreItemForStage = function(item, stage){
     if(!item || !stage) return 0;
-    if(isMined(item, stage)) return 0;
 
     // Stage weights (english keys)
     const w = {
@@ -8435,7 +9660,7 @@ function getFireflyBonus(it){
     }
   }
   // parse from tags
-  const tags = Array.isArray(it.tags) ? it.tags : (it.tags ? [it.tags] : []);
+  const tags = Array.isArray(getItemTags(it)) ? getItemTags(it) : (getItemTags(it) ? [getItemTags(it)] : []);
   const MAP = {
     "华丽":"flair","화려":"flair","flair":"flair",
     "简约":"simple","심플":"simple","simple":"simple",
@@ -8770,7 +9995,7 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
   }
 
   function safeTags(it){
-    const t = it && it.tags;
+    const t = it && getItemTags(it);
     if (Array.isArray(t)) return t.join(' ');
     return String(t||'');
   }
@@ -8783,7 +10008,7 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
   function getScore(it){
     const stage = getSelectedStageSafe();
     if (!stage || typeof window.scoreItemForStage !== 'function') return 0;
-    const code = (it && (it.code ?? it.id ?? it.name)) + '';
+    const code = (it && (it.code ?? it.id ?? getItemName(it))) + '';
     const k = stage.stage_id + '|' + code;
     if (scoreCache.has(k)) return scoreCache.get(k);
     let v = 0;
@@ -8880,7 +10105,7 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
     const kw = norm(state.keyword);
     if (kw){
       out = out.filter(it=>{
-        const n = norm(it && it.name);
+        const n = norm(it && getItemName(it));
         const t = norm(safeTags(it));
         return (n && n.includes(kw)) || (t && t.includes(kw));
       });
@@ -8924,7 +10149,7 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
       img.loading = 'lazy';
       img.referrerPolicy = 'no-referrer';
       img.src = it && it.img ? it.img : '';
-      img.alt = it && it.name ? it.name : '';
+      img.alt = it && getItemName(it) ? getItemName(it) : '';
       img.style.width = '34px';
       img.style.height = '34px';
       img.style.objectFit = 'cover';
@@ -9198,7 +10423,7 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
       // owned filter
       if (ownedOnly){
         if (window.ownedNameSet instanceof Set){
-          list = list.filter(it=> window.ownedNameSet.has(norm(it && it.name)));
+          list = list.filter(it=> window.ownedNameSet.has(norm(it && getItemName(it))));
         } else {
           list = list.filter(it=> it && it._owned === true);
         }
@@ -9215,11 +10440,11 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
           });
         }
       }catch(e){}
-      list = list.map(it=> Object.assign({}, it, { __req: reqSet.has(norm(it && it.name)) }));
+      list = list.map(it=> Object.assign({}, it, { __req: reqSet.has(norm(it && getItemName(it))) }));
 
       // sort
       if (sortBy === 'name'){
-        list.sort((a,b)=> (b.__req - a.__req) || String(a.name||'').localeCompare(String(b.name||'')));
+        list.sort((a,b)=> (b.__req - a.__req) || String(getItemName(a)||'').localeCompare(String(getItemName(b)||'')));
       } else {
         list.sort((a,b)=> (b.__req - a.__req) || (Number(b.score||0) - Number(a.score||0)));
       }
@@ -9261,7 +10486,7 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
             return Array.isArray(out) ? out : [];
           }
         }catch(e){}
-        const raw = (it && it.tags) ? it.tags : '';
+        const raw = (it && getItemTags(it)) ? getItemTags(it) : '';
         if (Array.isArray(raw)) return raw;
         return String(raw||'').split(/[,\s#]+/).filter(Boolean);
       };
@@ -9269,13 +10494,13 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
       listEl.innerHTML = pageList.map(it=>{
         const stars = Math.max(0, Math.min(6, Number(it.stars||0)));
         const tgs = toTags(it);
-        const img = it.img ? `<img class="thumb" src="${it.img}" alt="${String(it.name||'')}">` : '';
+        const img = it.img ? `<img class="thumb" src="${it.img}" alt="${String(getItemName(it)||'')}">` : '';
         const reqBadge = it.__req ? `<span class="req-badge">추천</span>` : '';
-        const safeName = String(it.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        const safeName = String(getItemName(it)||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
         const partLabel = (typeof window.displayShort==='function') ? window.displayShort(it.part) : (it.part||'-');
         return `<div class="card">
           <div class="row thumbrow">${img}<h3 style="margin:0;flex:1;display:flex;justify-content:space-between;align-items:center">
-            <span>${String(it.name||'-')}</span>
+            <span>${String(getItemName(it)||'-')}</span>
             <button class="copy-btn" onclick="copyText('${safeName}')">이름 복사</button>
           </h3>${reqBadge}</div>
           <div class="badges">
@@ -9337,7 +10562,7 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
     const ownedNames = ta
       ? ta.value.split(/[\n\r,]+/).map(s=>s.trim()).filter(Boolean)
       : [];
-    w.postMessage({ type:'ITEMSINFO_DATA', items, ownedNames }, '*');
+    w.postMessage({ type:'ITEMSINFO_DATA', items, ownedNames, server: window.NIKKI_SERVER||'na' }, '*');
   }
 
   function sendOwnedUpdate(){
@@ -9366,11 +10591,44 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
 
   // Respond to iframe requests
   window.addEventListener('message', function(ev){
-    if (ev.origin !== location.origin && ev.origin !== 'null') return;
     const msg = ev && ev.data;
     if (!msg || typeof msg !== 'object') return;
     if (msg.type === 'ITEMSINFO_REQUEST_DATA'){
       sendItems();
+    }
+    if (msg.type === 'CALENDAR_OPEN_SET' && msg.setName){
+      if(typeof window.__showPanel === 'function') window.__showPanel('sets');
+      setTimeout(function(){
+        var sf = document.getElementById('setsViewFrame');
+        if(sf && sf.contentWindow){
+          sf.contentWindow.postMessage({type:'SETS_SEARCH', query: msg.setName}, '*');
+        }
+      }, 300);
+    }
+    if (msg.type === 'CALENDAR_OPEN_SET_BY_ID' && msg.setId){
+      if(typeof window.__showPanel === 'function') window.__showPanel('sets');
+      var bar = document.getElementById('calBackBar');
+      if(bar) bar.style.display = 'block';
+      setTimeout(function(){
+        var sf = document.getElementById('setsViewFrame');
+        if(sf && sf.contentWindow){
+          sf.contentWindow.postMessage({type:'SETS_OPEN_BY_ID', setId: msg.setId}, '*');
+        }
+      }, 400);
+    }
+    if (msg.type === 'ITEMSINFO_OWNED_TOGGLE' && msg.name){
+      try{
+        var ta = document.getElementById('ownedInput');
+        if(ta){
+          var name = String(msg.name).trim();
+          var cur = ta.value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+          var idx = cur.findIndex(function(l){return l.toLowerCase()===name.toLowerCase();});
+          if(msg.owned && idx===-1) cur.push(name);
+          else if(!msg.owned && idx!==-1) cur.splice(idx,1);
+          ta.value = cur.join('\n');
+          ta.dispatchEvent(new Event('input',{bubbles:true}));
+        }
+      }catch(e){}
     }
   });
 
@@ -9459,8 +10717,7 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
     const stageSel = document.getElementById('stageSelect');
     if (!stageSel) return;
 
-    const all = ensureDedupStages();
-    window.__stagesDedup = all;
+    const all = window.__stagesDedup || ensureDedupStages();
     const g = groupSel ? groupSel.value : '';
     const q = search ? String(search.value||'').trim().toLowerCase() : '';
 
@@ -9493,8 +10750,7 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
     const groupSel = document.getElementById('stageGroupSelect');
     if (!groupSel) return;
 
-    const all = ensureDedupStages();
-    window.__stagesDedup = all;
+    const all = window.__stagesDedup || ensureDedupStages();
     const groups = new Set();
     all.forEach(s=> groups.add(stageCategory(s.stage_id)));
     const arr = Array.from(groups);
@@ -9550,6 +10806,77 @@ window.ITEM_DETAILS = window.itemDetails;
 
 
 <script>
+(function(){
+  function $(id){ return document.getElementById(id); }
+  window.addEventListener('message', function(ev){
+    var d = ev && ev.data;
+    if(!d || typeof d!=='object') return;
+      }
+  }, false);
+
+  // Also poll in case postMessage timing misses
+  function poll(){
+    setTimeout(poll, 300);
+  }
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(poll, 50); });
+})();
+</script>
+
+
+<script>
+/* __ITEMS_INDEX_BRIDGE__ : respond to sources_frame requesting minimal item index (file:// safe) */
+(function(){
+  function buildIndex(items){
+    try{
+      return (items||[]).map(function(it){
+        return { code: it.code, part: it.part, name: getItemName(it), img: it.img };
+      });
+    }catch(e){ return []; }
+  }
+
+  function resolveItems(){
+    try{
+      if (typeof window.__resolveItems === 'function'){
+        var r = window.__resolveItems();
+        if (Array.isArray(r)) return r;
+      }
+    }catch(e){}
+    if (Array.isArray(window.items)) return window.items;
+    if (Array.isArray(window.ITEMS)) return window.ITEMS;
+    return null;
+  }
+
+  function send(toWin, reqId){
+    var items = resolveItems();
+    if (!items || !items.length){
+      // retry for up to ~4 seconds
+      var n=0;
+      var t=setInterval(function(){
+        n++;
+        var it = resolveItems();
+        if (it && it.length){
+          clearInterval(t);
+          try{ toWin.postMessage({ type:"ITEMS_INDEX", reqId:reqId, items: buildIndex(it) }, "*"); }catch(e){}
+        }
+        if (n>40){ clearInterval(t); }
+      }, 100);
+      return;
+    }
+    try{ toWin.postMessage({ type:"ITEMS_INDEX", reqId:reqId, items: buildIndex(items) }, "*"); }catch(e){}
+  }
+
+  window.addEventListener("message", function(ev){
+    var msg = ev && ev.data;
+    if (!msg) return;
+    if (msg.type === "REQUEST_ITEMS_INDEX"){
+      send(ev.source || window, msg.reqId || null);
+    }
+  }, false);
+})();
+</script>
+
+
+<script>
 /* Quiz tab helpers */
 document.addEventListener('DOMContentLoaded', function(){
   var btn = document.getElementById('openQuizNewTab');
@@ -9597,7 +10924,7 @@ if (msg.type === 'FIND_ITEM_BY_IMG_RESULT'){
       if (Array.isArray(arr)){
         const it = arr.find(x => Number(x.code ?? x.itemCode) === Number(target.code));
         if (it){
-          target = Object.assign({}, target, { name: it.name || (it.names && (it.names.ko||it.names.zh||it.names.en||it.names.ja)) || "" });
+          target = Object.assign({}, target, { name: getItemName(it) || (it.names && (it.names.ko||it.names.zh||it.names.en||it.names.ja)) || "" });
         }
       }
     }
@@ -9624,7 +10951,7 @@ if (msg.type === 'FIND_ITEM_BY_IMG_RESULT'){
     setTimeout(function(){ t.classList.remove('show'); }, 1200);
   }
   window.copyText = async function(txt){
-    // txt는 it.name 값만 직접 전달됨 — 추가 파싱 불필요
+    // txt는 getItemName(it) 값만 직접 전달됨 — 추가 파싱 불필요
     var name = String(txt || '').trim();
     try{
       if(navigator.clipboard && navigator.clipboard.writeText){
@@ -9746,7 +11073,7 @@ function updateStatsBar(){
   var ownedNames = new Set(
     ta.value.split(/[\n\r,]+/).map(function(s){ return norm(s); }).filter(Boolean)
   );
-  var itemKeys = new Set(items.map(function(it){ return norm(it && it.name); }).filter(Boolean));
+  var itemKeys = new Set(items.map(function(it){ return norm(it && getItemName(it)); }).filter(Boolean));
   var owned = 0;
   ownedNames.forEach(function(n){ if(itemKeys.has(n)) owned++; });
   var miss = total - owned;
@@ -9812,13 +11139,13 @@ document.addEventListener('input', function(ev){
     if(ownedOnly){
       var ns = window.ownedNameSet;
       if(ns instanceof Set){
-        list = list.filter(function(it){ return ns.has(norm(it && it.name)); });
+        list = list.filter(function(it){ return ns.has(norm(it && getItemName(it))); });
       } else {
         list = list.filter(function(it){ return it._owned; });
       }
     }
     if(sortBy === 'name'){
-      list.sort(function(a,b){ return String(a.name||'').localeCompare(String(b.name||''),'ko'); });
+      list.sort(function(a,b){ return String(getItemName(a)||'').localeCompare(String(getItemName(b)||''),'ko'); });
     } else {
       list.sort(function(a,b){ return (Number(b.score||0)) - (Number(a.score||0)); });
     }
@@ -9828,7 +11155,7 @@ document.addEventListener('input', function(ev){
     list.forEach(function(it, i){
       rows.push([
         i+1,
-        '"' + String(it.name||'').replace(/"/g,'""') + '"',
+        '"' + String(getItemName(it)||'').replace(/"/g,'""') + '"',
         '"' + String(it.part||'').replace(/"/g,'""') + '"',
         Number(it.stars||0),
         Number(it.score||0).toFixed(2),
@@ -10087,11 +11414,11 @@ function updateOutfitBanner(){
     var s = Number(scoreFn(it, stage) || 0);
     var part = String(it.part||'');
     if(part === '원피스'){
-      if(s > bestOnePiece){ bestOnePiece = s; bestOnePieceName = it.name||''; }
+      if(s > bestOnePiece){ bestOnePiece = s; bestOnePieceName = getItemName(it)||''; }
     } else if(part === '상의'){
-      if(s > bestTop){ bestTop = s; bestTopName = it.name||''; }
+      if(s > bestTop){ bestTop = s; bestTopName = getItemName(it)||''; }
     } else if(part === '하의'){
-      if(s > bestBottom){ bestBottom = s; bestBottomName = it.name||''; }
+      if(s > bestBottom){ bestBottom = s; bestBottomName = getItemName(it)||''; }
     }
   });
 
@@ -10207,7 +11534,7 @@ setTimeout(updateOutfitBanner, 900);
       if(compareList[i]){
         var it=compareList[i];
         if(it.img){ var im=document.createElement('img'); im.src=it.img; s.appendChild(im); }
-        else { s.textContent=String(it.name||'').slice(0,4); s.style.fontSize='10px'; }
+        else { s.textContent=String(getItemName(it)||'').slice(0,4); s.style.fontSize='10px'; }
         var rm=document.createElement('div'); rm.className='cmp-rm'; rm.textContent='×';
         (function(idx){ rm.addEventListener('click',function(e){ e.stopPropagation(); removeItem(idx); }); })(i);
         s.appendChild(rm);
@@ -10223,17 +11550,17 @@ setTimeout(updateOutfitBanner, 900);
     // 카드 selected 표시
     document.querySelectorAll('.card').forEach(function(card){
       var n=norm(card.querySelector('h3 span') ? card.querySelector('h3 span').textContent : '');
-      var inList=compareList.some(function(it){ return norm(it.name)===n; });
+      var inList=compareList.some(function(it){ return norm(getItemName(it))===n; });
       card.classList.toggle('cmp-selected', inList);
     });
   }
 
   function addItem(it){
     if(compareList.length>=MAX){ showToast('최대 4개까지 비교 가능해요'); return; }
-    if(compareList.some(function(x){ return norm(x.name)===norm(it.name); })){ showToast('이미 추가된 아이템이에요'); return; }
+    if(compareList.some(function(x){ return norm(x.name)===norm(getItemName(it)); })){ showToast('이미 추가된 아이템이에요'); return; }
     compareList.push(it);
     renderSlots();
-    showToast('"'+it.name+'" 비교에 추가됨');
+    showToast('"'+getItemName(it)+'" 비교에 추가됨');
   }
 
   function removeItem(idx){
@@ -10278,7 +11605,7 @@ setTimeout(updateOutfitBanner, 900);
       {label:'태그', key:'tags'},
     ];
     var html='<table class="cmp-table"><thead><tr><th>항목</th>';
-    list.forEach(function(it){ html+='<th>'+String(it.name||'-')+'</th>'; });
+    list.forEach(function(it){ html+='<th>'+String(getItemName(it)||'-')+'</th>'; });
     html+='</tr></thead><tbody>';
     rows.forEach(function(row){
       html+='<tr><td style="text-align:left;font-weight:600;white-space:nowrap">'+row.label+'</td>';
@@ -10709,8 +12036,62 @@ body.dark .sc-desc{color:#f0e4ec}
   }, true);
 })();
 </script>
+
+<script>
+/* ── 서버 설정 ── */
+window.NIKKI_SERVER = localStorage.getItem('nikki_server') || 'na';
+
+function getItemName(it){
+  if(!it) return '';
+  if(window.NIKKI_SERVER === 'jp') return it.name_jp || it.name || '';
+  return it.name || '';
+}
+function getItemTags(it){
+  if(!it) return [];
+  if(window.NIKKI_SERVER === 'jp') return it.tags_jp || it.tags || [];
+  return it.tags || [];
+}
+
+function toggleServer(){
+  window.NIKKI_SERVER = window.NIKKI_SERVER === 'na' ? 'jp' : 'na';
+  localStorage.setItem('nikki_server', window.NIKKI_SERVER);
+  var btn = document.getElementById('serverToggleBtn');
+  if(btn) btn.textContent = window.NIKKI_SERVER === 'jp' ? '🇯🇵 일본' : '🌎 북미';
+  if(typeof window.renderAll === 'function') window.renderAll();
+  if(typeof window.ensureBeautyParts === 'function') window.ensureBeautyParts();
+  ['itemsInfoFrame','setsViewFrame','calendarFrame'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el && el.contentWindow){
+      el.contentWindow.postMessage({type:'NIKKI_SERVER_CHANGE', server: window.NIKKI_SERVER}, '*');
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  var btn = document.getElementById('serverToggleBtn');
+  if(btn) btn.textContent = window.NIKKI_SERVER === 'jp' ? '🇯🇵 일본' : '🌎 북미';
+  document.querySelectorAll('.tab').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      setTimeout(function(){
+        ['itemsInfoFrame','setsViewFrame','calendarFrame'].forEach(function(id){
+          var el = document.getElementById(id);
+          if(el && el.contentWindow){
+            el.contentWindow.postMessage({type:'NIKKI_SERVER_CHANGE', server: window.NIKKI_SERVER}, '*');
+          }
+        });
+      }, 300);
+    });
+  });
+  var calBtn = document.getElementById('calBackBtn');
+  var calBar = document.getElementById('calBackBar');
+  if(calBtn){
+    calBtn.addEventListener('click', function(){
+      if(typeof window.__showPanel === 'function') window.__showPanel('calendar');
+      if(calBar) calBar.style.display = 'none';
+    });
+  }
+  var setsTab = document.querySelector('[data-tab="sets"]');
+  if(setsTab) setsTab.addEventListener('click', function(){ if(calBar) calBar.style.display='none'; });
+});
+</script>
 </body>
-(function(){
-  'use strict';
-
-

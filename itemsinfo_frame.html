@@ -5,77 +5,69 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>아이템 정보</title>
 <style>
+  :root{--pk-1:#e91e8c;--pk-2:#f06292;--pk-3:#f48fb1;--pk-4:#fce4ec;--pk-5:#fff5f8;--pk-border:#f8bbd0;--pk-grad:linear-gradient(135deg,#e91e8c,#f06292);--pk-muted:#a06080;--pk-shadow:0 2px 12px rgba(233,30,140,.12);--pk-text:#2d1a22}
   *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,AppleSDGothicNeo,Segoe UI,Roboto,sans-serif;background:#f7f7fb;color:#222}
+  body{margin:0;font-family:system-ui,AppleSDGothicNeo,'Segoe UI',Roboto,sans-serif;background:var(--pk-5);color:var(--pk-text)}
+  ::-webkit-scrollbar{width:7px;height:7px}
+  ::-webkit-scrollbar-track{background:var(--pk-5);border-radius:999px}
+  ::-webkit-scrollbar-thumb{background:var(--pk-3);border-radius:999px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--pk-2)}
+  *{scrollbar-width:thin;scrollbar-color:var(--pk-3) var(--pk-5)}
   .wrap{display:flex;gap:12px;padding:12px}
-  .sidebar{width:320px;max-width:40vw;background:#fff;border:1px solid #eee;border-radius:12px;overflow:auto}
-  .side-head{padding:12px 12px 6px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
-  .side-head b{font-size:14px}
-  .side-head .total{font-size:12px;color:#666}
-  .list{padding:6px}
-  .itembtn{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;
-           padding:9px 10px;border:1px solid transparent;background:#fff;border-radius:10px;cursor:pointer}
-  .itembtn:hover{background:#fafafa}
-  .itembtn.active{background:#f0f7ff;border-color:#cfe4ff}
-  .badge{font-size:12px;background:#e9f3ff;border:1px solid #cfe4ff;border-radius:999px;padding:2px 8px;color:#225}
+  .sidebar{width:200px;max-width:38vw;background:#fff;border:1.5px solid var(--pk-border);border-radius:16px;overflow:hidden;box-shadow:var(--pk-shadow);align-self:flex-start;position:sticky;top:0}
+  .side-head{padding:10px 12px 8px;border-bottom:1.5px solid var(--pk-border);display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#fff5f8,#fce4ec)}
+  .side-head b{font-size:13px;color:var(--pk-1);font-weight:700}
+  .side-head .total{font-size:11px;color:var(--pk-muted)}
+  .list{padding:5px}
+  .itembtn{display:flex;justify-content:space-between;align-items:center;gap:6px;width:100%;padding:7px 9px;border:1.5px solid transparent;background:transparent;border-radius:10px;cursor:pointer;font-size:12px;font-family:inherit;color:var(--pk-text);transition:background .13s,border-color .13s;text-align:left}
+  .itembtn:hover{background:var(--pk-4);border-color:var(--pk-border)}
+  .itembtn.active{background:var(--pk-grad);border-color:transparent;color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(233,30,140,.2)}
+  .itembtn.active .badge{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.4);color:#fff}
+  .badge{font-size:11px;background:var(--pk-4);border:1px solid var(--pk-border);border-radius:999px;padding:1px 7px;color:var(--pk-1);font-weight:600;white-space:nowrap}
   .main{flex:1;min-width:0}
-  .toolbar{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-bottom:10px}
-  input,select,button{padding:8px;border:1px solid #ddd;border-radius:10px;background:#fff}
-  button{cursor:pointer}
-  .card{background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden}
-  .thumb{width:44px;height:44px;object-fit:cover;border-radius:10px;border:1px solid #eee;display:block;background:#fafafa}
+  .toolbar{display:flex;gap:7px;align-items:center;justify-content:flex-end;margin-bottom:10px;flex-wrap:wrap}
+  input,select,button{padding:7px 10px;border:1.5px solid var(--pk-border);border-radius:10px;background:#fff;color:var(--pk-text);font-family:inherit;font-size:13px}
+  select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23e91e8c' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:28px}
+  input:focus,select:focus{outline:none;border-color:var(--pk-2);box-shadow:0 0 0 3px rgba(233,30,140,.1)}
+  button{cursor:pointer;font-weight:600;transition:background .13s,border-color .13s}
+  button:hover{background:var(--pk-4);border-color:var(--pk-2)}
+  .card{background:#fff;border:1.5px solid var(--pk-border);border-radius:14px;overflow:hidden;box-shadow:var(--pk-shadow)}
+  .thumb{width:44px;height:44px;object-fit:cover;border-radius:10px;border:1.5px solid var(--pk-border);background:var(--pk-5);display:block}
   table{width:100%;border-collapse:collapse}
-  th,td{padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:left;font-size:13px}
-  th{background:#fafafa;font-weight:700}
-  .muted{color:#777;font-size:12px}
-  .badge-owned{font-size:11px;background:#eaffea;border:1px solid #cdeccc;border-radius:999px;padding:2px 7px;color:#1a6b1a;margin-left:4px;white-space:nowrap}
+  th,td{padding:8px 10px;border-bottom:1px solid var(--pk-4);text-align:left;font-size:13px}
+  th{background:linear-gradient(135deg,#fff5f8,#fce4ec);font-weight:700;color:var(--pk-1);font-size:12px}
+  tr:hover td{background:var(--pk-5)}
+  tr:last-child td{border-bottom:none}
+  .muted{color:var(--pk-muted);font-size:12px}
+  .badge-owned{font-size:11px;background:#eaffea;border:1px solid #cdeccc;border-radius:999px;padding:1px 7px;color:#2e7d32;font-weight:600}
   .itembtn.owned-only-on{background:#eaffea;border-color:#cdeccc}
-
-/* ===== 아이템 상세 팝업(dialog) ===== */
-.detailDialog{
-  width:min(980px, calc(100vw - 24px));
-  max-width:980px;
-  border:none;
-  padding:0;
-  border-radius:14px;
-  background:transparent;
-}
-.detailDialog::backdrop{
-  background:rgba(0,0,0,.45);
-}
-.detailDialogBox{
-  margin:0;
-  padding:0;
-  background:#fff;
-  border:1px solid #eee;
-  border-radius:14px;
-  overflow:hidden;
-}
-.detailDialogHead{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding:10px 12px;
-  border-bottom:1px solid #eee;
-  background:#fff;
-}
-.detailClose{
-  border:1px solid #ddd;
-  background:#fff;
-  border-radius:10px;
-  width:34px;height:34px;
-  cursor:pointer;
-}
-.detailClose:hover{ background:#fafafa; }
-.detailFrame{
-  width:100%;
-  height:min(78vh, 820px);
-  border:0;
-  display:block;
-  background:#f7f7fb;
-}
-
+  #pager{display:flex;gap:8px;align-items:center;justify-content:flex-end;padding:10px 2px}
+  #prevPage,#nextPage{padding:6px 14px;border-radius:999px;border:1.5px solid var(--pk-border);background:#fff;font-weight:600}
+  #prevPage:hover,#nextPage:hover{background:var(--pk-grad);border-color:transparent;color:#fff}
+  .empty{padding:40px 20px;text-align:center;color:var(--pk-muted);font-size:14px}
+  .detailDialog{width:min(980px,calc(100vw - 24px));max-width:980px;border:none;padding:0;border-radius:16px;background:transparent}
+  .detailDialog::backdrop{background:rgba(45,26,34,.55)}
+  .detailDialogBox{margin:0;padding:0;background:#fff;border:1.5px solid var(--pk-border);border-radius:16px;overflow:hidden}
+  .detailDialogHead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1.5px solid var(--pk-border);background:linear-gradient(135deg,#fff5f8,#fce4ec)}
+  .detailDialogHead b{color:var(--pk-1);font-size:14px}
+  .detailClose{border:1.5px solid var(--pk-border);background:#fff;border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:16px;color:var(--pk-muted);display:flex;align-items:center;justify-content:center}
+  .detailClose:hover{background:var(--pk-4);border-color:var(--pk-2);color:var(--pk-1)}
+  .detailFrame{width:100%;height:min(78vh,820px);border:0;display:block;background:var(--pk-5)}
+  .own-btn{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--pk-border);background:#fff;cursor:pointer;font-size:16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;padding:0;color:var(--pk-1);line-height:1;flex-shrink:0}
+  .own-btn:hover{background:var(--pk-4);border-color:var(--pk-2);transform:scale(1.15)}
+  .own-btn.is-owned{background:var(--pk-grad);border-color:transparent;color:#fff;font-size:13px;box-shadow:0 2px 6px rgba(233,30,140,.3)}
+  .own-btn.is-owned:hover{opacity:.85;transform:scale(1.15)}
+  /* 장식 서브항목 */
+  .itembtn.sub-item{padding-left:18px;font-size:11px;opacity:.85}
+  .itembtn.sub-item::before{content:"ㄴ ";color:var(--pk-muted);font-size:10px}
+  .itembtn.sub-item.active::before{color:rgba(255,255,255,.7)}
+  .itembtn.sub-item.active{color:#fff;opacity:1}
+  .sub-group-hidden{display:none}
+  .itembtn.group-btn{font-weight:700;color:var(--pk-1)}
+  .itembtn.group-btn.active{color:#fff}
+  .itembtn.group-btn .toggle-arrow{font-size:10px;margin-left:2px;transition:transform .2s}
+  .itembtn.group-btn.open .toggle-arrow{display:inline-block;transform:rotate(90deg)}
+  .itembtn.group-btn.open.active .toggle-arrow{color:rgba(255,255,255,.8)}
 </style>
 </head>
 <body>
@@ -119,6 +111,7 @@
             <th>이름</th>
             <th style="width:70px">별</th>
             <th style="width:220px">부위</th>
+            <th style="width:36px;text-align:center">+</th>
           </tr>
         </thead>
         <tbody id="rows"></tbody>
@@ -148,6 +141,18 @@
 
 <script>
 (function(){
+
+window.NIKKI_SERVER = window.NIKKI_SERVER || 'na';
+function getItemName(it){
+  if(!it) return '';
+  if(window.NIKKI_SERVER === 'jp') return it.name_jp || it.name || '';
+  return it.name || '';
+}
+function getItemTags(it){
+  if(!it) return [];
+  if(window.NIKKI_SERVER === 'jp') return it.tags_jp || it.tags || [];
+  return it.tags || [];
+}
   // XSS 방지용 이스케이프 함수
   function esc(s){
     const d = document.createElement('div');
@@ -199,31 +204,33 @@
     {label:'뷰티', parts:['뷰티']},
     {label:'반딧불의 영혼', parts:['반딧불의 영혼']},
 
-    // Accessory groups (exact part keys)
-    {label:'머리', parts:['장식 - 머리 - 머리']},
-    {label:'베일', parts:['장식 - 머리 - 베일']},
-    {label:'헤어핀', parts:['장식 - 머리 - 헤어핀']},
-    {label:'귀장식', parts:['장식 - 머리 - 귀']},
-    {label:'귀', parts:['장식 - 귀']},
-    {label:'목도리', parts:['장식 - 목 - 목도리']},
-    {label:'목걸이', parts:['장식 - 목 - 목걸이']},
-    {label:'팔찌(우)', parts:['장식 - 손 - 팔찌(우)']},
-    {label:'팔찌(좌)', parts:['장식 - 손 - 팔찌(좌)']},
-    {label:'장갑', parts:['장식 - 손 - 장갑']},
-    {label:'소품(우)', parts:['장식 - 소품 - 소품(우)']},
-    {label:'소품(좌)', parts:['장식 - 소품 - 소품(좌)']},
-    {label:'양손', parts:['장식 - 소품 - 양손']},
-    {label:'허리', parts:['장식 - 허리']},
-    {label:'얼굴', parts:['장식 - 특수 - 얼굴']},
-    {label:'가슴', parts:['장식 - 특수 - 가슴']},
-    {label:'문신', parts:['장식 - 특수 - 문신']},
-    {label:'날개', parts:['장식 - 특수 - 날개']},
-    {label:'꼬리', parts:['장식 - 특수 - 꼬리']},
-    {label:'전경', parts:['장식 - 특수 - 전경']},
-    {label:'배경', parts:['장식 - 특수 - 배경']},
-    {label:'상단', parts:['장식 - 특수 - 상단']},
-    {label:'하단', parts:['장식 - 특수 - 하단']},
-    {label:'스킨', parts:['장식 - 특수 - 스킨']},
+    // 장식 그룹 (전체)
+    {label:'장식 전체', group:'장식', parts:['장식 - 머리 - 머리','장식 - 머리 - 베일','장식 - 머리 - 헤어핀','장식 - 머리 - 귀','장식 - 귀','장식 - 목 - 목도리','장식 - 목 - 목걸이','장식 - 손 - 팔찌(우)','장식 - 손 - 팔찌(좌)','장식 - 손 - 장갑','장식 - 소품 - 소품(우)','장식 - 소품 - 소품(좌)','장식 - 소품 - 양손','장식 - 허리','장식 - 특수 - 얼굴','장식 - 특수 - 가슴','장식 - 특수 - 문신','장식 - 특수 - 날개','장식 - 특수 - 꼬리','장식 - 특수 - 전경','장식 - 특수 - 배경','장식 - 특수 - 상단','장식 - 특수 - 하단','장식 - 특수 - 스킨']},
+    // 장식 세부 항목 (접힘)
+    {label:'머리', parts:['장식 - 머리 - 머리'], sub:true},
+    {label:'베일', parts:['장식 - 머리 - 베일'], sub:true},
+    {label:'헤어핀', parts:['장식 - 머리 - 헤어핀'], sub:true},
+    {label:'귀장식', parts:['장식 - 머리 - 귀'], sub:true},
+    {label:'귀', parts:['장식 - 귀'], sub:true},
+    {label:'목도리', parts:['장식 - 목 - 목도리'], sub:true},
+    {label:'목걸이', parts:['장식 - 목 - 목걸이'], sub:true},
+    {label:'팔찌(우)', parts:['장식 - 손 - 팔찌(우)'], sub:true},
+    {label:'팔찌(좌)', parts:['장식 - 손 - 팔찌(좌)'], sub:true},
+    {label:'장갑', parts:['장식 - 손 - 장갑'], sub:true},
+    {label:'소품(우)', parts:['장식 - 소품 - 소품(우)'], sub:true},
+    {label:'소품(좌)', parts:['장식 - 소품 - 소품(좌)'], sub:true},
+    {label:'양손', parts:['장식 - 소품 - 양손'], sub:true},
+    {label:'허리', parts:['장식 - 허리'], sub:true},
+    {label:'얼굴', parts:['장식 - 특수 - 얼굴'], sub:true},
+    {label:'가슴', parts:['장식 - 특수 - 가슴'], sub:true},
+    {label:'문신', parts:['장식 - 특수 - 문신'], sub:true},
+    {label:'날개', parts:['장식 - 특수 - 날개'], sub:true},
+    {label:'꼬리', parts:['장식 - 특수 - 꼬리'], sub:true},
+    {label:'전경', parts:['장식 - 특수 - 전경'], sub:true},
+    {label:'배경', parts:['장식 - 특수 - 배경'], sub:true},
+    {label:'상단', parts:['장식 - 특수 - 상단'], sub:true},
+    {label:'하단', parts:['장식 - 특수 - 하단'], sub:true},
+    {label:'스킨', parts:['장식 - 특수 - 스킨'], sub:true},
   ];
 
   let ITEMS = [];
@@ -266,14 +273,48 @@
       const c = ITEMS.filter(it => p.parts.includes(String(it.part||''))).length;
       counts.set(p.label, c);
     }
-    PARTS.forEach((p, idx)=>{
-      const btn = document.createElement('button');
-      btn.className = 'itembtn' + (idx===active ? ' active':'');
+    // 장식 서브항목 표시 여부
+    var subOpen = false;
+    PARTS.forEach(function(p, idx){
+      var btn = document.createElement('button');
+      var isGroup = p.group === '장식' && !p.sub;
+      var isSub = p.sub === true;
       btn.type = 'button';
-      btn.innerHTML = `<span>${p.label}</span><span class="badge">${counts.get(p.label) || 0}</span>`;
-      btn.addEventListener('click', ()=>{
+      var cls = 'itembtn';
+      if(idx===active) cls += ' active';
+      if(isGroup) cls += ' group-btn';
+      if(isSub) cls += ' sub-item sub-group-hidden';
+      btn.className = cls;
+      var cnt = 0;
+      if(p.parts){
+        p.parts.forEach(function(pt){
+          ITEMS.forEach(function(it){ if(it.part===pt) cnt++; });
+        });
+      } else {
+        cnt = ITEMS.length;
+      }
+      if(isGroup){
+        btn.innerHTML = '<span>장식 <span class="toggle-arrow">▶</span></span><span class="badge">'+cnt+'</span>';
+      } else {
+        btn.innerHTML = '<span>'+p.label+'</span><span class="badge">'+cnt+'</span>';
+      }
+      btn.addEventListener('click', function(){
+        if(isGroup){
+          // 서브항목 토글
+          subOpen = !subOpen;
+          btn.classList.toggle('open', subOpen);
+          partList.querySelectorAll('.sub-group-hidden').forEach(function(el){
+            el.style.display = subOpen ? 'flex' : 'none';
+          });
+          // 장식 전체도 선택
+          active = idx;
+          partList.querySelectorAll('.itembtn').forEach(function(b){ b.classList.remove('active'); });
+          btn.classList.add('active');
+          render();
+          return;
+        }
         active = idx;
-        [...partList.querySelectorAll('.itembtn')].forEach(b=>b.classList.remove('active'));
+        partList.querySelectorAll('.itembtn').forEach(function(b){ b.classList.remove('active'); });
         btn.classList.add('active');
         render();
       });
@@ -288,6 +329,8 @@
     const starF = $('starFilter').value;
 
     let list = ITEMS.slice();
+    // 일본 모드에서 name_jp 없는 아이템 제외
+    if(window.NIKKI_SERVER === 'jp') list = list.filter(it => it.name_jp);
     const p = PARTS[active];
     if (p && p.parts){
       list = list.filter(it => p.parts.includes(String(it.part||'')));
@@ -299,8 +342,8 @@
 
     if (q){
       list = list.filter(it=>{
-        const name = String(it.name||'').toLowerCase();
-        const tags = normTags(it.tags).join(' ').toLowerCase();
+        const name = String(getItemName(it)||'').toLowerCase();
+        const tags = normTags(getItemTags(it)).join(' ').toLowerCase();
         return name.includes(q) || tags.includes(q);
       });
     }
@@ -312,7 +355,7 @@
     if (sort === 'stars'){
       list.sort((a,b)=>(Number(b.stars)||0)-(Number(a.stars)||0));
     }else if (sort === 'name'){
-      list.sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''), 'ko'));
+      list.sort((a,b)=>String(getItemName(a)||'').localeCompare(String(getItemName(b)||''), 'ko'));
     }else if (sort === 'part_code'){
       // 1순위: 부위(정의된 순서), 2순위: 코드
       const byCode = (x)=>Number(x.code)||0;
@@ -324,7 +367,7 @@
         if (d !== 0) return d;
         const c = byCode(a)-byCode(b);
         if (c !== 0) return c;
-        return String(a.name||'').localeCompare(String(b.name||''), 'ko');
+        return String(getItemName(a)||'').localeCompare(String(getItemName(b)||''), 'ko');
       });
     }else{
       // code
@@ -367,7 +410,7 @@
       const tdCode = document.createElement('td');
       tdCode.textContent = it.code ?? '';
       const tdName = document.createElement('td');
-      tdName.textContent = it.name ?? '';
+      tdName.textContent = getItemName(it) ?? '';
       if (it._owned){
         const badge = document.createElement('span');
         badge.className = 'badge-owned';
@@ -379,7 +422,30 @@
       const tdPart = document.createElement('td');
       tdPart.textContent = it.part ?? '';
 
-      tr.append(tdImg, tdCode, tdName, tdStars, tdPart);
+      // 보유 토글 버튼
+      const tdOwn = document.createElement('td');
+      tdOwn.style.cssText = 'text-align:center;width:36px';
+      const ownBtn = document.createElement('button');
+      ownBtn.className = 'own-btn' + (it._owned ? ' is-owned' : '');
+      ownBtn.title = it._owned ? '보유 해제' : '보유 추가';
+      ownBtn.textContent = it._owned ? '✓' : '+';
+      ownBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        const name = String((window.NIKKI_SERVER==='jp' ? (it.name_jp||it.name) : (it.name||it.name_jp))||'').trim();
+        const key  = name.toLowerCase();
+        const nowOwned = !OWNED_SET.has(key);
+        if(nowOwned) OWNED_SET.add(key); else OWNED_SET.delete(key);
+        ownBtn.className = 'own-btn' + (nowOwned ? ' is-owned' : '');
+        ownBtn.textContent = nowOwned ? '✓' : '+';
+        ownBtn.title = nowOwned ? '보유 해제' : '보유 추가';
+        const badge = tdName.querySelector('.badge-owned');
+        if(nowOwned && !badge){ const b=document.createElement('span'); b.className='badge-owned'; b.textContent='보유'; tdName.appendChild(b); }
+        else if(!nowOwned && badge){ badge.remove(); }
+        ITEMS = ITEMS.map(x=>({...x, _owned: window.NIKKI_SERVER==='jp' ? (x.name_jp ? OWNED_SET.has(String(x.name_jp||'').trim().toLowerCase()) : false) : OWNED_SET.has(String(x.name||'').trim().toLowerCase())}));
+        try{ window.parent.postMessage({type:'ITEMSINFO_OWNED_TOGGLE', name: name, owned: nowOwned}, '*'); }catch(e){}
+      });
+      tdOwn.appendChild(ownBtn);
+      tr.append(tdImg, tdCode, tdName, tdStars, tdPart, tdOwn);
       frag.appendChild(tr);
     }
     rows.appendChild(frag);
@@ -425,7 +491,24 @@
     if (ev.origin !== location.origin && ev.origin !== 'null') return;
     const msg = ev && ev.data;
     if (!msg || typeof msg !== 'object') return;
+    if(msg.type === 'NIKKI_SERVER_CHANGE'){
+      window.NIKKI_SERVER = msg.server;
+      // 서버 변경 시 _owned 전체 재계산
+      ITEMS = ITEMS.map(function(x){
+        var owned;
+        if(window.NIKKI_SERVER === 'jp'){
+          owned = x.name_jp ? OWNED_SET.has(String(x.name_jp||'').trim().toLowerCase()) : false;
+        } else {
+          owned = OWNED_SET.has(String(x.name||'').trim().toLowerCase());
+        }
+        return Object.assign({}, x, {_owned: owned});
+      });
+      if(typeof render === 'function') render();
+      return;
+    }
     if (msg.type === 'ITEMSINFO_DATA'){
+      if(msg.server) window.NIKKI_SERVER = msg.server;
+      // 서버 설정 먼저 적용 후 _owned 계산됨
       const arr = Array.isArray(msg.items) ? msg.items : [];
       // owned 이름 셋 업데이트
       if (Array.isArray(msg.ownedNames)){
@@ -434,7 +517,7 @@
       ITEMS = arr.filter(x => x && typeof x === 'object').map(it => ({
         ...it,
         _owned: OWNED_SET.size > 0
-          ? OWNED_SET.has(String(it.name||'').trim().toLowerCase())
+          ? (window.NIKKI_SERVER==='jp' ? (it.name_jp ? OWNED_SET.has(String(it.name_jp||'').trim().toLowerCase()) : false) : OWNED_SET.has(String(it.name||'').trim().toLowerCase()))
           : (it._owned === true)
       }));
       page = 1;
@@ -446,7 +529,7 @@
       OWNED_SET = new Set(msg.ownedNames.map(n => String(n||'').trim().toLowerCase()));
       ITEMS = ITEMS.map(it => ({
         ...it,
-        _owned: OWNED_SET.has(String(it.name||'').trim().toLowerCase())
+        _owned: (window.NIKKI_SERVER==='jp' ? (it.name_jp ? OWNED_SET.has(String(it.name_jp||'').trim().toLowerCase()) : false) : OWNED_SET.has(String(it.name||'').trim().toLowerCase()))
       }));
       render();
     }
