@@ -34,7 +34,7 @@ const PART_WEIGHTS = {
   window.__tagsFromItem = function(it){ return window.getItemTags(it); };
 })();
 </script>
-<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1, minimum-scale=0.5, maximum-scale=5, user-scalable=yes" name="viewport"/>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>니키 점수계산</title>
 <style>
   ::-webkit-scrollbar{width:7px;height:7px}
@@ -333,7 +333,30 @@ tbody tr:hover{background:#fff5f8}
   .tab{padding:6px 8px;font-size:12px}
   #darkModeBtn{padding:5px 8px;font-size:12px}
   #controls{padding:8px 10px;gap:6px;top:auto;position:relative}
-  #controls .filter-row{flex-wrap:wrap;gap:4px}
+
+  /* ── 필터 바: 보유만 보기를 맨 앞으로 ── */
+  #controls .filter-row{
+    display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+  }
+  /* 보유만 보기 — 전체 너비 맨 위 첫 줄 */
+  #ownedOnlyWrap{
+    order:-1;
+    width:100%;
+    display:flex;
+    align-items:center;
+  }
+  #ownedOnlyLabel{
+    display:flex;align-items:center;gap:8px;
+    width:100%;padding:9px 14px;
+    background:var(--pk-4);border:1.5px solid var(--pk-border);
+    border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;
+    color:var(--pk-1);
+  }
+  #ownedOnlyLabel.is-on{
+    background:var(--pk-grad);border-color:transparent;color:#fff;
+  }
+  #ownedOnly{width:18px;height:18px;accent-color:var(--pk-1);cursor:pointer}
+
   #list{padding:6px 10px;grid-template-columns:1fr}
   .card{padding:10px}
   #ownedBox{padding:0 10px 8px}
@@ -347,6 +370,12 @@ tbody tr:hover{background:#fff5f8}
   table{min-width:0}
   th,td{padding:6px 6px;font-size:12px}
   .group{margin:8px 10px}
+
+  /* ── 달력 iframe: 모바일에서 충분한 높이 ── */
+  #panel-calendar iframe{
+    height:calc(100svh - 120px) !important;
+    min-height:500px;
+  }
 }
 @media(max-width:480px){
   nav.tabs{top:0}
@@ -558,6 +587,7 @@ var stages = window.stages;
 <section id="controls">
 <div><label>
 <div class="filter-row">
+<span id="ownedOnlyWrap"><label id="ownedOnlyLabel" for="ownedOnly"><input id="ownedOnly" type="checkbox"/> 보유만 보기</label></span>
 <label for="stageGroupSelect">스테이지 분류</label>
 <select id="stageGroupSelect"><option value="">전체</option></select>
 <label for="stageSearchInput">검색</label>
@@ -619,7 +649,7 @@ var stages = window.stages;
 </optgroup>
 </select>
 <label>정렬</label><select id="sortBy"><option value="score">점수순</option><option value="name">이름순</option></select>
-<label><span class="checkbox-inline"><input id="ownedOnly" type="checkbox"/> 보유만 보기</span></label>
+
 <button id="exportCsvBtn" type="button" title="현재 결과를 CSV로 저장">CSV 내보내기</button>
 </div>
 </label><div>
@@ -747,7 +777,7 @@ var stages = window.stages;
 <section class="panel" id="panel-itemsinfo">
   <div style="padding:0; height: calc(100vh - 170px); min-height: 520px;">
     <iframe id="itemsInfoFrame" src="itemsinfo_frame.html"
-            style="width:100%; height:100%; border:0; background:transparent; touch-action:pan-x pan-y pinch-zoom;"
+            style="width:100%; height:100%; border:0; background:transparent;"
             loading="eager"></iframe>
   </div>
 </section>
@@ -756,7 +786,7 @@ var stages = window.stages;
   <!-- 세트정보: 아이템정보 탭처럼 '내부 스크롤(iframe)'로 고정 높이 -->
   <div style="padding:0; height: calc(100vh - 170px); min-height: 520px;">
     <iframe id="setsViewFrame" src="sets_frame.html"
-            style="width:100%; height:100%; border:0; background:transparent; touch-action:pan-x pan-y pinch-zoom;"
+            style="width:100%; height:100%; border:0; background:transparent;"
             loading="eager"></iframe>
   </div>
 </section>
@@ -1064,7 +1094,7 @@ body.dark .tl-act-btn:hover{background:#3f3f46}
 
 
 <section class="panel" id="panel-calendar">
-  <iframe id="calendarFrame" src="calendar.html" style="width:100%;height:80vh;border:none;display:block;touch-action:pan-x pan-y pinch-zoom;"></iframe>
+  <iframe id="calendarFrame" src="calendar.html" style="width:100%;height:80vh;border:none;display:block"></iframe>
 </section>
 
 <script>
@@ -12096,26 +12126,14 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 
 <script>
-/* 모바일 iframe 핀치줌 지원 */
+/* 모바일 보유만 보기 라벨 토글 */
 (function(){
-  function allowIframeZoom(){
-    document.querySelectorAll('iframe').forEach(function(f){
-      f.style.touchAction = 'pan-x pan-y pinch-zoom';
-    });
-  }
-  document.addEventListener('DOMContentLoaded', allowIframeZoom);
-  // iframe load 후에도 적용
-  document.querySelectorAll('iframe').forEach(function(f){
-    f.addEventListener('load', function(){
-      try{
-        var d = f.contentDocument || f.contentWindow.document;
-        var meta = d.querySelector('meta[name=viewport]');
-        if(meta){
-          meta.setAttribute('content','width=device-width,initial-scale=1,minimum-scale=0.5,maximum-scale=5,user-scalable=yes');
-        }
-      }catch(e){}
-    });
-  });
+  var cb = document.getElementById('ownedOnly');
+  var lbl = document.getElementById('ownedOnlyLabel');
+  if(!cb || !lbl) return;
+  function sync(){ lbl.classList.toggle('is-on', cb.checked); }
+  cb.addEventListener('change', sync);
+  sync();
 })();
 </script>
 </body>
