@@ -102,52 +102,13 @@ select:focus{outline:none;border-color:var(--p2)}
 .cchips{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
 .cc{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .1s;display:inline-block}
 .cc:hover,.cc.on{transform:scale(1.25);border-color:#333}
-@media(max-width:600px){.cell{min-height:75px}.ev-name{display:none}.fr{grid-template-columns:1fr}}
-
-/* ── 이미지 라이트박스 ── */
-#imgLb{
-  position:fixed;inset:0;z-index:9999;
-  background:rgba(0,0,0,.88);
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;
-  transition:opacity .2s;
-  padding:16px;
+@media(max-width:600px){
+  .cell{min-height:75px}
+  .ev-name{display:none}
+  .fr{grid-template-columns:1fr}
+  /* 모바일: 이벤트 카드 1개씩 세로로 */
+  .ev-card{flex:0 0 100% !important;min-width:0 !important}
 }
-#imgLb.open{opacity:1;pointer-events:auto}
-#imgLb img{
-  max-width:min(92vw,900px);
-  max-height:88vh;
-  border-radius:12px;
-  object-fit:contain;
-  box-shadow:0 8px 48px rgba(0,0,0,.7);
-  cursor:zoom-out;
-  transition:transform .2s;
-  user-select:none;
-}
-#imgLbClose{
-  position:fixed;top:16px;right:16px;
-  width:38px;height:38px;border-radius:50%;
-  background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.35);
-  color:#fff;font-size:18px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:background .15s;
-  backdrop-filter:blur(4px);
-  z-index:10000;
-}
-#imgLbClose:hover{background:rgba(255,255,255,.32)}
-#imgLbCaption{
-  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-  background:rgba(0,0,0,.6);color:#fff;
-  font-size:13px;font-weight:600;
-  padding:7px 18px;border-radius:999px;
-  backdrop-filter:blur(6px);
-  max-width:80vw;text-align:center;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  pointer-events:none;
-  z-index:10000;
-}
-/* 상세 모달 이미지에만 zoom 커서 */
-.mimg{ cursor:zoom-in !important; }
 </style>
 
 <div class="bar">
@@ -177,13 +138,6 @@ select:focus{outline:none;border-color:var(--p2)}
     <div class="cgrid" id="cgrid"></div>
   </div>
   <div class="lv" id="lv"><div id="litems"></div></div>
-</div>
-
-<!-- 이미지 라이트박스 -->
-<div id="imgLb">
-  <button id="imgLbClose" aria-label="닫기">✕</button>
-  <img id="imgLbImg" src="" alt="">
-  <div id="imgLbCaption"></div>
 </div>
 
 <!-- 상세 모달 -->
@@ -406,11 +360,8 @@ function renderCal(){
   for(var i=1;i<=remain;i++) html+='<div class="cell om"><span class="dn">'+i+'</span></div>';
 
   grid.innerHTML = html;
-  grid.querySelectorAll('.ev-card').forEach(function(card){
-    card.addEventListener('click',function(ev2){
-      ev2.stopPropagation();
-      openDetail(card.dataset.id);
-    });
+  grid.querySelectorAll('.ev-card').forEach(function(img){
+    img.addEventListener('click',function(ev2){ ev2.stopPropagation(); openDetail(img.dataset.id); });
   });
   grid.querySelectorAll('.ev-img-big, .ev-imgs-row img, .ev-imgs-row .ev-img-ph').forEach(function(img){
     img.addEventListener('click',function(ev2){ ev2.stopPropagation(); openDetail(img.dataset.id); });
@@ -423,16 +374,24 @@ function renderCal(){
 function renderList(){
   var el=document.getElementById('litems');
   if(!el) return;
-  var evs=filtered().slice().sort(function(a,b){return a.start>b.start?1:-1;});
-  if(!evs.length){el.innerHTML='<div style="color:var(--pm);padding:20px;text-align:center">이벤트가 없어요</div>';return;}
+
+  // 현재 달(curY/curM)과 겹치는 이벤트만
+  var monthStart = curY+'-'+pad(curM+1)+'-01';
+  var monthEnd   = curY+'-'+pad(curM+1)+'-'+pad(new Date(curY,curM+1,0).getDate());
+
+  var evs=filtered().filter(function(ev){
+    if(!ev.start||!ev.end) return false;
+    // 이벤트가 이번 달과 겹치는지 (start <= monthEnd AND end >= monthStart)
+    return ev.start<=monthEnd && ev.end>=monthStart;
+  }).slice().sort(function(a,b){return a.start>b.start?1:-1;});
+
+  if(!evs.length){el.innerHTML='<div style="color:var(--pm);padding:20px;text-align:center">이 달에는 이벤트가 없어요</div>';return;}
   el.innerHTML=evs.map(function(ev){
     var col=ev.color||'#f06292';
     var th=ev.img?'<img class="lth" src="'+esc(ev.img)+'" alt="" onerror="this.style.display=\'none\'">':'<div class="lph" style="background:'+col+'22">🌸</div>';
     return '<div class="litem" data-id="'+ev.id+'">'+th+'<div><div style="font-weight:700;font-size:13px;margin-bottom:2px">'+esc(ev.name)+(ev.nameEn&&ev.nameEn!==ev.name?' <span style="font-size:11px;color:var(--pm)">'+esc(ev.nameEn)+'</span>':'')+'</div><div style="font-size:11px;color:var(--pm);margin-bottom:3px">'+fmt(ev.start)+' ~ '+fmt(ev.end)+'</div><span class="badge '+srvCss(ev.server)+'">'+srvLabel(ev.server)+'</span></div></div>';
   }).join('');
-  el.querySelectorAll('.litem').forEach(function(el2){
-    el2.addEventListener('click',function(){ openDetail(el2.dataset.id); });
-  });
+  el.querySelectorAll('.litem').forEach(function(el2){ el2.addEventListener('click',function(){ openDetail(el2.dataset.id); }); });
 }
 
 function openDetail(id){
@@ -467,47 +426,6 @@ function openDetail(id){
   document.getElementById('dbd').classList.remove('h');
 }
 function closeDetail(){document.getElementById('dbd').classList.add('h');}
-
-/* ── 라이트박스 ── */
-(function(){
-  var lb    = document.getElementById('imgLb');
-  var lbImg = document.getElementById('imgLbImg');
-  var lbCap = document.getElementById('imgLbCaption');
-  var lbCls = document.getElementById('imgLbClose');
-
-  function openLb(src, caption){
-    if(!src) return;
-    lbImg.src = src;
-    lbCap.textContent = caption || '';
-    lbCap.style.display = caption ? 'block' : 'none';
-    lb.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeLb(){
-    lb.classList.remove('open');
-    document.body.style.overflow = '';
-    lbImg.src = '';
-  }
-
-  window.openImgLb = openLb;
-
-  lbCls.addEventListener('click', closeLb);
-  lb.addEventListener('click', function(e){ if(e.target === lb || e.target === lbImg) closeLb(); });
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape' && lb.classList.contains('open')) closeLb(); });
-})();
-
-/* 상세 모달 이미지 클릭 → 라이트박스 */
-(function(){
-  var im = document.getElementById('dimg');
-  if(!im) return;
-  im.addEventListener('click', function(e){
-    e.stopPropagation();
-    var src = im.getAttribute('src') || '';
-    if(!src) return;
-    var name = (document.getElementById('dname')||{}).textContent || '';
-    if(window.openImgLb) window.openImgLb(src, name);
-  });
-})();
 
 function buildChips(){
   var w=document.getElementById('cchips');
@@ -579,8 +497,8 @@ function showList(){document.getElementById('cv').classList.add('off');document.
 // 초기화
 renderCal();
 
-document.getElementById('bPrev').addEventListener('click',function(){curM--;if(curM<0){curM=11;curY--;}renderCal();});
-document.getElementById('bNext').addEventListener('click',function(){curM++;if(curM>11){curM=0;curY++;}renderCal();});
+document.getElementById('bPrev').addEventListener('click',function(){curM--;if(curM<0){curM=11;curY--;}renderCal();if(document.getElementById('lv').classList.contains('on')) renderList();});
+document.getElementById('bNext').addEventListener('click',function(){curM++;if(curM>11){curM=0;curY++;}renderCal();if(document.getElementById('lv').classList.contains('on')) renderList();});
 document.getElementById('bToday').addEventListener('click',function(){curY=new Date().getFullYear();curM=new Date().getMonth();showCal();renderCal();});
 document.getElementById('fSrv').addEventListener('change',function(){renderCal();renderList();});
 document.getElementById('bCal').addEventListener('click',showCal);
