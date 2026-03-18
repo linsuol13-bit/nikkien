@@ -68,11 +68,8 @@
   .itembtn.group-btn .toggle-arrow{font-size:10px;margin-left:2px;transition:transform .2s}
   .itembtn.group-btn.open .toggle-arrow{display:inline-block;transform:rotate(90deg)}
   .itembtn.group-btn.open.active .toggle-arrow{color:rgba(255,255,255,.8)}
-
-  /* ===== 모바일 최적화 ===== */
   @media(max-width:600px){
     .wrap{flex-direction:column;gap:8px;padding:8px}
-    /* 사이드바 → 가로 스크롤 탭형 */
     .sidebar{width:100%;max-width:100%;position:static;border-radius:12px;overflow:hidden}
     .side-head{padding:8px 10px 6px}
     .list{display:flex;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;padding:6px;gap:5px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
@@ -80,11 +77,9 @@
     .itembtn{white-space:nowrap;flex-shrink:0;width:auto;padding:5px 10px;font-size:11px;border-radius:999px;border:1.5px solid var(--pk-border)}
     .itembtn .badge{display:none}
     .itembtn.sub-item{display:none}
-    /* 툴바 */
     .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:6px;justify-content:unset}
     .toolbar input#q{grid-column:1/-1}
     .toolbar button{padding:7px 8px;font-size:12px}
-    /* 테이블: PC 리스트 그대로, 별·부위만 숨김 */
     .card{overflow-x:hidden !important;background:#fff !important;border:1.5px solid var(--pk-border) !important;box-shadow:var(--pk-shadow) !important}
     table{min-width:0 !important;width:100% !important;table-layout:fixed !important}
     th,td{padding:6px 5px;font-size:12px;overflow:hidden}
@@ -269,6 +264,8 @@ function getItemTags(it){
   let active = 0;
   let ownedOnly = false;
   let OWNED_SET = new Set(); // 보유 이름 집합 (parent에서 수신)
+  // normOwnedName과 동일한 정규화 (index.html과 키 일치)
+  function normN(s){ return String(s||'').normalize('NFKC').toLowerCase().replace(/\s+/g,''); }
   const PAGE_SIZE = 100;
   let page = 1;
 
@@ -464,8 +461,9 @@ function getItemTags(it){
       ownBtn.addEventListener('click', function(e){
         e.stopPropagation();
         const name = String((window.NIKKI_SERVER==='jp' ? (it.name_jp||it.name) : (it.name||it.name_jp))||'').trim();
-        const key  = name.toLowerCase();
-        const nowOwned = !OWNED_SET.has(key);
+        const part = String(it.part||'');
+        const nowOwned = !it._owned;
+        const key = normN(name) + '::' + normN(part);
         if(nowOwned) OWNED_SET.add(key); else OWNED_SET.delete(key);
         ownBtn.className = 'own-btn' + (nowOwned ? ' is-owned' : '');
         ownBtn.textContent = nowOwned ? '✓' : '+';
@@ -473,8 +471,8 @@ function getItemTags(it){
         const badge = tdName.querySelector('.badge-owned');
         if(nowOwned && !badge){ const b=document.createElement('span'); b.className='badge-owned'; b.textContent='보유'; tdName.appendChild(b); }
         else if(!nowOwned && badge){ badge.remove(); }
-        ITEMS = ITEMS.map(x=>({...x, _owned: window.NIKKI_SERVER==='jp' ? (x.name_jp ? OWNED_SET.has(String(x.name_jp||'').trim().toLowerCase()) : false) : OWNED_SET.has(String(x.name||'').trim().toLowerCase())}));
-        try{ window.parent.postMessage({type:'ITEMSINFO_OWNED_TOGGLE', name: name, owned: nowOwned}, '*'); }catch(e){}
+        ITEMS = ITEMS.map(x=>({...x, _owned: OWNED_SET.has(normN((window.NIKKI_SERVER==='jp'?(x.name_jp||x.name):(x.name||x.name_jp))||'') + '::' + normN(x.part||''))}));
+        try{ window.parent.postMessage({type:'ITEMSINFO_OWNED_TOGGLE', name, part, owned: nowOwned}, '*'); }catch(e){}
       });
       tdOwn.appendChild(ownBtn);
       tr.append(tdImg, tdCode, tdName, tdStars, tdPart, tdOwn);
@@ -514,6 +512,19 @@ function getItemTags(it){
     ownedOnlyBtn.addEventListener('click', ()=>{
       ownedOnly = !ownedOnly;
       ownedOnlyBtn.classList.toggle('owned-only-on', ownedOnly);
+      if(ownedOnly){
+        const ownedCount = ITEMS.filter(it => it._owned === true).length;
+        console.log('[보유만] OWNED_SET size:', OWNED_SET.size, '/ _owned items:', ownedCount, '/ 샘플:', Array.from(OWNED_SET).slice(0,3));
+        if(ownedCount === 0 && OWNED_SET.size > 0){
+          // _owned 재계산 시도
+          ITEMS = ITEMS.map(it => {
+            const n = normN((window.NIKKI_SERVER==='jp'?(it.name_jp||it.name):(it.name||it.name_jp))||'');
+            const p = normN(it.part||'');
+            return {...it, _owned: OWNED_SET.has(n + '::' + p)};
+          });
+          console.log('[보유만] 재계산 후 _owned items:', ITEMS.filter(it => it._owned).length);
+        }
+      }
       page = 1; render();
     });
   }
@@ -527,12 +538,9 @@ function getItemTags(it){
       window.NIKKI_SERVER = msg.server;
       // 서버 변경 시 _owned 전체 재계산
       ITEMS = ITEMS.map(function(x){
-        var owned;
-        if(window.NIKKI_SERVER === 'jp'){
-          owned = x.name_jp ? OWNED_SET.has(String(x.name_jp||'').trim().toLowerCase()) : false;
-        } else {
-          owned = OWNED_SET.has(String(x.name||'').trim().toLowerCase());
-        }
+        const n = normN((window.NIKKI_SERVER==='jp'?(x.name_jp||x.name):(x.name||x.name_jp))||'');
+        const p = normN(x.part||'');
+        const owned = OWNED_SET.has(n + '::' + p);
         return Object.assign({}, x, {_owned: owned});
       });
       if(typeof render === 'function') render();
@@ -544,13 +552,17 @@ function getItemTags(it){
       const arr = Array.isArray(msg.items) ? msg.items : [];
       // owned 이름 셋 업데이트
       if (Array.isArray(msg.ownedNames)){
-        OWNED_SET = new Set(msg.ownedNames.map(n => String(n||'').trim().toLowerCase()));
+        // name::part 형태만 허용
+        OWNED_SET = new Set(msg.ownedNames.map(n => normN(n)).filter(k => k.indexOf('::') >= 0));
+      }
+      function makeOwnedKey(it){
+        const n = normN((window.NIKKI_SERVER==='jp'?(it.name_jp||it.name):(it.name||it.name_jp))||'');
+        const p = normN(it.part||'');
+        return OWNED_SET.has(n + '::' + p);
       }
       ITEMS = arr.filter(x => x && typeof x === 'object').map(it => ({
         ...it,
-        _owned: OWNED_SET.size > 0
-          ? (window.NIKKI_SERVER==='jp' ? (it.name_jp ? OWNED_SET.has(String(it.name_jp||'').trim().toLowerCase()) : false) : OWNED_SET.has(String(it.name||'').trim().toLowerCase()))
-          : (it._owned === true)
+        _owned: OWNED_SET.size > 0 ? makeOwnedKey(it) : (it._owned === true)
       }));
       page = 1;
       buildSidebar();
@@ -558,25 +570,21 @@ function getItemTags(it){
     }
     // 보유 목록만 별도로 업데이트 (ownedInput 변경 시)
     if (msg.type === 'ITEMSINFO_OWNED_UPDATE' && Array.isArray(msg.ownedNames)){
-      OWNED_SET = new Set(msg.ownedNames.map(n => String(n||'').trim().toLowerCase()));
-      ITEMS = ITEMS.map(it => ({
-        ...it,
-        _owned: (window.NIKKI_SERVER==='jp' ? (it.name_jp ? OWNED_SET.has(String(it.name_jp||'').trim().toLowerCase()) : false) : OWNED_SET.has(String(it.name||'').trim().toLowerCase()))
-      }));
+      // name::part 형태만 허용
+      OWNED_SET = new Set(msg.ownedNames.map(n => normN(n)).filter(k => k.indexOf('::') >= 0));
+      ITEMS = ITEMS.map(it => {
+        const n = normN((window.NIKKI_SERVER==='jp'?(it.name_jp||it.name):(it.name||it.name_jp))||'');
+        const p = normN(it.part||'');
+        return {...it, _owned: OWNED_SET.has(n + '::' + p)};
+      });
       render();
     }
   });
 
   // 페이지네이션 리스너 — 초기화 시 한 번만 등록 (__bind 패턴 제거)
-  function scrollToTop(){
-    // iframe 자체 스크롤
-    try{ window.scrollTo({top:0, behavior:'smooth'}); }catch(e){}
-    // 부모(index.html)에도 요청
-    try{ window.parent.postMessage({type:'ITEMSINFO_SCROLL_TOP'}, '*'); }catch(e){}
-  }
-
-  document.getElementById('prevPage').addEventListener('click', ()=>{ page--; render(); scrollToTop(); });
-  document.getElementById('nextPage').addEventListener('click', ()=>{ page++; render(); scrollToTop(); });
+  function stt(){try{window.scrollTo({top:0,behavior:'smooth'});}catch(e){}try{window.parent.postMessage({type:'ITEMSINFO_SCROLL_TOP'},'*');}catch(e){}}
+  document.getElementById('prevPage').addEventListener('click',()=>{page--;render();stt();});
+  document.getElementById('nextPage').addEventListener('click',()=>{page++;render();stt();});
 
   // Request data on load
   window.parent && window.parent.postMessage({type:'ITEMSINFO_REQUEST_DATA'}, '*');

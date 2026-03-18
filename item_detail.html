@@ -88,6 +88,9 @@
   <div class="card">
   <div class="controls">
     <button class="ctrl-btn" id="btnBack" title="뒤로가기" aria-label="뒤로가기">←</button>
+    <button id="btnRegisterOwned" title="보유 등록" style="height:32px;padding:0 12px;border:1.5px solid var(--pk-border);border-radius:10px;background:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--pk-muted);transition:background .13s,border-color .13s,color .13s">
+      <span style="font-size:15px">👗</span> 보유 등록
+    </button>
     <button class="ctrl-btn" id="btnClose" title="닫기" aria-label="닫기">×</button>
   </div>
 
@@ -257,7 +260,7 @@
     const imgs = detail.imgs ? (Array.isArray(detail.imgs) ? detail.imgs : [detail.imgs]) : [];
     if (imgs.length){
       const pairs = imgs.slice(0, 6);
-      const cards = pairs.map(src => `<div class="imgcard"><img src="${esc(src)}" alt=""></div>`).join("");
+      const cards = pairs.map(src => `<div class="imgcard"><img src="${esc(src)}" alt="" loading="lazy" decoding="async"></div>`).join("");
       sections.push(`
         <div class="sec-title">이미지</div>
         <div class="grid2">${cards}</div>
@@ -306,7 +309,7 @@ if (detail.reform && detail.reform.enabled){
               data-img="${img}"
               ${codeVal ? ` data-code="${codeVal}"` : ``}
               ${m.part ? ` data-part="${esc(m.part)}"` : ``}>
-        <img class="mimg" src="${img}" alt="">
+        <img class="mimg" src="${img}" alt="" loading="lazy" decoding="async">
         <div class="matname" data-mimg="${img}" data-mcode="${codeVal}"></div>
         <div class="qty">× ${qty}</div>
       </button>
@@ -598,6 +601,130 @@ function parsePageToTarget(page){
       return;
     }
     render(res.detail);
+  });
+})();
+
+/* ===== 보유 등록 버튼 ===== */
+(function(){
+  var btnReg = document.getElementById('btnRegisterOwned');
+  if (!btnReg) return;
+
+  var _registered = false;
+
+  function getEffectivePart(){
+    // URL 파라미터에서 part 우선, 없으면 subtitle에서 추출
+    var qs = new URLSearchParams(location.search);
+    var p = String(qs.get('part') || '').trim();
+    if (p) return p;
+    var sub = document.getElementById('subtitle');
+    if (sub){
+      var txt = sub.textContent || '';
+      var m = txt.match(/^([^·]+)/);
+      if (m) return m[1].trim();
+    }
+    return '';
+  }
+  function getEffectiveCode(){
+    var qs = new URLSearchParams(location.search);
+    return String(qs.get('code') || '').trim();
+  }
+
+  function showToastLocal(msg, ok){
+    // 자체 토스트 (index.html과 분리된 환경일 때)
+    var el = document.getElementById('__regToast');
+    if (!el){
+      el = document.createElement('div');
+      el.id = '__regToast';
+      el.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:8px 18px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;z-index:9999;pointer-events:none;transition:opacity .3s;white-space:nowrap;max-width:80vw;text-align:center';
+      document.body.appendChild(el);
+    }
+    el.textContent = msg;
+    el.style.background = ok ? '#22c55e' : '#e91e8c';
+    el.style.opacity = '1';
+    clearTimeout(el.__t);
+    el.__t = setTimeout(function(){ el.style.opacity='0'; }, 2000);
+  }
+
+  function tryRegisterViaParent(partVal, codeVal){
+    // 방법 1: index.html이 직접 window.top/parent에 함수를 노출한 경우
+    try{
+      var top = window.top;
+      if (top && typeof top.__registerOwnedByCodePart === 'function'){
+        var ok = top.__registerOwnedByCodePart(partVal, codeVal);
+        if (ok) return true;
+      }
+    }catch(e){}
+    try{
+      var par = window.parent;
+      if (par && par !== window && typeof par.__registerOwnedByCodePart === 'function'){
+        var ok2 = par.__registerOwnedByCodePart(partVal, codeVal);
+        if (ok2) return true;
+      }
+    }catch(e){}
+    // 방법 2: postMessage로 전달 (dialog 안에 iframe으로 열린 경우)
+    try{
+      if (window.top && window.top !== window){
+        window.top.postMessage({ type:'OWNED_REGISTER_BY_CODE', part:partVal, code:Number(codeVal) }, '*');
+        return true; // 전달 성공 (결과는 비동기)
+      }
+    }catch(e){}
+    try{
+      if (window.parent && window.parent !== window){
+        window.parent.postMessage({ type:'OWNED_REGISTER_BY_CODE', part:partVal, code:Number(codeVal) }, '*');
+        return true;
+      }
+    }catch(e){}
+    return false;
+  }
+
+  function updateBtnState(registered){
+    _registered = registered;
+    if (registered){
+      btnReg.style.background = 'linear-gradient(135deg,#22c55e,#4ade80)';
+      btnReg.style.borderColor = '#86efac';
+      btnReg.style.color = '#fff';
+      btnReg.innerHTML = '<span style="font-size:15px">✓</span> 보유 등록됨';
+    } else {
+      btnReg.style.background = '#fff';
+      btnReg.style.borderColor = 'var(--pk-border)';
+      btnReg.style.color = 'var(--pk-muted)';
+      btnReg.innerHTML = '<span style="font-size:15px">👗</span> 보유 등록';
+    }
+  }
+
+  btnReg.addEventListener('click', function(){
+    var partVal = getEffectivePart();
+    var codeVal = getEffectiveCode();
+
+    if (!partVal || !codeVal){
+      showToastLocal('부위 또는 코드 정보가 없어요', false);
+      return;
+    }
+
+    var sent = tryRegisterViaParent(partVal, codeVal);
+    if (sent){
+      updateBtnState(true);
+      showToastLocal('✓ 부위: ' + partVal + ' · 코드: ' + codeVal + ' 등록 요청 완료!', true);
+    } else {
+      // standalone(단독 페이지)으로 열렸을 때 안내
+      showToastLocal('홈페이지 내에서 열어야 보유 등록이 적용돼요', false);
+    }
+  });
+
+  // hover 스타일
+  btnReg.addEventListener('mouseenter', function(){
+    if (!_registered){
+      btnReg.style.background = 'var(--pk-4)';
+      btnReg.style.borderColor = 'var(--pk-2)';
+      btnReg.style.color = 'var(--pk-1)';
+    }
+  });
+  btnReg.addEventListener('mouseleave', function(){
+    if (!_registered){
+      btnReg.style.background = '#fff';
+      btnReg.style.borderColor = 'var(--pk-border)';
+      btnReg.style.color = 'var(--pk-muted)';
+    }
   });
 })();
 

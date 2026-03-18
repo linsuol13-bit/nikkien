@@ -38,6 +38,8 @@ body{margin:0;font-family:system-ui,AppleSDGothicNeo,sans-serif;background:#f7f7
         const img=document.createElement("img");
         img.className="gimg";
         img.src=u;
+        img.loading="lazy";
+        img.decoding="async";
         gallery.appendChild(img);
       }
       if(set.desc){

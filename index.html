@@ -282,7 +282,8 @@ tbody tr:hover{background:#fff5f8}
       var names = String(raw||'').split(/\s*[\n\r;,]+\s*/).filter(Boolean);
       var set = new Set();
       var norm = (window.normOwnedName || function(s){ return String(s||'').trim().toLowerCase(); });
-      names.forEach(n => set.add(norm(n)));
+      // name::part 형태만 허용
+      names.forEach(function(n){ var k = norm(n); if(k.indexOf('::') >= 0) set.add(k); });
       return set;
     }catch(e){ return new Set(); }
   }
@@ -304,8 +305,7 @@ tbody tr:hover{background:#fff5f8}
           var hasSet = (window.ownedNameSet instanceof Set) && (typeof window.normOwnedName === 'function');
           if (hasSet){
             list = list.filter(function(it){
-              var key = window.normOwnedName(it && getItemName(it));
-              return window.ownedNameSet.has(key);
+              return window.isItemOwned ? window.isItemOwned(it, window.ownedNameSet) : false;
             });
           } else {
             list = list.filter(function(it){ return it && it._owned === true; });
@@ -524,17 +524,45 @@ var stages = window.stages;
     // controls는 추천/점수(calc) 탭에서만 표시
     var ctrl = document.getElementById('controls');
     if(ctrl) ctrl.classList.toggle('hidden', key !== 'calc');
+    // ── Lazy iframe 로드: 탭 클릭 시 data-src → src 할당 ──
+    var lazyFrameMap = {
+      'itemsinfo': 'itemsInfoFrame',
+      'sets':      'setsViewFrame',
+      'quiz':      'quizFrame',
+      'calendar':  'calendarFrame'
+    };
+    var lazyId = lazyFrameMap[key];
+    if(lazyId){
+      var lazyFrame = document.getElementById(lazyId);
+      var lazySrc = lazyFrame && lazyFrame.dataset && lazyFrame.dataset.src;
+      // data-loaded 플래그로 중복 로드 방지 (src="" 가 브라우저마다 다르게 해석됨)
+      if(lazyFrame && lazySrc && !lazyFrame.dataset.loaded){
+        lazyFrame.dataset.loaded = '1';
+        lazyFrame.src = lazySrc;
+      }
+    }
+
     // lazy render hooks
     try{
       if(key==='itemsinfo' && typeof window.renderItemsInfoTab==='function') window.renderItemsInfoTab();
       if(key==='sets' && typeof window.renderSetsTab==='function') window.renderSetsTab();
       if(key==='sets'){
-        setTimeout(function(){
+        var sf = document.getElementById('setsViewFrame');
+        function sendSetsOwned(){
           var ta = document.getElementById('ownedInput');
           var owned = ta ? ta.value.split(/[\n\r,]+/).map(function(s){return s.trim();}).filter(Boolean) : [];
-          var sf = document.getElementById('setsViewFrame');
-          if(sf && sf.contentWindow) sf.contentWindow.postMessage({type:'SETS_OWNED_UPDATE', owned:owned},'*');
-        }, 300);
+          var sfEl = document.getElementById('setsViewFrame');
+          if(sfEl && sfEl.contentWindow) sfEl.contentWindow.postMessage({type:'SETS_OWNED_UPDATE', owned:owned},'*');
+        }
+        // iframe이 이미 로드됐으면 바로, 아직이면 load 이벤트 후 전송
+        if(sf && sf.dataset.loaded && sf.contentWindow){
+          setTimeout(sendSetsOwned, 100);
+        } else if(sf){
+          sf.addEventListener('load', function onSetsLoad(){
+            sf.removeEventListener('load', onSetsLoad);
+            setTimeout(sendSetsOwned, 100);
+          });
+        }
       }
       if(key==='calc' && typeof window.renderAll==='function') window.renderAll();
     }catch(e){ console.warn('tab render error', e); }
@@ -710,7 +738,7 @@ var stages = window.stages;
   <span style="font-size:12px;color:#888;white-space:nowrap">필요 스탯</span>
   <div id="styleStatChips" style="display:flex;gap:6px;flex-wrap:wrap"></div>
 </div>
-<section id="tips"></section><section id="skills"></section>
+<section id="tips" style="display:none"></section><section id="skills"></section>
 <div id="reqUnownedBanner" style="display:none;margin:6px 20px;padding:10px 14px;background:#fff3f3;border:1px solid #ffc9c9;border-radius:10px;font-size:13px;color:#a30000;display:flex;align-items:center;gap:10px">
   <span style="font-size:16px">⚠</span>
   <span id="reqUnownedText">추천 아이템 중 미보유 0개</span>
@@ -750,18 +778,18 @@ var stages = window.stages;
 
 <section class="panel" id="panel-itemsinfo">
   <div style="padding:0; height: calc(100vh - 170px); min-height: 520px;">
-    <iframe id="itemsInfoFrame" src="itemsinfo_frame.html"
+    <iframe id="itemsInfoFrame" data-src="itemsinfo_frame.html" src=""
             style="width:100%; height:100%; border:0; background:transparent;"
-            loading="eager"></iframe>
+            loading="lazy"></iframe>
   </div>
 </section>
 
 <section class="panel" id="panel-sets">
   <!-- 세트정보: 아이템정보 탭처럼 '내부 스크롤(iframe)'로 고정 높이 -->
   <div style="padding:0; height: calc(100vh - 170px); min-height: 520px;">
-    <iframe id="setsViewFrame" src="sets_frame.html"
+    <iframe id="setsViewFrame" data-src="sets_frame.html" src=""
             style="width:100%; height:100%; border:0; background:transparent;"
-            loading="eager"></iframe>
+            loading="lazy"></iframe>
   </div>
 </section>
 
@@ -778,7 +806,7 @@ var stages = window.stages;
     </div>
   </div>
   <div style="padding:0 20px 20px 20px">
-    <iframe id="quizFrame" src="quiz_event.html" style="width:100%;height:72vh;border:1px solid #eee;border-radius:14px;background:#fff"></iframe>
+    <iframe id="quizFrame" data-src="quiz_event.html" src="" style="width:100%;height:72vh;border:1px solid #eee;border-radius:14px;background:#fff"></iframe>
   </div>
 </section>
 
@@ -1068,7 +1096,7 @@ body.dark .tl-act-btn:hover{background:#3f3f46}
 
 
 <section class="panel" id="panel-calendar">
-  <iframe id="calendarFrame" src="calendar.html" style="width:100%;height:80vh;border:none;display:block"></iframe>
+  <iframe id="calendarFrame" data-src="calendar.html" src="" style="width:100%;height:80vh;border:none;display:block"></iframe>
 </section>
 
 <script>
@@ -1179,7 +1207,7 @@ function renderStory(stageId){
     var name = speakerKr || '?';
     var iconSrc = CHAR_ICONS[name];
     if(iconSrc){
-      return '<div class="tl-icon-wrap"><img class="tl-icon" src="'+iconSrc+'" alt="'+escHtml(name)+'"><div class="tl-icon-name">'+escHtml(name)+'</div></div>';
+      return '<div class="tl-icon-wrap"><img class="tl-icon" src="'+iconSrc+'" alt="'+escHtml(name)+'" loading="lazy" decoding="async"><div class="tl-icon-name">'+escHtml(name)+'</div></div>';
     }
     // 이니셜 원형 아이콘
     var initial = name.charAt(0);
@@ -1301,47 +1329,8 @@ document.addEventListener('click', function(ev){
 </script>
 <!-- Owned items fix: parse/apply/save/load -->
 <script>
-(function(){
-  const OWNED_KEY = window.OWNED_KEY || 'nikki_owned_names';
-  const $ = (id)=> document.getElementById(id);
-
-  // pagination state
-  const state = { page: 1, key: '' };
-
-  // Robust split: commas/semicolons/newlines or 2+ spaces separate names.
-  function parseOwned(text){
-    return String(text||'')
-      .split(/[\n\r;,]+|\s{2,}/g)
-      .map(s=>s.trim())
-      .filter(Boolean);
-  }
-const normName = (s)=> String(s||'').normalize('NFKC').toLowerCase().replace(/\s+/g,'');
-      });
-    }
-    if(saveBtn){
-      saveBtn.addEventListener('click', ()=>{
-        saveOwned();
-        const t = document.getElementById('toast'); if(t){ t.textContent = '로컬 저장 완료'; t.classList.add('show'); setTimeout(()=> t.classList.remove('show'), 1000); }
-      });
-    }
-    if(clearBtn){
-      clearBtn.addEventListener('click', ()=>{
-        setOwned([]);
-        if(ta) ta.value = '';
-        try{ localStorage.removeItem(OWNED_KEY); }catch(e){}
-        if(typeof window.renderAll === 'function') window.renderAll();
-        const t = document.getElementById('toast'); if(t){ t.textContent = '보유 초기화'; t.classList.add('show'); setTimeout(()=> t.classList.remove('show'), 1000); }
-      });
-    }
-  }
-
-  // Load after the original init, then re-render so badges reflect owned state.
-  document.addEventListener('DOMContentLoaded', ()=>{
-    loadOwned();
-    bindOwnedUI();
-    if(typeof window.renderAll === 'function') window.renderAll();
-  });
-})();
+// (owned UI block - body references missing functions, replaced with stub)
+(function(){ try{ if(typeof window.renderAll==="function") window.renderAll(); }catch(e){} })();
 </script>
 <!-- De-dup & image fallback patch -->
 <script>
@@ -1504,26 +1493,17 @@ const normName = (s)=> String(s||'').normalize('NFKC').toLowerCase().replace(/\s
 })();
 </script>
 <script>
+// (thumbnail helper - syntax fixed)
 function toThumb(u){
-    try{
-      if(!u) return u;
-      if(/drive\.google\.com\/thumbnail\?id=/.test(u)) return u;
-      var m = String(u).match(/\/d\/([a-zA-Z0-9_-]{10,})\/view/);
-      if(m) return "https://drive.google.com/thumbnail?id="+m[1];
-      if(/^[a-zA-Z0-9_-]{10,}$/.test(u)) return "https://drive.google.com/thumbnail?id="+u;
-    }catch(e){}
-    return u;
-  }
-// 
-//   var sane = NEW_ITEMS.map(function(it){
-    var out = Object.assign({}, it);
-    out.img = toThumb(out.img);
-    return out;
-  });
-  if(Array.isArray(window.items)) window.items.push.apply(window.items, sane);
-  if(typeof window.renderAll === "function") window.renderAll();
-})();
-
+  try{
+    if(!u) return u;
+    if(/drive\.google\.com\/thumbnail\?id=/.test(u)) return u;
+    var m = String(u).match(/\/d\/([a-zA-Z0-9_-]{10,})\/view/);
+    if(m) return "https://drive.google.com/thumbnail?id="+m[1];
+    if(/^[a-zA-Z0-9_-]{10,}$/.test(u)) return "https://drive.google.com/thumbnail?id="+u;
+  }catch(e){}
+  return u;
+}
 </script>
 <script>
 (function(){
@@ -1579,12 +1559,38 @@ function toThumb(u){
   return data;
 }
   window.addEventListener('message', function(ev){
+    // origin 검증 (file:// 환경 포함)
+    if(ev.origin && ev.origin !== location.origin && ev.origin !== 'null') return;
     var msg = ev.data;
     if (!msg || !msg.__splitData) return;
-    if (msg.key==='items'){ window.items = __normalizeIncomingData('items', msg.data); got.items = true; try{ if(window._loading) window._loading.show(true);}catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){}; try{ if(typeof window.renderItemsInfoTab==='function') window.renderItemsInfoTab(); }catch(e){} }
-    if (msg.key==='stages'){ window.stages = __normalizeIncomingData('stages', msg.data); got.stages = true; try{ if(typeof __populateStages==='function') __populateStages(); }catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){} }
-    if (msg.key==='sets'){ window.sets = msg.data; got.sets = true; try{ if(typeof renderAll==='function') renderAll(); }catch(e){}; try{ if(typeof window.renderSetsTab==='function') window.renderSetsTab(); }catch(e){} }
-    if (msg.key==='sources'){ window.sources = msg.data; got.sources = true; try{ if(typeof renderAll==='function') renderAll(); }catch(e){};  }
+    if (msg.key==='items'){
+      window.items = __normalizeIncomingData('items', msg.data);
+      window.__cachedItems = window.items;   // 캐시 저장
+      got.items = true;
+      try{ if(window._loading) window._loading.show(true);}catch(e){};
+      try{ if(typeof renderAll==='function') renderAll(); }catch(e){};
+      try{ if(typeof window.renderItemsInfoTab==='function') window.renderItemsInfoTab(); }catch(e){}
+    }
+    if (msg.key==='stages'){
+      window.stages = __normalizeIncomingData('stages', msg.data);
+      window.__cachedStages = window.stages; // 캐시 저장
+      got.stages = true;
+      try{ if(typeof __populateStages==='function') __populateStages(); }catch(e){};
+      try{ if(typeof renderAll==='function') renderAll(); }catch(e){}
+    }
+    if (msg.key==='sets'){
+      window.sets = msg.data;
+      window.__cachedSets = window.sets;     // 캐시 저장
+      got.sets = true;
+      try{ if(typeof renderAll==='function') renderAll(); }catch(e){};
+      try{ if(typeof window.renderSetsTab==='function') window.renderSetsTab(); }catch(e){}
+    }
+    if (msg.key==='sources'){
+      window.sources = msg.data;
+      window.__cachedSources = window.sources; // 캐시 저장
+      got.sources = true;
+      try{ if(typeof renderAll==='function') renderAll(); }catch(e){};
+    }
     maybeInit();
   });
 })();
@@ -1608,12 +1614,37 @@ function toThumb(u){
       .map(s=> s.trim())
       .filter(Boolean);
   }
+  // "이름::부위" 형태 키에서 이름 부분만 추출 (norm 적용)
+  function extractNameFromKey(k){
+    var s = String(k||'');
+    var sep = s.indexOf('::');
+    return norm(sep >= 0 ? s.slice(0, sep) : s);
+  }
+  // "이름::부위" 형태 키에서 부위 부분 추출 (없으면 null)
+  function extractPartFromKey(k){
+    var s = String(k||'');
+    var sep = s.indexOf('::');
+    return sep >= 0 ? norm(s.slice(sep + 2)) : null;
+  }
   function computePerPart(){
+    // 전역 getItemName 폴백
+    var _getItemName = (typeof getItemName === 'function') ? getItemName
+      : (typeof window.getItemName === 'function') ? window.getItemName
+      : function(it){ return (it && (it.name || it.name_jp)) || ''; };
+    var _normOwned = window.normOwnedName || function(s){ return String(s||'').toLowerCase().replace(/\s+/g,''); };
+
     var items = (window.items || window.ITEMS || []);
     var itemByName = Object.create(null);
     for (var it of items){
-      var key = window.normOwnedName(it && getItemName(it));
+      var key = _normOwned(it && _getItemName(it));
       if (key && !(key in itemByName)) itemByName[key] = it;
+    }
+    // part별 인덱스 (동일 이름 다른 부위 구별용)
+    var itemByNamePart = Object.create(null);
+    for (var it of items){
+      var nk = _normOwned(_getItemName(it));
+      var pk = norm(it.part||'');
+      if(nk) itemByNamePart[nk + '::' + pk] = it;
     }
     // totals
     var totals = Object.create(null);
@@ -1627,7 +1658,15 @@ function toThumb(u){
     var names = input ? Array.from(new Set(parseOwned(input.value))) : [];
     var owned = Object.create(null);
     for (var n of names){
-      var it = itemByName[norm(n)];
+      var nNorm = extractNameFromKey(n);
+      var pNorm = extractPartFromKey(n);
+      var it;
+      if(pNorm !== null){
+        // "이름::부위" 형태 — 해당 부위 아이템만 찾기
+        it = itemByNamePart[nNorm + '::' + pNorm] || null;
+      } else {
+        it = itemByName[nNorm] || null;
+      }
       if (!it) continue;
       var p = it.part || '(기타)';
       if (!owned[p]) owned[p] = 0;
@@ -1635,7 +1674,10 @@ function toThumb(u){
     }
     // build rows
     var parts = Object.keys(totals).sort();
-    parts = ensureBeautyParts(parts, totals);
+    var _ensureBeauty = (typeof ensureBeautyParts === 'function') ? ensureBeautyParts
+      : (typeof window.ensureBeautyParts === 'function') ? window.ensureBeautyParts
+      : function(p, t){ if(t && !('뷰티' in t)) t['뷰티']=0; if(p.indexOf('뷰티')===-1) p.push('뷰티'); return p; };
+    parts = _ensureBeauty(parts, totals);
     var rows = parts.map(function(p){
       var t = totals[p]||0;
       var o = owned[p]||0;
@@ -1709,6 +1751,7 @@ function toThumb(u){
     }catch(e){}
     return parts;
   }
+  window.ensureBeautyParts = window.ensureBeautyParts || ensureBeautyParts;
 
   function computePartStats(){
     var items = (window.items || window.ITEMS || []);
@@ -1720,17 +1763,23 @@ function toThumb(u){
       var key = window.normOwnedName(it && getItemName(it));
       if (key && !(key in byName)) byName[key] = it;
     }
+    // name::part 복합키 인덱스
+    var byNamePart = Object.create(null);
+    for (var it of items){
+      var nk = window.normOwnedName(getItemName(it));
+      var pk = window.normOwnedName(it&&it.part||'');
+      if(nk) byNamePart[nk + '::' + pk] = it;
+    }
     var input = document.getElementById('ownedInput');
     var names = input ? Array.from(new Set(parseOwned(input.value))) : [];
     var ownedPer = Object.create(null);
     var ownedTotal = 0;
     for (var n of names){
-      var it = byName[norm(n)];
-      if (it){
-        var p = it.part || '(기타)';
-        ownedPer[p] = (ownedPer[p]||0)+1;
-        ownedTotal++;
-      }
+      var it2 = window.lookupOwnedItem ? window.lookupOwnedItem(n, byName, byNamePart) : null;
+      if (!it2) continue;
+      var p = it2.part || '(기타)';
+      ownedPer[p] = (ownedPer[p]||0)+1;
+      ownedTotal++;
     }
     var totalCount = (window.items||window.ITEMS||[]).length;
     // Build sorted parts
@@ -1817,21 +1866,23 @@ function toThumb(u){
   }
   function computeStats(){
     var items = (window.items || window.ITEMS || []);
-    var totals = {}, byName={};
+    var totals = {}, byName={}, byNamePart={};
     totals['뷰티'] = totals['뷰티'] || 0;
     for (var it of items){
       var p = it && it.part || '(기타)';
       totals[p] = (totals[p]||0)+1;
       var key = window.normOwnedName(it && getItemName(it));
       if (key && !(key in byName)) byName[key] = it;
+      var pk = window.normOwnedName(it&&it.part||'');
+      if(key) byNamePart[key + '::' + pk] = it;
     }
     var input = document.getElementById('ownedInput');
     var names = input ? Array.from(new Set(parseOwned(input.value))) : [];
     var ownedPer = {}, ownedTotal = 0;
     for (var n of names){
-      var it = byName[norm(n)];
-      if (it){
-        var p = it.part || '(기타)';
+      var it2 = window.lookupOwnedItem ? window.lookupOwnedItem(n, byName, byNamePart) : null;
+      if (it2){
+        var p = it2.part || '(기타)';
         ownedPer[p] = (ownedPer[p]||0)+1;
         ownedTotal++;
       }
@@ -1909,12 +1960,14 @@ var ORDER_SOUL = ["반딧불의 영혼"];
       totals[p] = (totals[p]||0)+1;
       var key = window.normOwnedName(it && getItemName(it));
       if (key && !(key in byName)) byName[key] = it;
+      if (!byNamePart) var byNamePart = Object.create(null);
+      if (key) byNamePart[key + '::' + (window.normOwnedName ? window.normOwnedName(it.part||"") : String(it.part||"").toLowerCase())] = it;
     }
     var ownedPer = Object.create(null);
     var input = document.getElementById('ownedInput');
     var names = input ? Array.from(new Set(parseOwned(input.value))) : [];
     for (var j=0;j<names.length;j++){
-      var it2 = byName[window.normOwnedName(names[j])];
+      var it2 = window.lookupOwnedItem ? window.lookupOwnedItem(names[j], byName, byNamePart) : byName[window.normOwnedName(names[j])];
       if (!it2) continue;
       var pp = it2.part || '';
       ownedPer[pp] = (ownedPer[pp]||0)+1;
@@ -1949,6 +2002,7 @@ var ORDER_SOUL = ["반딧불의 영혼"];
   } else {
     try { renderChips(g); } catch(e){ console.error('일반 렌더링 오류', e); }
   }
+  }
 })();
 </script>
 <script>
@@ -1959,19 +2013,28 @@ var ORDER_SOUL = ["반딧불의 영혼"];
   }
   function computeOwnedTotal(){
     var items = (window.items || window.ITEMS || []);
-    var total = items.length || 0;
-    var byName = Object.create(null);
-    for (var i=0;i<items.length;i++){
-      var it = items[i];
-      var key = window.normOwnedName(it && getItemName(it));
-      if (key && !(key in byName)) byName[key] = true;
-    }
-    var ta = document.getElementById('ownedInput');
-    var names = ta ? Array.from(new Set(parseOwned(ta.value))) : [];
+    // window.ownedNameSet 우선 사용, 없으면 textarea에서 직접 빌드
+    var ownedSet = (window.ownedNameSet instanceof Set) ? window.ownedNameSet : (function(){
+      var ta = document.getElementById('ownedInput');
+      if(!ta) return new Set();
+      return new Set(parseOwned(ta.value).map(function(n){
+        return window.normOwnedName ? window.normOwnedName(n) : n.toLowerCase();
+      }).filter(function(k){ return k.indexOf('::') >= 0; }));
+    })();
+    // unique name::part 조합만 카운트 (중복 아이템 제외)
     var owned = 0;
-    for (var j=0;j<names.length;j++){
-      if (byName[window.normOwnedName(names[j])]) owned++;
+    var seenKeys = new Set();
+    for(var i=0;i<items.length;i++){
+      var it = items[i];
+      if(!it) continue;
+      var nm = window.normOwnedName ? window.normOwnedName(getItemName(it)) : '';
+      var pt = window.normOwnedName ? window.normOwnedName(it.part||'') : '';
+      var k = nm + '::' + pt;
+      if(seenKeys.has(k)) continue;
+      seenKeys.add(k);
+      if(window.isItemOwned ? window.isItemOwned(it, ownedSet) : false) owned++;
     }
+    var total = seenKeys.size; // 중복 제거된 전체 수
     return {owned: owned, total: total};
   }
   function updateOwnedBadges(){
@@ -2029,26 +2092,28 @@ var ORDER_SOUL = ["반딧불의 영혼"];
 (function(){
   var ORDER_WEAR = ["헤어","원피스","아우터","상의","하의","양말","양말장식","신발","뷰티"];
 
-  function norm(s){ return String(s||'').toLowerCase().replace(/[\\s\\u00A0]+/g,' ').trim(); }
+  function norm(s){ return String(s||'').toLowerCase().replace(/[\s\u00A0]+/g,' ').trim(); }
   function parseOwned(text){
-    return String(text||'').split(/[\\n\\r;,]+|\\s{2,}/g).map(function(s){return s.trim();}).filter(Boolean);
+    return String(text||'').split(/[\n\r;,]+|\s{2,}/g).map(function(s){return s.trim();}).filter(Boolean);
   }
   function getStats(){
     var items = (window.items || window.ITEMS || []);
     var totals = Object.create(null);
     var byName = Object.create(null);
+    var byNamePart = Object.create(null);
     for (var i=0;i<items.length;i++){
       var it = items[i];
       var p = (it && it.part) || '';
       totals[p] = (totals[p]||0)+1;
-      var key = window.normOwnedName(it && getItemName(it));
+      var key = window.normOwnedName ? window.normOwnedName(it && (it.name||'')) : norm(it && (it.name||''));
       if (key && !(key in byName)) byName[key] = it;
+      if (key) byNamePart[key + '::' + norm(p)] = it;
     }
     var ownedPer = Object.create(null);
     var input = document.getElementById('ownedInput');
     var names = input ? Array.from(new Set(parseOwned(input.value))) : [];
     for (var j=0;j<names.length;j++){
-      var it2 = byName[window.normOwnedName(names[j])];
+      var it2 = window.lookupOwnedItem ? window.lookupOwnedItem(names[j], byName, byNamePart) : null;
       if (!it2) continue;
       var pp = it2.part || '';
       ownedPer[pp] = (ownedPer[pp]||0)+1;
@@ -2057,9 +2122,7 @@ var ORDER_SOUL = ["반딧불의 영혼"];
   }
   function sumCounts(keys, map){
     var s = 0;
-    for (var i=0;i<keys.length;i++){
-      s += map[keys[i]] || 0;
-    }
+    for (var i=0;i<keys.length;i++) s += map[keys[i]] || 0;
     return s;
   }
   function chipHtml(label, owned, total, partValue){
@@ -2078,16 +2141,14 @@ var ORDER_SOUL = ["반딧불의 영혼"];
   }
   function renderChips_acc(S){
     var html = [];
-    // singles
-    var singles = ACC_SINGLES;
+    var singles = (typeof ACC_SINGLES !== 'undefined') ? ACC_SINGLES : [];
     for (var i=0;i<singles.length;i++){
       var p = singles[i];
       html.push(chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p));
     }
-    // subgroups aggregate badges (no click filter for now)
-    html.push(chipHtml("팔찌",        sumCounts(ACC_PALJJI, S.ownedPer), sumCounts(ACC_PALJJI, S.totals), ""));
-    html.push(chipHtml("등 장식",     sumCounts(ACC_BACK,   S.ownedPer), sumCounts(ACC_BACK,   S.totals), ""));
-    html.push(chipHtml("특수 아이템", sumCounts(ACC_SPEC,   S.ownedPer), sumCounts(ACC_SPEC,   S.totals), ""));
+    if(typeof ACC_PALJJI !== 'undefined') html.push(chipHtml("팔찌", sumCounts(ACC_PALJJI, S.ownedPer), sumCounts(ACC_PALJJI, S.totals), ""));
+    if(typeof ACC_BACK !== 'undefined') html.push(chipHtml("등 장식", sumCounts(ACC_BACK, S.ownedPer), sumCounts(ACC_BACK, S.totals), ""));
+    if(typeof ACC_SPEC !== 'undefined') html.push(chipHtml("특수 아이템", sumCounts(ACC_SPEC, S.ownedPer), sumCounts(ACC_SPEC, S.totals), ""));
     return html.join('');
   }
   function renderChips(groupKey){
@@ -2096,24 +2157,18 @@ var ORDER_SOUL = ["반딧불의 영혼"];
     if (groupKey === 'wear'){
       row.innerHTML = ORDER_WEAR.map(function(p){
         return chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p);
-      
-    
-    try{ window.shortenChipLabels(); }catch(e){}
-try{ relabelDecorations(); }catch(e){};
-}).join('');
+      }).join('');
     } else if (groupKey === 'acc'){
       row.innerHTML = renderChips_acc(S);
     } else if (groupKey === 'beauty'){
-      row.innerHTML = ORDER_BEAUTY.map(function(p){
-        return chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p);
-      }
-    else if (groupKey === 'soul'){
-      row.innerHTML = (ORDER_SOUL || ['반딧불의 영혼']).map(function(p){
-        return chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p);
-      }).join('');
-    }).join('');
-    }).join('');
+      var OB = (typeof ORDER_BEAUTY !== 'undefined') ? ORDER_BEAUTY : ['뷰티'];
+      row.innerHTML = OB.map(function(p){ return chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p); }).join('');
+    } else if (groupKey === 'soul'){
+      var OS = (typeof ORDER_SOUL !== 'undefined') ? ORDER_SOUL : ['반딧불의 영혼'];
+      row.innerHTML = OS.map(function(p){ return chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p); }).join('');
     }
+    try{ window.shortenChipLabels(); }catch(e){}
+    try{ if(typeof relabelDecorations==='function') relabelDecorations(); }catch(e){}
   }
   function setGroup(g){
     var tabs = document.querySelectorAll('#partTabs .gtab');
@@ -2124,7 +2179,7 @@ try{ relabelDecorations(); }catch(e){};
     var chip = ev.target.closest && ev.target.closest('#partChips .chip');
     if (!chip) return;
     var part = chip.getAttribute('data-part') || '';
-    if (!part) return; // aggregated badges do nothing on click
+    if (!part) return;
     var sel = document.getElementById('partFilter');
     if (sel){
       var found = false;
@@ -2146,7 +2201,7 @@ try{ relabelDecorations(); }catch(e){};
     if (typeof __origInit === 'function') __origInit();
     setGroup('wear');
   };
-  document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loading) window._loading.show(true);}catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){}; setTimeout(function(){ setGroup('wear'); }, 50); });
+  document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loading) window._loading.show(true);}catch(e){}; setTimeout(function(){ setGroup('wear'); }, 60); });
 })();
 </script>
 <script>
@@ -2154,242 +2209,168 @@ try{ relabelDecorations(); }catch(e){};
 (function(){
   var ORDER_WEAR = ["헤어","원피스","아우터","상의","하의","양말","양말장식","신발","뷰티"];
 
-  function norm(s){ return String(s||'').toLowerCase().replace(/[\s\u00A0]+/g,' ').trim(); }
-  function parseOwned(text){
-    return String(text||'').split(/[\n\r;,]+|\s{2,}/g).map(function(s){return s.trim();}).filter(Boolean);
-  }
   function getStats(){
     var items = (window.items || window.ITEMS || []);
     var totals = Object.create(null);
-    var byName = Object.create(null);
-    for (var i=0;i<items.length;i++){
-      var it = items[i];
-      var p = (it && it.part) || '';
-      totals[p] = (totals[p]||0)+1;
-      var key = window.normOwnedName(it && getItemName(it));
-      if (key && !(key in byName)) byName[key] = it;
-    }
     var ownedPer = Object.create(null);
+    var byName = Object.create(null);
+    var byNamePart = Object.create(null);
+    var normFn = window.normOwnedName || function(s){ return String(s||'').toLowerCase().replace(/\s+/g,''); };
+    for (var i=0;i<items.length;i++){
+      var it = items[i]; if(!it) continue;
+      var p = it.part || '';
+      totals[p] = (totals[p]||0)+1;
+      var key = normFn(it.name||'');
+      if (key && !(key in byName)) byName[key] = it;
+      byNamePart[key + '::' + normFn(p)] = it;
+    }
     var input = document.getElementById('ownedInput');
-    var names = input ? Array.from(new Set(parseOwned(input.value))) : [];
-    for (var j=0;j<names.length;j++){
-      var it2 = byName[window.normOwnedName(names[j])];
+    var raw = input ? input.value.split(/[\n\r;,]+|\s{2,}/g).map(function(s){return s.trim();}).filter(Boolean) : [];
+    for (var j=0;j<raw.length;j++){
+      var it2 = window.lookupOwnedItem ? window.lookupOwnedItem(raw[j], byName, byNamePart) : null;
       if (!it2) continue;
       var pp = it2.part || '';
       ownedPer[pp] = (ownedPer[pp]||0)+1;
     }
     return {totals: totals, ownedPer: ownedPer};
   }
-  function sumCounts(keys, map){
-    var s = 0;
-    for (var i=0;i<keys.length;i++) s += map[keys[i]] || 0;
-    return s;
-  }
-  function chipHtml(label, owned, total, partValue){
-    var pv = partValue || '';
-    return '<span class="chip" data-part="'+ pv.replace(/"/g,'&quot;') +'">'
-         +   '<span class="k">'+ lbl +'</span>'
-         +   '<span class="v">'+ owned +'/'+ total +'</span>'
-         + '</span>';
+  function sumCounts(keys, map){ var s=0; for(var i=0;i<keys.length;i++) s+=map[keys[i]]||0; return s; }
+  function chipHtml(label, owned, total, pv){
+    var lbl = String(label||'');
+    return '<span class="chip" data-part="'+ String(pv||'').replace(/"/g,'&quot;') +'"><span class="k">'+ lbl +'</span><span class="v">'+ (owned||0) +'/'+ (total||0) +'</span></span>';
   }
   function renderChips2(groupKey){
     var row = document.getElementById('partChips'); if (!row) return;
     var S = getStats();
     var html = [];
     if (groupKey === 'wear'){
-      ORDER_WEAR.forEach(function(p){
-        html.push(chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p));
-      });
+      ORDER_WEAR.forEach(function(p){ html.push(chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p)); });
     } else if (groupKey === 'acc'){
-      ACC_SINGLES.forEach(function(p){
-        html.push(chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p));
-      }
-    else if (groupKey === 'soul'){
-      row.innerHTML = (ORDER_SOUL || ['반딧불의 영혼']).map(function(p){
-        return chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p);
-      
-    try{ window.shortenChipLabels(); }catch(e){}
-}).join('');
-    }
-    else if (groupKey === 'beauty'){
-      row.innerHTML = (ORDER_BEAUTY || ['뷰티']).map(function(p){
-        return chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p);
-      }).join('');
-    });
-      html.push(chipHtml("팔찌",        sumCounts(ACC_PALJJI, S.ownedPer), sumCounts(ACC_PALJJI, S.totals), ""));
-      html.push(chipHtml("등 장식",     sumCounts(ACC_BACK,   S.ownedPer), sumCounts(ACC_BACK,   S.totals), ""));
-      html.push(chipHtml("특수 아이템", sumCounts(ACC_SPEC,   S.ownedPer), sumCounts(ACC_SPEC,   S.totals), ""));
+      var singles = (typeof ACC_SINGLES!=='undefined') ? ACC_SINGLES : [];
+      singles.forEach(function(p){ html.push(chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p)); });
+      var paljji = (typeof ACC_PALJJI!=='undefined') ? ACC_PALJJI : [];
+      var back   = (typeof ACC_BACK!=='undefined')   ? ACC_BACK   : [];
+      var spec   = (typeof ACC_SPEC!=='undefined')   ? ACC_SPEC   : [];
+      html.push(chipHtml("팔찌",        sumCounts(paljji, S.ownedPer), sumCounts(paljji, S.totals), ""));
+      html.push(chipHtml("등 장식",     sumCounts(back,   S.ownedPer), sumCounts(back,   S.totals), ""));
+      html.push(chipHtml("특수 아이템", sumCounts(spec,   S.ownedPer), sumCounts(spec,   S.totals), ""));
     } else if (groupKey === 'beauty'){
-      ORDER_BEAUTY.forEach(function(p){
-        html.push(chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p));
-      });
+      var OB = (typeof ORDER_BEAUTY!=='undefined') ? ORDER_BEAUTY : ['뷰티'];
+      OB.forEach(function(p){ html.push(chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p)); });
+    } else if (groupKey === 'soul'){
+      var OS = (typeof ORDER_SOUL!=='undefined') ? ORDER_SOUL : ['반딧불의 영혼'];
+      OS.forEach(function(p){ html.push(chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p)); });
     }
     row.innerHTML = html.join('');
+    try{ if(typeof window.shortenChipLabels==='function') window.shortenChipLabels(); }catch(e){}
   }
   function setGroup2(g){
     var tabs = document.querySelectorAll('#partTabs .gtab');
     tabs.forEach(function(b){ b.classList.toggle('is-on', b.getAttribute('data-g')===g); });
     renderChips2(g);
   }
-  // Override globals if any
   window.renderChips = renderChips2;
   window.setGroup = setGroup2;
-
-  // Rebind tab clicks to our setGroup
   document.addEventListener('click', function(ev){
     var t = ev.target.closest && ev.target.closest('#partTabs .gtab');
-    if (t){
-      setGroup2(t.getAttribute('data-g'));
-    }
+    if (t) setGroup2(t.getAttribute('data-g'));
   });
-
-  // Re-render on owned input
   document.addEventListener('input', function(ev){
     if (ev.target && ev.target.id === 'ownedInput'){
       var on = document.querySelector('#partTabs .gtab.is-on');
       setGroup2(on ? on.getAttribute('data-g') : 'wear');
     }
   });
-
-  // Run once after init
   var __origInit2 = window.init;
   window.init = function(){
     if (typeof __origInit2 === 'function') __origInit2();
     setGroup2('wear');
   };
-  document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loading) window._loading.show(true);}catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){}; setTimeout(function(){ setGroup2('wear'); }, 60); });
+  document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loading) window._loading.show(true);}catch(e){}; setTimeout(function(){ setGroup2('wear'); }, 60); });
 })();
 </script>
 <script>
 (function(){
   var ORDER_WEAR = ["헤어","원피스","아우터","상의","하의","양말","양말장식","신발","뷰티"];
 
-  function norm(s){ return String(s||'').toLowerCase().replace(/[\s\u00A0]+/g,' ').trim(); }
-  function parseOwned(text){
-    return String(text||'').split(/[\n\\r;,]+|\\s{2,}/g).map(function(s){return s.trim();}).filter(Boolean);
-  }
   function getStats(){
     var items = (window.items || window.ITEMS || []);
     var totals = Object.create(null);
-    var byName = Object.create(null);
-    for (var i=0;i<items.length;i++){
-      var it = items[i];
-      var p = (it && it.part) || '';
-      totals[p] = (totals[p]||0)+1;
-      var key = window.normOwnedName(it && getItemName(it));
-      if (key && !(key in byName)) byName[key] = it;
-    }
     var ownedPer = Object.create(null);
+    var byName = Object.create(null);
+    var byNamePart = Object.create(null);
+    var normFn = window.normOwnedName || function(s){ return String(s||'').toLowerCase().replace(/\s+/g,''); };
+    for (var i=0;i<items.length;i++){
+      var it = items[i]; if(!it) continue;
+      var p = it.part || '';
+      totals[p] = (totals[p]||0)+1;
+      var key = normFn(it.name||'');
+      if (key && !(key in byName)) byName[key] = it;
+      byNamePart[key + '::' + normFn(p)] = it;
+    }
     var input = document.getElementById('ownedInput');
-    var names = input ? Array.from(new Set(parseOwned(input.value))) : [];
-    for (var j=0;j<names.length;j++){
-      var it2 = byName[window.normOwnedName(names[j])];
+    var raw = input ? input.value.split(/[\n\r;,]+|\s{2,}/g).map(function(s){return s.trim();}).filter(Boolean) : [];
+    for (var j=0;j<raw.length;j++){
+      var it2 = window.lookupOwnedItem ? window.lookupOwnedItem(raw[j], byName, byNamePart) : null;
       if (!it2) continue;
       var pp = it2.part || '';
       ownedPer[pp] = (ownedPer[pp]||0)+1;
     }
     return {totals: totals, ownedPer: ownedPer};
   }
-  function shortLabel(full){
-    var prefixes = ["팔찌 - ", "등 장식 - ", "특수 아이템 - "];
-    for (var i=0;i<prefixes.length;i++){
-      if (full.indexOf(prefixes[i]) === 0) return full.slice(prefixes[i].length);
-    }
-    return full;
-  }
-  function chipHtml(label, owned, total, partValue){
-    var pv = partValue || '';
-    return '<span class="chip" data-part="'+ pv.replace(/"/g,'&quot;') +'">'
-         +   '<span class="k">'+ lbl +'</span>'
-         +   '<span class="v">'+ owned +'/'+ total +'</span>'
-         + '</span>';
+  function sumCounts(keys, map){ var s=0; for(var i=0;i<keys.length;i++) s+=map[keys[i]]||0; return s; }
+  function chipHtml(label, owned, total, pv){
+    var lbl = String(label||'');
+    return '<span class="chip" data-part="'+ String(pv||'').replace(/"/g,'&quot;') +'"><span class="k">'+ lbl +'</span><span class="v">'+ (owned||0) +'/'+ (total||0) +'</span></span>';
   }
   function renderChips2(groupKey){
     var row = document.getElementById('partChips'); if (!row) return;
     var S = getStats();
     var html = [];
     if (groupKey === 'wear'){
-      ORDER_WEAR.forEach(function(p){
-        html.push(chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p));
-      });
+      ORDER_WEAR.forEach(function(p){ html.push(chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p)); });
     } else if (groupKey === 'acc'){
-      // Singles
-      ACC_SINGLES.forEach(function(p){
-        html.push(chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p));
-      }
-    else if (groupKey === 'soul'){
-      row.innerHTML = (ORDER_SOUL || ['반딧불의 영혼']).map(function(p){
-        return chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p);
-      
-    try{ window.shortenChipLabels(); }catch(e){}
-}).join('');
-    }
-    else if (groupKey === 'beauty'){
-      row.innerHTML = (ORDER_BEAUTY || ['뷰티']).map(function(p){
-        return chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p);
-      }).join('');
-    });
-      // Detailed sub-items with short labels (but data-part stays full for filter)
-      var all = ACC_PALJJI.concat(ACC_BACK).concat(ACC_SPEC);
-      all.forEach(function(full){
-        var lbl = shortLabel(full);
-        html.push(chipHtml(lbl, S.ownedPer[full]||0, S.totals[full]||0, full));
-      });
+      var singles = (typeof ACC_SINGLES!=='undefined') ? ACC_SINGLES : [];
+      singles.forEach(function(p){ html.push(chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p)); });
+      var paljji = (typeof ACC_PALJJI!=='undefined') ? ACC_PALJJI : [];
+      var back   = (typeof ACC_BACK!=='undefined')   ? ACC_BACK   : [];
+      var spec   = (typeof ACC_SPEC!=='undefined')   ? ACC_SPEC   : [];
+      html.push(chipHtml("팔찌",        sumCounts(paljji, S.ownedPer), sumCounts(paljji, S.totals), ""));
+      html.push(chipHtml("등 장식",     sumCounts(back,   S.ownedPer), sumCounts(back,   S.totals), ""));
+      html.push(chipHtml("특수 아이템", sumCounts(spec,   S.ownedPer), sumCounts(spec,   S.totals), ""));
     } else if (groupKey === 'beauty'){
-      ORDER_BEAUTY.forEach(function(p){
-        html.push(chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p));
-      });
+      var OB = (typeof ORDER_BEAUTY!=='undefined') ? ORDER_BEAUTY : ['뷰티'];
+      OB.forEach(function(p){ html.push(chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p)); });
+    } else if (groupKey === 'soul'){
+      var OS = (typeof ORDER_SOUL!=='undefined') ? ORDER_SOUL : ['반딧불의 영혼'];
+      OS.forEach(function(p){ html.push(chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p)); });
     }
     row.innerHTML = html.join('');
+    try{ if(typeof window.shortenChipLabels==='function') window.shortenChipLabels(); }catch(e){}
   }
   function setGroup2(g){
     var tabs = document.querySelectorAll('#partTabs .gtab');
     tabs.forEach(function(b){ b.classList.toggle('is-on', b.getAttribute('data-g')===g); });
     renderChips2(g);
   }
-  // Override previous globals
   window.renderChips = renderChips2;
   window.setGroup = setGroup2;
-
-  // Tab click
   document.addEventListener('click', function(ev){
     var t = ev.target.closest && ev.target.closest('#partTabs .gtab');
     if (t) setGroup2(t.getAttribute('data-g'));
-    var chip = ev.target.closest && ev.target.closest('#partChips .chip');
-    if (chip){
-      var part = chip.getAttribute('data-part') || '';
-      if (!part) return;
-      var sel = document.getElementById('partFilter');
-      if (sel){
-        // match by value (full part); fallback to text
-        var found = false;
-        for (var i=0;i<sel.options.length;i++){
-          var opt = sel.options[i];
-          if (opt.value === part || opt.text.trim() === part){
-            sel.selectedIndex = i; found = true; break;
-          }
-        }
-        if (!found) sel.value = '';
-        sel.dispatchEvent(new Event('change', {bubbles:true}));
-      }
-    }
   });
-
-  // Owned input change -> refresh
   document.addEventListener('input', function(ev){
     if (ev.target && ev.target.id === 'ownedInput'){
       var on = document.querySelector('#partTabs .gtab.is-on');
       setGroup2(on ? on.getAttribute('data-g') : 'wear');
     }
   });
-
-  // After init
   var __origInit2 = window.init;
   window.init = function(){
     if (typeof __origInit2 === 'function') __origInit2();
     setGroup2('wear');
   };
-  document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loading) window._loading.show(true);}catch(e){}; try{ if(typeof renderAll==='function') renderAll(); }catch(e){}; setTimeout(function(){ setGroup2('wear'); }, 60); });
+  document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loading) window._loading.show(true);}catch(e){}; setTimeout(function(){ setGroup2('wear'); }, 60); });
 })();
 </script>
 <script>
@@ -2415,12 +2396,14 @@ try{ relabelDecorations(); }catch(e){};
       totals[p] = (totals[p]||0) + 1;
       var key = window.normOwnedName(getItemName(it));
       if (key && !(key in byName)) byName[key] = it;
+      if (!byNamePart) var byNamePart = Object.create(null);
+      if (key) byNamePart[key + '::' + (window.normOwnedName ? window.normOwnedName(it.part||"") : String(it.part||"").toLowerCase())] = it;
     }
     var ownedPer = Object.create(null);
     var input = document.getElementById('ownedInput');
     var names = input ? Array.from(new Set(parseOwned(input.value))) : [];
     for (var j=0;j<names.length;j++){
-      var it2 = byName[window.normOwnedName(names[j])];
+      var it2 = window.lookupOwnedItem ? window.lookupOwnedItem(names[j], byName, byNamePart) : byName[window.normOwnedName(names[j])];
       if (!it2) continue; // 입력한 이름이 데이터에 없으면 무시
       var pp = it2.part || '';
       ownedPer[pp] = (ownedPer[pp]||0) + 1;
@@ -2444,6 +2427,15 @@ var ACC_HAND     = ["장식 - 손 - 팔찌(우)","장식 - 손 - 팔찌(좌)","�
 var ACC_PROP     = ["장식 - 소품 - 소품(우)","장식 - 소품 - 소품(좌)","장식 - 소품 - 양손","장식 - 허리"];
 var ACC_SPECIAL  = ["장식 - 특수 - 얼굴","장식 - 특수 - 가슴","장식 - 특수 - 문신","장식 - 특수 - 날개","장식 - 특수 - 꼬리","장식 - 특수 - 전경","장식 - 특수 - 배경","장식 - 특수 - 상단","장식 - 특수 - 하단","장식 - 특수 - 스킨"];
 var ACC_OTHER    = ["반딧불의 영혼"];
+
+  function renderChips_fixed(groupKey){
+    var row = document.getElementById('partChips');
+    if (!row) return;
+    var S = getStatsOwnedAware();
+    var html = [];
+    if (groupKey === 'wear'){
+      ORDER_WEAR.forEach(function(p){ html.push(chipHtml(p, S.ownedPer[p]||0, S.totals[p]||0, p)); });
+    } else if (groupKey === 'acc'){
       // 개별 액세서리 (그룹 접두사 없는 항목)
       ACC_SINGLES.forEach(function(p){
         html.push(chipHtml(p, S.ownedPer[p], S.totals[p], p));
@@ -2557,12 +2549,14 @@ var ACC_OTHER    = ["반딧불의 영혼"];
       totals[p] = (totals[p]||0) + 1;
       var key = window.normOwnedName(getItemName(it));
       if (key && !(key in byName)) byName[key] = it;
+      if (!byNamePart) var byNamePart = Object.create(null);
+      if (key) byNamePart[key + '::' + (window.normOwnedName ? window.normOwnedName(it.part||"") : String(it.part||"").toLowerCase())] = it;
     }
     var ownedPer = Object.create(null);
     var input = document.getElementById('ownedInput');
     var names = input ? Array.from(new Set(parseOwned(input.value))) : [];
     for (var j=0;j<names.length;j++){
-      var it2 = byName[window.normOwnedName(names[j])];
+      var it2 = window.lookupOwnedItem ? window.lookupOwnedItem(names[j], byName, byNamePart) : byName[window.normOwnedName(names[j])];
       if (!it2) continue;
       var pp = it2.part || '';
       ownedPer[pp] = (ownedPer[pp]||0) + 1;
@@ -2619,7 +2613,8 @@ var ACC_OTHER    = ["반딧불의 영혼"];
   function computeOwnedSet(){
     var ta = document.getElementById('ownedInput');
     if (!ta) return null;
-    var names = Array.from(new Set(parseOwnedRaw(ta.value))).map(normName);
+    // name::part 형태만 허용
+    var names = Array.from(new Set(parseOwnedRaw(ta.value))).map(normName).filter(function(k){ return k.indexOf('::') >= 0; });
     window.ownedNameSet = window.ownedNameSet || new Set();
     // reset
     window.ownedNameSet.clear();
@@ -2700,6 +2695,14 @@ var ACC_OTHER    = ["반딧불의 영혼"];
       // trigger existing input handlers to recompute owned set
       ta.dispatchEvent(new Event('input', {bubbles:true}));
       setTimeout(refreshAll, 50);
+      // iframe에도 보유 목록 재전송 (로드 타이밍 보정)
+      setTimeout(function(){
+        if(typeof window.__sendOwnedUpdate === 'function') window.__sendOwnedUpdate();
+        else if(typeof window.__sendItemsInfo === 'function') window.__sendItemsInfo();
+      }, 300);
+      setTimeout(function(){
+        if(typeof window.__sendOwnedUpdate === 'function') window.__sendOwnedUpdate();
+      }, 1000);
     }
   });
 
@@ -2714,12 +2717,12 @@ var ACC_OTHER    = ["반딧불의 영혼"];
 <script>
 // --- Internal persistent owned-set (independent from textarea) ---
 (function(){
-  var LS_SET = 'nikki_owned_set_v1';
+  var LS_SET = 'nikki_owned_set_v2';   // v2: name::part 형태만 저장
   var LS_DRAFT = 'nikki_owned_draft_v1';
 
   function norm(s){
-    try { return String(s||'').normalize('NFKC').replace(/\s+/gu,' ').trim().toLowerCase(); }
-    catch(e){ return String(s||'').toLowerCase().trim(); }
+    try { return String(s||'').normalize('NFKC').toLowerCase().replace(/\s+/gu,''); }
+    catch(e){ return String(s||'').toLowerCase().replace(/\s+/g,''); }
   }
   function parseList(text){
     return String(text||'').split(/[\n\r;,]+|\s{2,}/g).map(function(s){return s.trim();}).filter(Boolean);
@@ -2741,7 +2744,8 @@ var ACC_OTHER    = ["반딧불의 영혼"];
   function loadOwnedSet(){
     var saved = safeGet(LS_SET, '') || '';
     var arr = saved ? saved.split('\n').map(function(s){return s.trim();}).filter(Boolean) : [];
-    var set = new Set(arr.map(norm));
+    // name::part 형태인 키만 허용 (이름만인 이전 데이터 무시)
+    var set = new Set(arr.map(norm).filter(function(k){ return k.indexOf('::') >= 0; }));
     // expose as canonical set used by filters/renderers
     window.ownedNameSet = set;
     window.__ownedNamesArray = Array.from(set);
@@ -2882,81 +2886,54 @@ var ACC_OTHER    = ["반딧불의 영혼"];
 (function(){
   function moveRequiredFirst(){
     try{
-      const tips = document.getElementById('tips');
+      var tips = document.getElementById('tips');
       if(!tips) return;
-      const req = tips.querySelector('.reqlist');
-      if(req && tips.firstChild !== req){
-        tips/* disabled tips reorder */ void 0;
-      }
+      var req = tips.querySelector('.reqlist');
+      if(req && tips.firstChild !== req) tips.insertBefore(req, tips.firstChild);
     }catch(e){}
   }
   function hideStyleRatio(){
-    const tips = document.getElementById('tips');
-    if(!tips) return;
-    const kids = Array.from(tips.children);
-    const m=/메인\s*[^,%]+?\d+%/; const s=/서브\s*[^,%]+?\d+%/; const t=/태그\s*[^,%]+?\d+%/;
-    kids.forEach(el=>{
-      const tx=(el.textContent||'').replace(/\s+/g,' ').trim();
-      const c=[m.test(tx),s.test(tx),t.test(tx)].filter(Boolean).length;
-      if((c>=2&&tx.length<=120)||(/^메인\s*[^,%]+?\d+%/.test(tx)&&tx.length<=80)){ el.style.display='none'; }
-    });
+    try{
+      var tips = document.getElementById('tips');
+      if(!tips) return;
+      var kids = Array.from(tips.children);
+      var m=/메인\s*[^,%]+?\d+%/, s=/서브\s*[^,%]+?\d+%/, t=/태그\s*[^,%]+?\d+%/;
+      kids.forEach(function(el){
+        var tx=(el.textContent||'').replace(/\s+/g,' ').trim();
+        var c=[m.test(tx),s.test(tx),t.test(tx)].filter(Boolean).length;
+        if((c>=2&&tx.length<=120)||(/^메인\s*[^,%]+?\d+%/.test(tx)&&tx.length<=80)) el.style.display='none';
+      });
+    }catch(e){}
   }
-  function postRender(){
-    hideStyleRatio();
-    moveRequiredFirst();
-  }
+  function postRender(){ hideStyleRatio(); moveRequiredFirst(); }
   function ensureStagesSynced(){
-    var tries=0, max=64; var timer=setInterval(function(){ tries++;
-      var sf = document.getElementById('stagesFrame');
-      var ifw = sf && sf.contentWindow;
-      var iframeStages = (ifw && ifw.stages) || null;
-      var parentStages = window.stages || null;
-      // If iframe has stages but parent doesn't, copy
-      if(iframeStages && Array.isArray(iframeStages) && iframeStages.length){
-        if(!parentStages || !Array.isArray(parentStages) || parentStages.length < iframeStages.length){
-          try{ window.stages = JSON.parse(JSON.stringify(iframeStages)); }catch(e){ window.stages = iframeStages; }
-          // Trigger renderAll if available
-          try{ if(typeof window.__populateStages==='function'){ window.__populateStages(); }
-          if(typeof window.renderAll==='function'){ window.renderAll(); } }catch(e){}
-          // Also try to dispatch change on stageSelect
-          var sel = document.getElementById('stageSelect');
-          if(sel){
-            var ev = new Event('change', {bubbles:true});
-            sel.dispatchEvent(ev);
-          }
-          // After syncing, run postRender
-          setTimeout(postRender, 0);
+    var tries=0, max=64;
+    var timer=setInterval(function(){
+      tries++;
+      var sf=document.getElementById('stagesFrame');
+      var ifw=sf&&sf.contentWindow;
+      var iframeStages=(ifw&&ifw.stages)||null;
+      var parentStages=window.stages||null;
+      if(iframeStages&&Array.isArray(iframeStages)&&iframeStages.length){
+        if(!parentStages||!Array.isArray(parentStages)||parentStages.length<iframeStages.length){
+          try{ window.stages=JSON.parse(JSON.stringify(iframeStages)); }catch(e){ window.stages=iframeStages; }
+          try{ if(typeof window.__populateStages==='function') window.__populateStages(); if(typeof window.renderAll==='function') window.renderAll(); }catch(e){}
+          var sel=document.getElementById('stageSelect');
+          if(sel) sel.dispatchEvent(new Event('change',{bubbles:true}));
+          setTimeout(postRender,0);
         }
       }
-      if(tries>=max || (window.stages && Array.isArray(window.stages) && window.stages.length>0)){
-        clearInterval(timer);
-        setTimeout(postRender, 0);
+      if(tries>=max||(window.stages&&Array.isArray(window.stages)&&window.stages.length>0)){
+        clearInterval(timer); setTimeout(postRender,0);
       }
     },125);
   }
   window.addEventListener('load', function(){
-    // Guard: both iframes should exist
-    var s = document.querySelector('iframe[src$="stages.html"]');
-    var i = document.querySelector('iframe[src$="items.html"]');
-    if(!s || !i){ console.warn('[fix] expected stages/items iframes not found'); }
     ensureStagesSynced();
-    // Observe tips only (non-intrusive)
-    const tips = document.getElementById('tips');
-    if(tips){
-      const mo = /* MO-off */ (null && new MutationObserver)(postRender);
-      mo.observe(tips, {childList:true, subtree:true});
-document.addEventListener('DOMContentLoaded', function(){
-    // Guard: both iframes should exist
-    var s = document.querySelector('iframe[src$="stages.html"]');
-    var i = document.querySelector('iframe[src$="items.html"]');
-    if(!s || !i){ console.warn('[fix] expected stages/items iframes not found'); }
+    setTimeout(postRender, 200);
+  });
+  document.addEventListener('DOMContentLoaded', function(){
     ensureStagesSynced();
-    // Observe tips only (non-intrusive)
-    const tips = document.getElementById('tips');
-    if(tips){
-      const mo = /* MO-off */ (null && new MutationObserver)(postRender);
-      mo.observe(tips, {childList:true, subtree:true});
-    }
   });
 })();
 </script>
@@ -2990,7 +2967,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const ownedSet = window.ownedNameSet || new Set();
     const list = Object.keys(reqMap).map(part=>{
       const names = (reqMap[part]||[]).map(name=>{
-        const owned = ownedSet.has(ownNorm(name));
+        const owned = (window.isItemOwned && window.items) ? window.items.some(it=> (window.normOwnedName ? window.normOwnedName(it.name||"") : (it.name||"").toLowerCase()) === (window.normOwnedName ? window.normOwnedName(name) : name.toLowerCase()) && window.isItemOwned(it, ownedSet)) : false;
         const cls = owned ? 'own' : 'miss';
         const icon = owned ? '✔' : '✖';
         return `<span class="pill ${cls}" title="${owned?'보유':'미보유'}">${icon} ${name}</span>`;
@@ -3005,7 +2982,7 @@ document.addEventListener('DOMContentLoaded', function(){
     // Ensure it's at the top even if render re-writes tips later
     const req = tips.querySelector('.reqlist');
     if(req && tips.firstChild !== req){
-      tips/* disabled tips reorder */ void 0;
+      tips.insertBefore(req, tips.firstChild);
     }
   }
   function addBadgesToCards(stage, reqMap){
@@ -3067,7 +3044,7 @@ document.addEventListener('DOMContentLoaded', function(){
       /* MO-off */ (null && new MutationObserver)(()=>{
         // keep required block FIRST
         const req = tips.querySelector('.reqlist');
-        if(req && tips.firstChild !== req) tips/* disabled tips reorder */ void 0;
+        if(req && tips.firstChild !== req) tips.insertBefore(req, tips.firstChild);
       }).observe(tips, {childList:true, subtree:true});
     }
   });
@@ -3131,7 +3108,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const ownedSet = window.ownedNameSet || new Set();
     const rows = Object.keys(reqMap).map(part=>{
       const names = reqMap[part].map(name=>{
-        const owned = ownedSet.has(ownNorm(name));
+        const owned = (window.isItemOwned && window.items) ? window.items.some(it=> (window.normOwnedName ? window.normOwnedName(it.name||"") : (it.name||"").toLowerCase()) === (window.normOwnedName ? window.normOwnedName(name) : name.toLowerCase()) && window.isItemOwned(it, ownedSet)) : false;
         const cls = owned ? 'own' : 'miss';
         const icon = owned ? '✔' : '✖';
         return `<span class="pill ${cls}" title="${owned?'보유':'미보유'}">${icon} ${name}</span>`;
@@ -3200,7 +3177,7 @@ document.addEventListener('DOMContentLoaded', function(){
       /* MO-off */ (null && new MutationObserver)(()=>{
         // keep reqlist first
         const req = tips.querySelector('.reqlist');
-        if(req && tips.firstChild !== req) tips/* disabled tips reorder */ void 0;
+        if(req && tips.firstChild !== req) tips.insertBefore(req, tips.firstChild);
       }).observe(tips, {childList:true, subtree:true});
     }
   });
@@ -3274,7 +3251,7 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 <script>
 // Single-file datasets removed (use iframe/postMessage only);
-window.stages = [{stage_id:"테스트-1", flair:1, simple:1, elegant:1, lively:1, mature:1, cute:1, sexy:1, pure:1, cool:1, 20%, 서브 큐티 10%"}];
+window.stages = [{stage_id:"테스트-1", flair:1, simple:1, elegant:1, lively:1, mature:1, cute:1, sexy:1, pure:1, cool:1}];
 window.ITEMS = window.items;
 
 
@@ -3369,7 +3346,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       let list=(Array.isArray(window.items)?window.items:[]).map(it=> ({...it, part:it.part, score:scoreItemForStageSafe(it, stage)}));
       const part=document.getElementById('partFilter')?.value || '';
       if(part) list=list.filter(it=> it.part===part);
-      if(ownedOnly && window.ownedNameSet && window.normOwnedName) list=list.filter(it=> window.ownedNameSet.has(window.normOwnedName(getItemName(it))));
+      if(ownedOnly && window.ownedNameSet && window.normOwnedName) list=list.filter(it=> window.isItemOwned ? window.isItemOwned(it, window.ownedNameSet) : false);
 
       // required-first sorting (data-level)
       const __reqSet = getRequiredNameSetSafe();
@@ -3469,7 +3446,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       let list = src.map(it=> ({...it, score:scoreSafe(it, stage)}));
       if(part) list = list.filter(it=> it.part===part);
       if(ownedOnly && window.ownedNameSet && window.normOwnedName){
-        list = list.filter(it=> window.ownedNameSet.has(window.normOwnedName(getItemName(it))));
+        list = list.filter(it=> window.isItemOwned ? window.isItemOwned(it, window.ownedNameSet) : false);
       }
 
       list = list.map(it=> ({...it, __req: reqSet.has(ownNorm(getItemName(it)||''))}));
@@ -3582,13 +3559,8 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       try{ __origRenderAll(); } finally { try{ relabelDecorations(); }catch(e){} }
     };
   }
-  // Also observe dynamic changes
-  try{
-    var mo = new MutationObserver(function(muts){
-      relabelDecorations();
-    });
-    mo.observe(document.documentElement, {childList:true, subtree:true});
-  }catch(e){}
+  // MO-off: document.documentElement 전역 감시는 렌더링 부하 유발 → 비활성화
+  // relabelDecorations는 renderAll wrapper에서 이미 호출됨
   console.log("[UI] Decoration labels shortened for display (e.g., '장식 - 손 - 장갑' → '장갑').");
 })();
 </script>
@@ -3780,23 +3752,8 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     };
   })(window.shortenChipLabels);
 
-  // Observe future DOM changes to keep labels short
-  var mo = new MutationObserver(function(muts){
-    for (var i=0;i<muts.length;i++){
-      var m = muts[i];
-      if (m.type === 'childList'){
-        m.addedNodes && m.addedNodes.forEach(function(n){
-          try{ if (n.nodeType === 1) relabelGeneric(n); }catch(_){}
-        });
-      } else if (m.type === 'characterData') {
-        var el = m.target && m.target.parentElement;
-        try{ if (el) relabelGeneric(el); }catch(_){}
-      }
-    }
-  });
-  try{
-    mo.observe(document.documentElement, { subtree:true, childList:true, characterData:true });
-  }catch(_){}
+  // MO-off: characterData까지 포함한 전역 감시는 렌더링 루프 유발 → 비활성화
+  // shortenChipLabels는 renderAll wrapper에서 이미 호출됨
 })();
 </script>
 <script>
@@ -3861,7 +3818,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       var p = it && it.part || '';
       if (!stats[p]) continue;
       stats[p].total++;
-      if (ownedSet.has(normName(getItemName(it)))) stats[p].owned++;
+      if (window.isItemOwned ? window.isItemOwned(it, ownedSet) : false) stats[p].owned++;
     }
     return stats;
   }
@@ -3893,7 +3850,10 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     try{ if (typeof window.shortenChipLabels==='function') window.shortenChipLabels(); }catch(e){}
   }
 
-  )();
+  window.renderSpecialChips = renderSpecialChips;
+  ensureSpecialTab();
+  document.addEventListener('DOMContentLoaded', function(){ ensureSpecialTab(); });
+})();
 </script>
 <script>
 /* === FORCE Special tab render & correct 특수 option values === */
@@ -3932,7 +3892,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
   }
   function computeStats(){
     var items = Array.isArray(window.items) ? window.items : [];
-    var owned = getOwnedNameSet();
+    var ownedSet = (window.ownedNameSet instanceof Set) ? window.ownedNameSet : new Set();
     var stats = {};
     SPECIAL_PARTS.forEach(function(p){ stats[p] = {owned:0,total:0}; });
     for (var i=0;i<items.length;i++){
@@ -3940,7 +3900,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       var p = it && it.part || '';
       if (!(p in stats)) continue;
       stats[p].total++;
-      if (owned.has(normName(getItemName(it)))) stats[p].owned++;
+      if(window.isItemOwned ? window.isItemOwned(it, ownedSet) : false) stats[p].owned++;
     }
     return stats;
   }
@@ -4045,12 +4005,14 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       totals[p] = (totals[p]||0)+1;
       var key = norm(it && getItemName(it));
       if (key && !(key in byName)) byName[key] = it;
+      if (!byNamePart) var byNamePart = Object.create(null);
+      if (key) byNamePart[key + '::' + (window.normOwnedName ? window.normOwnedName(it.part||"") : String(it.part||"").toLowerCase())] = it;
     }
     var ownedPer = Object.create(null);
     var input = document.getElementById('ownedInput');
     var names = input ? Array.from(new Set(parseOwned(input.value))) : [];
     for (var j=0;j<names.length;j++){
-      var it2 = byName[norm(names[j])];
+      var it2 = window.lookupOwnedItem ? window.lookupOwnedItem(names[j], byName, byNamePart) : byName[norm(names[j])];
       if (!it2) continue;
       var pp = it2.part || '';
       ownedPer[pp] = (ownedPer[pp]||0)+1;
@@ -4481,7 +4443,8 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
         }
         // Owned marker
         return list.map(function(it){
-          var owned = (window.ownedNameSet && window.normOwnedName) ? window.ownedNameSet.has(window.normOwnedName(getItemName(it))) : false;
+          var owned = window.isItemOwned ? window.isItemOwned(it, window.ownedNameSet)
+            : false;
           return Object.assign({}, it, {_owned: owned});
         });
       }catch(e){
@@ -4718,7 +4681,6 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
   }
 
   document.addEventListener('click', function(ev){
-, function(ev){
     var t = ev.target.closest && ev.target.closest('nav.tabs .tab');
     if(!t) return;
     var key = t.getAttribute('data-tab');
@@ -5978,12 +5940,14 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       totals[p] = (totals[p]||0)+1;
       var key = (window.normOwnedName ? window.normOwnedName(it && getItemName(it)) : normName(it && getItemName(it)));
       if (key && !(key in byName)) byName[key] = it;
+      if (!byNamePart) var byNamePart = Object.create(null);
+      if (key) byNamePart[key + '::' + (window.normOwnedName ? window.normOwnedName(it.part||"") : String(it.part||"").toLowerCase())] = it;
     }
     var ta = document.getElementById('ownedInput');
     var names = ta ? Array.from(new Set(parseOwned(ta.value))) : [];
     var ownedPer = Object.create(null);
     for (var n of names){
-      var it2 = byName[(window.normOwnedName ? window.normOwnedName(n) : normName(n))];
+      var it2 = window.lookupOwnedItem ? window.lookupOwnedItem(n, byName, byNamePart) : byName[(window.normOwnedName ? window.normOwnedName(n) : normName(n))];
       if (!it2) continue;
       var pp = it2.part || '';
       ownedPer[pp] = (ownedPer[pp]||0)+1;
@@ -6136,13 +6100,15 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       totalsByPart[p] = (totalsByPart[p]||0)+1;
       var key = (window.normOwnedName ? window.normOwnedName(it && getItemName(it)) : normName(it && getItemName(it)));
       if (key && !(key in byName)) byName[key] = it;
+      if (!byNamePart) var byNamePart = Object.create(null);
+      if (key) byNamePart[key + '::' + (window.normOwnedName ? window.normOwnedName(it.part||"") : String(it.part||"").toLowerCase())] = it;
     }
     // Owned mapping -> count by part (same keying as totalsByPart)
     var ta = document.getElementById('ownedInput');
     var names = ta ? Array.from(new Set(parseOwned(ta.value))) : [];
     var ownedByPart = Object.create(null);
     for (var n of names){
-      var it2 = byName[(window.normOwnedName ? window.normOwnedName(n) : normName(n))];
+      var it2 = window.lookupOwnedItem ? window.lookupOwnedItem(n, byName, byNamePart) : byName[(window.normOwnedName ? window.normOwnedName(n) : normName(n))];
       if (!it2) continue;
       var pp = it2.part || '';
       ownedByPart[pp] = (ownedByPart[pp]||0)+1;
@@ -6280,12 +6246,14 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
         totalsByPart[p] = (totalsByPart[p]||0)+1;
         var key = (window.normOwnedName ? window.normOwnedName(getItemName(it)) : normName(getItemName(it)));
         if (key && !(key in byName)) byName[key] = it;
+        if (!byNamePart) var byNamePart = Object.create(null);
+        if (key) byNamePart[key + '::' + (window.normOwnedName ? window.normOwnedName(it.part||"") : String(it.part||"").toLowerCase())] = it;
       }
       var ta = document.getElementById('ownedInput');
       var names = ta ? Array.from(new Set(parseOwned(ta.value))) : [];
       var ownedByPart = Object.create(null);
       for (var j=0;j<names.length;j++){
-        var it2 = byName[(window.normOwnedName ? window.normOwnedName(names[j]) : normName(names[j]))];
+        var it2 = window.lookupOwnedItem ? window.lookupOwnedItem(names[j], byName, byNamePart) : byName[(window.normOwnedName ? window.normOwnedName(names[j]) : normName(names[j]))];
         if (!it2) continue;
         var pp = it2.part || '';
         ownedByPart[pp] = (ownedByPart[pp]||0)+1;
@@ -6368,12 +6336,14 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       totals[p] = (totals[p]||0)+1;
       var key = (window.normOwnedName ? window.normOwnedName(getItemName(it)) : normName(getItemName(it)));
       if (key && !(key in byName)) byName[key] = it;
+      if (!byNamePart) var byNamePart = Object.create(null);
+      if (key) byNamePart[key + '::' + (window.normOwnedName ? window.normOwnedName(it.part||"") : String(it.part||"").toLowerCase())] = it;
     }
     var ta = document.getElementById('ownedInput');
     var names = ta ? Array.from(new Set(parseOwned(ta.value))) : [];
     var ownedPer = Object.create(null);
     for (var j=0;j<names.length;j++){
-      var it2 = byName[(window.normOwnedName ? window.normOwnedName(names[j]) : normName(names[j]))];
+      var it2 = window.lookupOwnedItem ? window.lookupOwnedItem(names[j], byName, byNamePart) : byName[(window.normOwnedName ? window.normOwnedName(names[j]) : normName(names[j]))];
       if (!it2) continue;
       var pp = it2.part || '';
       ownedPer[pp] = (ownedPer[pp]||0)+1;
@@ -6446,8 +6416,8 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       const name = getItemName(it) || '';
       if (!part || !Number.isFinite(code) || !name) continue;
       const key = part + '#' + code;
-      // keep first occurrence
-      if (idx[key] == null) idx[key] = name;
+      // "이름::부위" 형태로 저장
+      if (idx[key] == null) idx[key] = name + '::' + part;
     }
     return idx;
   }
@@ -6537,10 +6507,11 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     }
 
     // Merge into owned list (de-duplicate, preserve existing)
+    const normKey = window.normOwnedName || norm;
     const owned = getOwnedNames();
-    const set = new Set(owned.map(n=> norm(n)));
+    const set = new Set(owned.map(n => normKey(n)));
     for (const nm of namesToAdd){
-      const k = norm(nm);
+      const k = normKey(nm);
       if (!set.has(k)){
         owned.push(nm);
         set.add(k);
@@ -8067,6 +8038,32 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
   function normOwnedName(s){ return String(s||'').normalize('NFKC').toLowerCase().replace(/\s+/g,''); }
   window.normOwnedName = window.normOwnedName || normOwnedName;
 
+  // name::part 복합키를 지원하는 보유 체크 헬퍼
+  // ownedSet에 "name::part" 키가 있어야만 보유로 인정
+  window.isItemOwned = function(it, ownedSet){
+    try{
+      if(!(ownedSet instanceof Set) || !it) return false;
+      var nm = normOwnedName(getItemName(it));
+      var pt = normOwnedName(it.part||'');
+      return ownedSet.has(nm + '::' + pt);
+    }catch(e){ return false; }
+  };
+
+  // byName(이름→아이템) + byNamePart(이름::부위→아이템) 인덱스에서
+  // rawKey("이름::부위")로 아이템을 찾는 전역 헬퍼
+  // name::part 형태여야만 매칭 (이름만이면 null 반환)
+  window.lookupOwnedItem = function(rawKey, byName, byNamePart){
+    try{
+      var s = String(rawKey||'');
+      var sep = s.indexOf('::');
+      if(sep < 0) return null; // 부위 없으면 매칭 안 함
+      var nk = normOwnedName(s.slice(0, sep));
+      var pk = normOwnedName(s.slice(sep + 2));
+      if(byNamePart) return byNamePart[nk + '::' + pk] || null;
+      return null;
+    }catch(e){ return null; }
+  };
+
   function parseOwned(text){
     return String(text||'')
       .split(/[\n\r;,]+|\s{2,}/g)
@@ -8078,7 +8075,8 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     try{
       var ta = document.getElementById('ownedInput');
       var names = ta ? Array.from(new Set(parseOwned(ta.value))) : [];
-      window.ownedNameSet = new Set(names.map(normOwnedName));
+      // name::part 형태인 키만 허용
+      window.ownedNameSet = new Set(names.map(normOwnedName).filter(function(k){ return k.indexOf('::') >= 0; }));
     }catch(e){
       window.ownedNameSet = new Set();
     }
@@ -8093,9 +8091,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       var hasSet = (window.ownedNameSet instanceof Set) && (typeof window.normOwnedName === 'function');
       if(!hasSet) return base;
       return base.map(function(it){
-        var nm = (it && getItemName(it)) || '';
-        var key = window.normOwnedName(nm);
-        return Object.assign({}, it, {_owned: window.ownedNameSet.has(key)});
+        return Object.assign({}, it, {_owned: window.isItemOwned(it, window.ownedNameSet)});
       });
     }catch(e){
       return [];
@@ -8161,9 +8157,11 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
           if(part){ show = show && (ptxt === part); }
           if(ownedOnly){
             var ownedMark = card.querySelector('.badge.owned,[data-owned="1"]');
-            // fallback: check with global set
+            // fallback: check with global set using name::part
             if(!ownedMark && window.ownedNameSet && typeof window.normOwnedName === 'function' && nm){
-              show = show && window.ownedNameSet.has(window.normOwnedName(nm));
+              var ptNorm = window.normOwnedName(ptxt);
+              var nmNorm = window.normOwnedName(nm);
+              show = show && window.ownedNameSet.has(nmNorm + '::' + ptNorm);
             } else {
               show = show && !!ownedMark;
             }
@@ -8184,7 +8182,9 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
           if(ownedOnly){
             var ownedCell = tr.querySelector('.badge.owned,[data-owned="1"]');
             if(!ownedCell && window.ownedNameSet && typeof window.normOwnedName === 'function' && nm){
-              show = show && window.ownedNameSet.has(window.normOwnedName(nm));
+              var ptNorm2 = window.normOwnedName(ptxt);
+              var nmNorm2 = window.normOwnedName(nm);
+              show = show && window.ownedNameSet.has(nmNorm2 + '::' + ptNorm2);
             } else if(ownedCell){
               show = show && true;
             } else {
@@ -8225,11 +8225,15 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     var sel = document.getElementById('partFilter');
     return sel ? sel.value : '';
   }
-  function isOwnedName(nm){
+  function isOwnedName(nm, prt){
     try{
+      if(window.isItemOwned){
+        var fakeIt = {name: nm, part: prt||''};
+        return window.isItemOwned(fakeIt, getOwnedSet());
+      }
       var set = getOwnedSet();
       if(!set.size) return false;
-      return set.has(norm(nm));
+      return set.has(norm(nm) + '::' + norm(prt||''));
     }catch(e){ return false; }
   }
   function extractNameFromCard(card){
@@ -8282,12 +8286,12 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
         var prt = extractPartFromCard(card);
         var show = true;
         if(part) show = show && (prt === part);
-        if(ownedOnly) show = show && isOwnedName(nm);
+        if(ownedOnly) show = show && isOwnedName(nm, prt);
         card.style.display = show ? '' : 'none';
         // annotate for debugging
         if(nm) card.setAttribute('data-filter-name', nm);
         if(prt) card.setAttribute('data-filter-part', prt);
-        card.setAttribute('data-filter-owned', isOwnedName(nm) ? '1' : '0');
+        card.setAttribute('data-filter-owned', isOwnedName(nm, prt) ? '1' : '0');
       });
     }
 
@@ -8302,11 +8306,11 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
         var prt = partCell ? (partCell.textContent||'').trim() : '';
         var show = true;
         if(part) show = show && (prt === part);
-        if(ownedOnly) show = show && isOwnedName(nm);
+        if(ownedOnly) show = show && isOwnedName(nm, prt);
         tr.style.display = show ? '' : 'none';
         if(nm) tr.setAttribute('data-filter-name', nm);
         if(prt) tr.setAttribute('data-filter-part', prt);
-        tr.setAttribute('data-filter-owned', isOwnedName(nm) ? '1' : '0');
+        tr.setAttribute('data-filter-owned', isOwnedName(nm, prt) ? '1' : '0');
       });
     }
   }
@@ -8343,6 +8347,8 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
   }
   function getOwnedSet(){
     try{
+      // window.ownedNameSet이 있으면 그걸 우선 사용 (normOwnedName으로 정규화된 키)
+      if(window.ownedNameSet instanceof Set) return window.ownedNameSet;
       var ta = document.getElementById('ownedInput');
       var names = ta ? Array.from(new Set(parseOwned(ta.value))) : [];
       return new Set(names.map(norm));
@@ -8362,7 +8368,10 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
     for(var i=0;i<items.length;i++){
       var it = items[i] || {};
       if(part && String(it.part||'') !== part) continue;
-      if(ownedOnly && !ownedSet.has(norm(getItemName(it)))) continue;
+      if(ownedOnly){
+        var owned = window.isItemOwned ? window.isItemOwned(it, ownedSet) : false;
+        if(!owned) continue;
+      }
       set.add(norm(getItemName(it)));
     }
     return set;
@@ -8661,7 +8670,8 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       var name = String(getItemName(it)||'');
       if (!code || !name) continue;
       var keys = codeKeys(code);
-      for (var k=0;k<keys.length;k++){ var key = keys[k]; if (!(key in idx)) idx[key] = name; }
+      var part = String(it.part||"");
+      for (var k=0;k<keys.length;k++){ var key = keys[k]; if (!(key in idx)) idx[key] = name + "::" + part; }
     }
     window.__CODE_IDX_UNIFIED_STRICT = idx;
     return idx;
@@ -8779,8 +8789,9 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       if (!namesToAdd.length){ alert('일치하는 코드가 없습니다. (장식/특수 통합)'); return; }
 
       var owned = String(ta.value||'').split(/[\n\r;,,]+|\s{2,}/g).map(function(s){ return s.trim(); }).filter(Boolean);
-      var set = new Set(owned.map(norm));
-      for (var j=0;j<namesToAdd.length;j++){ var k = norm(namesToAdd[j]); if (!set.has(k)){ set.add(k); owned.push(namesToAdd[j]); } }
+      var normKey = window.normOwnedName || norm;
+      var set = new Set(owned.map(normKey));
+      for (var j=0;j<namesToAdd.length;j++){ var k = normKey(namesToAdd[j]); if (!set.has(k)){ set.add(k); owned.push(namesToAdd[j]); } }
       ta.value = owned.join('\n');
       try{ if (typeof window.updateOwnedBadges==='function') window.updateOwnedBadges(); }catch(e){}
       try{ if (typeof window.renderAll==='function') window.renderAll(); }catch(e){}
@@ -8909,7 +8920,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       var name = String(getItemName(it)||'');
       if (!code || !name) continue;
       var keys = codeKeys(code);
-      for (var k=0;k<keys.length;k++){ var key = keys[k]; if (!(key in idx)) idx[key] = name; }
+      for (var k=0;k<keys.length;k++){ var key = keys[k]; if (!(key in idx)) idx[key] = name + "::" + part; }
     }
     window.__CODE_IDX_SOCKS_UNIFIED = idx;
     return idx;
@@ -8966,8 +8977,9 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
       if (!namesToAdd.length){ alert('일치하는 코드가 없습니다. (양말/양말장식 통합)'); return; }
 
       var owned = String(ta.value||'').split(/[\n\r;,,]+|\s{2,}/g).map(function(s){ return s.trim(); }).filter(Boolean);
-      var set = new Set(owned.map(norm));
-      for (var j=0;j<namesToAdd.length;j++){ var k = norm(namesToAdd[j]); if (!set.has(k)){ set.add(k); owned.push(namesToAdd[j]); } }
+      var normKey2 = window.normOwnedName || norm;
+      var set = new Set(owned.map(normKey2));
+      for (var j=0;j<namesToAdd.length;j++){ var k = normKey2(namesToAdd[j]); if (!set.has(k)){ set.add(k); owned.push(namesToAdd[j]); } }
       ta.value = owned.join('\n');
       try{ if (typeof window.updateOwnedBadges==='function') window.updateOwnedBadges(); }catch(e){}
       try{ if (typeof window.renderAll==='function') window.renderAll(); }catch(e){}
@@ -9274,6 +9286,31 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
 })();
 </script>
 
+<script>
+/* ── renderAll 중복 호출 방지: rAF + 플래그 기반 디바운서 ──
+   동일 프레임 내 renderAll 이 여러 번 호출돼도 실제 실행은 1회만 */
+(function(){
+  var _rafPending = false;
+  var _orig = window.renderAll;
+  if(typeof _orig !== 'function') return;
+
+  window.renderAll = function(){
+    if(_rafPending) return;          // 이미 예약됨 → 스킵
+    _rafPending = true;
+    requestAnimationFrame(function(){
+      _rafPending = false;
+      try{ _orig(); }catch(e){ console.warn('renderAll error', e); }
+    });
+  };
+
+  // 외부에서 즉시 실행이 필요할 때 쓸 수 있는 강제 실행 함수
+  window.renderAllImmediate = function(){
+    _rafPending = false;
+    try{ _orig(); }catch(e){}
+  };
+})();
+</script>
+
 
 <!-- === PATCH: mine_items always zero (final wrapper) === -->
 <script>
@@ -9335,182 +9372,80 @@ document.addEventListener('DOMContentLoaded', function(){ try{ if(window._loadin
 (function(){
   'use strict';
 
-  const GRADE = {
-    "SSS":130,
-    "SS":115,
-    "S":100,
-    "A":85,
-    "B":70,
-    "C":55,
-    "D":40
-  };
-
-  const PART_MULT = {
-    "장식": 0.15,
-    "헤어": 0.9617,
-    "원피스": 3.832350,
-    "아우터": 0.373913,
-    "상의": 1.923561,
-    "하의": 1.911129,
-    "양말장식": 0.561508,
-    "양말": 0.619258,
-    "신발": 0.844369,
-    "뷰티": 0.223041,
-    "반딧불의 영혼": 0.306456
-  };
+  const GRADE = {"SSS":130,"SS":115,"S":100,"A":85,"B":70,"C":55,"D":40};
+  const PART_MULT = {"장식":0.15,"헤어":0.9617,"원피스":3.832350,"아우터":0.373913,"상의":1.923561,"하의":1.911129,"양말장식":0.561508,"양말":0.619258,"신발":0.844369,"뷰티":0.223041,"반딧불의 영혼":0.306456};
+  const STAR_MULT = {1:0.5,2:0.7,3:0.85,4:1.0,5:1.1,6:1.2};
+  const ATTRS = ["simple","mature","elegant","sexy","cool","pure","cute","flair","lively","warm"];
 
   const PART_CN_TO_KO = [
-    [/^饰品|^飾品|^配饰|^配飾/i, "장식"],
-    [/^头发|^髮型|^发型/i, "헤어"],
-    [/^连衣裙|^連衣裙/i, "원피스"],
-    [/^外套/i, "아우터"],
-    [/^上衣/i, "상의"],
-    [/^下装|^下裝/i, "하의"],
-    [/^袜套|^襪套|^袜饰|^襪飾|^袜部件|^襪部件/i, "양말장식"],
-    [/^袜子|^襪子/i, "양말"],
-    [/^鞋子|^鞋/i, "신발"],
-    [/^妆容|^妝容|^美妆|^美妝|^彩妆|^彩妝/i, "뷰티"],
-    [/^萤火|^螢火/i, "반딧불의 영혼"]
+    [/^饰品|^飾品|^配饰|^配飾/i,"장식"],[/^头发|^髮型|^发型/i,"헤어"],[/^连衣裙|^連衣裙/i,"원피스"],
+    [/^外套/i,"아우터"],[/^上衣/i,"상의"],[/^下装|^下裝/i,"하의"],
+    [/^袜套|^襪套|^袜饰|^襪飾|^袜部件|^襪部件/i,"양말장식"],[/^袜子|^襪子/i,"양말"],
+    [/^鞋子|^鞋/i,"신발"],[/^妆容|^妝容|^美妆|^美妝|^彩妆|^彩妆/i,"뷰티"],[/^萤火|^螢火/i,"반딧불의 영혼"]
   ];
-
-  const STAT_CN_TO_EN = {
-    "华丽":"flair",
-    "簡約":"simple","简约":"simple",
-    "优雅":"elegant","優雅":"elegant",
-    "活泼":"lively","活潑":"lively",
-    "成熟":"mature",
-    "可爱":"cute","可愛":"cute",
-    "性感":"sexy",
-    "清纯":"pure","清純":"pure","清新":"pure",
-    "清凉":"cool","清涼":"cool",
-    "保暖":"warm"
-  };
-
-  const ATTRS = [
-    "simple","mature","elegant","sexy","cool",
-    "pure","cute","flair","lively","warm"
-  ];
+  const STAT_CN_TO_EN = {"华丽":"flair","簡約":"simple","简约":"simple","优雅":"elegant","優雅":"elegant","活泼":"lively","活潑":"lively","成熟":"mature","可爱":"cute","可愛":"cute","性感":"sexy","清纯":"pure","清純":"pure","清新":"pure","清凉":"cool","清涼":"cool","保暖":"warm"};
 
   function normVal(v){
     if(v==null) return null;
-    const n = Number(v);
+    const n=Number(v);
     if(Number.isFinite(n)) return n;
-    const s = String(v).trim().toUpperCase();
-    return s || null;
+    return String(v).trim().toUpperCase()||null;
   }
-
   function normalizeItem(item){
-    const out = Object.assign({}, item||{});
+    const out=Object.assign({},item||{});
     if(out.part!=null){
-      let p = String(out.part).trim();
-      for(const m of PART_CN_TO_KO){
-        if(m[0].test(p)){ p = m[1] + p.replace(m[0],''); break; }
-      }
-      out.part = p;
+      let p=String(out.part).trim();
+      for(const m of PART_CN_TO_KO){ if(m[0].test(p)){ p=m[1]+p.replace(m[0],''); break; } }
+      out.part=p;
     }
-    for(const cn in STAT_CN_TO_EN){
-      const en = STAT_CN_TO_EN[cn];
-      if(out[en]==null && out[cn]!=null) out[en]=normVal(out[cn]);
-    }
+    for(const cn in STAT_CN_TO_EN){ const en=STAT_CN_TO_EN[cn]; if(out[en]==null&&out[cn]!=null) out[en]=normVal(out[cn]); }
     for(const k of ATTRS){ if(out[k]!=null) out[k]=normVal(out[k]); }
     return out;
   }
 
-  // ===== TAG HANDLING =====
-// 스테이지 tag_rules 전용 처리
-// - 형식: { name, tier, stacks }
-// - weight 개념 없음
-// - tier에 따라 배율 적용
+  const TAG_TIER_MULT = {"SSS":0.08,"SS":0.06,"S":0.05,"A":0.04,"B":0.03,"C":0.02,"D":0.01};
+  const TAG_ALIAS = {"洛丽塔":"롤리타","欧式古典":"유럽고전","未来系":"미래계","童话系":"동화계","睡衣":"잠옷","动物系":"애니멀룩"};
 
-const TAG_TIER_MULT = {
-  "SSS": 0.08,
-  "SS":  0.06,
-  "S":   0.05,
-  "A":   0.04,
-  "B":   0.03,
-  "C":   0.02,
-  "D":   0.01
-};
-
-const TAG_ALIAS = {
-  "洛丽塔": "롤리타",
-  "欧式古典": "유럽고전",
-  "未来系": "미래계",
-  "童话系": "동화계",
-  "睡衣": "잠옷",
-  "动物系": "애니멀룩"
-};
-
-function normalizeTags(item){
-  const tags = Array.isArray(item.tags) ? item.tags : (item.tags ? [item.tags] : []);
-  const set = new Set();
-  for(const t of tags){
-    const s = String(t||"").trim();
-    if(!s) continue;
-    set.add(s);
-    if(TAG_ALIAS[s]) set.add(TAG_ALIAS[s]);
+  function normalizeTags(item){
+    const tags=Array.isArray(item.tags)?item.tags:(item.tags?[item.tags]:[]);
+    const set=new Set();
+    for(const t of tags){ const s=String(t||"").trim(); if(!s) continue; set.add(s); if(TAG_ALIAS[s]) set.add(TAG_ALIAS[s]); }
+    return set;
   }
-  return set;
-}
-
-function applyStageTagRules(sum, item, stage){
-  const rules = Array.isArray(stage.tag_rules) ? stage.tag_rules : [];
-  if(rules.length === 0) return sum;
-
-  const tagSet = normalizeTags(item);
-
-  for(const r of rules){
-    if(!r) continue;
-    const name = String(r.name || "").trim();
-    if(!name || !tagSet.has(name)) continue;
-
-    const tier = String(r.tier || "C").toUpperCase();
-    const stacks = Number(r.stacks ?? 1) || 1;
-    const mult = TAG_TIER_MULT[tier] ?? 0;
-
-    sum *= (1 + mult * stacks);
-  }
-  return sum;
-}
-  }
-  return sum;
-}
-    return bonus;
+  function applyStageTagRules(sum, item, stage){
+    const rules=Array.isArray(stage.tag_rules)?stage.tag_rules:[];
+    if(!rules.length) return sum;
+    const tagSet=normalizeTags(item);
+    for(const r of rules){
+      if(!r) continue;
+      const name=String(r.name||"").trim();
+      if(!name||!tagSet.has(name)) continue;
+      const tier=String(r.tier||"C").toUpperCase();
+      const stacks=Number(r.stacks??1)||1;
+      const mult=TAG_TIER_MULT[tier]??0;
+      sum*=(1+mult*stacks);
+    }
+    return sum;
   }
 
   window.scoreItemForStage = function(item, stage){
     if(!item||!stage) return 0;
-    const it = normalizeItem(item);
-    const part = String(it.part||"");
-
-    const basePart =
-      part.startsWith("장식") ? "장식" :
-      part.startsWith("헤어") ? "헤어" :
-      part.startsWith("원피스") ? "원피스" :
-      part.startsWith("아우터") ? "아우터" :
-      part.startsWith("상의") ? "상의" :
-      part.startsWith("하의") ? "하의" :
-      part.startsWith("양말장식") ? "양말장식" :
-      part.startsWith("양말") ? "양말" :
-      part.startsWith("신발") ? "신발" :
-      part.startsWith("뷰티") ? "뷰티" :
-      (part.startsWith("반딧불") ? "반딧불의 영혼" : null);
-
+    const it=normalizeItem(item);
+    const part=String(it.part||"");
+    const basePart=
+      part.startsWith("장식")?"장식":part.startsWith("헤어")?"헤어":part.startsWith("원피스")?"원피스":
+      part.startsWith("아우터")?"아우터":part.startsWith("상의")?"상의":part.startsWith("하의")?"하의":
+      part.startsWith("양말장식")?"양말장식":part.startsWith("양말")?"양말":part.startsWith("신발")?"신발":
+      part.startsWith("뷰티")?"뷰티":(part.startsWith("반딧불")?"반딧불의 영혼":null);
     if(!basePart) return 0;
-
-    let sum = 0;
-    for(const attr of ATTRS){
-      if(stage[attr]){
-        sum += (GRADE[it[attr]] || 0) * stage[attr];
-      }
-    }
-
-    sum += getFlatTagBonus(item);
-
-const star = Number(it.stars || it.star || 0);
-const starMult = STAR_MULT[star] ?? 1;
-return sum * PART_MULT[basePart] * starMult;
+    let sum=0;
+    for(const attr of ATTRS){ if(stage[attr]) sum+=(GRADE[it[attr]]||0)*stage[attr]; }
+    sum=applyStageTagRules(sum, item, stage);
+    const star=Number(it.stars||it.star||0);
+    const starMult=STAR_MULT[star]??1;
+    return sum*PART_MULT[basePart]*starMult;
   };
+  console.log('[TAG GRADE+WEIGHT] enabled (SSS~C)');
 })();
 </script>
 
@@ -10427,7 +10362,7 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
       // owned filter
       if (ownedOnly){
         if (window.ownedNameSet instanceof Set){
-          list = list.filter(it=> window.ownedNameSet.has(norm(it && getItemName(it))));
+          list = list.filter(it=> window.isItemOwned ? window.isItemOwned(it, window.ownedNameSet) : false);
         } else {
           list = list.filter(it=> it && it._owned === true);
         }
@@ -10495,29 +10430,87 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
         return String(raw||'').split(/[,\s#]+/).filter(Boolean);
       };
 
-      listEl.innerHTML = pageList.map(it=>{
-        const stars = Math.max(0, Math.min(6, Number(it.stars||0)));
-        const tgs = toTags(it);
-        const img = it.img ? `<img class="thumb" src="${it.img}" alt="${String(getItemName(it)||'')}">` : '';
-        const reqBadge = it.__req ? `<span class="req-badge">추천</span>` : '';
-        const safeName = String(getItemName(it)||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-        const partLabel = (typeof window.displayShort==='function') ? window.displayShort(it.part) : (it.part||'-');
-        return `<div class="card">
-          <div class="row thumbrow">${img}<h3 style="margin:0;flex:1;display:flex;justify-content:space-between;align-items:center">
-            <span>${String(getItemName(it)||'-')}</span>
-            <button class="copy-btn" onclick="copyText('${safeName}')">이름 복사</button>
-          </h3>${reqBadge}</div>
-          <div class="badges">
-            <span class="badge">${partLabel}</span>
-            <span class="badge">${stars}★</span>
-            ${it._owned ? '<span class="badge owned">보유</span>' : ''}
-          </div>
-          <div class="badges tags">${tgs.map(x=>`<span class='badge tag'>#${String(x)}</span>`).join('')}</div>
-          <div class="score">점수: ${Number(it.score||0).toFixed(2)}</div>
-        </div>`;
-      }).join('');
+      // ── 카드 렌더링: rAF + DocumentFragment로 메인 스레드 블로킹 방지 ──
+      requestAnimationFrame(function(){
+        var frag = document.createDocumentFragment();
+        pageList.forEach(function(it){
+          var stars = Math.max(0, Math.min(6, Number(it.stars||0)));
+          var tgs = toTags(it);
+          var name = String(getItemName(it)||'-');
+          var safeName = name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+          var partLabel = (typeof window.displayShort==='function') ? window.displayShort(it.part) : (it.part||'-');
 
-      renderPager(totalItems, totalPages);
+          var card = document.createElement('div');
+          card.className = 'card';
+
+          // 썸네일 + 제목 행
+          var thumbRow = document.createElement('div');
+          thumbRow.className = 'row thumbrow';
+          if(it.img){
+            var imgEl = document.createElement('img');
+            imgEl.className = 'thumb';
+            imgEl.src = it.img;
+            imgEl.alt = name;
+            imgEl.loading = 'lazy';
+            imgEl.decoding = 'async';
+            imgEl.fetchPriority = 'low';
+            thumbRow.appendChild(imgEl);
+          }
+          var h3 = document.createElement('h3');
+          h3.style.cssText = 'margin:0;flex:1;display:flex;justify-content:space-between;align-items:center';
+          var nameSpan = document.createElement('span');
+          nameSpan.textContent = name;
+          var copyBtn = document.createElement('button');
+          copyBtn.className = 'copy-btn';
+          copyBtn.setAttribute('onclick', "copyText('"+safeName+"')");
+          copyBtn.textContent = '이름 복사';
+          h3.appendChild(nameSpan);
+          h3.appendChild(copyBtn);
+          thumbRow.appendChild(h3);
+          if(it.__req){
+            var reqBadge = document.createElement('span');
+            reqBadge.className = 'req-badge';
+            reqBadge.textContent = '추천';
+            thumbRow.appendChild(reqBadge);
+          }
+          card.appendChild(thumbRow);
+
+          // 배지
+          var badges = document.createElement('div');
+          badges.className = 'badges';
+          var b1 = document.createElement('span'); b1.className='badge'; b1.textContent=partLabel;
+          var b2 = document.createElement('span'); b2.className='badge'; b2.textContent=stars+'★';
+          badges.appendChild(b1); badges.appendChild(b2);
+          if(it._owned){
+            var ob = document.createElement('span'); ob.className='badge owned'; ob.textContent='보유';
+            badges.appendChild(ob);
+          }
+          card.appendChild(badges);
+
+          // 태그
+          if(tgs.length){
+            var tagBadges = document.createElement('div');
+            tagBadges.className = 'badges tags';
+            tgs.forEach(function(x){
+              var t = document.createElement('span'); t.className='badge tag'; t.textContent='#'+String(x);
+              tagBadges.appendChild(t);
+            });
+            card.appendChild(tagBadges);
+          }
+
+          // 점수
+          var scoreDiv = document.createElement('div');
+          scoreDiv.className = 'score';
+          scoreDiv.textContent = '점수: ' + Number(it.score||0).toFixed(2);
+          card.appendChild(scoreDiv);
+
+          frag.appendChild(card);
+        });
+
+        listEl.innerHTML = '';
+        listEl.appendChild(frag);
+        renderPager(totalItems, totalPages);
+      });
     }catch(e){
       // swallow
     }
@@ -10590,6 +10583,10 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
     if (ev.target && ev.target.id === 'ownedInput') sendOwnedUpdate();
   });
 
+  // 전역 노출 (타이밍 보정용)
+  window.__sendOwnedUpdate = sendOwnedUpdate;
+  window.__sendItemsInfo = sendItems;
+
   // If legacy renderer exists, disable to avoid double-render and DOM clobbering.
   try{ window.renderItemsInfoTab = function(){}; }catch(e){}
 
@@ -10625,9 +10622,12 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
         var ta = document.getElementById('ownedInput');
         if(ta){
           var name = String(msg.name).trim();
+          var part = String(msg.part||'').trim();
+          if(!part) return; // 부위 없으면 저장 안 함
+          var key = name + '::' + part;
           var cur = ta.value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
-          var idx = cur.findIndex(function(l){return l.toLowerCase()===name.toLowerCase();});
-          if(msg.owned && idx===-1) cur.push(name);
+          var idx = cur.findIndex(function(l){return l.toLowerCase()===key.toLowerCase();});
+          if(msg.owned && idx===-1) cur.push(key);
           else if(!msg.owned && idx!==-1) cur.splice(idx,1);
           ta.value = cur.join('\n');
           ta.dispatchEvent(new Event('input',{bubbles:true}));
@@ -10637,15 +10637,39 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
   });
 
   // Push once when iframe loads
-  window.addEventListener('load', function(){
-    const el = document.getElementById(FRAME_ID);
-    if (el){
-      el.addEventListener('load', function(){ sendItems(); });
+  // lazy 로드 대응: window.load 시점에 이미 src 없을 수 있으므로 MutationObserver 대신
+  // __showPanel 호출 시 src 할당 → 그 직후 load 이벤트 바인딩으로 처리
+  (function(){
+    var el = document.getElementById(FRAME_ID);
+    if(!el) return;
+
+    function bindOnLoad(){
+      el.addEventListener('load', function onFrameLoad(){
+        el.removeEventListener('load', onFrameLoad);
+        sendItems();
+      });
     }
-    // Also send after a short delay (in case items arrive slightly later)
-    setTimeout(sendItems, 200);
-    setTimeout(sendItems, 800);
-  });
+
+    if(el.src && el.src !== location.href && el.src !== 'about:blank'){
+      // 이미 src 있으면 바로 바인딩
+      bindOnLoad();
+    } else {
+      // src 할당을 기다렸다가 바인딩 (lazy 로드 대응)
+      var srcObserver = new MutationObserver(function(){
+        if(el.src && el.src !== location.href && el.src !== 'about:blank'){
+          srcObserver.disconnect();
+          bindOnLoad();
+        }
+      });
+      srcObserver.observe(el, { attributes: true, attributeFilter: ['src'] });
+    }
+
+    // 안전망: items 도착 후 아직 iframe 로드 안 됐으면 로드 완료 후 전송
+    window.addEventListener('load', function(){
+      setTimeout(sendItems, 200);
+      setTimeout(sendItems, 800);
+    });
+  })();
 
   // Watch for items arrival/update
   let lastLen = -1;
@@ -10815,7 +10839,6 @@ window.ITEM_DETAILS = window.itemDetails;
   window.addEventListener('message', function(ev){
     var d = ev && ev.data;
     if(!d || typeof d!=='object') return;
-      }
   }, false);
 
   // Also poll in case postMessage timing misses
@@ -10937,7 +10960,7 @@ if (msg.type === 'FIND_ITEM_BY_IMG_RESULT'){
   try{ src.postMessage({ type:'FIND_ITEM_BY_IMG_RESPONSE', reqId:reqId, target: target }, '*'); }catch(e){}
   pending.delete(reqId);
 }
-=>apply(target));
+  if(target && typeof target.apply === "function") target.apply(null, []);
   });
 })();
 </script>
@@ -11058,8 +11081,8 @@ function norm(s){ return String(s||'').trim().toLowerCase().replace(/\s+/g,' ');
       var saved = localStorage.getItem(LS_TAB);
       if(!saved) return;
       var btn = document.querySelector('nav.tabs .tab[data-tab="'+saved+'"]');
-      if(btn && typeof window.showPanel === 'function'){
-        window.showPanel(saved);
+      if(btn && typeof window.__showPanel === 'function'){
+        window.__showPanel(saved);
       }
     }catch(e){}
   })();
@@ -11071,15 +11094,27 @@ function norm(s){ return String(s||'').trim().toLowerCase().replace(/\s+/g,' ');
 ──────────────────────────────────────────── */
 function updateStatsBar(){
   var items = window.items || window.ITEMS || [];
-  var total = items.length;
   var ta = $('ownedInput');
   if(!ta) return;
-  var ownedNames = new Set(
-    ta.value.split(/[\n\r,]+/).map(function(s){ return norm(s); }).filter(Boolean)
+  var ownedSet = new Set(
+    ta.value.split(/[\n\r,]+/).map(function(s){
+      return (window.normOwnedName ? window.normOwnedName(s.trim()) : s.trim().toLowerCase());
+    }).filter(function(k){ return k.length > 0 && k.indexOf('::') >= 0; })
   );
-  var itemKeys = new Set(items.map(function(it){ return norm(it && getItemName(it)); }).filter(Boolean));
+  // unique name::part 조합만 카운트 (중복 아이템 제외)
   var owned = 0;
-  ownedNames.forEach(function(n){ if(itemKeys.has(n)) owned++; });
+  var total = 0;
+  var seenKeys = new Set();
+  items.forEach(function(it){
+    if(!it) return;
+    var nm = window.normOwnedName ? window.normOwnedName(getItemName(it)) : '';
+    var pt = window.normOwnedName ? window.normOwnedName(it.part||'') : '';
+    var k = nm + '::' + pt;
+    if(seenKeys.has(k)) return;
+    seenKeys.add(k);
+    total++;
+    if(window.isItemOwned && window.isItemOwned(it, ownedSet)) owned++;
+  });
   var miss = total - owned;
   var pct = total > 0 ? Math.round(owned / total * 100) : 0;
 
@@ -11100,17 +11135,23 @@ function updateStatsBar(){
 }
 window.updateStatsBar = updateStatsBar;
 
-// ownedInput 변경 시마다 갱신
-document.addEventListener('input', function(ev){
-  if(ev.target && ev.target.id === 'ownedInput') updateStatsBar();
-});
-// 데이터 로드 후 갱신
-(function waitData(){
-  if(Array.isArray(window.items) && window.items.length){
+// ownedInput input 이벤트는 capture phase의 stopImmediatePropagation 리스너가 차단하므로
+// 이 리스너는 실제로 실행되지 않음 → 비활성화 (중복 방지)
+// document.addEventListener('input', function(ev){
+//   if(ev.target && ev.target.id === 'ownedInput') updateStatsBar();
+// });
+// 데이터 로드 후 갱신 — 폴링 대신 이미 캐시된 데이터 우선 사용
+(function(){
+  // 이미 로드된 캐시가 있으면 즉시 실행
+  if(Array.isArray(window.__cachedItems) && window.__cachedItems.length){
     updateStatsBar();
-  } else {
-    setTimeout(waitData, 300);
+    return;
   }
+  // 아직 없으면 renderAll hook 이후 자동 호출됨 (waitRenderAll에서 wrapping)
+  // 안전망으로 1회만 폴백
+  setTimeout(function(){
+    if(Array.isArray(window.items) && window.items.length) updateStatsBar();
+  }, 1500);
 })();
 
 
@@ -11141,12 +11182,9 @@ document.addEventListener('input', function(ev){
 
     if(part) list = list.filter(function(it){ return String(it.part||'') === part; });
     if(ownedOnly){
-      var ns = window.ownedNameSet;
-      if(ns instanceof Set){
-        list = list.filter(function(it){ return ns.has(norm(it && getItemName(it))); });
-      } else {
-        list = list.filter(function(it){ return it._owned; });
-      }
+      list = list.filter(function(it){
+        return window.isItemOwned ? window.isItemOwned(it, window.ownedNameSet) : (it._owned === true);
+      });
     }
     if(sortBy === 'name'){
       list.sort(function(a,b){ return String(getItemName(a)||'').localeCompare(String(getItemName(b)||''),'ko'); });
@@ -11259,10 +11297,10 @@ function renderContribChart(){
 }
 window.renderContribChart = renderContribChart;
 
-// renderAll 이후 차트 갱신
+// renderAll 이후 차트·통계 갱신 — 폴링 대신 DOM 준비 후 1회 래핑
 (function(){
-  function waitRenderAll(){
-    if(typeof window.renderAll !== 'function'){ setTimeout(waitRenderAll, 300); return; }
+  function hookRenderAllOnce(){
+    if(typeof window.renderAll !== 'function') return; // 아직 없으면 skip (하위 hook들이 이미 처리)
     var orig = window.renderAll;
     window.renderAll = function(){
       orig.apply(this, arguments);
@@ -11270,7 +11308,12 @@ window.renderContribChart = renderContribChart;
       try{ updateStatsBar(); }catch(e){}
     };
   }
-  waitRenderAll();
+  // 이미 정의돼 있으면 즉시, 아니면 DOMContentLoaded 후 1회
+  if(typeof window.renderAll === 'function'){
+    hookRenderAllOnce();
+  } else {
+    document.addEventListener('DOMContentLoaded', hookRenderAllOnce);
+  }
 })();
 
 })();
@@ -11409,12 +11452,18 @@ function updateOutfitBanner(){
   var scoreFn = window.scoreItemForStage;
   if(typeof scoreFn !== 'function'){ banner.style.display='none'; return; }
 
+  // 보유만 보기 체크 시 보유 아이템만 대상으로
+  var ownedOnly = document.getElementById('ownedOnly') ? !!document.getElementById('ownedOnly').checked : false;
+  var ownedSet  = (window.ownedNameSet instanceof Set) ? window.ownedNameSet : new Set();
+
   // 부위별 최고 점수 찾기
   var bestOnePiece = 0, bestTop = 0, bestBottom = 0;
   var bestOnePieceName = '', bestTopName = '', bestBottomName = '';
 
   items.forEach(function(it){
     if(!it) return;
+    // 보유만 보기 ON이면 보유 아이템만
+    if(ownedOnly && !(window.isItemOwned ? window.isItemOwned(it, ownedSet) : false)) return;
     var s = Number(scoreFn(it, stage) || 0);
     var part = String(it.part||'');
     if(part === '원피스'){
@@ -11461,7 +11510,10 @@ window.updateOutfitBanner = updateOutfitBanner;
 
 // stageSelect 변경 시 갱신
 document.addEventListener('change', function(ev){
-  if(ev.target && ev.target.id==='stageSelect') updateOutfitBanner();
+  if(ev.target && (ev.target.id==='stageSelect' || ev.target.id==='ownedOnly')) updateOutfitBanner();
+});
+document.addEventListener('input', function(ev){
+  if(ev.target && ev.target.id==='ownedInput') updateOutfitBanner();
 });
 
 // stageSelect 변경 / ownedInput 변경 시 갱신
@@ -11473,13 +11525,17 @@ document.addEventListener('input', function(ev){
 });
 // renderAll 이후에도 갱신
 (function hookRender(){
-  if(typeof window.renderAll!=='function'){ setTimeout(hookRender,400); return; }
-  var orig=window.renderAll;
-  window.renderAll=function(){
-    orig.apply(this,arguments);
-    try{ updateReqBanner(); }catch(e){}
-    try{ updateOutfitBanner(); }catch(e){}
-  };
+  function doHook(){
+    if(typeof window.renderAll!=='function') return;
+    var orig=window.renderAll;
+    window.renderAll=function(){
+      orig.apply(this,arguments);
+      try{ updateReqBanner(); }catch(e){}
+      try{ updateOutfitBanner(); }catch(e){}
+    };
+  }
+  if(typeof window.renderAll==='function') doHook();
+  else document.addEventListener('DOMContentLoaded', doHook);
 })();
 setTimeout(updateReqBanner, 800);
 setTimeout(updateOutfitBanner, 900);
@@ -11617,7 +11673,7 @@ setTimeout(updateOutfitBanner, 900);
         var v=it[row.key];
         var best=(row.key==='score' && Number(v)===maxScore && maxScore>0);
         var cell='';
-        if(row.key==='img') cell=v?'<img src="'+v+'" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid #eee">':'-';
+        if(row.key==='img') cell=v?'<img src="'+v+'" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid #eee" loading="lazy" decoding="async">':'-';
         else if(row.key==='stars') cell=Number(v||0)+'★';
         else if(row.key==='score') cell='<b>'+Number(v||0).toFixed(2)+'</b>';
         else if(row.key==='_owned') cell=v?'<span style="color:#2a7a2a;font-weight:700">✓ 보유</span>':'<span style="color:#aaa">미보유</span>';
@@ -11641,12 +11697,16 @@ setTimeout(updateOutfitBanner, 900);
 
   // renderAll 이후 카드 selected 상태 재적용
   (function hookRender2(){
-    if(typeof window.renderAll!=='function'){ setTimeout(hookRender2,400); return; }
-    var orig2=window.renderAll;
-    window.renderAll=function(){
-      orig2.apply(this,arguments);
-      setTimeout(renderSlots, 50);
-    };
+    function doHook2(){
+      if(typeof window.renderAll!=='function') return;
+      var orig2=window.renderAll;
+      window.renderAll=function(){
+        orig2.apply(this,arguments);
+        setTimeout(renderSlots, 50);
+      };
+    }
+    if(typeof window.renderAll==='function') doHook2();
+    else document.addEventListener('DOMContentLoaded', doHook2);
   })();
 
   window.__compareAdd = addItem;
@@ -11807,12 +11867,16 @@ document.addEventListener('change', function(ev){
   if(ev.target && ev.target.id==='stageSelect') updateRadar();
 });
 (function hookR(){
-  if(typeof window.renderAll!=='function'){ setTimeout(hookR,400); return; }
-  var orig = window.renderAll;
-  window.renderAll = function(){
-    orig.apply(this,arguments);
-    try{ updateRadar(); }catch(e){}
-  };
+  function doHookR(){
+    if(typeof window.renderAll!=='function') return;
+    var orig = window.renderAll;
+    window.renderAll = function(){
+      orig.apply(this,arguments);
+      try{ updateRadar(); }catch(e){}
+    };
+  }
+  if(typeof window.renderAll==='function') doHookR();
+  else document.addEventListener('DOMContentLoaded', doHookR);
 })();
 setTimeout(updateRadar, 900);
 
@@ -12108,5 +12172,46 @@ window.addEventListener('message', function(ev){
   var top = frame.getBoundingClientRect().top + window.pageYOffset - 10;
   window.scrollTo({top: Math.max(0, top), behavior: 'smooth'});
 });
+</script>
+
+<script>
+/* === ownedInput 입력 렉 방지 — stopImmediatePropagation + 강화 debounce === */
+(function(){
+  var DELAY = 500;          // 400 → 500ms: 빠른 타이핑 시 렉 감소
+  var LS_SAVE_DELAY = 1000; // localStorage 저장은 더 느긋하게
+  var timer = null;
+  var lsTimer = null;
+  var LS = 'nikki_owned_names_v2';
+
+  document.addEventListener('input', function(ev){
+    if(!ev || !ev.target || ev.target.id !== 'ownedInput') return;
+
+    // 타이핑 중엔 다른 리스너 차단
+    ev.stopImmediatePropagation();
+
+    var ta = ev.target;
+
+    // localStorage 저장: 별도 타이머로 분리 (렌더와 무관하게)
+    if(lsTimer) clearTimeout(lsTimer);
+    lsTimer = setTimeout(function(){
+      lsTimer = null;
+      try{ localStorage.setItem(LS, ta.value); }catch(e){}
+    }, LS_SAVE_DELAY);
+
+    // 렌더 관련 함수들: DELAY 후 1회만 실행
+    if(timer) clearTimeout(timer);
+    timer = setTimeout(function(){
+      timer = null;
+      // 순서 중요: 데이터 재빌드 → UI 갱신 → renderAll (rAF 디바운서가 중복 방지)
+      try{ if(typeof window.rebuildOwnedSet   === 'function') window.rebuildOwnedSet(); }catch(e){}
+      try{ if(typeof window.__sendOwnedUpdate === 'function') window.__sendOwnedUpdate(); }catch(e){}
+      try{ if(typeof window.updateOwnedBadges === 'function') window.updateOwnedBadges(); }catch(e){}
+      try{ if(typeof window.renderPartBar     === 'function') window.renderPartBar(); }catch(e){}
+      try{ if(typeof window.renderAll         === 'function') window.renderAll(); }catch(e){}
+      // renderAll wrapper가 updateStatsBar·updateReqBanner·updateOutfitBanner를
+      // 내부에서 호출하므로 여기서 별도 호출 생략 (중복 방지)
+    }, DELAY);
+  }, true); // capture phase
+})();
 </script>
 </body>
