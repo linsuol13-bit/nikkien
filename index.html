@@ -1286,45 +1286,10 @@ document.addEventListener('click', function(ev){
 </script>
 
 <script>
-/* Global de-duplication by (part + normalized name).
-   Name normalization removes spaces/punct and common particles (의/와/과) to catch variants like '소녀의고양이' vs '소녀와 고양이'. */
+/* Global de-duplication 비활성화 — 같은 이름이라도 code가 다르면 다른 아이템 */
 (function(){
-  const arr = (window.items || window.ITEMS || []);
-  const normName = (s)=> String(s||"")
-    .replace(/[ \t\r\n._-]+/g,"")
-    .replace(/[의와과]/g,"") // drop common particles
-    .toLowerCase();
-  const key = (it)=> String(it.part||"").trim()+"@@"+normName(getItemName(it));
-  const best = new Map();
-  const merge = (a,b)=>{
-    const out = {...a};
-    const fields = ["stars","img","tags","flair","simple","elegant","lively","mature","cute","sexy","pure","cool","warm","name","part"];
-    const bonuses = ["flair_bonus","simple_bonus","elegant_bonus","lively_bonus","mature_bonus","cute_bonus","sexy_bonus","pure_bonus","cool_bonus","warm_bonus"];
-    const isEmpty = (v)=> v==null || String(v).trim()==="" || String(v).trim()==="-";
-    // prefer non-empty image
-    if(isEmpty(out.img) && !isEmpty(b.img)) out.img = b.img;
-    // fill empties
-    for(const f of fields){
-      if(isEmpty(out[f]) && !isEmpty(b[f])) out[f]=b[f];
-    }
-    // bonuses: prefer numeric; if both numeric, take larger absolute value
-    for(const f of bonuses){
-      const av = Number(out[f]);
-      const bv = Number(b[f]);
-      if(Number.isFinite(bv)){
-        if(!Number.isFinite(av) || Math.abs(bv)>Math.abs(av)) out[f]=bv;
-      }
-    }
-    return out;
-  };
-  for(const it of arr){
-    const k = key(it);
-    if(!best.has(k)) best.set(k, it);
-    else best.set(k, merge(best.get(k), it));
-  }
-  // Replace items with merged unique list
-  const unique = Array.from(best.values());
-  window.items = unique;
+  // dedup 없이 그대로 유지
+  window.items = (window.items || window.ITEMS || []);
 })();
 </script>
 <!-- Owned items fix: parse/apply/save/load -->
@@ -1335,23 +1300,10 @@ document.addEventListener('click', function(ev){
 <!-- De-dup & image fallback patch -->
 <script>
 (function(){
-  const norm = (s)=> String(s||'').toLowerCase().replace(/[\s\u00A0]+/g,' ').trim();
-
   function dedupItems(){
-    if(!Array.isArray(window.ITEMS)) return {removed:0};
-    const seen = new Set();
-    const out = [];
-    let removed = 0;
-    for(const it of window.ITEMS){
-      const key = norm(it && getItemName(it));
-      if(!key){ out.push(it); continue; }
-      if(seen.has(key)){ removed++; continue; }
-      seen.add(key);
-      out.push(it);
-    }
-    if(removed > 0){
-      window.ITEMS = out;
-    }
+    // dedup 비활성화 — 이름이 같아도 code가 다르면 다른 아이템
+    return {removed: 0};
+  }
     return {removed};
   }
 
@@ -1763,7 +1715,6 @@ function toThumb(u){
       var key = window.normOwnedName(it && getItemName(it));
       if (key && !(key in byName)) byName[key] = it;
     }
-    // name::part 복합키 인덱스
     var byNamePart = Object.create(null);
     for (var it of items){
       var nk = window.normOwnedName(getItemName(it));
@@ -2021,20 +1972,16 @@ var ORDER_SOUL = ["반딧불의 영혼"];
         return window.normOwnedName ? window.normOwnedName(n) : n.toLowerCase();
       }).filter(function(k){ return k.indexOf('::') >= 0; }));
     })();
-    // unique name::part 조합만 카운트 (중복 아이템 제외)
+    // 전체 수 = items.html 등록 개수 그대로 (dedup 없음)
     var owned = 0;
-    var seenKeys = new Set();
+    var total = 0;
     for(var i=0;i<items.length;i++){
       var it = items[i];
       if(!it) continue;
-      var nm = window.normOwnedName ? window.normOwnedName(getItemName(it)) : '';
-      var pt = window.normOwnedName ? window.normOwnedName(it.part||'') : '';
-      var k = nm + '::' + pt;
-      if(seenKeys.has(k)) continue;
-      seenKeys.add(k);
+      total++;
       if(window.isItemOwned ? window.isItemOwned(it, ownedSet) : false) owned++;
     }
-    var total = seenKeys.size; // 중복 제거된 전체 수
+    var total = total;
     return {owned: owned, total: total};
   }
   function updateOwnedBadges(){
@@ -11101,17 +11048,11 @@ function updateStatsBar(){
       return (window.normOwnedName ? window.normOwnedName(s.trim()) : s.trim().toLowerCase());
     }).filter(function(k){ return k.length > 0 && k.indexOf('::') >= 0; })
   );
-  // unique name::part 조합만 카운트 (중복 아이템 제외)
+  // 전체 수 = items 그대로 (dedup 없음)
   var owned = 0;
   var total = 0;
-  var seenKeys = new Set();
   items.forEach(function(it){
     if(!it) return;
-    var nm = window.normOwnedName ? window.normOwnedName(getItemName(it)) : '';
-    var pt = window.normOwnedName ? window.normOwnedName(it.part||'') : '';
-    var k = nm + '::' + pt;
-    if(seenKeys.has(k)) return;
-    seenKeys.add(k);
     total++;
     if(window.isItemOwned && window.isItemOwned(it, ownedSet)) owned++;
   });
