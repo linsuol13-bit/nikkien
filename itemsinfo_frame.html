@@ -405,7 +405,19 @@ function getItemTags(it){
     return list;
   }
 
+  function syncOwned(){
+    if(OWNED_SET.size === 0) return;
+    ITEMS = ITEMS.map(x => {
+      const code = x.code != null ? String(x.code).trim() : '';
+      const p = normN(x.part||'');
+      const n = normN((window.NIKKI_SERVER==='jp'?(x.name_jp||x.name):(x.name||x.name_jp))||'');
+      const owned = code ? OWNED_SET.has(code + '::' + p) : OWNED_SET.has(n + '::' + p);
+      return owned === x._owned ? x : {...x, _owned: owned};
+    });
+  }
+
   function render(){
+    syncOwned();
     const list = getFiltered();
     const total = list.length;
     const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -462,17 +474,22 @@ function getItemTags(it){
         e.stopPropagation();
         const name = String((window.NIKKI_SERVER==='jp' ? (it.name_jp||it.name) : (it.name||it.name_jp))||'').trim();
         const part = String(it.part||'');
-        const nowOwned = !it._owned;
-        const key = normN(name) + '::' + normN(part);
+        const code = it.code != null ? String(it.code).trim() : '';
+        const key = (code || normN(name)) + '::' + normN(part);
+        // 현재 보유 상태를 OWNED_SET 기준으로 확인 (클로저 문제 방지)
+        const currentOwned = OWNED_SET.has(key);
+        const nowOwned = !currentOwned;
         if(nowOwned) OWNED_SET.add(key); else OWNED_SET.delete(key);
+        // it._owned 업데이트
+        it._owned = nowOwned;
         ownBtn.className = 'own-btn' + (nowOwned ? ' is-owned' : '');
         ownBtn.textContent = nowOwned ? '✓' : '+';
         ownBtn.title = nowOwned ? '보유 해제' : '보유 추가';
         const badge = tdName.querySelector('.badge-owned');
         if(nowOwned && !badge){ const b=document.createElement('span'); b.className='badge-owned'; b.textContent='보유'; tdName.appendChild(b); }
         else if(!nowOwned && badge){ badge.remove(); }
-        ITEMS = ITEMS.map(x=>({...x, _owned: OWNED_SET.has(normN((window.NIKKI_SERVER==='jp'?(x.name_jp||x.name):(x.name||x.name_jp))||'') + '::' + normN(x.part||''))}));
-        try{ window.parent.postMessage({type:'ITEMSINFO_OWNED_TOGGLE', name, part, owned: nowOwned}, '*'); }catch(e){}
+        ITEMS = ITEMS.map(x=>({...x, _owned: OWNED_SET.has((x.code!=null?String(x.code).trim():normN((window.NIKKI_SERVER==='jp'?(x.name_jp||x.name):(x.name||x.name_jp))||'')) + '::' + normN(x.part||''))}));
+        try{ window.parent.postMessage({type:'ITEMSINFO_OWNED_TOGGLE', name, part, code, owned: nowOwned}, '*'); }catch(e){}
       });
       tdOwn.appendChild(ownBtn);
       tr.append(tdImg, tdCode, tdName, tdStars, tdPart, tdOwn);
@@ -516,13 +533,14 @@ function getItemTags(it){
         const ownedCount = ITEMS.filter(it => it._owned === true).length;
         console.log('[보유만] OWNED_SET size:', OWNED_SET.size, '/ _owned items:', ownedCount, '/ 샘플:', Array.from(OWNED_SET).slice(0,3));
         if(ownedCount === 0 && OWNED_SET.size > 0){
-          // _owned 재계산 시도
+          // _owned 재계산 시도 (코드::부위 기반)
           ITEMS = ITEMS.map(it => {
-            const n = normN((window.NIKKI_SERVER==='jp'?(it.name_jp||it.name):(it.name||it.name_jp))||'');
+            const code = it.code != null ? String(it.code).trim() : '';
             const p = normN(it.part||'');
-            return {...it, _owned: OWNED_SET.has(n + '::' + p)};
+            const owned = code ? OWNED_SET.has(code + '::' + p)
+              : OWNED_SET.has(normN((window.NIKKI_SERVER==='jp'?(it.name_jp||it.name):(it.name||it.name_jp))||'') + '::' + p);
+            return {...it, _owned: owned};
           });
-          console.log('[보유만] 재계산 후 _owned items:', ITEMS.filter(it => it._owned).length);
         }
       }
       page = 1; render();
@@ -552,12 +570,13 @@ function getItemTags(it){
       const arr = Array.isArray(msg.items) ? msg.items : [];
       // owned 이름 셋 업데이트
       if (Array.isArray(msg.ownedNames)){
-        // name::part 형태만 허용
         OWNED_SET = new Set(msg.ownedNames.map(n => normN(n)).filter(k => k.indexOf('::') >= 0));
       }
       function makeOwnedKey(it){
-        const n = normN((window.NIKKI_SERVER==='jp'?(it.name_jp||it.name):(it.name||it.name_jp))||'');
+        const code = it.code != null ? String(it.code).trim() : '';
         const p = normN(it.part||'');
+        if(code) return OWNED_SET.has(code + '::' + p);
+        const n = normN((window.NIKKI_SERVER==='jp'?(it.name_jp||it.name):(it.name||it.name_jp))||'');
         return OWNED_SET.has(n + '::' + p);
       }
       ITEMS = arr.filter(x => x && typeof x === 'object').map(it => ({
@@ -570,12 +589,13 @@ function getItemTags(it){
     }
     // 보유 목록만 별도로 업데이트 (ownedInput 변경 시)
     if (msg.type === 'ITEMSINFO_OWNED_UPDATE' && Array.isArray(msg.ownedNames)){
-      // name::part 형태만 허용
       OWNED_SET = new Set(msg.ownedNames.map(n => normN(n)).filter(k => k.indexOf('::') >= 0));
       ITEMS = ITEMS.map(it => {
-        const n = normN((window.NIKKI_SERVER==='jp'?(it.name_jp||it.name):(it.name||it.name_jp))||'');
+        const code = it.code != null ? String(it.code).trim() : '';
         const p = normN(it.part||'');
-        return {...it, _owned: OWNED_SET.has(n + '::' + p)};
+        const owned = code ? OWNED_SET.has(code + '::' + p)
+          : OWNED_SET.has(normN((window.NIKKI_SERVER==='jp'?(it.name_jp||it.name):(it.name||it.name_jp))||'') + '::' + p);
+        return {...it, _owned: owned};
       });
       render();
     }
