@@ -1,6 +1,22 @@
 <!doctype html>
 <html lang="ko">
 <head>
+<style id="custom-font">
+@font-face {
+  font-family: "AngyeongGothic";
+  src: url("Ba안경고딕_김영화_cej8784_naver_com_.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+* { font-family: "AngyeongGothic", system-ui, AppleSDGothicNeo, sans-serif !important; }
+.badge, .pill, .pill-small, .tag-pill, .tag-chip,
+.chip, .gtab, .skill, .countpill { font-size: 14px !important; }
+.sc-num, .chip .v, .pill-small .v { font-weight: 700 !important; }
+.tl-title-id, .tl-title-sub, .tl-speaker, .tl-kr-trans { font-weight: 700 !important; }
+.score, .badge { font-weight: 700 !important; }
+.badge.tag, .tag-pill, .tag-chip { font-weight: 400 !important; }
+</style>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>세트정보</title>
@@ -24,8 +40,8 @@
   *{scrollbar-width:thin;scrollbar-color:var(--pk-3) var(--pk-5)}
   .wrap{padding:12px}
   .topbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
-  .title{font-weight:800;font-size:16px;color:var(--pk-1)}
-  .muted{color:var(--pk-muted);font-size:12px}
+  .title{font-weight:500;font-size:19px;color:var(--pk-1)}
+  .muted{color:var(--pk-muted);font-size:14px}
   input[type=text]{padding:8px 12px;border:1.5px solid var(--pk-border);border-radius:10px;background:#fff;min-width:220px;color:var(--pk-text);font-family:inherit;outline:none}
   input[type=text]:focus{border-color:var(--pk-2);box-shadow:0 0 0 3px rgba(233,30,140,.1)}
   /* 카드 그리드 */
@@ -39,92 +55,92 @@
   .completion-bar-wrap{margin-top:4px}
   .completion-bar-bg{height:5px;border-radius:999px;background:var(--pk-4);overflow:hidden}
   .completion-bar-fill{height:100%;border-radius:999px;background:var(--pk-grad);transition:width .3s}
-  .completion-text{font-size:11px;font-weight:700;margin-bottom:3px;color:var(--pk-1)}
+  .completion-text{font-size:13px;font-weight:500;margin-bottom:3px;color:var(--pk-1)}
   /* 보유 배지 */
   .pitem.owned-yes{border-color:#bbf7d0;background:#f0fdf4}
   .pitem.owned-no{border-color:#fecaca;background:#fff5f5}
-  .owned-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;margin-left:auto;flex-shrink:0}
+  .owned-badge{font-size:12px;font-weight:500;padding:2px 7px;border-radius:999px;margin-left:auto;flex-shrink:0}
   .owned-badge.yes{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0}
   .owned-badge.no{background:#fee2e2;color:#dc2626;border:1px solid #fecaca}
   /* 텍스트 */
-  .name{font-weight:800;font-size:14px;line-height:1.2;color:var(--pk-text)}
-  .sub{font-size:12px;color:var(--pk-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .name{font-weight:500;font-size:17px;line-height:1.2;color:var(--pk-text)}
+  .sub{font-size:14px;color:var(--pk-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .pillrow{display:flex;gap:6px;flex-wrap:wrap}
-  .pill{font-size:11px;border:1.5px solid var(--pk-border);padding:3px 8px;border-radius:999px;background:var(--pk-5);color:var(--pk-text)}
+  .pill{font-size:13px;border:1.5px solid var(--pk-border);padding:3px 8px;border-radius:999px;background:var(--pk-5);color:var(--pk-text)}
   .empty{padding:22px 6px;color:var(--pk-muted)}
   /* 페이저 */
   .pager{display:flex;gap:6px;justify-content:center;align-items:center;flex-wrap:wrap;margin:14px 0 6px}
-  .pbtn{border:1.5px solid var(--pk-border);background:#fff;border-radius:10px;padding:6px 10px;font-size:12px;cursor:pointer;color:var(--pk-text);transition:background .13s,border-color .13s}
+  .pbtn{border:1.5px solid var(--pk-border);background:#fff;border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer;color:var(--pk-text);transition:background .13s,border-color .13s}
   .pbtn:hover{background:var(--pk-4);border-color:var(--pk-2)}
   .pbtn[disabled]{opacity:.45;cursor:default}
   .pbtn[disabled]:hover{background:#fff;border-color:var(--pk-border)}
   .pbtn.active{background:var(--pk-grad);color:#fff;border-color:transparent}
-  .pdots{color:var(--pk-muted);font-size:12px;padding:0 4px}
+  .pdots{color:var(--pk-muted);font-size:14px;padding:0 4px}
   /* 다이얼로그 */
   dialog{border:0;padding:0;border-radius:20px;max-width:min(980px,96vw);width:980px;box-shadow:0 20px 70px rgba(233,30,140,.18)}
   dialog::backdrop{background:rgba(45,26,34,.45)}
   .dlg{display:flex;flex-direction:column;max-height:88vh;background:#fff;border-radius:20px;overflow:hidden}
   .dlgHead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:14px 16px;border-bottom:1.5px solid var(--pk-border);background:linear-gradient(135deg,var(--pk-5),var(--pk-4));position:sticky;top:0;z-index:10}
   .dlgTitle{display:flex;flex-direction:column;gap:4px}
-  .dlgTitle .main{font-weight:900;font-size:18px;color:var(--pk-1)}
-  .dlgTitle .names{font-size:12px;color:var(--pk-muted);display:flex;flex-direction:column;gap:2px}
+  .dlgTitle .main{font-weight:500;font-size:22px;color:var(--pk-1)}
+  .dlgTitle .names{font-size:14px;color:var(--pk-muted);display:flex;flex-direction:column;gap:2px}
   .close{border:1.5px solid var(--pk-border);background:#fff;border-radius:12px;padding:8px 10px;cursor:pointer;color:var(--pk-muted);transition:background .13s,color .13s}
   .close:hover{background:var(--pk-4);color:var(--pk-1)}
   .dlgBody{padding:14px 16px;overflow:auto;background:var(--pk-5)}
   .section{background:#fff;border:1.5px solid var(--pk-border);border-radius:16px;padding:12px;margin-bottom:12px}
-  .section h3{margin:0 0 8px 0;font-size:14px;font-weight:800;color:var(--pk-1)}
+  .section h3{margin:0 0 8px 0;font-size:17px;font-weight:500;color:var(--pk-1)}
   /* 획득경로 강조 */
   .acqSection{border:2px solid var(--pk-border);background:linear-gradient(135deg,var(--pk-5),#fff)}
   .acqHead{display:flex;align-items:center;gap:10px;margin:0 0 10px 0}
-  .acqBadge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800;background:var(--pk-grad);color:#fff}
-  .acqTitle{font-size:15px;font-weight:800;color:var(--pk-1)}
+  .acqBadge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:14px;font-weight:500;background:var(--pk-grad);color:#fff}
+  .acqTitle{font-size:18px;font-weight:500;color:var(--pk-1)}
   /* 이벤트/공략 박스 */
   .eventPlain{margin-bottom:12px}
-  .eventPlain h3{margin:0 0 10px 0;font-size:15px;font-weight:800;color:var(--pk-1)}
+  .eventPlain h3{margin:0 0 10px 0;font-size:18px;font-weight:500;color:var(--pk-1)}
   .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
   .gimg{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;border:1.5px solid var(--pk-border);background:var(--pk-5);cursor:zoom-in;transition:transform .13s}
   .gimg:hover{transform:scale(1.02)}
   .sources{display:flex;flex-direction:column;gap:6px}
   .src{display:flex;gap:8px;align-items:flex-start}
-  .src .k{min-width:110px;font-weight:700;font-size:12px;color:var(--pk-1)}
-  .src .v{font-size:12px;color:var(--pk-text);white-space:pre-wrap}
-  .guide{margin-top:8px;padding-top:8px;border-top:1px dashed var(--pk-border);font-size:12px;color:var(--pk-text);white-space:pre-wrap}
+  .src .k{min-width:110px;font-weight:500;font-size:14px;color:var(--pk-1)}
+  .src .v{font-size:14px;color:var(--pk-text);white-space:pre-wrap}
+  .guide{margin-top:8px;padding-top:8px;border-top:1px dashed var(--pk-border);font-size:14px;color:var(--pk-text);white-space:pre-wrap}
   .parts{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
   .pitem{display:flex;gap:10px;align-items:center;border:1.5px solid var(--pk-border);border-radius:14px;padding:10px;background:#fff;cursor:pointer;transition:background .13s,border-color .13s}
   .pitem:hover{background:var(--pk-5);border-color:var(--pk-2)}
   .pimg{width:56px;height:56px;border-radius:12px;object-fit:cover;border:1.5px solid var(--pk-border);background:var(--pk-5)}
   .pmeta{display:flex;flex-direction:column;gap:2px;min-width:0}
-  .pname{font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .ppart{font-size:12px;color:var(--pk-muted)}
-  .code{font-size:11px;color:var(--pk-muted)}
+  .pname{font-weight:500;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ppart{font-size:14px;color:var(--pk-muted)}
+  .code{font-size:13px;color:var(--pk-muted)}
   /* 이벤트/공략 강조 박스 */
   .eventBox{border:2px solid var(--pk-border);background:var(--pk-5);border-radius:16px;padding:12px;margin-top:10px}
   .guideBox{border:2px solid #bae6fd;background:#f0f9ff;border-radius:16px;padding:12px;margin-top:10px}
-  .hdr{display:flex;align-items:center;gap:10px;font-weight:900}
-  .hdr .ico{font-size:18px}
-  .hdr .tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800}
+  .hdr{display:flex;align-items:center;gap:10px;font-weight:500}
+  .hdr .ico{font-size:22px}
+  .hdr .tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:14px;font-weight:500}
   .hdr .tag-event{background:var(--pk-grad);color:#fff}
   .hdr .tag-guide{background:#0ea5e9;color:#fff}
-  .hdr .title{font-size:14px;font-weight:800;color:var(--pk-1)}
-  .eventBox .body{margin-top:8px;font-size:13px;color:var(--pk-text);white-space:pre-wrap;line-height:1.7}
-  .guideBox .body{margin-top:8px;font-size:13px;color:#0c4a6e;white-space:pre-wrap;line-height:1.7}
+  .hdr .title{font-size:17px;font-weight:500;color:var(--pk-1)}
+  .eventBox .body{margin-top:8px;font-size:16px;color:var(--pk-text);white-space:pre-wrap;line-height:1.7}
+  .guideBox .body{margin-top:8px;font-size:16px;color:#0c4a6e;white-space:pre-wrap;line-height:1.7}
   /* 이미지 줌 */
   .zoomDlg{max-width:min(980px,96vw);width:980px}
   .zoomBox{background:#000;border-radius:18px;overflow:hidden}
   .zoomImg{width:100%;height:auto;display:block}
   /* 세트 설명 */
-  .setDesc{margin-top:10px;padding:12px 14px;border-radius:14px;background:var(--pk-5);border:1.5px solid var(--pk-border);font-size:13px;line-height:1.7;color:var(--pk-text)}
+  .setDesc{margin-top:10px;padding:12px 14px;border-radius:14px;background:var(--pk-5);border:1.5px solid var(--pk-border);font-size:16px;line-height:1.7;color:var(--pk-text)}
   /* 진화 */
   .evoStage{margin-top:14px}
   .evoHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px 0}
-  .evoTitle{font-weight:800;font-size:13px;color:var(--pk-1)}
-  .evoSub{font-weight:700;font-size:12px;color:var(--pk-muted);margin:8px 0}
+  .evoTitle{font-weight:500;font-size:16px;color:var(--pk-1)}
+  .evoSub{font-weight:500;font-size:14px;color:var(--pk-muted);margin:8px 0}
   .vgroup{margin-top:10px}
-  .vtitle{font-weight:800;font-size:13px;margin:0 0 8px 0;color:var(--pk-1)}
+  .vtitle{font-weight:500;font-size:16px;margin:0 0 8px 0;color:var(--pk-1)}
   .vlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
   /* source-list (획득경로) */
   .source-list{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px}
-  .source-list li{padding:5px 12px;border-radius:999px;background:#fff;border:1.5px solid var(--pk-border);font-weight:700;color:var(--pk-1);font-size:12px;transition:background .13s}
+  .source-list li{padding:5px 12px;border-radius:999px;background:#fff;border:1.5px solid var(--pk-border);font-weight:500;color:var(--pk-1);font-size:14px;transition:background .13s}
   .source-list li:hover{background:var(--pk-4)}
   .source-list li::before{content:none}
 </style>
@@ -255,15 +271,49 @@
 
   let SETS = [];
   let ITEMS = [];
-  let OWNED_NAMES = new Set(); // 보유 의상 이름 목록
+  let OWNED_NAMES = new Set(); // 보유 의상 이름 목록 (fallback)
+  let OWNED_CODES = new Set(); // 보유 의상 코드 목록 (코드::부위 or 코드 형식)
 
   // 이름 정규화 (공백·특수문자 제거, 소문자)
   function normName(s){ return String(s||'').replace(/[\s\-·・''`]/g,'').toLowerCase(); }
   function isOwned(name){ return OWNED_NAMES.has(normName(name)); }
 
+  // 코드 기반 보유 확인 (코드번호 단독으로도 체크)
+  function isOwnedByCode(code, part){
+    if(code === null || code === undefined || code === '') return false;
+    const c = String(code);
+    const p = String(part || '');
+    // "코드::부위" 형식으로 체크
+    if(p && OWNED_CODES.has(c + '::' + p)) return true;
+    // 코드만으로도 체크 (부위 무관)
+    if(OWNED_CODES.has(c)) return true;
+    // OWNED_CODES 중 같은 코드번호가 있는지 확인 (부위가 다를 수 있으므로)
+    for(const entry of OWNED_CODES){
+      if(entry === c || entry.startsWith(c + '::')) return true;
+    }
+    return false;
+  }
+
   // 보유 목록 업데이트
   function updateOwned(names){
-    OWNED_NAMES = new Set((names||[]).map(normName).filter(Boolean));
+    // names 배열에 "코드::부위" 형식이 있으면 코드 기반으로 처리
+    const codeEntries = [];
+    const nameEntries = [];
+    (names || []).forEach(function(s){
+      s = String(s || '').trim();
+      if(!s) return;
+      // "숫자::부위" 형식이면 코드 기반
+      if(/^\d+::/.test(s) || /^\d+$/.test(s)){
+        codeEntries.push(s);
+        // 숫자 부분만 추출해서도 추가
+        const numPart = s.split('::')[0];
+        if(numPart) codeEntries.push(numPart);
+      } else {
+        nameEntries.push(normName(s));
+      }
+    });
+    OWNED_CODES = new Set(codeEntries.filter(Boolean));
+    OWNED_NAMES = new Set(nameEntries.filter(Boolean));
     // 열려있는 세트 상세 새로고침
     renderList();
   }
@@ -431,7 +481,12 @@ function trim(s){ return norm(s).trim(); }
       parts.forEach(p => {
         const resolved = resolvePartAndItem(p.part, (p.code==null)?"":(p.code));
         const name = trim(p.name) || trim(resolved.item && resolved.item.name) || "";
-        if(name && isOwned(name)) ownedCount++;
+        const code = (p.code == null) ? "" : String(p.code);
+        if(OWNED_CODES.size > 0){
+          if(isOwnedByCode(code, p.part)) ownedCount++;
+        } else if(name && isOwned(name)){
+          ownedCount++;
+        }
       });
       const total = parts.length;
       const pct = total > 0 ? Math.round(ownedCount / total * 100) : 0;
@@ -543,7 +598,12 @@ function trim(s){ return norm(s).trim(); }
       plist2.forEach(p => {
         const r = resolvePartAndItem(p.part, (p.code==null)?"":(p.code));
         const n = trim(p.name) || trim(r.item && r.item.name) || "";
-        if(n && isOwned(n)) owned2++;
+        const c = (p.code == null) ? "" : String(p.code);
+        if(OWNED_CODES.size > 0){
+          if(isOwnedByCode(c, p.part)) owned2++;
+        } else if(n && isOwned(n)){
+          owned2++;
+        }
       });
       const tot2 = plist2.length;
       const pct2 = tot2 > 0 ? Math.round(owned2/tot2*100) : 0;
@@ -555,7 +615,7 @@ function trim(s){ return norm(s).trim(); }
           <div style="flex:1;height:6px;border-radius:999px;background:#f0f0f0;overflow:hidden">
             <div style="height:100%;border-radius:999px;width:${pct2}%;background:${col2};transition:width .4s"></div>
           </div>
-          <span style="font-size:12px;font-weight:800;color:${col2};white-space:nowrap">${owned2}/${tot2} 보유 (${pct2}%)</span>
+          <span style="font-size:14px;font-weight:500;color:${col2};white-space:nowrap">${owned2}/${tot2} 보유 (${pct2}%)</span>
         `;
       } else {
         dlgCompletion.style.display = 'none';
@@ -694,7 +754,13 @@ function trim(s){ return norm(s).trim(); }
         const name = trim(p.name) || trim(fromItems && fromItems.name) || "-";
 
         const div = document.createElement("div");
-        const ownedFlag = name && name !== '-' ? isOwned(name) : null;
+        // 코드 기반으로 보유 판정 (우선), 없으면 이름 기반
+        let ownedFlag = null;
+        if(OWNED_CODES.size > 0){
+          ownedFlag = isOwnedByCode(code, p.part || part);
+        } else if(name && name !== '-'){
+          ownedFlag = isOwned(name);
+        }
         div.className = "pitem" + (ownedFlag === true ? " owned-yes" : ownedFlag === false ? " owned-no" : "");
         div.innerHTML = `
           ${img ? `<img class="pimg" src="${img}" alt="" loading="lazy" decoding="async">` : `<div class="pimg"></div>`}
@@ -925,12 +991,12 @@ function trim(s){ return norm(s).trim(); }
 <dialog id="itemDetailDialog" style="width:min(980px,92vw);height:min(86vh,900px);padding:0;border:0;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.25);">
   
 <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #eee;">
-  <div style="font-weight:700;">아이템 상세</div>
+  <div style="font-weight:500;">아이템 상세</div>
   <div style="display:flex;gap:6px;align-items:center;">
     <button type="button" id="itemDetailBackBtn" title="뒤로가기"
-      style="border:0;background:transparent;font-size:18px;line-height:1;cursor:pointer;padding:4px 8px;border-radius:6px;">←</button>
+      style="border:0;background:transparent;font-size:22px;line-height:1;cursor:pointer;padding:4px 8px;border-radius:6px;">←</button>
     <button type="button" id="itemDetailCloseBtn" title="닫기"
-      style="border:0;background:transparent;font-size:22px;line-height:1;cursor:pointer;padding:2px 8px;border-radius:6px;">×</button>
+      style="border:0;background:transparent;font-size:26px;line-height:1;cursor:pointer;padding:2px 8px;border-radius:6px;">×</button>
   </div>
 </div>
 

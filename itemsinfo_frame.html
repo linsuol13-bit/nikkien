@@ -1,6 +1,22 @@
 <!doctype html>
 <html lang="ko">
 <head>
+<style id="custom-font">
+@font-face {
+  font-family: "AngyeongGothic";
+  src: url("Ba안경고딕_김영화_cej8784_naver_com_.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+* { font-family: "AngyeongGothic", system-ui, AppleSDGothicNeo, sans-serif !important; }
+.badge, .pill, .pill-small, .tag-pill, .tag-chip,
+.chip, .gtab, .skill, .countpill { font-size: 14px !important; }
+.sc-num, .chip .v, .pill-small .v { font-weight: 700 !important; }
+.tl-title-id, .tl-title-sub, .tl-speaker, .tl-kr-trans { font-weight: 700 !important; }
+.score, .badge { font-weight: 700 !important; }
+.badge.tag, .tag-pill, .tag-chip { font-weight: 400 !important; }
+</style>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>아이템 정보</title>
@@ -16,56 +32,59 @@
   .wrap{display:flex;gap:12px;padding:12px}
   .sidebar{width:200px;max-width:38vw;background:#fff;border:1.5px solid var(--pk-border);border-radius:16px;overflow:hidden;box-shadow:var(--pk-shadow);align-self:flex-start;position:sticky;top:0}
   .side-head{padding:10px 12px 8px;border-bottom:1.5px solid var(--pk-border);display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#fff5f8,#fce4ec)}
-  .side-head b{font-size:13px;color:var(--pk-1);font-weight:700}
-  .side-head .total{font-size:11px;color:var(--pk-muted)}
+  .side-head b{font-size:16px;color:var(--pk-1);font-weight:500}
+  .side-head .total{font-size:13px;color:var(--pk-muted)}
   .list{padding:5px}
-  .itembtn{display:flex;justify-content:space-between;align-items:center;gap:6px;width:100%;padding:7px 9px;border:1.5px solid transparent;background:transparent;border-radius:10px;cursor:pointer;font-size:12px;font-family:inherit;color:var(--pk-text);transition:background .13s,border-color .13s;text-align:left}
+  .itembtn{display:flex;justify-content:space-between;align-items:center;gap:6px;width:100%;padding:7px 9px;border:1.5px solid transparent;background:transparent;border-radius:10px;cursor:pointer;font-size:14px;font-family:inherit;color:var(--pk-text);transition:background .13s,border-color .13s;text-align:left}
   .itembtn:hover{background:var(--pk-4);border-color:var(--pk-border)}
-  .itembtn.active{background:var(--pk-grad);border-color:transparent;color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(233,30,140,.2)}
+  .itembtn.active{background:var(--pk-grad);border-color:transparent;color:#fff;font-weight:500;box-shadow:0 2px 8px rgba(233,30,140,.2)}
   .itembtn.active .badge{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.4);color:#fff}
-  .badge{font-size:11px;background:var(--pk-4);border:1px solid var(--pk-border);border-radius:999px;padding:1px 7px;color:var(--pk-1);font-weight:600;white-space:nowrap}
+  .badge{font-size:13px;background:var(--pk-4);border:1px solid var(--pk-border);border-radius:999px;padding:1px 7px;color:var(--pk-1);font-weight:500;white-space:nowrap}
   .main{flex:1;min-width:0}
   .toolbar{display:flex;gap:7px;align-items:center;justify-content:flex-end;margin-bottom:10px;flex-wrap:wrap}
-  input,select,button{padding:7px 10px;border:1.5px solid var(--pk-border);border-radius:10px;background:#fff;color:var(--pk-text);font-family:inherit;font-size:13px}
+  input,select,button{padding:7px 10px;border:1.5px solid var(--pk-border);border-radius:10px;background:#fff;color:var(--pk-text);font-family:inherit;font-size:16px}
   select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23e91e8c' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:28px}
   input:focus,select:focus{outline:none;border-color:var(--pk-2);box-shadow:0 0 0 3px rgba(233,30,140,.1)}
-  button{cursor:pointer;font-weight:600;transition:background .13s,border-color .13s}
+  button{cursor:pointer;font-weight:500;transition:background .13s,border-color .13s}
   button:hover{background:var(--pk-4);border-color:var(--pk-2)}
   .card{background:#fff;border:1.5px solid var(--pk-border);border-radius:14px;overflow:hidden;box-shadow:var(--pk-shadow)}
   .thumb{width:44px;height:44px;object-fit:cover;border-radius:10px;border:1.5px solid var(--pk-border);background:var(--pk-5);display:block}
   table{width:100%;border-collapse:collapse}
-  th,td{padding:8px 10px;border-bottom:1px solid var(--pk-4);text-align:left;font-size:13px}
-  th{background:linear-gradient(135deg,#fff5f8,#fce4ec);font-weight:700;color:var(--pk-1);font-size:12px}
+  th,td{padding:8px 10px;border-bottom:1px solid var(--pk-4);text-align:left;font-size:16px}
+  th{background:linear-gradient(135deg,#fff5f8,#fce4ec);font-weight:500;color:var(--pk-1);font-size:14px}
   tr:hover td{background:var(--pk-5)}
   tr:last-child td{border-bottom:none}
-  .muted{color:var(--pk-muted);font-size:12px}
-  .badge-owned{font-size:11px;background:#eaffea;border:1px solid #cdeccc;border-radius:999px;padding:1px 7px;color:#2e7d32;font-weight:600}
+  .muted{color:var(--pk-muted);font-size:14px}
+  .badge-owned{font-size:13px;background:#eaffea;border:1px solid #cdeccc;border-radius:999px;padding:1px 7px;color:#2e7d32;font-weight:500}
   .itembtn.owned-only-on{background:#eaffea;border-color:#cdeccc}
-  #pager{display:flex;gap:8px;align-items:center;justify-content:flex-end;padding:10px 2px}
-  #prevPage,#nextPage{padding:6px 14px;border-radius:999px;border:1.5px solid var(--pk-border);background:#fff;font-weight:600}
-  #prevPage:hover,#nextPage:hover{background:var(--pk-grad);border-color:transparent;color:#fff}
-  .empty{padding:40px 20px;text-align:center;color:var(--pk-muted);font-size:14px}
+  #pager{display:flex;gap:6px;align-items:center;justify-content:flex-end;padding:10px 2px;flex-wrap:wrap}
+  .page-btn{min-width:34px;height:34px;padding:0 8px;border-radius:10px;border:1.5px solid var(--pk-border);background:#fff;font-weight:500;font-size:14px;cursor:pointer;transition:background .13s,border-color .13s,color .13s;display:inline-flex;align-items:center;justify-content:center}
+  .page-btn:hover:not(:disabled){background:var(--pk-4);border-color:var(--pk-2);color:var(--pk-1)}
+  .page-btn.active{background:var(--pk-grad);border-color:transparent;color:#fff;box-shadow:0 2px 8px rgba(233,30,140,.2)}
+  .page-btn:disabled{opacity:.4;cursor:default}
+  #prevPage,#nextPage{padding:0 12px;border-radius:999px}
+  .empty{padding:40px 20px;text-align:center;color:var(--pk-muted);font-size:17px}
   .detailDialog{width:min(980px,calc(100vw - 24px));max-width:980px;border:none;padding:0;border-radius:16px;background:transparent}
   .detailDialog::backdrop{background:rgba(45,26,34,.55)}
   .detailDialogBox{margin:0;padding:0;background:#fff;border:1.5px solid var(--pk-border);border-radius:16px;overflow:hidden}
   .detailDialogHead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1.5px solid var(--pk-border);background:linear-gradient(135deg,#fff5f8,#fce4ec)}
-  .detailDialogHead b{color:var(--pk-1);font-size:14px}
-  .detailClose{border:1.5px solid var(--pk-border);background:#fff;border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:16px;color:var(--pk-muted);display:flex;align-items:center;justify-content:center}
+  .detailDialogHead b{color:var(--pk-1);font-size:17px}
+  .detailClose{border:1.5px solid var(--pk-border);background:#fff;border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:19px;color:var(--pk-muted);display:flex;align-items:center;justify-content:center}
   .detailClose:hover{background:var(--pk-4);border-color:var(--pk-2);color:var(--pk-1)}
   .detailFrame{width:100%;height:min(78vh,820px);border:0;display:block;background:var(--pk-5)}
-  .own-btn{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--pk-border);background:#fff;cursor:pointer;font-size:16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;padding:0;color:var(--pk-1);line-height:1;flex-shrink:0}
+  .own-btn{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--pk-border);background:#fff;cursor:pointer;font-size:19px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;padding:0;color:var(--pk-1);line-height:1;flex-shrink:0}
   .own-btn:hover{background:var(--pk-4);border-color:var(--pk-2);transform:scale(1.15)}
-  .own-btn.is-owned{background:var(--pk-grad);border-color:transparent;color:#fff;font-size:13px;box-shadow:0 2px 6px rgba(233,30,140,.3)}
+  .own-btn.is-owned{background:var(--pk-grad);border-color:transparent;color:#fff;font-size:16px;box-shadow:0 2px 6px rgba(233,30,140,.3)}
   .own-btn.is-owned:hover{opacity:.85;transform:scale(1.15)}
   /* 장식 서브항목 */
-  .itembtn.sub-item{padding-left:18px;font-size:11px;opacity:.85}
-  .itembtn.sub-item::before{content:"ㄴ ";color:var(--pk-muted);font-size:10px}
+  .itembtn.sub-item{padding-left:18px;font-size:13px;opacity:.85}
+  .itembtn.sub-item::before{content:"ㄴ ";color:var(--pk-muted);font-size:12px}
   .itembtn.sub-item.active::before{color:rgba(255,255,255,.7)}
   .itembtn.sub-item.active{color:#fff;opacity:1}
   .sub-group-hidden{display:none}
-  .itembtn.group-btn{font-weight:700;color:var(--pk-1)}
+  .itembtn.group-btn{font-weight:500;color:var(--pk-1)}
   .itembtn.group-btn.active{color:#fff}
-  .itembtn.group-btn .toggle-arrow{font-size:10px;margin-left:2px;transition:transform .2s}
+  .itembtn.group-btn .toggle-arrow{font-size:12px;margin-left:2px;transition:transform .2s}
   .itembtn.group-btn.open .toggle-arrow{display:inline-block;transform:rotate(90deg)}
   .itembtn.group-btn.open.active .toggle-arrow{color:rgba(255,255,255,.8)}
   @media(max-width:600px){
@@ -74,25 +93,25 @@
     .side-head{padding:8px 10px 6px}
     .list{display:flex;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;padding:6px;gap:5px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
     .list::-webkit-scrollbar{display:none}
-    .itembtn{white-space:nowrap;flex-shrink:0;width:auto;padding:5px 10px;font-size:11px;border-radius:999px;border:1.5px solid var(--pk-border)}
+    .itembtn{white-space:nowrap;flex-shrink:0;width:auto;padding:5px 10px;font-size:13px;border-radius:999px;border:1.5px solid var(--pk-border)}
     .itembtn .badge{display:none}
     .itembtn.sub-item{display:none}
     .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:6px;justify-content:unset}
     .toolbar input#q{grid-column:1/-1}
-    .toolbar button{padding:7px 8px;font-size:12px}
+    .toolbar button{padding:7px 8px;font-size:14px}
     .card{overflow-x:hidden !important;background:#fff !important;border:1.5px solid var(--pk-border) !important;box-shadow:var(--pk-shadow) !important}
     table{min-width:0 !important;width:100% !important;table-layout:fixed !important}
-    th,td{padding:6px 5px;font-size:12px;overflow:hidden}
+    th,td{padding:6px 5px;font-size:14px;overflow:hidden}
     th:nth-child(1),td:nth-child(1){width:46px}
     .thumb{width:40px;height:40px;border-radius:8px}
-    th:nth-child(2),td:nth-child(2){width:50px;font-size:11px;color:var(--pk-1);font-weight:700}
+    th:nth-child(2),td:nth-child(2){width:50px;font-size:13px;color:var(--pk-1);font-weight:500}
     th:nth-child(3),td:nth-child(3){width:auto}
-    td:nth-child(3){white-space:normal;word-break:break-all;font-size:12px}
+    td:nth-child(3){white-space:normal;word-break:break-all;font-size:14px}
     th:nth-child(4),td:nth-child(4){display:none !important}
     th:nth-child(5),td:nth-child(5){display:none !important}
     th:nth-child(6),td:nth-child(6){width:44px;text-align:center}
-    .own-btn{width:34px;height:34px;font-size:20px}
-    .own-btn.is-owned{font-size:16px}
+    .own-btn{width:34px;height:34px;font-size:24px}
+    .own-btn.is-owned{font-size:19px}
     #pager{justify-content:center}
   }
 </style>
@@ -145,10 +164,11 @@
       </table>
       <div class="empty" id="empty" style="display:none">표시할 아이템이 없어요.</div>
     </div>
-    <div id="pager" style="display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin-top:10px">
+    <div id="pager" style="margin-top:10px">
       <span class="muted" id="pageInfo"></span>
-      <button id="prevPage" type="button">이전</button>
-      <button id="nextPage" type="button">다음</button>
+      <button id="prevPage" type="button" class="page-btn">‹</button>
+      <span id="pageNumbers"></span>
+      <button id="nextPage" type="button" class="page-btn">›</button>
     </div>
     <div class="muted" style="padding:8px 2px">※ 이 탭은 스테이지/추천 필터와 완전히 분리되어 있어.</div>
 
@@ -266,6 +286,11 @@ function getItemTags(it){
   let OWNED_SET = new Set(); // 보유 이름 집합 (parent에서 수신)
   // normOwnedName과 동일한 정규화 (index.html과 키 일치)
   function normN(s){ return String(s||'').normalize('NFKC').toLowerCase().replace(/\s+/g,''); }
+  // 장식 부위는 입력창에 "장식"으로 저장되므로 통일
+  function normPart(p){
+    const s = normN(p||'');
+    return s.startsWith('장식') ? '장식' : s;
+  }
   const PAGE_SIZE = 100;
   let page = 1;
 
@@ -337,12 +362,14 @@ function getItemTags(it){
           });
           // 장식 전체도 선택
           active = idx;
+          page = 1;
           partList.querySelectorAll('.itembtn').forEach(function(b){ b.classList.remove('active'); });
           btn.classList.add('active');
           render();
           return;
         }
         active = idx;
+        page = 1;
         partList.querySelectorAll('.itembtn').forEach(function(b){ b.classList.remove('active'); });
         btn.classList.add('active');
         render();
@@ -409,7 +436,7 @@ function getItemTags(it){
     if(OWNED_SET.size === 0) return;
     ITEMS = ITEMS.map(x => {
       const code = x.code != null ? String(x.code).trim() : '';
-      const p = normN(x.part||'');
+      const p = normPart(x.part||'');
       const n = normN((window.NIKKI_SERVER==='jp'?(x.name_jp||x.name):(x.name||x.name_jp))||'');
       const owned = code ? OWNED_SET.has(code + '::' + p) : OWNED_SET.has(n + '::' + p);
       return owned === x._owned ? x : {...x, _owned: owned};
@@ -475,7 +502,7 @@ function getItemTags(it){
         const name = String((window.NIKKI_SERVER==='jp' ? (it.name_jp||it.name) : (it.name||it.name_jp))||'').trim();
         const part = String(it.part||'');
         const code = it.code != null ? String(it.code).trim() : '';
-        const key = (code || normN(name)) + '::' + normN(part);
+        const key = (code || normN(name)) + '::' + normPart(part);
         // 현재 보유 상태를 OWNED_SET 기준으로 확인 (클로저 문제 방지)
         const currentOwned = OWNED_SET.has(key);
         const nowOwned = !currentOwned;
@@ -488,7 +515,7 @@ function getItemTags(it){
         const badge = tdName.querySelector('.badge-owned');
         if(nowOwned && !badge){ const b=document.createElement('span'); b.className='badge-owned'; b.textContent='보유'; tdName.appendChild(b); }
         else if(!nowOwned && badge){ badge.remove(); }
-        ITEMS = ITEMS.map(x=>({...x, _owned: OWNED_SET.has((x.code!=null?String(x.code).trim():normN((window.NIKKI_SERVER==='jp'?(x.name_jp||x.name):(x.name||x.name_jp))||'')) + '::' + normN(x.part||''))}));
+        ITEMS = ITEMS.map(x=>({...x, _owned: OWNED_SET.has((x.code!=null?String(x.code).trim():normN((window.NIKKI_SERVER==='jp'?(x.name_jp||x.name):(x.name||x.name_jp))||'')) + '::' + normPart(x.part||''))}));
         try{ window.parent.postMessage({type:'ITEMSINFO_OWNED_TOGGLE', name, part, code, owned: nowOwned}, '*'); }catch(e){}
       });
       tdOwn.appendChild(ownBtn);
@@ -502,11 +529,39 @@ function getItemTags(it){
     const info = document.getElementById('pageInfo');
     const prev = document.getElementById('prevPage');
     const next = document.getElementById('nextPage');
+    const pageNumbers = document.getElementById('pageNumbers');
 
     if (pager) pager.style.display = (total > PAGE_SIZE) ? 'flex' : 'none';
-    if (info) info.textContent = total ? `${page}/${totalPages} 페이지 · ${total}개` : '';
+    if (info) info.textContent = total ? `총 ${total}개` : '';
     if (prev) prev.disabled = (page <= 1);
     if (next) next.disabled = (page >= totalPages);
+
+    // 번호 버튼 렌더링
+    if (pageNumbers) {
+      pageNumbers.innerHTML = '';
+      if (totalPages > 1) {
+        const WINDOW = 2;
+        let pages = new Set([1, totalPages]);
+        for (let i = Math.max(1, page - WINDOW); i <= Math.min(totalPages, page + WINDOW); i++) pages.add(i);
+        const sorted = Array.from(pages).sort((a,b)=>a-b);
+        let prevP = 0;
+        for (const p of sorted) {
+          if (p - prevP > 1) {
+            const dots = document.createElement('span');
+            dots.textContent = '…';
+            dots.style.cssText = 'padding:0 4px;color:var(--pk-muted);font-size:14px;align-self:center';
+            pageNumbers.appendChild(dots);
+          }
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'page-btn' + (p === page ? ' active' : '');
+          btn.textContent = p;
+          btn.addEventListener('click', (function(pg){ return function(){ page=pg; render(); stt(); }; })(p));
+          pageNumbers.appendChild(btn);
+          prevP = p;
+        }
+      }
+    }
   }
 
   $('clear').addEventListener('click', ()=>{
@@ -536,9 +591,9 @@ function getItemTags(it){
           // _owned 재계산 시도 (코드::부위 기반)
           ITEMS = ITEMS.map(it => {
             const code = it.code != null ? String(it.code).trim() : '';
-            const p = normN(it.part||'');
-            const owned = code ? OWNED_SET.has(code + '::' + p)
-              : OWNED_SET.has(normN((window.NIKKI_SERVER==='jp'?(it.name_jp||it.name):(it.name||it.name_jp))||'') + '::' + p);
+            const p2 = normPart(it.part||'');
+            const owned = code ? OWNED_SET.has(code + '::' + p2)
+              : OWNED_SET.has(normN((window.NIKKI_SERVER==='jp'?(it.name_jp||it.name):(it.name||it.name_jp))||'') + '::' + p2);
             return {...it, _owned: owned};
           });
         }
@@ -557,7 +612,7 @@ function getItemTags(it){
       // 서버 변경 시 _owned 전체 재계산
       ITEMS = ITEMS.map(function(x){
         const n = normN((window.NIKKI_SERVER==='jp'?(x.name_jp||x.name):(x.name||x.name_jp))||'');
-        const p = normN(x.part||'');
+        const p = normPart(x.part||'');
         const owned = OWNED_SET.has(n + '::' + p);
         return Object.assign({}, x, {_owned: owned});
       });
@@ -574,7 +629,7 @@ function getItemTags(it){
       }
       function makeOwnedKey(it){
         const code = it.code != null ? String(it.code).trim() : '';
-        const p = normN(it.part||'');
+        const p = normPart(it.part||'');
         if(code) return OWNED_SET.has(code + '::' + p);
         const n = normN((window.NIKKI_SERVER==='jp'?(it.name_jp||it.name):(it.name||it.name_jp))||'');
         return OWNED_SET.has(n + '::' + p);
@@ -592,7 +647,7 @@ function getItemTags(it){
       OWNED_SET = new Set(msg.ownedNames.map(n => normN(n)).filter(k => k.indexOf('::') >= 0));
       ITEMS = ITEMS.map(it => {
         const code = it.code != null ? String(it.code).trim() : '';
-        const p = normN(it.part||'');
+        const p = normPart(it.part||'');
         const owned = code ? OWNED_SET.has(code + '::' + p)
           : OWNED_SET.has(normN((window.NIKKI_SERVER==='jp'?(it.name_jp||it.name):(it.name||it.name_jp))||'') + '::' + p);
         return {...it, _owned: owned};

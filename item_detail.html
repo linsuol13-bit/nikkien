@@ -1,4 +1,20 @@
 <!doctype html>
+<style id="custom-font">
+@font-face {
+  font-family: "AngyeongGothic";
+  src: url("Ba안경고딕_김영화_cej8784_naver_com_.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+* { font-family: "AngyeongGothic", system-ui, AppleSDGothicNeo, sans-serif !important; }
+.badge, .pill, .pill-small, .tag-pill, .tag-chip,
+.chip, .gtab, .skill, .countpill { font-size: 14px !important; }
+.sc-num, .chip .v, .pill-small .v { font-weight: 700 !important; }
+.tl-title-id, .tl-title-sub, .tl-speaker, .tl-kr-trans { font-weight: 700 !important; }
+.score, .badge { font-weight: 700 !important; }
+.badge.tag, .tag-pill, .tag-chip { font-weight: 400 !important; }
+</style>
 <meta charset="utf-8">
 <title>아이템 상세</title>
 <style>
@@ -24,36 +40,36 @@
   .head{display:flex;gap:14px;align-items:flex-start;padding:16px}
   .thumb{width:86px;height:86px;border-radius:16px;border:2px solid var(--pk-border);background:var(--pk-5);object-fit:cover;flex:0 0 auto;box-shadow:0 4px 12px rgba(233,30,140,.12)}
   .hcol{flex:1 1 auto;min-width:240px}
-  .title{font-size:22px;font-weight:800;margin:0 0 2px;color:var(--pk-text)}
-  .sub{font-size:13px;color:var(--pk-muted);margin:0 0 10px}
+  .title{font-size:26px;font-weight:500;margin:0 0 2px;color:var(--pk-text)}
+  .sub{font-size:16px;color:var(--pk-muted);margin:0 0 10px}
   .chips{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:var(--pk-5);border:1.5px solid var(--pk-border);font-size:12px;color:var(--pk-text)}
-  .chip b{font-weight:700;color:var(--pk-1)}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:var(--pk-5);border:1.5px solid var(--pk-border);font-size:14px;color:var(--pk-text)}
+  .chip b{font-weight:500;color:var(--pk-1)}
   .section{padding:0 16px 16px}
-  .sec-title{display:flex;align-items:center;gap:8px;font-weight:800;margin:14px 0 10px;color:var(--pk-1);font-size:14px}
+  .sec-title{display:flex;align-items:center;gap:8px;font-weight:500;margin:14px 0 10px;color:var(--pk-1);font-size:17px}
   .sec-title::before{content:'';display:block;width:3px;height:16px;background:var(--pk-grad);border-radius:999px}
-  .sec-title small{font-weight:600;color:var(--pk-muted);font-size:12px}
+  .sec-title small{font-weight:500;color:var(--pk-muted);font-size:14px}
   .box{border:1.5px solid var(--pk-border);border-radius:14px;background:#fff;padding:12px}
   .box-plain{border:0;background:transparent;padding:0}
   .rowline{height:1px;background:var(--pk-border);margin:0 16px}
   .lang{display:grid;grid-template-columns:74px 1fr;gap:10px 12px;align-items:start}
   .lang+.lang{margin-top:10px}
-  .pill{display:inline-flex;align-items:center;justify-content:center;height:24px;padding:0 10px;border-radius:999px;font-size:12px;border:1.5px solid var(--pk-border);background:#fff;color:var(--pk-text);width:max-content;font-weight:600}
+  .pill{display:inline-flex;align-items:center;justify-content:center;height:24px;padding:0 10px;border-radius:999px;font-size:14px;border:1.5px solid var(--pk-border);background:#fff;color:var(--pk-text);width:max-content;font-weight:500}
   .pill.ko{background:var(--pk-5);border-color:var(--pk-border);color:var(--pk-1)}
   .pill.zh{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
   .pill.ja{background:#eef2ff;border-color:#c7d2fe;color:#3730a3}
   .pill.en{background:#ecfeff;border-color:#a5f3fc;color:#0e7490}
-  .text{white-space:pre-wrap;line-height:1.5;font-size:13.5px}
+  .text{white-space:pre-wrap;line-height:1.5;font-size:16px}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .imgcard{border:1.5px solid var(--pk-border);border-radius:14px;background:var(--pk-5);overflow:hidden;min-height:180px;display:flex;align-items:center;justify-content:center}
   .imgcard img{max-width:100%;height:auto;display:block}
   .dyegrid{display:flex;flex-wrap:wrap;gap:12px}
   .dyeitem{width:62px;text-align:center}
   .dyeitem img{width:56px;height:56px;border-radius:12px;object-fit:cover;display:block;border:1.5px solid var(--pk-border);background:var(--pk-5)}
-  .muted{color:var(--pk-muted);font-size:13px}
+  .muted{color:var(--pk-muted);font-size:16px}
   .stats{display:flex;flex-wrap:wrap;gap:10px}
-  .stat{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--pk-border);background:#fff;font-size:13px}
-  .grade{width:28px;height:28px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;border:1.5px solid transparent;background:var(--pk-5);font-size:11px}
+  .stat{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--pk-border);background:#fff;font-size:16px}
+  .grade{width:28px;height:28px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:500;border:1.5px solid transparent;background:var(--pk-5);font-size:13px}
   .grade.grade-SSS{background:linear-gradient(135deg,#ffb3b3,#ff7c7c);color:#7f0000;border-color:#ffb3b3}
   .grade.grade-SS{background:linear-gradient(135deg,#fbb6ce,#f687b3);color:#831843;border-color:#fbb6ce}
   .grade.grade-S{background:linear-gradient(135deg,#fde68a,#fbbf24);color:#78350f;border-color:#fde68a}
@@ -65,8 +81,8 @@
   .materials{display:flex;flex-wrap:wrap;gap:12px}
   .mat{width:62px;text-align:center}
   .mat .mimg{width:56px;height:56px;border-radius:12px;border:1.5px solid var(--pk-border);background:var(--pk-5);object-fit:cover}
-  .matname{font-size:12px;margin-top:4px;color:var(--pk-muted);text-align:center;line-height:1.2}
-  .qty{margin-top:6px;font-size:12px;color:var(--pk-muted)}
+  .matname{font-size:14px;margin-top:4px;color:var(--pk-muted);text-align:center;line-height:1.2}
+  .qty{margin-top:6px;font-size:14px;color:var(--pk-muted)}
   .clickable{cursor:pointer}
   .matbtn{all:unset;cursor:pointer;width:62px;text-align:center}
   .matbtn:focus{outline:2px solid rgba(233,30,140,.35);outline-offset:2px;border-radius:12px}
@@ -76,11 +92,11 @@
   .imgbtn:hover img{transform:translateY(-2px);box-shadow:0 8px 18px rgba(233,30,140,.15)}
   .imgbtn img{transition:transform .12s ease,box-shadow .12s ease}
   .controls{position:absolute;top:14px;right:14px;display:flex;gap:6px;z-index:5}
-  .ctrl-btn{width:32px;height:32px;border:1.5px solid var(--pk-border);border-radius:10px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--pk-muted);padding:0;transition:background .13s,border-color .13s}
+  .ctrl-btn{width:32px;height:32px;border:1.5px solid var(--pk-border);border-radius:10px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--pk-muted);padding:0;transition:background .13s,border-color .13s}
   .ctrl-btn:hover{background:var(--pk-4);border-color:var(--pk-2);color:var(--pk-1)}
   .source-box{border:1.5px solid var(--pk-border);background:linear-gradient(135deg,var(--pk-5),#fff);padding:12px;border-radius:14px}
   .source-list{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px}
-  .source-list li{padding:6px 12px;border-radius:999px;background:#fff;border:1.5px solid var(--pk-border);font-weight:700;color:var(--pk-1);font-size:12px}
+  .source-list li{padding:6px 12px;border-radius:999px;background:#fff;border:1.5px solid var(--pk-border);font-weight:500;color:var(--pk-1);font-size:14px}
   .source-list li::before{content:none}
 </style>
 
@@ -88,8 +104,8 @@
   <div class="card">
   <div class="controls">
     <button class="ctrl-btn" id="btnBack" title="뒤로가기" aria-label="뒤로가기">←</button>
-    <button id="btnRegisterOwned" title="보유 등록" style="height:32px;padding:0 12px;border:1.5px solid var(--pk-border);border-radius:10px;background:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--pk-muted);transition:background .13s,border-color .13s,color .13s">
-      <span style="font-size:15px">👗</span> 보유 등록
+    <button id="btnRegisterOwned" title="보유 등록" style="height:32px;padding:0 12px;border:1.5px solid var(--pk-border);border-radius:10px;background:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:14px;font-weight:500;color:var(--pk-muted);transition:background .13s,border-color .13s,color .13s">
+      <span style="font-size:18px">👗</span> 보유 등록
     </button>
     <button class="ctrl-btn" id="btnClose" title="닫기" aria-label="닫기">×</button>
   </div>
@@ -611,16 +627,36 @@ function parsePageToTarget(page){
 
   var _registered = false;
 
+  // 보유 상태 응답 수신 (로드 시 복원 + 등록 ACK)
+  window.addEventListener('message', function(ev){
+    if(ev.origin && ev.origin !== location.origin && ev.origin !== 'null') return;
+    var msg = ev.data;
+    if (!msg || typeof msg !== 'object') return;
+    var qs = new URLSearchParams(location.search);
+    var myCode = String(qs.get('code') || '').trim();
+    if (
+      (msg.type === 'OWNED_REGISTER_ACK' || msg.type === 'OWNED_CHECK_RESULT') &&
+      String(msg.code) === myCode
+    ){
+      updateBtnState(!!msg.owned);
+    }
+  });
+
+  function normalizePart(p){
+    // "장식 - 머리 - 머리" -> "장식" 으로 정규화
+    if (!p) return p;
+    var t = p.trim();
+    return t.startsWith('장식') ? '장식' : t;
+  }
   function getEffectivePart(){
-    // URL 파라미터에서 part 우선, 없으면 subtitle에서 추출
     var qs = new URLSearchParams(location.search);
     var p = String(qs.get('part') || '').trim();
-    if (p) return p;
+    if (p) return normalizePart(p);
     var sub = document.getElementById('subtitle');
     if (sub){
       var txt = sub.textContent || '';
       var m = txt.match(/^([^·]+)/);
-      if (m) return m[1].trim();
+      if (m) return normalizePart(m[1].trim());
     }
     return '';
   }
@@ -635,7 +671,7 @@ function parsePageToTarget(page){
     if (!el){
       el = document.createElement('div');
       el.id = '__regToast';
-      el.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:8px 18px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;z-index:9999;pointer-events:none;transition:opacity .3s;white-space:nowrap;max-width:80vw;text-align:center';
+      el.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:8px 18px;border-radius:10px;font-size:16px;font-weight:500;color:#fff;z-index:9999;pointer-events:none;transition:opacity .3s;white-space:nowrap;max-width:80vw;text-align:center';
       document.body.appendChild(el);
     }
     el.textContent = msg;
@@ -664,13 +700,13 @@ function parsePageToTarget(page){
     // 방법 2: postMessage로 전달 (dialog 안에 iframe으로 열린 경우)
     try{
       if (window.top && window.top !== window){
-        window.top.postMessage({ type:'OWNED_REGISTER_BY_CODE', part:partVal, code:Number(codeVal) }, '*');
+        window.top.postMessage({ type:'OWNED_REGISTER_BY_CODE', part:partVal, code:String(codeVal) }, '*');
         return true; // 전달 성공 (결과는 비동기)
       }
     }catch(e){}
     try{
       if (window.parent && window.parent !== window){
-        window.parent.postMessage({ type:'OWNED_REGISTER_BY_CODE', part:partVal, code:Number(codeVal) }, '*');
+        window.parent.postMessage({ type:'OWNED_REGISTER_BY_CODE', part:partVal, code:String(codeVal) }, '*');
         return true;
       }
     }catch(e){}
@@ -683,12 +719,12 @@ function parsePageToTarget(page){
       btnReg.style.background = 'linear-gradient(135deg,#22c55e,#4ade80)';
       btnReg.style.borderColor = '#86efac';
       btnReg.style.color = '#fff';
-      btnReg.innerHTML = '<span style="font-size:15px">✓</span> 보유 등록됨';
+      btnReg.innerHTML = '<span style="font-size:18px">✓</span> 보유 등록됨';
     } else {
       btnReg.style.background = '#fff';
       btnReg.style.borderColor = 'var(--pk-border)';
       btnReg.style.color = 'var(--pk-muted)';
-      btnReg.innerHTML = '<span style="font-size:15px">👗</span> 보유 등록';
+      btnReg.innerHTML = '<span style="font-size:18px">👗</span> 보유 등록';
     }
   }
 
@@ -726,6 +762,17 @@ function parsePageToTarget(page){
       btnReg.style.color = 'var(--pk-muted)';
     }
   });
+
+  // 페이지 로드 시 보유 여부 확인 (버튼 상태 복원)
+  setTimeout(function(){
+    var qs = new URLSearchParams(location.search);
+    var partVal = normalizePart(String(qs.get('part') || '').trim());
+    var codeVal = String(qs.get('code') || '').trim();
+    if (!partVal || !codeVal) return;
+    var send = function(w){ try{ if(w && w !== window) w.postMessage({ type:'OWNED_CHECK_BY_CODE', part:partVal, code:codeVal }, '*'); }catch(e){} };
+    send(window.top);
+    if (window.parent !== window.top) send(window.parent);
+  }, 300);
 })();
 
 </script>

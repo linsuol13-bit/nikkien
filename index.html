@@ -3,6 +3,22 @@
 
 <html lang="ko">
 <head>
+<style id="custom-font">
+@font-face {
+  font-family: "AngyeongGothic";
+  src: url("Ba안경고딕_김영화_cej8784_naver_com_.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+* { font-family: "AngyeongGothic", system-ui, AppleSDGothicNeo, sans-serif !important; }
+.badge, .pill, .pill-small, .tag-pill, .tag-chip,
+.chip, .gtab, .skill, .countpill { font-size: 14px !important; }
+.sc-num, .chip .v, .pill-small .v { font-weight: 700 !important; }
+.tl-title-id, .tl-title-sub, .tl-speaker, .tl-kr-trans { font-weight: 700 !important; }
+.score, .badge { font-weight: 700 !important; }
+.badge.tag, .tag-pill, .tag-chip { font-weight: 400 !important; }
+</style>
 <!-- Injected: PART_WEIGHTS (user-defined) -->
 <script>
 const PART_WEIGHTS = {
@@ -61,7 +77,7 @@ const PART_WEIGHTS = {
 /* ── 기본 ── */
 *{box-sizing:border-box}
 body{font-family:'Nunito','Apple SD Gothic Neo',system-ui,sans-serif;margin:0;background:var(--pk-5);color:var(--pk-text)}
-h1{margin:0 0 6px 0;font-size:20px}
+h1{margin:0 0 6px 0;font-size:24px}
 
 /* ── 배너 헤더 ── */
 #siteHeader{position:sticky;top:0;z-index:3;background:transparent;will-change:transform}
@@ -74,10 +90,10 @@ h1{margin:0 0 6px 0;font-size:20px}
 .banner-deco-1{width:120px;height:120px;background:#fff;right:-20px;top:-30px}
 .banner-deco-2{width:70px;height:70px;background:#fff;right:80px;bottom:-30px}
 .banner-deco-3{width:40px;height:40px;background:#fff;left:220px;top:8px}
-.banner-icon{font-size:32px;z-index:1;filter:drop-shadow(0 2px 4px rgba(180,30,80,.2))}
+.banner-icon{font-size:38px;z-index:1;filter:drop-shadow(0 2px 4px rgba(180,30,80,.2))}
 .banner-text{z-index:1}
-.banner-title{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.3px;line-height:1.2;text-shadow:0 1px 6px rgba(150,20,60,.2)}
-.banner-sub{font-size:11px;color:rgba(255,255,255,.82);font-weight:600;margin-top:1px}
+.banner-title{font-size:24px;font-weight:500;color:#fff;letter-spacing:-.3px;line-height:1.2;text-shadow:0 1px 6px rgba(150,20,60,.2)}
+.banner-sub{font-size:13px;color:rgba(255,255,255,.82);font-weight:500;margin-top:1px}
 .banner-nikki{
   position:absolute;right:0;bottom:0;
   height:110px;width:auto;
@@ -101,7 +117,7 @@ nav.tabs{
 .tab{
   padding:7px 14px;border:1.5px solid var(--pk-border);
   background:#fff;border-radius:999px;cursor:pointer;
-  font-size:13px;font-weight:700;color:var(--pk-1);
+  font-size:16px;font-weight:500;color:var(--pk-1);
   transition:all .15s;white-space:nowrap;
 }
 .tab:hover{background:var(--pk-4)}
@@ -112,7 +128,7 @@ nav.tabs{
 #darkModeBtn{
   margin-left:auto;padding:6px 12px;border-radius:999px;
   border:1.5px solid var(--pk-border);background:#fff;
-  cursor:pointer;font-size:12px;font-weight:700;color:var(--pk-1);
+  cursor:pointer;font-size:14px;font-weight:500;color:var(--pk-1);
 }
 #darkModeBtn:hover{background:var(--pk-4)}
 
@@ -133,7 +149,7 @@ select,textarea,input[type=text],button{
   font-family:inherit;
 }
 select:focus,input:focus{outline:none;border-color:var(--pk-2)}
-button{cursor:pointer;font-family:inherit;font-weight:600}
+button{cursor:pointer;font-family:inherit;font-weight:500}
 button:hover{background:var(--pk-4);border-color:var(--pk-3)}
 
 /* ── 카드 ── */
@@ -150,20 +166,20 @@ button:hover{background:var(--pk-4);border-color:var(--pk-3)}
   background:var(--pk-grad);
 }
 .card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(233,30,140,.13)}
-.card h3{margin:0 0 4px 0;font-size:15px;display:flex;justify-content:space-between;align-items:center}
+.card h3{margin:0 0 4px 0;font-size:18px;display:flex;justify-content:space-between;align-items:center}
 
 /* ── 배지 ── */
 .badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
-.badge{font-size:11px;border:1px solid var(--pk-border);padding:3px 8px;border-radius:999px;background:#fff8fa;color:var(--pk-1);font-weight:600}
+.badge{font-size:13px;border:1px solid var(--pk-border);padding:3px 8px;border-radius:999px;background:#fff8fa;color:var(--pk-1);font-weight:500}
 .badge.tag{background:#fff0fb;border-color:#ffd1f3;color:#c2185b}
 .badges.tags{margin-top:2px}
 .badge.owned{background:#eaffea;border-color:#cdeccc;color:#2e7d32}
-.score{font-weight:800;color:var(--pk-1);font-size:14px}
-.small{color:var(--pk-muted);font-size:12px}
+.score{font-weight:500;color:var(--pk-1);font-size:17px}
+.small{color:var(--pk-muted);font-size:14px}
 .empty{padding:24px 20px;color:var(--pk-muted)}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.muted{color:var(--pk-muted);font-size:12px}
-.copy-btn{font-size:12px;padding:5px 8px;border-radius:8px;border:1px solid var(--pk-border);color:var(--pk-1)}
+.muted{color:var(--pk-muted);font-size:14px}
+.copy-btn{font-size:14px;padding:5px 8px;border-radius:8px;border:1px solid var(--pk-border);color:var(--pk-1)}
 
 /* ── 토스트 ── */
 .toast{
@@ -171,7 +187,7 @@ button:hover{background:var(--pk-4);border-color:var(--pk-3)}
   background:var(--pk-grad);color:#fff;
   padding:9px 18px;border-radius:999px;
   opacity:0;transition:opacity .2s,transform .2s;
-  pointer-events:none;z-index:9999;font-weight:700;
+  pointer-events:none;z-index:9999;font-weight:500;
   box-shadow:var(--pk-shadow);
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
@@ -179,15 +195,15 @@ button:hover{background:var(--pk-4);border-color:var(--pk-3)}
 /* ── 테이블 ── */
 .table-wrap{padding:10px 20px}
 table{width:100%;border-collapse:collapse;background:#fff;border:1.5px solid var(--pk-border);border-radius:12px;overflow:hidden}
-th,td{padding:8px 10px;border-bottom:1px solid var(--pk-4);font-size:13px;vertical-align:middle}
-thead th{top:0;background:#fff8fa;z-index:1;color:var(--pk-1);font-weight:700}
+th,td{padding:8px 10px;border-bottom:1px solid var(--pk-4);font-size:16px;vertical-align:middle}
+thead th{top:0;background:#fff8fa;z-index:1;color:var(--pk-1);font-weight:500}
 tbody tr:hover{background:#fff5f8}
 .nowrap{white-space:nowrap}.num{text-align:right}
 .group table thead th{top:auto !important}
 .group{margin:14px 20px;border:1.5px solid var(--pk-border);border-radius:12px;background:#fff}
-.group summary{padding:10px 12px;cursor:pointer;font-weight:700;border-bottom:1px solid var(--pk-4);color:var(--pk-1)}
+.group summary{padding:10px 12px;cursor:pointer;font-weight:500;border-bottom:1px solid var(--pk-4);color:var(--pk-1)}
 .group .inner{padding:10px 12px}
-.countpill{display:inline-block;margin-left:8px;font-size:11px;background:var(--pk-4);border:1px solid var(--pk-border);border-radius:999px;padding:2px 8px;color:var(--pk-1);font-weight:700}
+.countpill{display:inline-block;margin-left:8px;font-size:13px;background:var(--pk-4);border:1px solid var(--pk-border);border-radius:999px;padding:2px 8px;color:var(--pk-1);font-weight:500}
 
 /* ── 썸네일 ── */
 .thumb{width:65px;height:65px;border-radius:10px;object-fit:cover;border:1.5px solid var(--pk-border);background:#fff8fa}
@@ -206,39 +222,39 @@ tbody tr:hover{background:#fff5f8}
 #controls .filter-row{display:flex;align-items:center;justify-content:flex-start;gap:4px;flex-wrap:wrap}
 #controls .filter-row label,
 #controls .filter-row select,
-#controls .filter-row input[type=checkbox]{font-size:14px;margin:0;padding:2px 4px}
-#controls .filter-row .checkbox-inline{display:flex;align-items:center;gap:2px;margin:0;white-space:nowrap;font-size:14px}
+#controls .filter-row input[type=checkbox]{font-size:17px;margin:0;padding:2px 4px}
+#controls .filter-row .checkbox-inline{display:flex;align-items:center;gap:2px;margin:0;white-space:nowrap;font-size:17px}
 
 /* ── 보유 의상 영역 ── */
 #ownedBox{padding:0 20px 8px 20px}
-#ownedBox label,#ownedBox textarea,#ownedBox button{font-size:14px}
-#ownedBox button{font-size:14px !important}
+#ownedBox label,#ownedBox textarea,#ownedBox button{font-size:17px}
+#ownedBox button{font-size:17px !important}
 #partCounts{display:none !important}
 #partSummary{display:none !important}
 #list{padding:8px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
 .panel{display:none;content-visibility:auto}.panel.active{display:block;content-visibility:visible}
 
 /* ── 부위 칩 ── */
-.pill{display:inline-block;margin:4px 6px 0 0;padding:5px 10px;background:var(--pk-4);border:1px solid var(--pk-border);border-radius:999px;font-size:12px;color:var(--pk-1);font-weight:600}
+.pill{display:inline-block;margin:4px 6px 0 0;padding:5px 10px;background:var(--pk-4);border:1px solid var(--pk-border);border-radius:999px;font-size:14px;color:var(--pk-1);font-weight:500}
 #skills{padding:0 20px 6px 20px}
-.skill{display:inline-block;margin:4px 6px 0 0;padding:5px 10px;background:var(--pk-4);border:1px solid var(--pk-border);border-radius:999px;font-size:12px;color:var(--pk-1)}
-.pill-small{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--pk-border);border-radius:999px;font-size:12px;background:#fff;cursor:pointer;color:var(--pk-text)}
+.skill{display:inline-block;margin:4px 6px 0 0;padding:5px 10px;background:var(--pk-4);border:1px solid var(--pk-border);border-radius:999px;font-size:14px;color:var(--pk-1)}
+.pill-small{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--pk-border);border-radius:999px;font-size:14px;background:#fff;cursor:pointer;color:var(--pk-text)}
 .pill-small .k{opacity:.75}
-.pill-small .v{font-weight:700}
+.pill-small .v{font-weight:500}
 .partbar .pill-small:hover{background:var(--pk-4);border-color:var(--pk-2)}
-.small{font-size:12px}
-.partbar-wrap .muted.small{font-size:12px;color:var(--pk-muted)}
-.gtab{border:1.5px solid var(--pk-border);background:#fff;border-radius:999px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--pk-1);font-weight:600}
+.small{font-size:14px}
+.partbar-wrap .muted.small{font-size:14px;color:var(--pk-muted)}
+.gtab{border:1.5px solid var(--pk-border);background:#fff;border-radius:999px;padding:3px 10px;font-size:14px;cursor:pointer;color:var(--pk-1);font-weight:500}
 .gtab.is-on{background:var(--pk-4);border-color:var(--pk-2)}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border:1px solid var(--pk-border);border-radius:999px;font-size:12px;background:#fff;cursor:pointer;color:var(--pk-text)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border:1px solid var(--pk-border);border-radius:999px;font-size:14px;background:#fff;cursor:pointer;color:var(--pk-text)}
 .chip .k{opacity:.75}
-.chip .v{font-weight:700}
+.chip .v{font-weight:500}
 .chip:hover{background:var(--pk-4);border-color:var(--pk-2)}
-#partFilter option.groupHdr{font-weight:700}
+#partFilter option.groupHdr{font-weight:500}
 .tag-bar{padding:0 20px 8px 20px}
-.tag-pill{display:inline-block;margin:4px 6px 0 0;padding:4px 10px;background:#fff0fb;border:1px solid #ffd1f3;border-radius:999px;font-size:12px;color:#c2185b}
+.tag-pill{display:inline-block;margin:4px 6px 0 0;padding:4px 10px;background:#fff0fb;border:1px solid #ffd1f3;border-radius:999px;font-size:14px;color:#c2185b}
 .tags-panel{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px;padding:8px;border:1.5px solid var(--pk-border);border-radius:10px;background:#fff}
-.tag-chip{display:flex;gap:6px;align-items:center;font-size:12px;padding:6px 8px;border:1px solid var(--pk-border);border-radius:999px;background:#fff8fa}
+.tag-chip{display:flex;gap:6px;align-items:center;font-size:14px;padding:6px 8px;border:1px solid var(--pk-border);border-radius:999px;background:#fff8fa}
 .tag-chip input{margin:0}
 
 #itemsTable th,#itemsTable td,#byPartWrap th,#byPartWrap td{text-align:center}
@@ -246,33 +262,33 @@ tbody tr:hover{background:#fff5f8}
 /* ── 모바일 반응형 ── */
 @media(max-width:600px){
   .site-banner{height:74px;padding:0 16px;gap:10px}
-  .banner-title{font-size:17px}
+  .banner-title{font-size:20px}
   nav.tabs{top:74px;gap:4px;padding:8px 10px;flex-wrap:wrap}
-  .tab{padding:6px 10px;font-size:12px}
+  .tab{padding:6px 10px;font-size:14px}
   #controls{padding:8px 10px;gap:6px;top:auto;position:relative}
   #list{padding:6px 10px;grid-template-columns:1fr}
   .card{padding:10px}
   #ownedBox{padding:0 10px 8px}
   .table-wrap{padding:6px 10px;overflow-x:auto}
   table{min-width:0}
-  th,td{padding:6px;font-size:12px}
+  th,td{padding:6px;font-size:14px}
   .group{margin:8px 10px}
 }
 @media(max-width:480px){
   nav.tabs{top:0}
   #controls{top:auto}
-  select,input[type=text],button{font-size:13px;padding:6px}
-  .tab{font-size:11px;padding:5px 8px}
+  select,input[type=text],button{font-size:16px;padding:6px}
+  .tab{font-size:13px;padding:5px 8px}
 }
 </style>
 <style>
 /* Required item badge & checklist */
 .badge.req{background:#fff3cd;border-color:#ffe8a1}
 .reqlist{padding:6px 20px}
-.reqlist .pill{display:inline-block;margin:4px 6px 0 0;padding:6px 10px;background:#fff7e0;border:1px solid #ffe8a1;border-radius:999px;font-size:12px}
+.reqlist .pill{display:inline-block;margin:4px 6px 0 0;padding:6px 10px;background:#fff7e0;border:1px solid #ffe8a1;border-radius:999px;font-size:14px}
 .reqlist .own{background:#eaffea;border-color:#cdeccc}
 .reqlist .miss{background:#ffecec;border-color:#ffd1d1}
-.reqlist .part{font-weight:600;margin-right:8px}
+.reqlist .part{font-weight:500;margin-right:8px}
 </style>
 <script>
 /* === Harden getFilteredList + required name set helpers (replaced clean) === */
@@ -322,20 +338,20 @@ tbody tr:hover{background:#fff5f8}
 /* === End: Harden getFilteredList === */
 </script>
 <style>
-.req-badge{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:6px;border:1px solid #ff9b9b;background:#ffecec;color:#d40000;font-weight:600;font-size:12px}
+.req-badge{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:6px;border:1px solid #ff9b9b;background:#ffecec;color:#d40000;font-weight:500;font-size:14px}
 .stat-card{background:#fff;border:1.5px solid #f8bbd0;border-radius:12px;padding:6px 14px;text-align:center;min-width:64px;box-shadow:0 2px 8px rgba(233,30,140,.07)}
-.sc-lbl{font-size:11px;color:#a06080;font-weight:600;margin-bottom:2px}
-.sc-num{font-size:18px;font-weight:800;color:#e91e8c;line-height:1.1}
+.sc-lbl{font-size:13px;color:#a06080;font-weight:500;margin-bottom:2px}
+.sc-num{font-size:22px;font-weight:500;color:#e91e8c;line-height:1.1}
 .card.req-unowned{border:1.5px solid #ff9b9b !important;background:#fff8f8}
 .card.req-unowned .req-badge{background:#ff4444;color:#fff;border-color:#ff4444}
-.contrib-row{display:flex;align-items:center;gap:6px;font-size:12px;min-width:180px}
+.contrib-row{display:flex;align-items:center;gap:6px;font-size:14px;min-width:180px}
 .contrib-bar-wrap{flex:1;height:6px;background:#eee;border-radius:999px;overflow:hidden;min-width:60px}
 .contrib-bar{height:100%;background:#378ADD;border-radius:999px}
 /* ── 모바일 반응형 ── */
 @media(max-width:600px){
   nav.tabs{gap:4px;padding:8px 10px;flex-wrap:wrap}
-  .tab{padding:6px 8px;font-size:12px}
-  #darkModeBtn{padding:5px 8px;font-size:12px}
+  .tab{padding:6px 8px;font-size:14px}
+  #darkModeBtn{padding:5px 8px;font-size:14px}
   #controls{padding:8px 10px;gap:6px;top:auto;position:relative}
   #controls .filter-row{flex-wrap:wrap;gap:4px}
   #list{padding:6px 10px;grid-template-columns:1fr}
@@ -343,21 +359,21 @@ tbody tr:hover{background:#fff5f8}
   #ownedBox{padding:0 10px 8px}
   #ownedStatsBar{gap:6px}
   .stat-card{padding:4px 8px;min-width:50px}
-  .sc-num{font-size:18px;font-weight:800;color:#e91e8c;line-height:1.1}
+  .sc-num{font-size:22px;font-weight:500;color:#e91e8c;line-height:1.1}
   #ownedProgressWrap{min-width:80px}
   #partSummaryTable{min-width:0 !important;width:100%}
   #compareBar{padding:8px 10px}
   .table-wrap{padding:6px 10px;overflow-x:auto}
   table{min-width:0}
-  th,td{padding:6px 6px;font-size:12px}
+  th,td{padding:6px 6px;font-size:14px}
   .group{margin:8px 10px}
 }
 @media(max-width:480px){
   nav.tabs{top:0}
   #controls{top:auto}
   #list{grid-template-columns:1fr}
-  select,input[type=text],button{font-size:13px;padding:6px}
-  .tab{font-size:11px;padding:5px 7px}
+  select,input[type=text],button{font-size:16px;padding:6px}
+  .tab{font-size:13px;padding:5px 7px}
 }
 body.dark{background:#1a1018;color:#f0e4ec}
 body.dark nav.tabs,body.dark #controls,body.dark .card,body.dark .group,body.dark table,body.dark th{background:#27202a;border-color:#4a2d3a;color:#f0e4ec}
@@ -369,8 +385,8 @@ body.dark td{border-color:#4a2d3a}
 body.dark .badge{background:#3a1a2a;border-color:#4a2d3a;color:#f48fb1}
 body.dark .badge.owned{background:#14532d;border-color:#166534;color:#bbf7d0}
 body.dark .stat-card{background:#27202a;border-color:#4a2d3a}
-body.dark .sc-num{font-size:18px;font-weight:800;color:#e91e8c;line-height:1.1}
-body.dark .sc-lbl{font-size:11px;color:#a06080;font-weight:600;margin-bottom:2px}
+body.dark .sc-num{font-size:22px;font-weight:500;color:#e91e8c;line-height:1.1}
+body.dark .sc-lbl{font-size:13px;color:#a06080;font-weight:500;margin-bottom:2px}
 body.dark #ownedProgressWrap>div:first-child{color:#c0849c}
 body.dark .muted{color:#c0849c}
 body.dark #darkModeBtn{background:#27202a;border-color:#4a2d3a;color:#f48fb1}
@@ -427,24 +443,24 @@ body.dark #compareBar{background:#27272a;border-color:#3f3f46}
 #compareBar.open{display:flex}
 .cmp-slot{width:52px;height:52px;border:1.5px dashed #ccc;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;flex-shrink:0}
 .cmp-slot img{width:100%;height:100%;object-fit:cover}
-.cmp-slot .cmp-rm{position:absolute;top:1px;right:1px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:10px;line-height:16px;text-align:center;cursor:pointer;display:none}
+.cmp-slot .cmp-rm{position:absolute;top:1px;right:1px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:12px;line-height:16px;text-align:center;cursor:pointer;display:none}
 .cmp-slot:hover .cmp-rm{display:block}
 .card.cmp-selected{outline:2px solid #3b82f6;outline-offset:2px}
 #compareModal{display:none;position:fixed;inset:0;z-index:10002;background:rgba(0,0,0,.5);align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto}
 #compareModal.open{display:flex}
 .cmp-table-wrap{background:#fff;border-radius:16px;padding:20px;width:min(98vw,900px);max-height:82vh;overflow-y:auto}
 body.dark .cmp-table-wrap{background:#27272a;color:#e4e4e7}
-.cmp-table{width:100%;border-collapse:collapse;font-size:13px}
+.cmp-table{width:100%;border-collapse:collapse;font-size:16px}
 .cmp-table th,.cmp-table td{padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:center}
 body.dark .cmp-table th,body.dark .cmp-table td{border-color:#3f3f46}
-.cmp-table th{background:#fafafa;font-weight:700}
+.cmp-table th{background:#fafafa;font-weight:500}
 body.dark .cmp-table th{background:#18181b}
-.cmp-best{background:#eaffea;font-weight:700}
+.cmp-best{background:#eaffea;font-weight:500}
 body.dark .cmp-best{background:#14532d}
 .contrib-lbl{color:#555;min-width:32px;text-align:right}
 .req-panel{margin:10px 20px;padding:10px;border:1px solid #f3d2d2;background:#fff6f6;border-radius:10px}
-.req-panel h3{margin:0 0 8px 0;font-size:14px;color:#b10000}
-.req-table{width:100%;border-collapse:collapse;font-size:13px}
+.req-panel h3{margin:0 0 8px 0;font-size:17px;color:#b10000}
+.req-table{width:100%;border-collapse:collapse;font-size:16px}
 .req-table th,.req-table td{border:1px solid #f1c9c9;padding:6px 8px;text-align:left}
 .req-table th{background:#ffe3e3}
 </style>
@@ -462,6 +478,9 @@ function displayShort(txt){
     return s;
   }catch(e){ return txt; }
 }
+</script>
+<script>
+window.__CIDX={"1050::장식":"장식 - 소품 - 소품(우)","1050::장식-소품":"장식 - 소품 - 소품(우)","6::장식":"장식 - 머리 - 머리","6::장식-머리":"장식 - 머리 - 머리","7::장식":"장식 - 머리 - 머리","7::장식-머리":"장식 - 머리 - 머리","12::장식":"장식 - 손 - 장갑","12::장식-손":"장식 - 손 - 장갑","13::장식":"장식 - 손 - 팔찌(우)","13::장식-손":"장식 - 손 - 팔찌(우)","14::장식":"장식 - 손 - 팔찌(좌)","14::장식-손":"장식 - 손 - 팔찌(좌)","17::장식":"장식 - 특수 - 얼굴","17::장식-특수":"장식 - 특수 - 얼굴","18::장식":"장식 - 목 - 목걸이","18::장식-목":"장식 - 목 - 목걸이","39::장식":"장식 - 소품 - 소품(우)","39::장식-소품":"장식 - 소품 - 소품(우)","56::장식":"장식 - 머리 - 머리","56::장식-머리":"장식 - 머리 - 머리","57::장식":"장식 - 머리 - 머리","57::장식-머리":"장식 - 머리 - 머리","60::장식":"장식 - 목 - 목도리","60::장식-목":"장식 - 목 - 목도리","64::장식":"장식 - 특수 - 얼굴","64::장식-특수":"장식 - 특수 - 얼굴","68::장식":"장식 - 머리 - 머리","68::장식-머리":"장식 - 머리 - 머리","73::장식":"장식 - 소품 - 소품(우)","73::장식-소품":"장식 - 소품 - 소품(우)","74::장식":"장식 - 소품 - 소품(좌)","74::장식-소품":"장식 - 소품 - 소품(좌)","79::장식":"장식 - 목 - 목도리","79::장식-목":"장식 - 목 - 목도리","81::장식":"장식 - 머리 - 머리","81::장식-머리":"장식 - 머리 - 머리","91::장식":"장식 - 목 - 목걸이","91::장식-목":"장식 - 목 - 목걸이","93::장식":"장식 - 목 - 목걸이","93::장식-목":"장식 - 목 - 목걸이","109::장식":"장식 - 머리 - 머리","109::장식-머리":"장식 - 머리 - 머리","110::장식":"장식 - 머리 - 머리","110::장식-머리":"장식 - 머리 - 머리","112::장식":"장식 - 귀","113::장식":"장식 - 목 - 목걸이","113::장식-목":"장식 - 목 - 목걸이","114::장식":"장식 - 머리 - 머리","114::장식-머리":"장식 - 머리 - 머리","115::장식":"장식 - 목 - 목걸이","115::장식-목":"장식 - 목 - 목걸이","116::장식":"장식 - 손 - 장갑","116::장식-손":"장식 - 손 - 장갑","121::장식":"장식 - 소품 - 소품(우)","121::장식-소품":"장식 - 소품 - 소품(우)","134::장식":"장식 - 귀","135::장식":"장식 - 손 - 장갑","135::장식-손":"장식 - 손 - 장갑","160::장식":"장식 - 머리 - 머리","160::장식-머리":"장식 - 머리 - 머리","163::장식":"장식 - 머리 - 베일","163::장식-머리":"장식 - 머리 - 베일","179::장식":"장식 - 머리 - 머리","179::장식-머리":"장식 - 머리 - 머리","180::장식":"장식 - 소품 - 소품(우)","180::장식-소품":"장식 - 소품 - 소품(우)","182::장식":"장식 - 머리 - 머리","182::장식-머리":"장식 - 머리 - 머리","183::장식":"장식 - 머리 - 머리","183::장식-머리":"장식 - 머리 - 머리","184::장식":"장식 - 머리 - 머리","184::장식-머리":"장식 - 머리 - 머리","187::장식":"장식 - 머리 - 머리","187::장식-머리":"장식 - 머리 - 머리","221::장식":"장식 - 목 - 목걸이","221::장식-목":"장식 - 목 - 목걸이","236::장식":"장식 - 손 - 팔찌(우)","236::장식-손":"장식 - 손 - 팔찌(우)","237::장식":"장식 - 목 - 목걸이","237::장식-목":"장식 - 목 - 목걸이","238::장식":"장식 - 손 - 장갑","238::장식-손":"장식 - 손 - 장갑","239::장식":"장식 - 머리 - 머리","239::장식-머리":"장식 - 머리 - 머리","244::장식":"장식 - 목 - 목걸이","244::장식-목":"장식 - 목 - 목걸이","245::장식":"장식 - 손 - 팔찌(우)","245::장식-손":"장식 - 손 - 팔찌(우)","246::장식":"장식 - 목 - 목걸이","246::장식-목":"장식 - 목 - 목걸이","258::장식":"장식 - 머리 - 머리","258::장식-머리":"장식 - 머리 - 머리","266::장식":"장식 - 특수 - 얼굴","266::장식-특수":"장식 - 특수 - 얼굴","285::장식":"장식 - 귀","286::장식":"장식 - 목 - 목걸이","286::장식-목":"장식 - 목 - 목걸이","287::장식":"장식 - 소품 - 소품(우)","287::장식-소품":"장식 - 소품 - 소품(우)","316::장식":"장식 - 목 - 목걸이","316::장식-목":"장식 - 목 - 목걸이","317::장식":"장식 - 손 - 팔찌(우)","317::장식-손":"장식 - 손 - 팔찌(우)","322::장식":"장식 - 손 - 팔찌(좌)","322::장식-손":"장식 - 손 - 팔찌(좌)","323::장식":"장식 - 손 - 팔찌(우)","323::장식-손":"장식 - 손 - 팔찌(우)","328::장식":"장식 - 목 - 목걸이","328::장식-목":"장식 - 목 - 목걸이","330::장식":"장식 - 귀","337::장식":"장식 - 목 - 목도리","337::장식-목":"장식 - 목 - 목도리","338::장식":"장식 - 귀","350::장식":"장식 - 귀","360::장식":"장식 - 머리 - 머리","360::장식-머리":"장식 - 머리 - 머리","405::장식":"장식 - 머리 - 머리","405::장식-머리":"장식 - 머리 - 머리","408::장식":"장식 - 목 - 목걸이","408::장식-목":"장식 - 목 - 목걸이","410::장식":"장식 - 목 - 목도리","410::장식-목":"장식 - 목 - 목도리","437::장식":"장식 - 귀","456::장식":"장식 - 특수 - 얼굴","456::장식-특수":"장식 - 특수 - 얼굴","457::장식":"장식 - 소품 - 소품(좌)","457::장식-소품":"장식 - 소품 - 소품(좌)","479::장식":"장식 - 손 - 팔찌(우)","479::장식-손":"장식 - 손 - 팔찌(우)","480::장식":"장식 - 손 - 장갑","480::장식-손":"장식 - 손 - 장갑","544::장식":"장식 - 소품 - 소품(우)","544::장식-소품":"장식 - 소품 - 소품(우)","545::장식":"장식 - 손 - 장갑","545::장식-손":"장식 - 손 - 장갑","546::장식":"장식 - 특수 - 가슴","546::장식-특수":"장식 - 특수 - 가슴","547::장식":"장식 - 특수 - 문신","547::장식-특수":"장식 - 특수 - 문신","593::장식":"장식 - 특수 - 가슴","593::장식-특수":"장식 - 특수 - 가슴","594::장식":"장식 - 머리 - 머리","594::장식-머리":"장식 - 머리 - 머리","595::장식":"장식 - 소품 - 소품(우)","595::장식-소품":"장식 - 소품 - 소품(우)","675::장식":"장식 - 목 - 목걸이","675::장식-목":"장식 - 목 - 목걸이","687::장식":"장식 - 손 - 장갑","687::장식-손":"장식 - 손 - 장갑","784::장식":"장식 - 손 - 팔찌(우)","784::장식-손":"장식 - 손 - 팔찌(우)","787::장식":"장식 - 목 - 목걸이","787::장식-목":"장식 - 목 - 목걸이","789::장식":"장식 - 목 - 목걸이","789::장식-목":"장식 - 목 - 목걸이","803::장식":"장식 - 목 - 목걸이","803::장식-목":"장식 - 목 - 목걸이","878::장식":"장식 - 머리 - 머리","878::장식-머리":"장식 - 머리 - 머리","879::장식":"장식 - 목 - 목걸이","879::장식-목":"장식 - 목 - 목걸이","880::장식":"장식 - 귀","958::장식":"장식 - 특수 - 배경","958::장식-특수":"장식 - 특수 - 배경","959::장식":"장식 - 소품 - 소품(좌)","959::장식-소품":"장식 - 소품 - 소품(좌)","960::장식":"장식 - 손 - 장갑","960::장식-손":"장식 - 손 - 장갑","961::장식":"장식 - 머리 - 머리","961::장식-머리":"장식 - 머리 - 머리","962::장식":"장식 - 소품 - 소품(우)","962::장식-소품":"장식 - 소품 - 소품(우)","963::장식":"장식 - 목 - 목걸이","963::장식-목":"장식 - 목 - 목걸이","995::장식":"장식 - 목 - 목도리","995::장식-목":"장식 - 목 - 목도리","998::장식":"장식 - 귀","1097::장식":"장식 - 손 - 장갑","1097::장식-손":"장식 - 손 - 장갑","1122::장식":"장식 - 귀","1196::장식":"장식 - 특수 - 전경","1196::장식-특수":"장식 - 특수 - 전경","1197::장식":"장식 - 머리 - 머리","1197::장식-머리":"장식 - 머리 - 머리","1198::장식":"장식 - 목 - 목걸이","1198::장식-목":"장식 - 목 - 목걸이","1199::장식":"장식 - 특수 - 하단","1199::장식-특수":"장식 - 특수 - 하단","1307::장식":"장식 - 목 - 목걸이","1307::장식-목":"장식 - 목 - 목걸이","1308::장식":"장식 - 손 - 장갑","1308::장식-손":"장식 - 손 - 장갑","1309::장식":"장식 - 머리 - 머리","1309::장식-머리":"장식 - 머리 - 머리","1353::장식":"장식 - 손 - 팔찌(우)","1353::장식-손":"장식 - 손 - 팔찌(우)","1378::장식":"장식 - 목 - 목걸이","1378::장식-목":"장식 - 목 - 목걸이","1381::장식":"장식 - 특수 - 전경","1381::장식-특수":"장식 - 특수 - 전경","1762::장식":"장식 - 머리 - 머리","1762::장식-머리":"장식 - 머리 - 머리","1763::장식":"장식 - 목 - 목걸이","1763::장식-목":"장식 - 목 - 목걸이","1764::장식":"장식 - 소품 - 소품(좌)","1764::장식-소품":"장식 - 소품 - 소품(좌)","1765::장식":"장식 - 특수 - 배경","1765::장식-특수":"장식 - 특수 - 배경","2763::장식":"장식 - 머리 - 머리","2763::장식-머리":"장식 - 머리 - 머리","2764::장식":"장식 - 귀","2765::장식":"장식 - 특수 - 얼굴","2765::장식-특수":"장식 - 특수 - 얼굴","2766::장식":"장식 - 목 - 목걸이","2766::장식-목":"장식 - 목 - 목걸이","2767::장식":"장식 - 특수 - 문신","2767::장식-특수":"장식 - 특수 - 문신","2768::장식":"장식 - 특수 - 스킨","2768::장식-특수":"장식 - 특수 - 스킨","3186::장식":"장식 - 특수 - 전경","3186::장식-특수":"장식 - 특수 - 전경","3187::장식":"장식 - 머리 - 헤어핀","3187::장식-머리":"장식 - 머리 - 헤어핀","3188::장식":"장식 - 특수 - 얼굴","3188::장식-특수":"장식 - 특수 - 얼굴","3189::장식":"장식 - 머리 - 베일","3189::장식-머리":"장식 - 머리 - 베일","3190::장식":"장식 - 손 - 장갑","3190::장식-손":"장식 - 손 - 장갑","3191::장식":"장식 - 특수 - 문신","3191::장식-특수":"장식 - 특수 - 문신","3192::장식":"장식 - 특수 - 날개","3192::장식-특수":"장식 - 특수 - 날개","3225::장식":"장식 - 머리 - 베일","3225::장식-머리":"장식 - 머리 - 베일","3226::장식":"장식 - 특수 - 얼굴","3226::장식-특수":"장식 - 특수 - 얼굴","3227::장식":"장식 - 목 - 목걸이","3227::장식-목":"장식 - 목 - 목걸이","3228::장식":"장식 - 손 - 장갑","3228::장식-손":"장식 - 손 - 장갑","3229::장식":"장식 - 손 - 장갑","3229::장식-손":"장식 - 손 - 장갑","3376::장식":"장식 - 특수 - 스킨","3376::장식-특수":"장식 - 특수 - 스킨","3385::장식":"장식 - 특수 - 스킨","3385::장식-특수":"장식 - 특수 - 스킨","4093::장식":"장식 - 머리 - 머리","4093::장식-머리":"장식 - 머리 - 머리","4094::장식":"장식 - 목 - 목걸이","4094::장식-목":"장식 - 목 - 목걸이","4095::장식":"장식 - 허리","4096::장식":"장식 - 소품 - 소품(좌)","4096::장식-소품":"장식 - 소품 - 소품(좌)","4097::장식":"장식 - 소품 - 소품(우)","4097::장식-소품":"장식 - 소품 - 소품(우)","4395::장식":"장식 - 특수 - 스킨","4395::장식-특수":"장식 - 특수 - 스킨","5540::장식":"장식 - 특수 - 스킨","5540::장식-특수":"장식 - 특수 - 스킨","5576::장식":"장식 - 특수 - 스킨","5576::장식-특수":"장식 - 특수 - 스킨","5697::장식":"장식 - 머리 - 머리","5697::장식-머리":"장식 - 머리 - 머리","5698::장식":"장식 - 목 - 목걸이","5698::장식-목":"장식 - 목 - 목걸이","5699::장식":"장식 - 귀","5700::장식":"장식 - 손 - 장갑","5700::장식-손":"장식 - 손 - 장갑","5701::장식":"장식 - 손 - 팔찌(우)","5701::장식-손":"장식 - 손 - 팔찌(우)","5702::장식":"장식 - 소품 - 소품(우)","5702::장식-소품":"장식 - 소품 - 소품(우)","5703::장식":"장식 - 손 - 장갑","5703::장식-손":"장식 - 손 - 장갑","6056::장식":"장식 - 머리 - 헤어핀","6056::장식-머리":"장식 - 머리 - 헤어핀","6060::장식":"장식 - 손 - 장갑","6060::장식-손":"장식 - 손 - 장갑","6618::장식":"장식 - 특수 - 스킨","6618::장식-특수":"장식 - 특수 - 스킨","7182::장식":"장식 - 소품 - 양손","7182::장식-소품":"장식 - 소품 - 양손","7183::장식":"장식 - 머리 - 머리","7183::장식-머리":"장식 - 머리 - 머리","7184::장식":"장식 - 머리 - 헤어핀","7184::장식-머리":"장식 - 머리 - 헤어핀","7185::장식":"장식 - 특수 - 배경","7185::장식-특수":"장식 - 특수 - 배경","7907::장식":"장식 - 머리 - 머리","7907::장식-머리":"장식 - 머리 - 머리","7908::장식":"장식 - 특수 - 얼굴","7908::장식-특수":"장식 - 특수 - 얼굴","7909::장식":"장식 - 소품 - 소품(우)","7909::장식-소품":"장식 - 소품 - 소품(우)","7938::장식":"장식 - 특수 - 스킨","7938::장식-특수":"장식 - 특수 - 스킨","8203::장식":"장식 - 특수 - 스킨","8203::장식-특수":"장식 - 특수 - 스킨","8319::장식":"장식 - 특수 - 상단","8319::장식-특수":"장식 - 특수 - 상단","8320::장식":"장식 - 특수 - 하단","8320::장식-특수":"장식 - 특수 - 하단","8321::장식":"장식 - 특수 - 하단","8321::장식-특수":"장식 - 특수 - 하단","8322::장식":"장식 - 머리 - 머리","8322::장식-머리":"장식 - 머리 - 머리","8323::장식":"장식 - 머리 - 헤어핀","8323::장식-머리":"장식 - 머리 - 헤어핀","8324::장식":"장식 - 귀","8325::장식":"장식 - 목 - 목걸이","8325::장식-목":"장식 - 목 - 목걸이","8326::장식":"장식 - 손 - 장갑","8326::장식-손":"장식 - 손 - 장갑","8327::장식":"장식 - 손 - 팔찌(우)","8327::장식-손":"장식 - 손 - 팔찌(우)","8328::장식":"장식 - 특수 - 날개","8328::장식-특수":"장식 - 특수 - 날개","8329::장식":"장식 - 머리 - 헤어핀","8329::장식-머리":"장식 - 머리 - 헤어핀","8840::장식":"장식 - 특수 - 상단","8840::장식-특수":"장식 - 특수 - 상단","8841::장식":"장식 - 특수 - 배경","8841::장식-특수":"장식 - 특수 - 배경","8842::장식":"장식 - 특수 - 하단","8842::장식-특수":"장식 - 특수 - 하단","8843::장식":"장식 - 머리 - 머리","8843::장식-머리":"장식 - 머리 - 머리","8844::장식":"장식 - 머리 - 헤어핀","8844::장식-머리":"장식 - 머리 - 헤어핀","8845::장식":"장식 - 귀","8846::장식":"장식 - 목 - 목걸이","8846::장식-목":"장식 - 목 - 목걸이","8847::장식":"장식 - 손 - 팔찌(우)","8847::장식-손":"장식 - 손 - 팔찌(우)","8848::장식":"장식 - 손 - 장갑","8848::장식-손":"장식 - 손 - 장갑","8849::장식":"장식 - 손 - 팔찌(좌)","8849::장식-손":"장식 - 손 - 팔찌(좌)","8850::장식":"장식 - 특수 - 문신","8850::장식-특수":"장식 - 특수 - 문신","8851::장식":"장식 - 머리 - 헤어핀","8851::장식-머리":"장식 - 머리 - 헤어핀","8984::장식":"장식 - 특수 - 스킨","8984::장식-특수":"장식 - 특수 - 스킨","9299::장식":"장식 - 특수 - 스킨","9299::장식-특수":"장식 - 특수 - 스킨","9540::장식":"장식 - 특수 - 전경","9540::장식-특수":"장식 - 특수 - 전경","9541::장식":"장식 - 특수 - 하단","9541::장식-특수":"장식 - 특수 - 하단","9542::장식":"장식 - 특수 - 배경","9542::장식-특수":"장식 - 특수 - 배경","9543::장식":"장식 - 특수 - 상단","9543::장식-특수":"장식 - 특수 - 상단","9544::장식":"장식 - 머리 - 머리","9544::장식-머리":"장식 - 머리 - 머리","9545::장식":"장식 - 목 - 목걸이","9545::장식-목":"장식 - 목 - 목걸이","9546::장식":"장식 - 손 - 팔찌(우)","9546::장식-손":"장식 - 손 - 팔찌(우)","9547::장식":"장식 - 손 - 장갑","9547::장식-손":"장식 - 손 - 장갑","9548::장식":"장식 - 머리 - 머리","9548::장식-머리":"장식 - 머리 - 머리","10127::장식":"장식 - 머리 - 머리","10127::장식-머리":"장식 - 머리 - 머리","10128::장식":"장식 - 귀","10129::장식":"장식 - 특수 - 가슴","10129::장식-특수":"장식 - 특수 - 가슴","11847::장식":"장식 - 특수 - 전경","11847::장식-특수":"장식 - 특수 - 전경","11848::장식":"장식 - 특수 - 배경","11848::장식-특수":"장식 - 특수 - 배경","11849::장식":"장식 - 특수 - 상단","11849::장식-특수":"장식 - 특수 - 상단","11850::장식":"장식 - 머리 - 귀장식","11850::장식-머리":"장식 - 머리 - 귀장식","11851::장식":"장식 - 머리 - 헤어핀","11851::장식-머리":"장식 - 머리 - 헤어핀","11852::장식":"장식 - 목 - 목걸이","11852::장식-목":"장식 - 목 - 목걸이","11853::장식":"장식 - 손 - 장갑","11853::장식-손":"장식 - 손 - 장갑","11854::장식":"장식 - 소품 - 소품(우)","11854::장식-소품":"장식 - 소품 - 소품(우)","11855::장식":"장식 - 소품 - 소품(좌)","11855::장식-소품":"장식 - 소품 - 소품(좌)","11856::장식":"장식 - 특수 - 꼬리","11856::장식-특수":"장식 - 특수 - 꼬리","11857::장식":"장식 - 특수 - 하단","11857::장식-특수":"장식 - 특수 - 하단","11858::장식":"장식 - 특수 - 꼬리","11858::장식-특수":"장식 - 특수 - 꼬리","12779::장식":"장식 - 머리 - 머리","12779::장식-머리":"장식 - 머리 - 머리","12780::장식":"장식 - 머리 - 헤어핀","12780::장식-머리":"장식 - 머리 - 헤어핀","12781::장식":"장식 - 손 - 장갑","12781::장식-손":"장식 - 손 - 장갑","13449::장식":"장식 - 소품 - 소품(우)","13449::장식-소품":"장식 - 소품 - 소품(우)","13628::장식":"장식 - 특수 - 스킨","13628::장식-특수":"장식 - 특수 - 스킨","13838::장식":"장식 - 특수 - 스킨","13838::장식-특수":"장식 - 특수 - 스킨","13850::장식":"장식 - 머리 - 머리","13850::장식-머리":"장식 - 머리 - 머리","13851::장식":"장식 - 머리 - 헤어핀","13851::장식-머리":"장식 - 머리 - 헤어핀","13852::장식":"장식 - 특수 - 얼굴","13852::장식-특수":"장식 - 특수 - 얼굴","13853::장식":"장식 - 귀","13854::장식":"장식 - 손 - 장갑","13854::장식-손":"장식 - 손 - 장갑","13855::장식":"장식 - 소품 - 소품(우)","13855::장식-소품":"장식 - 소품 - 소품(우)","13856::장식":"장식 - 특수 - 꼬리","13856::장식-특수":"장식 - 특수 - 꼬리","13857::장식":"장식 - 손 - 장갑","13857::장식-손":"장식 - 손 - 장갑","13858::장식":"장식 - 손 - 장갑","13858::장식-손":"장식 - 손 - 장갑","15052::장식":"장식 - 특수 - 스킨","15052::장식-특수":"장식 - 특수 - 스킨","15532::장식":"장식 - 소품 - 소품(우)","15532::장식-소품":"장식 - 소품 - 소품(우)","16185::장식":"장식 - 머리 - 머리","16185::장식-머리":"장식 - 머리 - 머리","16187::장식":"장식 - 손 - 팔찌(좌)","16187::장식-손":"장식 - 손 - 팔찌(좌)","16902::장식":"장식 - 특수 - 전경","16902::장식-특수":"장식 - 특수 - 전경","16903::장식":"장식 - 특수 - 배경","16903::장식-특수":"장식 - 특수 - 배경","16904::장식":"장식 - 머리 - 머리","16904::장식-머리":"장식 - 머리 - 머리","16905::장식":"장식 - 머리 - 헤어핀","16905::장식-머리":"장식 - 머리 - 헤어핀","16906::장식":"장식 - 특수 - 가슴","16906::장식-특수":"장식 - 특수 - 가슴","17383::장식":"장식 - 귀","61::장식":"장식 - 목 - 목도리","61::장식-목":"장식 - 목 - 목도리","62::장식":"장식 - 목 - 목도리","62::장식-목":"장식 - 목 - 목도리","63::장식":"장식 - 목 - 목도리","63::장식-목":"장식 - 목 - 목도리","71::장식":"장식 - 손 - 장갑","71::장식-손":"장식 - 손 - 장갑","200::장식":"장식 - 머리 - 머리","200::장식-머리":"장식 - 머리 - 머리","6058::장식":"장식 - 머리 - 머리","6058::장식-머리":"장식 - 머리 - 머리","14186::장식":"장식 - 머리 - 머리","14186::장식-머리":"장식 - 머리 - 머리","14187::장식":"장식 - 머리 - 베일","14187::장식-머리":"장식 - 머리 - 베일","14188::장식":"장식 - 손 - 장갑","14188::장식-손":"장식 - 손 - 장갑","14189::장식":"장식 - 특수 - 전경","14189::장식-특수":"장식 - 특수 - 전경","14190::장식":"장식 - 소품 - 소품(좌)","14190::장식-소품":"장식 - 소품 - 소품(좌)","14191::장식":"장식 - 손 - 장갑","14191::장식-손":"장식 - 손 - 장갑","14192::장식":"장식 - 손 - 장갑","14192::장식-손":"장식 - 손 - 장갑","14295::장식":"장식 - 특수 - 상단","14295::장식-특수":"장식 - 특수 - 상단","14296::장식":"장식 - 특수 - 전경","14296::장식-특수":"장식 - 특수 - 전경","14297::장식":"장식 - 특수 - 하단","14297::장식-특수":"장식 - 특수 - 하단","14298::장식":"장식 - 특수 - 배경","14298::장식-특수":"장식 - 특수 - 배경","14299::장식":"장식 - 머리 - 머리","14299::장식-머리":"장식 - 머리 - 머리","14300::장식":"장식 - 머리 - 헤어핀","14300::장식-머리":"장식 - 머리 - 헤어핀","14301::장식":"장식 - 귀","14302::장식":"장식 - 목 - 목걸이","14302::장식-목":"장식 - 목 - 목걸이","14303::장식":"장식 - 손 - 팔찌(우)","14303::장식-손":"장식 - 손 - 팔찌(우)","14304::장식":"장식 - 손 - 장갑","14304::장식-손":"장식 - 손 - 장갑","14305::장식":"장식 - 허리","14306::장식":"장식 - 허리","17075::장식":"장식 - 특수 - 상단","17075::장식-특수":"장식 - 특수 - 상단","17076::장식":"장식 - 특수 - 하단","17076::장식-특수":"장식 - 특수 - 하단","17078::장식":"장식 - 머리 - 머리","17078::장식-머리":"장식 - 머리 - 머리","17079::장식":"장식 - 귀","17080::장식":"장식 - 소품 - 소품(우)","17080::장식-소품":"장식 - 소품 - 소품(우)","17081::장식":"장식 - 손 - 팔찌(우)","17081::장식-손":"장식 - 손 - 팔찌(우)","162::장식":"장식 - 소품 - 소품(우)","162::장식-소품":"장식 - 소품 - 소품(우)","691::장식":"장식 - 손 - 팔찌(우)","691::장식-손":"장식 - 손 - 팔찌(우)","693::장식":"장식 - 머리 - 머리","693::장식-머리":"장식 - 머리 - 머리","1570::장식":"장식 - 머리 - 머리","1570::장식-머리":"장식 - 머리 - 머리","6059::장식":"장식 - 목 - 목걸이","6059::장식-목":"장식 - 목 - 목걸이","15585::장식":"장식 - 특수 - 하단","15585::장식-특수":"장식 - 특수 - 하단","15586::장식":"장식 - 손 - 장갑","15586::장식-손":"장식 - 손 - 장갑","15587::장식":"장식 - 소품 - 소품(우)","15587::장식-소품":"장식 - 소품 - 소품(우)","15664::장식":"장식 - 특수 - 전경","15664::장식-특수":"장식 - 특수 - 전경","15665::장식":"장식 - 특수 - 배경","15665::장식-특수":"장식 - 특수 - 배경","15666::장식":"장식 - 머리 - 머리","15666::장식-머리":"장식 - 머리 - 머리","15667::장식":"장식 - 특수 - 얼굴","15667::장식-특수":"장식 - 특수 - 얼굴","15668::장식":"장식 - 귀","15669::장식":"장식 - 소품 - 소품(좌)","15669::장식-소품":"장식 - 소품 - 소품(좌)","17082::장식":"장식 - 허리","17083::장식":"장식 - 소품 - 소품(좌)","17083::장식-소품":"장식 - 소품 - 소품(좌)","717::장식":"장식 - 소품 - 소품(우)","717::장식-소품":"장식 - 소품 - 소품(우)","719::장식":"장식 - 목 - 목걸이","719::장식-목":"장식 - 목 - 목걸이","718::장식":"장식 - 귀","810::장식":"장식 - 특수 - 가슴","810::장식-특수":"장식 - 특수 - 가슴","811::장식":"장식 - 머리 - 머리","811::장식-머리":"장식 - 머리 - 머리","812::장식":"장식 - 목 - 목걸이","812::장식-목":"장식 - 목 - 목걸이","829::장식":"장식 - 목 - 목걸이","829::장식-목":"장식 - 목 - 목걸이","831::장식":"장식 - 손 - 장갑","831::장식-손":"장식 - 손 - 장갑","832::장식":"장식 - 머리 - 머리","832::장식-머리":"장식 - 머리 - 머리","830::장식":"장식 - 소품 - 소품(우)","830::장식-소품":"장식 - 소품 - 소품(우)","955::장식":"장식 - 목 - 목걸이","955::장식-목":"장식 - 목 - 목걸이","956::장식":"장식 - 소품 - 소품(우)","956::장식-소품":"장식 - 소품 - 소품(우)","957::장식":"장식 - 손 - 팔찌(우)","957::장식-손":"장식 - 손 - 팔찌(우)","967::장식":"장식 - 머리 - 머리","967::장식-머리":"장식 - 머리 - 머리","966::장식":"장식 - 특수 - 가슴","966::장식-특수":"장식 - 특수 - 가슴","1053::장식":"장식 - 머리 - 머리","1053::장식-머리":"장식 - 머리 - 머리","1051::장식":"장식 - 손 - 장갑","1051::장식-손":"장식 - 손 - 장갑","1052::장식":"장식 - 목걸이","602::장식":"장식 - 귀","603::장식":"장식 - 목 - 목걸이","603::장식-목":"장식 - 목 - 목걸이","604::장식":"장식 - 손 - 팔찌(우)","604::장식-손":"장식 - 손 - 팔찌(우)","918::장식":"장식 - 목 - 목걸이","918::장식-목":"장식 - 목 - 목걸이","914::장식":"장식 - 소품 - 소품(우)","914::장식-소품":"장식 - 소품 - 소품(우)","915::장식":"장식 - 머리 - 머리","915::장식-머리":"장식 - 머리 - 머리","311::장식":"장식 - 머리 - 머리","311::장식-머리":"장식 - 머리 - 머리","1572::장식":"장식 - 손 - 장갑","1572::장식-손":"장식 - 손 - 장갑","1574::장식":"장식 - 허리","1573::장식":"장식 - 소품 - 소품(우)","1573::장식-소품":"장식 - 소품 - 소품(우)","1571::장식":"장식 - 귀","92::장식":"장식 - 머리 - 머리","92::장식-머리":"장식 - 머리 - 머리","88::장식":"장식 - 손 - 장갑","88::장식-손":"장식 - 손 - 장갑","1150::장식":"장식 - 머리 - 머리","1150::장식-머리":"장식 - 머리 - 머리","1152::장식":"장식 - 소품 - 소품(우)","1152::장식-소품":"장식 - 소품 - 소품(우)","1153::장식":"장식 - 특수 - 가슴","1153::장식-특수":"장식 - 특수 - 가슴","1154::장식":"장식 - 허리","1201::장식":"장식 - 머리 - 머리","1201::장식-머리":"장식 - 머리 - 머리","1200::장식":"장식 - 소품 - 소품(우)","1200::장식-소품":"장식 - 소품 - 소품(우)","1332::장식":"장식 - 머리 - 머리","1332::장식-머리":"장식 - 머리 - 머리","1414::장식":"장식 - 허리","1412::장식":"장식 - 머리 - 머리","1412::장식-머리":"장식 - 머리 - 머리","1413::장식":"장식 - 손 - 오른손","1413::장식-손":"장식 - 손 - 오른손","161::장식":"장식 - 소품 - 소품(우)","161::장식-소품":"장식 - 소품 - 소품(우)","1068::장식":"장식 - 머리 - 베일","1068::장식-머리":"장식 - 머리 - 베일","35::장식":"장식 - 목 - 목도리","35::장식-목":"장식 - 목 - 목도리","315::장식":"장식 - 머리 - 머리","315::장식-머리":"장식 - 머리 - 머리","177::장식":"장식 - 목 - 목도리","177::장식-목":"장식 - 목 - 목도리","133::장식":"장식 - 머리 - 머리","133::장식-머리":"장식 - 머리 - 머리","411::장식":"장식 - 머리 - 머리","411::장식-머리":"장식 - 머리 - 머리","1::장식":"장식 - 머리 - 머리","1::장식-머리":"장식 - 머리 - 머리","72::장식":"장식 - 머리 - 머리","72::장식-머리":"장식 - 머리 - 머리","692::장식":"장식 - 목 - 목걸이","692::장식-목":"장식 - 목 - 목걸이","1362::장식":"장식 - 머리 - 머리","1362::장식-머리":"장식 - 머리 - 머리","12785::장식":"장식 - 목 - 목걸이","12785::장식-목":"장식 - 목 - 목걸이","17501::장식":"장식 - 특수 - 전경","17501::장식-특수":"장식 - 특수 - 전경","17503::장식":"장식 - 소품 - 소품(우)","17503::장식-소품":"장식 - 소품 - 소품(우)","17502::장식":"장식 - 머리 - 머리","17502::장식-머리":"장식 - 머리 - 머리","211::장식":"장식 - 머리 - 머리","211::장식-머리":"장식 - 머리 - 머리","351::장식":"장식 - 귀","70::장식":"장식 - 목 - 목도리","70::장식-목":"장식 - 목 - 목도리","16496::장식":"장식 - 귀","920::장식":"장식 - 귀","1532::장식":"장식 - 소품 - 소품(우)","1532::장식-소품":"장식 - 소품 - 소품(우)","1531::장식":"장식 - 머리 - 머리","1531::장식-머리":"장식 - 머리 - 머리","1575::장식":"장식 - 머리 - 머리","1575::장식-머리":"장식 - 머리 - 머리","1576::장식":"장식 - 특수 - 가슴","1576::장식-특수":"장식 - 특수 - 가슴","1568::장식":"장식 - 목 - 목걸이","1568::장식-목":"장식 - 목 - 목걸이","1737::장식":"장식 - 머리 - 머리","1737::장식-머리":"장식 - 머리 - 머리","1738::장식":"장식 - 손 - 장갑","1738::장식-손":"장식 - 손 - 장갑","1819::장식":"장식 - 머리 - 헤어핀","1819::장식-머리":"장식 - 머리 - 헤어핀","1820::장식":"장식 - 목 - 목걸이","1820::장식-목":"장식 - 목 - 목걸이","1818::장식":"장식 - 귀 - 귀걸이","1818::장식-귀":"장식 - 귀 - 귀걸이","1950::장식":"장식 - 머리 - 머리","1950::장식-머리":"장식 - 머리 - 머리","1951::장식":"장식 - 목 - 목걸이","1951::장식-목":"장식 - 목 - 목걸이","2004::장식":"장식 - 머리 - 머리","2004::장식-머리":"장식 - 머리 - 머리","2005::장식":"장식 - 목 - 목걸이","2005::장식-목":"장식 - 목 - 목걸이","2200::장식":"장식 - 특수 - 전경","2200::장식-특수":"장식 - 특수 - 전경","2203::장식":"장식 - 손 - 팔찌(우)","2203::장식-손":"장식 - 손 - 팔찌(우)","2259::장식":"장식 - 머리 - 머리","2259::장식-머리":"장식 - 머리 - 머리","2260::장식":"장식 - 목 - 목걸이","2260::장식-목":"장식 - 목 - 목걸이","2261::장식":"장식 - 손 - 장갑","2261::장식-손":"장식 - 손 - 장갑","2339::장식":"장식 - 머리 - 머리","2339::장식-머리":"장식 - 머리 - 머리","2422::장식":"장식 - 소품 - 소품(우)","2422::장식-소품":"장식 - 소품 - 소품(우)","2600::장식":"장식 - 귀","2601::장식":"장식 - 손 - 팔찌(좌)","2601::장식-손":"장식 - 손 - 팔찌(좌)","2602::장식":"장식 - 목 - 목걸이","2602::장식-목":"장식 - 목 - 목걸이","2668::장식":"장식 - 목 - 목도리","2668::장식-목":"장식 - 목 - 목도리","2669::장식":"장식 - 손 - 팔찌(우)","2669::장식-손":"장식 - 손 - 팔찌(우)","2747::장식":"장식 - 귀","2880::장식":"장식 - 머리 - 머리","2880::장식-머리":"장식 - 머리 - 머리","2881::장식":"장식 - 손 - 장갑","2881::장식-손":"장식 - 손 - 장갑","2882::장식":"장식 - 소품 - 소품(좌)","2882::장식-소품":"장식 - 소품 - 소품(좌)","3029::장식":"장식 - 머리 - 머리","3029::장식-머리":"장식 - 머리 - 머리","3030::장식":"장식 - 귀","3031::장식":"장식 - 소품 - 소품(우)","3031::장식-소품":"장식 - 소품 - 소품(우)","3150::장식":"장식 - 귀","3215::장식":"장식 - 머리 - 머리","3215::장식-머리":"장식 - 머리 - 머리","3216::장식":"장식 - 귀","3363::장식":"장식 - 머리 - 머리","3363::장식-머리":"장식 - 머리 - 머리","3364::장식":"장식 - 소품 - 소품(좌)","3364::장식-소품":"장식 - 소품 - 소품(좌)","3217::장식":"장식 - 소품 - 소품(우)","3217::장식-소품":"장식 - 소품 - 소품(우)","3149::장식":"장식 - 머리 - 머리","3149::장식-머리":"장식 - 머리 - 머리","3152::장식":"장식 - 특수 - 가슴","3152::장식-특수":"장식 - 특수 - 가슴","3032::장식":"장식 - 목 - 목걸이","3032::장식-목":"장식 - 목 - 목걸이","2421::장식":"장식 - 머리 - 머리","2421::장식-머리":"장식 - 머리 - 머리","2423::장식":"장식 - 머리 - 헤어핀","2423::장식-머리":"장식 - 머리 - 헤어핀","2340::장식":"장식 - 특수 - 가슴","2340::장식-특수":"장식 - 특수 - 가슴","2201::장식":"장식 - 머리 - 머리","2201::장식-머리":"장식 - 머리 - 머리","2202::장식":"장식 - 목 - 목걸이","2202::장식-목":"장식 - 목 - 목걸이","1821::장식":"장식 - 특수 - 가슴","1821::장식-특수":"장식 - 특수 - 가슴","1567::장식":"장식 - 머리 - 머리","1567::장식-머리":"장식 - 머리 - 머리","1569::장식":"장식 - 손 - 팔찌(우)","1569::장식-손":"장식 - 손 - 팔찌(우)","919::장식":"장식 - 머리 - 머리","919::장식-머리":"장식 - 머리 - 머리","1354::장식":"장식 - 목 - 목걸이","1354::장식-목":"장식 - 목 - 목걸이","16499::장식":"장식 - 손 - 팔찌(우)","16499::장식-손":"장식 - 손 - 팔찌(우)","202::장식":"장식 - 머리 - 머리","202::장식-머리":"장식 - 머리 - 머리","3447::장식":"장식 - 귀","513::장식":"장식 - 머리 - 머리","513::장식-머리":"장식 - 머리 - 머리","512::장식":"장식 - 귀","516::장식":"장식 - 목 - 목걸이","516::장식-목":"장식 - 목 - 목걸이","515::장식":"장식 - 손 - 장갑","515::장식-손":"장식 - 손 - 장갑","514::장식":"장식 - 소품 - 소품(우)","514::장식-소품":"장식 - 소품 - 소품(우)","3124::장식":"장식 - 소품 - 소품(좌)","3124::장식-소품":"장식 - 소품 - 소품(좌)","1735::장식":"장식 - 머리 - 머리","1735::장식-머리":"장식 - 머리 - 머리","1732::장식":"장식 - 목 - 목걸이","1732::장식-목":"장식 - 목 - 목걸이","1733::장식":"장식 - 손 - 팔찌(우)","1733::장식-손":"장식 - 손 - 팔찌(우)","1736::장식":"장식 - 소품 - 소품(좌)","1736::장식-소품":"장식 - 소품 - 소품(좌)","1734::장식":"장식 - 특수 - 얼굴","1734::장식-특수":"장식 - 특수 - 얼굴","6785::장식":"장식 - 특수 - 상단","6785::장식-특수":"장식 - 특수 - 상단","1094::장식":"장식 - 목 - 목도리","1094::장식-목":"장식 - 목 - 목도리","6782::장식":"장식 - 소품 - 소품(좌)","6782::장식-소품":"장식 - 소품 - 소품(좌)","6780::장식":"장식 - 특수 - 가슴","6780::장식-특수":"장식 - 특수 - 가슴","6783::장식":"장식 - 특수 - 문신","6783::장식-특수":"장식 - 특수 - 문신","6777::장식":"장식 - 특수 - 전경","6777::장식-특수":"장식 - 특수 - 전경","6784::장식":"장식 - 특수 - 하단","6784::장식-특수":"장식 - 특수 - 하단","6778::장식":"장식 - 머리 - 머리","6778::장식-머리":"장식 - 머리 - 머리","6779::장식":"장식 - 머리 - 헤어핀","6779::장식-머리":"장식 - 머리 - 헤어핀","17539::장식":"장식 - 특수 - 가슴","17539::장식-특수":"장식 - 특수 - 가슴","6781::장식":"장식 - 소품 - 소품(우)","6781::장식-소품":"장식 - 소품 - 소품(우)","17540::장식":"장식 - 머리 - 머리","17540::장식-머리":"장식 - 머리 - 머리","17541::장식":"장식 - 특수 - 하단","17541::장식-특수":"장식 - 특수 - 하단","17233::장식":"장식 - 머리 - 머리","17233::장식-머리":"장식 - 머리 - 머리","17234::장식":"장식 - 귀","17236::장식":"장식 - 허리","17235::장식":"장식 - 손 - 팔찌(우)","17235::장식-손":"장식 - 손 - 팔찌(우)","17237::장식":"장식 - 특수 - 얼굴","17237::장식-특수":"장식 - 특수 - 얼굴","17232::장식":"장식 - 특수 - 하단","17232::장식-특수":"장식 - 특수 - 하단","17238::장식":"장식 - 머리 - 머리","17238::장식-머리":"장식 - 머리 - 머리","17220::장식":"장식 - 특수 - 상단","17220::장식-특수":"장식 - 특수 - 상단","17221::장식":"장식 - 특수 - 하단","17221::장식-특수":"장식 - 특수 - 하단","17222::장식":"장식 - 머리 - 머리","17222::장식-머리":"장식 - 머리 - 머리","17223::장식":"장식 - 머리 - 헤어핀","17223::장식-머리":"장식 - 머리 - 헤어핀","17224::장식":"장식 - 귀","17225::장식":"장식 - 소품 - 소품(우)","17225::장식-소품":"장식 - 소품 - 소품(우)","17226::장식":"장식 - 손 - 장갑","17226::장식-손":"장식 - 손 - 장갑","17227::장식":"장식 - 목 - 목걸이","17227::장식-목":"장식 - 목 - 목걸이","17228::장식":"장식 - 소품 - 소품(좌)","17228::장식-소품":"장식 - 소품 - 소품(좌)","17229::장식":"장식 - 특수 - 꼬리","17229::장식-특수":"장식 - 특수 - 꼬리","17230::장식":"장식 - 손 - 장갑","17230::장식-손":"장식 - 손 - 장갑","17231::장식":"장식 - 손 - 장갑","17231::장식-손":"장식 - 손 - 장갑","17273::장식":"장식 - 머리 - 머리","17273::장식-머리":"장식 - 머리 - 머리","17274::장식":"장식 - 머리 - 베일","17274::장식-머리":"장식 - 머리 - 베일","17275::장식":"장식 - 머리 - 헤어핀","17275::장식-머리":"장식 - 머리 - 헤어핀","17276::장식":"장식 - 귀","17278::장식":"장식 - 목 - 목걸이","17278::장식-목":"장식 - 목 - 목걸이","17279::장식":"장식 - 손 - 팔찌(우)","17279::장식-손":"장식 - 손 - 팔찌(우)","17280::장식":"장식 - 손 - 장갑","17280::장식-손":"장식 - 손 - 장갑","17277::장식":"장식 - 소품 - 소품(우)","17277::장식-소품":"장식 - 소품 - 소품(우)","17283::장식":"장식 - 허리","17281::장식":"장식 - 특수 - 얼굴","17281::장식-특수":"장식 - 특수 - 얼굴","17282::장식":"장식 - 특수 - 문신","17282::장식-특수":"장식 - 특수 - 문신","17269::장식":"장식 - 특수 - 전경","17269::장식-특수":"장식 - 특수 - 전경","17272::장식":"장식 - 특수 - 배경","17272::장식-특수":"장식 - 특수 - 배경","17271::장식":"장식 - 특수 - 상단","17271::장식-특수":"장식 - 특수 - 상단","17270::장식":"장식 - 특수 - 하단","17270::장식-특수":"장식 - 특수 - 하단","17284::장식":"장식 - 머리 - 머리","17284::장식-머리":"장식 - 머리 - 머리","17285::장식":"장식 - 머리 - 베일","17285::장식-머리":"장식 - 머리 - 베일","17286::장식":"장식 - 머리 - 헤어핀","17286::장식-머리":"장식 - 머리 - 헤어핀","17287::장식":"장식 - 귀","17288::장식":"장식 - 특수 - 전경","17288::장식-특수":"장식 - 특수 - 전경","17289::장식":"장식 - 특수 - 하단","17289::장식-특수":"장식 - 특수 - 하단","17290::장식":"장식 - 특수 - 상단","17290::장식-특수":"장식 - 특수 - 상단","17291::장식":"장식 - 특수 - 배경","17291::장식-특수":"장식 - 특수 - 배경","38::장식":"장식 - 목 - 목걸이","38::장식-목":"장식 - 목 - 목걸이","65::장식":"장식 - 허리","205::장식":"장식 - 허리","342::장식":"장식 - 귀","17292::장식":"장식 - 소품 - 소품(우)","17292::장식-소품":"장식 - 소품 - 소품(우)","17293::장식":"장식 - 소품 - 소품(좌)","17293::장식-소품":"장식 - 소품 - 소품(좌)","17294::장식":"장식 - 특수 - 배경","17294::장식-특수":"장식 - 특수 - 배경","403::장식":"장식 - 머리 - 귀","403::장식-머리":"장식 - 머리 - 귀","478::장식":"장식 - 머리 - 머리","478::장식-머리":"장식 - 머리 - 머리","700::장식":"장식 - 목 - 목걸이","700::장식-목":"장식 - 목 - 목걸이","3671::장식":"장식 - 소품 - 소품(우)","3671::장식-소품":"장식 - 소품 - 소품(우)","3670::장식":"장식 - 머리 - 머리","3670::장식-머리":"장식 - 머리 - 머리","3764::장식":"장식 - 머리 - 머리","3764::장식-머리":"장식 - 머리 - 머리","3765::장식":"장식 - 손 - 장갑","3765::장식-손":"장식 - 손 - 장갑","3766::장식":"장식 - 특수 - 가슴","3766::장식-특수":"장식 - 특수 - 가슴","3888::장식":"장식 - 목 - 목걸이","3888::장식-목":"장식 - 목 - 목걸이","3887::장식":"장식 - 머리 - 머리","3887::장식-머리":"장식 - 머리 - 머리","3889::장식":"장식 - 소품 - 소품(우)","3889::장식-소품":"장식 - 소품 - 소품(우)","3944::장식":"장식 - 소품 - 소품(우)","3944::장식-소품":"장식 - 소품 - 소품(우)","3943::장식":"장식 - 허리","3942::장식":"장식 - 머리 - 머리","3942::장식-머리":"장식 - 머리 - 머리","3945::장식":"장식 - 소품 - 소품(좌)","3945::장식-소품":"장식 - 소품 - 소품(좌)","4156::장식":"장식 - 특수 - 얼굴","4156::장식-특수":"장식 - 특수 - 얼굴","4155::장식":"장식 - 머리 - 머리","4155::장식-머리":"장식 - 머리 - 머리","4157::장식":"장식 - 특수 - 가슴","4157::장식-특수":"장식 - 특수 - 가슴","4269::장식":"장식 - 손 - 팔찌(좌)","4269::장식-손":"장식 - 손 - 팔찌(좌)","4266::장식":"장식 - 머리 - 머리","4266::장식-머리":"장식 - 머리 - 머리","4267::장식":"장식 - 목 - 목걸이","4267::장식-목":"장식 - 목 - 목걸이","4268::장식":"장식 - 특수 - 가슴","4268::장식-특수":"장식 - 특수 - 가슴","4411::장식":"장식 - 목 - 목걸이","4411::장식-목":"장식 - 목 - 목걸이","4412::장식":"장식 - 소품 - 소품(우)","4412::장식-소품":"장식 - 소품 - 소품(우)","4413::장식":"장식 - 손 - 장갑","4413::장식-손":"장식 - 손 - 장갑","4517::장식":"장식 - 귀","4631::장식":"장식 - 손 - 장갑","4631::장식-손":"장식 - 손 - 장갑","4630::장식":"장식 - 머리 - 머리","4630::장식-머리":"장식 - 머리 - 머리","4632::장식":"장식 - 소품 - 소품(우)","4632::장식-소품":"장식 - 소품 - 소품(우)","4759::장식":"장식 - 목 - 목걸이","4759::장식-목":"장식 - 목 - 목걸이","4760::장식":"장식 - 소품 - 소품(우)","4760::장식-소품":"장식 - 소품 - 소품(우)","4883::장식":"장식 - 머리 - 머리","4883::장식-머리":"장식 - 머리 - 머리","4884::장식":"장식 - 특수 - 가슴","4884::장식-특수":"장식 - 특수 - 가슴","4969::장식":"장식 - 손 - 장갑","4969::장식-손":"장식 - 손 - 장갑","4968::장식":"장식 - 머리 - 머리","4968::장식-머리":"장식 - 머리 - 머리","5119::장식":"장식 - 머리 - 헤어핀","5119::장식-머리":"장식 - 머리 - 헤어핀","5120::장식":"장식 - 귀","5118::장식":"장식 - 특수 - 가슴","5118::장식-특수":"장식 - 특수 - 가슴","5197::장식":"장식 - 손 - 장갑","5197::장식-손":"장식 - 손 - 장갑","5198::장식":"장식 - 소품 - 소품(우)","5198::장식-소품":"장식 - 소품 - 소품(우)","5334::장식":"장식 - 손 - 장갑","5334::장식-손":"장식 - 손 - 장갑","5332::장식":"장식 - 머리 - 헤어핀","5332::장식-머리":"장식 - 머리 - 헤어핀","5333::장식":"장식 - 목 - 목걸이","5333::장식-목":"장식 - 목 - 목걸이","5489::장식":"장식 - 귀","5488::장식":"장식 - 머리 - 머리","5488::장식-머리":"장식 - 머리 - 머리","5490::장식":"장식 - 소품 - 소품(우)","5490::장식-소품":"장식 - 소품 - 소품(우)","5597::장식":"장식 - 목 - 목걸이","5597::장식-목":"장식 - 목 - 목걸이","5596::장식":"장식 - 머리 - 머리","5596::장식-머리":"장식 - 머리 - 머리","5834::장식":"장식 - 머리 - 머리","5834::장식-머리":"장식 - 머리 - 머리","6002::장식":"장식 - 머리 - 머리","6002::장식-머리":"장식 - 머리 - 머리","6003::장식":"장식 - 특수 - 가슴","6003::장식-특수":"장식 - 특수 - 가슴","6150::장식":"장식 - 목 - 목걸이","6150::장식-목":"장식 - 목 - 목걸이","6151::장식":"장식 - 손 - 팔찌(우)","6151::장식-손":"장식 - 손 - 팔찌(우)","6149::장식":"장식 - 머리 - 머리","6149::장식-머리":"장식 - 머리 - 머리","6229::장식":"장식 - 머리 - 머리","6229::장식-머리":"장식 - 머리 - 머리","6230::장식":"장식 - 손 - 장갑","6230::장식-손":"장식 - 손 - 장갑","7034::장식":"장식 - 목 - 목걸이","7034::장식-목":"장식 - 목 - 목걸이","6980::장식":"장식 - 목 - 목걸이","6980::장식-목":"장식 - 목 - 목걸이","7035::장식":"장식 - 손 - 팔찌(우)","7035::장식-손":"장식 - 손 - 팔찌(우)","6794::장식":"장식 - 머리 - 머리","6794::장식-머리":"장식 - 머리 - 머리","6796::장식":"장식 - 특수 - 가슴","6796::장식-특수":"장식 - 특수 - 가슴","6795::장식":"장식 - 머리 - 헤어핀","6795::장식-머리":"장식 - 머리 - 헤어핀","6793::장식":"장식 - 소품 - 소품(우)","6793::장식-소품":"장식 - 소품 - 소품(우)","6979::장식":"장식 - 머리 - 머리","6979::장식-머리":"장식 - 머리 - 머리","6525::장식":"장식 - 손 - 팔찌(우)","6525::장식-손":"장식 - 손 - 팔찌(우)","6524::장식":"장식 - 머리 - 머리","6524::장식-머리":"장식 - 머리 - 머리","6354::장식":"장식 - 머리 - 머리","6354::장식-머리":"장식 - 머리 - 머리","6522::장식":"장식 - 머리 - 머리","6522::장식-머리":"장식 - 머리 - 머리","6523::장식":"장식 - 목 - 목걸이","6523::장식-목":"장식 - 목 - 목걸이","1541::장식":"장식 - 머리 - 머리","1541::장식-머리":"장식 - 머리 - 머리","1542::장식":"장식 - 특수 - 가슴","1542::장식-특수":"장식 - 특수 - 가슴","3931::장식":"장식 - 머리 - 머리","3931::장식-머리":"장식 - 머리 - 머리","3932::장식":"장식 - 손 - 팔찌(우)","3932::장식-손":"장식 - 손 - 팔찌(우)","1087::장식":"장식 - 귀","1377::장식":"장식 - 특수 - 전경","1377::장식-특수":"장식 - 특수 - 전경","1095::장식":"장식 - 허리","145::장식":"장식 - 목 - 목걸이","145::장식-목":"장식 - 목 - 목걸이","321::장식":"장식 - 머리 - 머리","321::장식-머리":"장식 - 머리 - 머리","1536::장식":"장식 - 머리 - 머리","1536::장식-머리":"장식 - 머리 - 머리","1537::장식":"장식 - 귀","1538::장식":"장식 - 목 - 목걸이","1538::장식-목":"장식 - 목 - 목걸이","1539::장식":"장식 - 손 - 팔찌(우)","1539::장식-손":"장식 - 손 - 팔찌(우)","1540::장식":"장식 - 소품 - 소품(우)","1540::장식-소품":"장식 - 소품 - 소품(우)","801::장식":"장식 - 목 - 목걸이","801::장식-목":"장식 - 목 - 목걸이","802::장식":"장식 - 소품 - 소품(우)","802::장식-소품":"장식 - 소품 - 소품(우)","1745::장식":"장식 - 머리 - 머리","1745::장식-머리":"장식 - 머리 - 머리","1744::장식":"장식 - 손 - 장갑","1744::장식-손":"장식 - 손 - 장갑","1816::장식":"장식 - 소품 - 소품(우)","1816::장식-소품":"장식 - 소품 - 소품(우)","7859::장식":"장식 - 손 - 팔찌(우)","7859::장식-손":"장식 - 손 - 팔찌(우)","7858::장식":"장식 - 머리 - 머리","7858::장식-머리":"장식 - 머리 - 머리","8177::장식":"장식 - 머리 - 머리","8177::장식-머리":"장식 - 머리 - 머리","1358::장식":"장식 - 머리 - 머리","1358::장식-머리":"장식 - 머리 - 머리","1355::장식":"장식 - 머리 - 베일","1355::장식-머리":"장식 - 머리 - 베일","1356::장식":"장식 - 머리 - 머리","1356::장식-머리":"장식 - 머리 - 머리","1357::장식":"장식 - 머리 - 머리","1357::장식-머리":"장식 - 머리 - 머리","7188::장식":"장식 - 머리 - 머리","7188::장식-머리":"장식 - 머리 - 머리","7189::장식":"장식 - 목 - 목걸이","7189::장식-목":"장식 - 목 - 목걸이","7186::장식":"장식 - 머리 - 머리","7186::장식-머리":"장식 - 머리 - 머리","7187::장식":"장식 - 귀","7411::장식":"장식 - 특수 - 문신","7411::장식-특수":"장식 - 특수 - 문신","7410::장식":"장식 - 머리 - 머리","7410::장식-머리":"장식 - 머리 - 머리","7533::장식":"장식 - 머리 - 헤어핀","7533::장식-머리":"장식 - 머리 - 헤어핀","7758::장식":"장식 - 머리 - 머리","7758::장식-머리":"장식 - 머리 - 머리","1817::장식":"장식 - 귀","1938::장식":"장식 - 머리 - 머리","1938::장식-머리":"장식 - 머리 - 머리","1939::장식":"장식 - 소품 - 소품(우)","1939::장식-소품":"장식 - 소품 - 소품(우)","2094::장식":"장식 - 머리 - 머리","2094::장식-머리":"장식 - 머리 - 머리","2095::장식":"장식 - 소품 - 소품(우)","2095::장식-소품":"장식 - 소품 - 소품(우)","2096::장식":"장식 - 목 - 목도리","2096::장식-목":"장식 - 목 - 목도리","2111::장식":"장식 - 머리 - 머리","2111::장식-머리":"장식 - 머리 - 머리","2113::장식":"장식 - 목 - 목걸이","2113::장식-목":"장식 - 목 - 목걸이","2112::장식":"장식 - 손 - 팔찌(우)","2112::장식-손":"장식 - 손 - 팔찌(우)","2114::장식":"장식 - 소품 - 소품(우)","2114::장식-소품":"장식 - 소품 - 소품(우)","2209::장식":"장식 - 머리 - 머리","2209::장식-머리":"장식 - 머리 - 머리","2210::장식":"장식 - 소품 - 소품(좌)","2210::장식-소품":"장식 - 소품 - 소품(좌)","2226::장식":"장식 - 머리 - 머리","2226::장식-머리":"장식 - 머리 - 머리","2227::장식":"장식 - 소품 - 소품(좌)","2227::장식-소품":"장식 - 소품 - 소품(좌)","2370::장식":"장식 - 머리 - 머리","2370::장식-머리":"장식 - 머리 - 머리","2371::장식":"장식 - 목 - 목걸이","2371::장식-목":"장식 - 목 - 목걸이","2444::장식":"장식 - 머리 - 머리","2444::장식-머리":"장식 - 머리 - 머리","2445::장식":"장식 - 목 - 목걸이","2445::장식-목":"장식 - 목 - 목걸이","2597::장식":"장식 - 귀","2598::장식":"장식 - 손 - 팔찌(좌)","2598::장식-손":"장식 - 손 - 팔찌(좌)","2708::장식":"장식 - 머리 - 머리","2708::장식-머리":"장식 - 머리 - 머리","2709::장식":"장식 - 머리 - 헤어핀","2709::장식-머리":"장식 - 머리 - 헤어핀","2710::장식":"장식 - 손 - 팔찌(우)","2710::장식-손":"장식 - 손 - 팔찌(우)","2711::장식":"장식 - 소품 - 소품(우)","2711::장식-소품":"장식 - 소품 - 소품(우)","2889::장식":"장식 - 머리 - 머리","2889::장식-머리":"장식 - 머리 - 머리","2890::장식":"장식 - 귀","2891::장식":"장식 - 목 - 목걸이","2891::장식-목":"장식 - 목 - 목걸이","2892::장식":"장식 - 손 - 장갑","2892::장식-손":"장식 - 손 - 장갑","3033::장식":"장식 - 머리 - 베일","3033::장식-머리":"장식 - 머리 - 베일","3034::장식":"장식 - 목 - 목걸이","3034::장식-목":"장식 - 목 - 목걸이","3035::장식":"장식 - 소품 - 소품(우)","3035::장식-소품":"장식 - 소품 - 소품(우)","3036::장식":"장식 - 머리 - 헤어핀","3036::장식-머리":"장식 - 머리 - 헤어핀","3933::장식":"장식 - 특수 - 날개","3933::장식-특수":"장식 - 특수 - 날개","7047::장식":"장식 - 머리 - 머리","7047::장식-머리":"장식 - 머리 - 머리","3314::장식":"장식 - 소품 - 소품(우)","3314::장식-소품":"장식 - 소품 - 소품(우)","4764::장식":"장식 - 손 - 팔찌(우)","4764::장식-손":"장식 - 손 - 팔찌(우)","4763::장식":"장식 - 귀","4967::장식":"장식 - 머리 - 머리","4967::장식-머리":"장식 - 머리 - 머리","4761::장식":"장식 - 머리 - 머리","4761::장식-머리":"장식 - 머리 - 머리","4762::장식":"장식 - 목 - 목걸이","4762::장식-목":"장식 - 목 - 목걸이","4765::장식":"장식 - 소품 - 소품(우)","4765::장식-소품":"장식 - 소품 - 소품(우)","4766::장식":"장식 - 특수 - 배경","4766::장식-특수":"장식 - 특수 - 배경","2392::장식":"장식 - 머리 - 머리","2392::장식-머리":"장식 - 머리 - 머리","2393::장식":"장식 - 손 - 장갑","2393::장식-손":"장식 - 손 - 장갑","4255::장식":"장식 - 목 - 목걸이","4255::장식-목":"장식 - 목 - 목걸이","6776::장식":"장식 - 머리 - 머리","6776::장식-머리":"장식 - 머리 - 머리","7867::장식":"장식 - 머리 - 머리","7867::장식-머리":"장식 - 머리 - 머리","7868::장식":"장식 - 손 - 장갑","7868::장식-손":"장식 - 손 - 장갑","7178::장식":"장식 - 특수 - 얼굴","7178::장식-특수":"장식 - 특수 - 얼굴","5564::장식":"장식 - 목 - 목걸이","5564::장식-목":"장식 - 목 - 목걸이","5565::장식":"장식 - 소품 - 소품(좌)","5565::장식-소품":"장식 - 소품 - 소품(좌)","5693::장식":"장식 - 손 - 장갑","5693::장식-손":"장식 - 손 - 장갑","5694::장식":"장식 - 소품 - 소품(좌)","5694::장식-소품":"장식 - 소품 - 소품(좌)","5831::장식":"장식 - 머리 - 머리","5831::장식-머리":"장식 - 머리 - 머리","5832::장식":"장식 - 목 - 목걸이","5832::장식-목":"장식 - 목 - 목걸이","5833::장식":"장식 - 소품 - 소품(우)","5833::장식-소품":"장식 - 소품 - 소품(우)","6526::장식":"장식 - 머리 - 머리","6526::장식-머리":"장식 - 머리 - 머리","6527::장식":"장식 - 소품 - 소품(우)","6527::장식-소품":"장식 - 소품 - 소품(우)","4885::장식":"장식 - 머리 - 머리","4885::장식-머리":"장식 - 머리 - 머리","4886::장식":"장식 - 손 - 장갑","4886::장식-손":"장식 - 손 - 장갑","4970::장식":"장식 - 귀","4971::장식":"장식 - 목 - 목걸이","4971::장식-목":"장식 - 목 - 목걸이","4972::장식":"장식 - 소품 - 소품(우)","4972::장식-소품":"장식 - 소품 - 소품(우)","4973::장식":"장식 - 손 - 장갑","4973::장식-손":"장식 - 손 - 장갑","5691::장식":"장식 - 머리 - 헤어핀","5691::장식-머리":"장식 - 머리 - 헤어핀","5692::장식":"장식 - 귀","3672::장식":"장식 - 소품 - 소품(좌)","3672::장식-소품":"장식 - 소품 - 소품(좌)","3885::장식":"장식 - 머리 - 머리","3885::장식-머리":"장식 - 머리 - 머리","3886::장식":"장식 - 손 - 장갑","3886::장식-손":"장식 - 손 - 장갑","4414::장식":"장식 - 머리 - 머리","4414::장식-머리":"장식 - 머리 - 머리","4415::장식":"장식 - 소품 - 소품(좌)","4415::장식-소품":"장식 - 소품 - 소품(좌)","3443::장식":"장식 - 귀","3444::장식":"장식 - 목 - 목걸이","3444::장식-목":"장식 - 목 - 목걸이","3445::장식":"장식 - 손 - 장갑","3445::장식-손":"장식 - 손 - 장갑","775::장식":"장식 - 손 - 장갑","775::장식-손":"장식 - 손 - 장갑","773::장식":"장식 - 소품 - 소품(우)","773::장식-소품":"장식 - 소품 - 소품(우)","772::장식":"장식 - 소품 - 소품(좌)","772::장식-소품":"장식 - 소품 - 소품(좌)","774::장식":"장식 - 목 - 목도리","774::장식-목":"장식 - 목 - 목도리","778::장식":"장식 - 목 - 목걸이","778::장식-목":"장식 - 목 - 목걸이","779::장식":"장식 - 손 - 장갑","779::장식-손":"장식 - 손 - 장갑","780::장식":"장식 - 머리 - 머리","780::장식-머리":"장식 - 머리 - 머리","782::장식":"장식 - 머리 - 머리","782::장식-머리":"장식 - 머리 - 머리","781::장식":"장식 - 목 - 목걸이","781::장식-목":"장식 - 목 - 목걸이","791::장식":"장식 - 소품 - 소품(좌)","791::장식-소품":"장식 - 소품 - 소품(좌)","788::장식":"장식 - 머리 - 머리","788::장식-머리":"장식 - 머리 - 머리","792::장식":"장식 - 머리 - 머리","792::장식-머리":"장식 - 머리 - 머리","790::장식":"장식 - 손 - 팔찌(우)","790::장식-손":"장식 - 손 - 팔찌(우)","1341::장식":"장식 - 손 - 장갑","1341::장식-손":"장식 - 손 - 장갑","822::장식":"장식 - 소품 - 소품(우)","822::장식-소품":"장식 - 소품 - 소품(우)","823::장식":"장식 - 머리 - 머리","823::장식-머리":"장식 - 머리 - 머리","786::장식":"장식 - 머리 - 머리","786::장식-머리":"장식 - 머리 - 머리","785::장식":"장식 - 소품 - 소품(좌)","785::장식-소품":"장식 - 소품 - 소품(좌)","1342::장식":"장식 - 손 - 장갑","1342::장식-손":"장식 - 손 - 장갑","1343::장식":"장식 - 머리 - 베일","1343::장식-머리":"장식 - 머리 - 베일","1344::장식":"장식 - 목 - 목걸이","1344::장식-목":"장식 - 목 - 목걸이","1338::장식":"장식 - 머리 - 머리","1338::장식-머리":"장식 - 머리 - 머리","3230::장식":"장식 - 손 - 팔찌(우)","3230::장식-손":"장식 - 손 - 팔찌(우)","1339::장식":"장식 - 머리 - 머리","1339::장식-머리":"장식 - 머리 - 머리","1334::장식":"장식 - 특수 - 날개","1334::장식-특수":"장식 - 특수 - 날개","1335::장식":"장식 - 머리 - 머리","1335::장식-머리":"장식 - 머리 - 머리","1336::장식":"장식 - 목 - 목도리","1336::장식-목":"장식 - 목 - 목도리","1337::장식":"장식 - 손 - 장갑","1337::장식-손":"장식 - 손 - 장갑","1345::장식":"장식 - 머리 - 머리","1345::장식-머리":"장식 - 머리 - 머리","1346::장식":"장식 - 소품 - 소품(좌)","1346::장식-소품":"장식 - 소품 - 소품(좌)","4125::장식":"장식 - 머리 - 머리","4125::장식-머리":"장식 - 머리 - 머리","4126::장식":"장식 - 소품 - 소품(우)","4126::장식-소품":"장식 - 소품 - 소품(우)","1325::장식":"장식 - 머리 - 머리","1325::장식-머리":"장식 - 머리 - 머리","1326::장식":"장식 - 특수 - 얼굴","1326::장식-특수":"장식 - 특수 - 얼굴","1328::장식":"장식 - 소품 - 소품(우)","1328::장식-소품":"장식 - 소품 - 소품(우)","3734::장식":"장식 - 머리 - 머리","3734::장식-머리":"장식 - 머리 - 머리","3744::장식":"장식 - 손 - 장갑","3744::장식-손":"장식 - 손 - 장갑","4191::장식":"장식 - 목 - 목걸이","4191::장식-목":"장식 - 목 - 목걸이","4192::장식":"장식 - 손 - 장갑","4192::장식-손":"장식 - 손 - 장갑","4193::장식":"장식 - 목 - 목걸이","4193::장식-목":"장식 - 목 - 목걸이","4194::장식":"장식 - 손 - 장갑","4194::장식-손":"장식 - 손 - 장갑","4123::장식":"장식 - 머리 - 머리","4123::장식-머리":"장식 - 머리 - 머리","2569::장식":"장식 - 머리 - 머리","2569::장식-머리":"장식 - 머리 - 머리","2570::장식":"장식 - 특수 - 얼굴","2570::장식-특수":"장식 - 특수 - 얼굴","2571::장식":"장식 - 소품 - 소품(우)","2571::장식-소품":"장식 - 소품 - 소품(우)","2572::장식":"장식 - 목 - 목걸이","2572::장식-목":"장식 - 목 - 목걸이","2573::장식":"장식 - 목 - 목도리","2573::장식-목":"장식 - 목 - 목도리","2574::장식":"장식 - 손 - 장갑","2574::장식-손":"장식 - 손 - 장갑","1881::장식":"장식 - 머리 - 머리","1881::장식-머리":"장식 - 머리 - 머리","1883::장식":"장식 - 특수 - 가슴","1883::장식-특수":"장식 - 특수 - 가슴","2883::장식":"장식 - 머리 - 머리","2883::장식-머리":"장식 - 머리 - 머리","2884::장식":"장식 - 목 - 목도리","2884::장식-목":"장식 - 목 - 목도리","2885::장식":"장식 - 소품 - 소품(우)","2885::장식-소품":"장식 - 소품 - 소품(우)","2986::장식":"장식 - 머리 - 머리","2986::장식-머리":"장식 - 머리 - 머리","2987::장식":"장식 - 목 - 목도리","2987::장식-목":"장식 - 목 - 목도리","2988::장식":"장식 - 소품 - 소품(우)","2988::장식-소품":"장식 - 소품 - 소품(우)","2886::장식":"장식 - 귀","2887::장식":"장식 - 목 - 목걸이","2887::장식-목":"장식 - 목 - 목걸이","2888::장식":"장식 - 소품 - 소품(좌)","2888::장식-소품":"장식 - 소품 - 소품(좌)","3209::장식":"장식 - 소품 - 소품(우)","3209::장식-소품":"장식 - 소품 - 소품(우)","3224::장식":"장식 - 머리 - 머리","3224::장식-머리":"장식 - 머리 - 머리","3212::장식":"장식 - 소품 - 소품(우)","3212::장식-소품":"장식 - 소품 - 소품(우)","3211::장식":"장식 - 소품 - 소품(우)","3211::장식-소품":"장식 - 소품 - 소품(우)","3210::장식":"장식 - 머리 - 머리","3210::장식-머리":"장식 - 머리 - 머리","3213::장식":"장식 - 머리 - 머리","3213::장식-머리":"장식 - 머리 - 머리","3214::장식":"장식 - 특수 - 가슴","3214::장식-특수":"장식 - 특수 - 가슴","3768::장식":"장식 - 목 - 목걸이","3768::장식-목":"장식 - 목 - 목걸이","3769::장식":"장식 - 목 - 목걸이","3769::장식-목":"장식 - 목 - 목걸이","3770::장식":"장식 - 목 - 목걸이","3770::장식-목":"장식 - 목 - 목걸이","3771::장식":"장식 - 목 - 목걸이","3771::장식-목":"장식 - 목 - 목걸이","3731::장식":"장식 - 머리 - 머리","3731::장식-머리":"장식 - 머리 - 머리","3735::장식":"장식 - 소품 - 소품(우)","3735::장식-소품":"장식 - 소품 - 소품(우)","3737::장식":"장식 - 소품 - 소품(좌)","3737::장식-소품":"장식 - 소품 - 소품(좌)","3738::장식":"장식 - 특수 - 얼굴","3738::장식-특수":"장식 - 특수 - 얼굴","3741::장식":"장식 - 손 - 장갑","3741::장식-손":"장식 - 손 - 장갑","3732::장식":"장식 - 머리 - 머리","3732::장식-머리":"장식 - 머리 - 머리","3740::장식":"장식 - 특수 - 얼굴","3740::장식-특수":"장식 - 특수 - 얼굴","3742::장식":"장식 - 손 - 장갑","3742::장식-손":"장식 - 손 - 장갑","3733::장식":"장식 - 머리 - 머리","3733::장식-머리":"장식 - 머리 - 머리","3736::장식":"장식 - 소품 - 소품(우)","3736::장식-소품":"장식 - 소품 - 소품(우)","3739::장식":"장식 - 특수 - 얼굴","3739::장식-특수":"장식 - 특수 - 얼굴","3743::장식":"장식 - 손 - 장갑","3743::장식-손":"장식 - 손 - 장갑","3312::장식":"장식 - 머리 - 머리","3312::장식-머리":"장식 - 머리 - 머리","3310::장식":"장식 - 소품 - 소품(좌)","3310::장식-소품":"장식 - 소품 - 소품(좌)","3311::장식":"장식 - 귀","3309::장식":"장식 - 머리 - 머리","3309::장식-머리":"장식 - 머리 - 머리","3315::장식":"장식 - 특수 - 가슴","3315::장식-특수":"장식 - 특수 - 가슴","3313::장식":"장식 - 특수 - 가슴","3313::장식-특수":"장식 - 특수 - 가슴","1946::장식":"장식 - 머리 - 머리","1946::장식-머리":"장식 - 머리 - 머리","1947::장식":"장식 - 귀","1943::장식":"장식 - 목 - 목걸이","1943::장식-목":"장식 - 목 - 목걸이","1949::장식":"장식 - 목 - 목걸이","1949::장식-목":"장식 - 목 - 목걸이","1944::장식":"장식 - 소품 - 소품(우)","1944::장식-소품":"장식 - 소품 - 소품(우)","1948::장식":"장식 - 특수 - 얼굴","1948::장식-특수":"장식 - 특수 - 얼굴","6337::장식":"장식 - 머리 - 헤어핀","6337::장식-머리":"장식 - 머리 - 헤어핀","6341::장식":"장식 - 소품 - 소품(좌)","6341::장식-소품":"장식 - 소품 - 소품(좌)","1698::장식":"장식 - 특수 - 가슴","1698::장식-특수":"장식 - 특수 - 가슴","1699::장식":"장식 - 목 - 목걸이","1699::장식-목":"장식 - 목 - 목걸이","1700::장식":"장식 - 특수 - 가슴","1700::장식-특수":"장식 - 특수 - 가슴","1876::장식":"장식 - 머리 - 머리","1876::장식-머리":"장식 - 머리 - 머리","1875::장식":"장식 - 머리 - 헤어핀","1875::장식-머리":"장식 - 머리 - 헤어핀","1877::장식":"장식 - 귀","1878::장식":"장식 - 특수 - 가슴","1878::장식-특수":"장식 - 특수 - 가슴","1880::장식":"장식 - 머리 - 머리","1880::장식-머리":"장식 - 머리 - 머리","1879::장식":"장식 - 귀","1882::장식":"장식 - 특수 - 가슴","1882::장식-특수":"장식 - 특수 - 가슴","2250::장식":"장식 - 머리 - 머리","2250::장식-머리":"장식 - 머리 - 머리","2252::장식":"장식 - 귀","2254::장식":"장식 - 목 - 목걸이","2254::장식-목":"장식 - 목 - 목걸이","2253::장식":"장식 - 특수 - 얼굴","2253::장식-특수":"장식 - 특수 - 얼굴","2251::장식":"장식 - 머리 - 머리","2251::장식-머리":"장식 - 머리 - 머리","2255::장식":"장식 - 머리 - 머리","2255::장식-머리":"장식 - 머리 - 머리","2256::장식":"장식 - 귀","2257::장식":"장식 - 소품 - 소품(우)","2257::장식-소품":"장식 - 소품 - 소품(우)","2258::장식":"장식 - 소품 - 소품(우)","2258::장식-소품":"장식 - 소품 - 소품(우)","2563::장식":"장식 - 머리 - 머리","2563::장식-머리":"장식 - 머리 - 머리","2565::장식":"장식 - 귀","2566::장식":"장식 - 특수 - 얼굴","2566::장식-특수":"장식 - 특수 - 얼굴","2567::장식":"장식 - 특수 - 가슴","2567::장식-특수":"장식 - 특수 - 가슴","2568::장식":"장식 - 특수 - 가슴","2568::장식-특수":"장식 - 특수 - 가슴","2564::장식":"장식 - 머리 - 머리","2564::장식-머리":"장식 - 머리 - 머리","3153::장식":"장식 - 머리 - 머리","3153::장식-머리":"장식 - 머리 - 머리","3154::장식":"장식 - 목 - 목도리","3154::장식-목":"장식 - 목 - 목도리","3222::장식":"장식 - 머리 - 머리","3222::장식-머리":"장식 - 머리 - 머리","3223::장식":"장식 - 소품 - 소품(좌)","3223::장식-소품":"장식 - 소품 - 소품(좌)","3442::장식":"장식 - 머리 - 머리","3442::장식-머리":"장식 - 머리 - 머리","3446::장식":"장식 - 소품 - 소품(우)","3446::장식-소품":"장식 - 소품 - 소품(우)","605::장식":"장식 - 머리 - 머리","605::장식-머리":"장식 - 머리 - 머리","606::장식":"장식 - 머리 - 머리","606::장식-머리":"장식 - 머리 - 머리","607::장식":"장식 - 머리 - 머리","607::장식-머리":"장식 - 머리 - 머리","608::장식":"장식 - 소품 - 소품(우)","608::장식-소품":"장식 - 소품 - 소품(우)","609::장식":"장식 - 소품 - 소품(우)","609::장식-소품":"장식 - 소품 - 소품(우)","610::장식":"장식 - 소품 - 소품(우)","610::장식-소품":"장식 - 소품 - 소품(우)","559::장식":"장식 - 머리 - 베일","559::장식-머리":"장식 - 머리 - 베일","558::장식":"장식 - 머리 - 베일","558::장식-머리":"장식 - 머리 - 베일","538::장식":"장식 - 머리 - 머리","538::장식-머리":"장식 - 머리 - 머리","582::장식":"장식 - 특수 - 꼬리","582::장식-특수":"장식 - 특수 - 꼬리","580::장식":"장식 - 소품 - 소품(우)","580::장식-소품":"장식 - 소품 - 소품(우)","577::장식":"장식 - 소품 - 소품(우)","577::장식-소품":"장식 - 소품 - 소품(우)","581::장식":"장식 - 손 - 장갑","581::장식-손":"장식 - 손 - 장갑","578::장식":"장식 - 손 - 장갑","578::장식-손":"장식 - 손 - 장갑","579::장식":"장식 - 머리 - 머리","579::장식-머리":"장식 - 머리 - 머리","576::장식":"장식 - 머리 - 머리","576::장식-머리":"장식 - 머리 - 머리","529::장식":"장식 - 소품 - 소품(좌)","529::장식-소품":"장식 - 소품 - 소품(좌)","612::장식":"장식 - 머리 - 머리","612::장식-머리":"장식 - 머리 - 머리","611::장식":"장식 - 머리 - 머리","611::장식-머리":"장식 - 머리 - 머리","528::장식":"장식 - 머리 - 머리","528::장식-머리":"장식 - 머리 - 머리","534::장식":"장식 - 머리 - 머리","534::장식-머리":"장식 - 머리 - 머리","616::장식":"장식 - 머리 - 머리","616::장식-머리":"장식 - 머리 - 머리","560::장식":"장식 - 머리 - 베일","560::장식-머리":"장식 - 머리 - 베일","562::장식":"장식 - 머리 - 머리","562::장식-머리":"장식 - 머리 - 머리","563::장식":"장식 - 머리 - 머리","563::장식-머리":"장식 - 머리 - 머리","561::장식":"장식 - 소품 - 소품(좌)","561::장식-소품":"장식 - 소품 - 소품(좌)","524::장식":"장식 - 머리 - 머리","524::장식-머리":"장식 - 머리 - 머리","525::장식":"장식 - 목 - 목걸이","525::장식-목":"장식 - 목 - 목걸이","526::장식":"장식 - 손 - 팔찌(우)","526::장식-손":"장식 - 손 - 팔찌(우)","570::장식":"장식 - 머리 - 머리","570::장식-머리":"장식 - 머리 - 머리","568::장식":"장식 - 귀","572::장식":"장식 - 목 - 목걸이","572::장식-목":"장식 - 목 - 목걸이","573::장식":"장식 - 소품 - 소품(좌)","573::장식-소품":"장식 - 소품 - 소품(좌)","574::장식":"장식 - 소품 - 소품(좌)","574::장식-소품":"장식 - 소품 - 소품(좌)","575::장식":"장식 - 소품 - 소품(좌)","575::장식-소품":"장식 - 소품 - 소품(좌)","517::장식":"장식 - 머리 - 머리","517::장식-머리":"장식 - 머리 - 머리","521::장식":"장식 - 머리 - 머리","521::장식-머리":"장식 - 머리 - 머리","518::장식":"장식 - 귀","522::장식":"장식 - 귀","520::장식":"장식 - 손 - 팔찌(우)","520::장식-손":"장식 - 손 - 팔찌(우)","523::장식":"장식 - 손 - 팔찌(우)","523::장식-손":"장식 - 손 - 팔찌(우)","519::장식":"장식 - 특수 - 전경","519::장식-특수":"장식 - 특수 - 전경","535::장식":"장식 - 머리 - 머리","535::장식-머리":"장식 - 머리 - 머리","536::장식":"장식 - 목 - 목걸이","536::장식-목":"장식 - 목 - 목걸이","537::장식":"장식 - 소품 - 소품(우)","537::장식-소품":"장식 - 소품 - 소품(우)","433::장식":"장식 - 머리 - 베일","433::장식-머리":"장식 - 머리 - 베일","434::장식":"장식 - 귀","435::장식":"장식 - 목 - 목걸이","435::장식-목":"장식 - 목 - 목걸이","436::장식":"장식 - 손 - 장갑","436::장식-손":"장식 - 손 - 장갑","475::장식":"장식 - 손 - 팔찌(우)","475::장식-손":"장식 - 손 - 팔찌(우)","476::장식":"장식 - 목 - 목도리","476::장식-목":"장식 - 목 - 목도리","125::장식":"장식 - 머리 - 머리","125::장식-머리":"장식 - 머리 - 머리","126::장식":"장식 - 목 - 목걸이","126::장식-목":"장식 - 목 - 목걸이","127::장식":"장식 - 손 - 장갑","127::장식-손":"장식 - 손 - 장갑","306::장식":"장식 - 머리 - 머리","306::장식-머리":"장식 - 머리 - 머리","288::장식":"장식 - 머리 - 머리","288::장식-머리":"장식 - 머리 - 머리","296::장식":"장식 - 손 - 장갑","296::장식-손":"장식 - 손 - 장갑","297::장식":"장식 - 손 - 장갑","297::장식-손":"장식 - 손 - 장갑","299::장식":"장식 - 손 - 장갑","299::장식-손":"장식 - 손 - 장갑","292::장식":"장식 - 특수 - 가슴","292::장식-특수":"장식 - 특수 - 가슴","273::장식":"장식 - 소품 - 소품(우)","273::장식-소품":"장식 - 소품 - 소품(우)","271::장식":"장식 - 머리 - 머리","271::장식-머리":"장식 - 머리 - 머리","272::장식":"장식 - 목 - 목걸이","272::장식-목":"장식 - 목 - 목걸이","210::장식":"장식 - 머리 - 머리","210::장식-머리":"장식 - 머리 - 머리","209::장식":"장식 - 머리 - 베일","209::장식-머리":"장식 - 머리 - 베일","213::장식":"장식 - 머리 - 머리","213::장식-머리":"장식 - 머리 - 머리","214::장식":"장식 - 손 - 팔찌(우)","214::장식-손":"장식 - 손 - 팔찌(우)","215::장식":"장식 - 소품 - 소품(우)","215::장식-소품":"장식 - 소품 - 소품(우)","111::장식":"장식 - 머리 - 머리","111::장식-머리":"장식 - 머리 - 머리","77::장식":"장식 - 머리 - 머리","77::장식-머리":"장식 - 머리 - 머리","78::장식":"장식 - 머리 - 머리","78::장식-머리":"장식 - 머리 - 머리","75::장식":"장식 - 귀","76::장식":"장식 - 귀","80::장식":"장식 - 목 - 목도리","80::장식-목":"장식 - 목 - 목도리","374::장식":"장식 - 목 - 목도리","374::장식-목":"장식 - 목 - 목도리","375::장식":"장식 - 목 - 목도리","375::장식-목":"장식 - 목 - 목도리","376::장식":"장식 - 목 - 목도리","376::장식-목":"장식 - 목 - 목도리","82::장식":"장식 - 머리 - 머리","82::장식-머리":"장식 - 머리 - 머리","83::장식":"장식 - 머리 - 머리","83::장식-머리":"장식 - 머리 - 머리","84::장식":"장식 - 목 - 목걸이","84::장식-목":"장식 - 목 - 목걸이","85::장식":"장식 - 목 - 목걸이","85::장식-목":"장식 - 목 - 목걸이","86::장식":"장식 - 목 - 목걸이","86::장식-목":"장식 - 목 - 목걸이","87::장식":"장식 - 손 - 장갑","87::장식-손":"장식 - 손 - 장갑","89::장식":"장식 - 손 - 장갑","89::장식-손":"장식 - 손 - 장갑","122::장식":"장식 - 머리 - 머리","122::장식-머리":"장식 - 머리 - 머리","123::장식":"장식 - 머리 - 머리","123::장식-머리":"장식 - 머리 - 머리","124::장식":"장식 - 목 - 목도리","124::장식-목":"장식 - 목 - 목도리","118::장식":"장식 - 머리 - 머리","118::장식-머리":"장식 - 머리 - 머리","117::장식":"장식 - 머리 - 베일","117::장식-머리":"장식 - 머리 - 베일","119::장식":"장식 - 귀","120::장식":"장식 - 목 - 목걸이","120::장식-목":"장식 - 목 - 목걸이","274::장식":"장식 - 목 - 목걸이","274::장식-목":"장식 - 목 - 목걸이","275::장식":"장식 - 손 - 장갑","275::장식-손":"장식 - 손 - 장갑","204::장식":"장식 - 머리 - 머리","204::장식-머리":"장식 - 머리 - 머리","206::장식":"장식 - 목 - 목도리","206::장식-목":"장식 - 목 - 목도리","231::장식":"장식 - 머리 - 머리","231::장식-머리":"장식 - 머리 - 머리","232::장식":"장식 - 목 - 목걸이","232::장식-목":"장식 - 목 - 목걸이","254::장식":"장식 - 머리 - 머리","254::장식-머리":"장식 - 머리 - 머리","255::장식":"장식 - 귀","257::장식":"장식 - 손 - 장갑","257::장식-손":"장식 - 손 - 장갑","256::장식":"장식 - 특수 - 가슴","256::장식-특수":"장식 - 특수 - 가슴","240::장식":"장식 - 머리 - 머리","240::장식-머리":"장식 - 머리 - 머리","253::장식":"장식 - 머리 - 머리","253::장식-머리":"장식 - 머리 - 머리","252::장식":"장식 - 소품 - 소품(우)","252::장식-소품":"장식 - 소품 - 소품(우)","207::장식":"장식 - 머리 - 머리","207::장식-머리":"장식 - 머리 - 머리","208::장식":"장식 - 소품 - 소품(우)","208::장식-소품":"장식 - 소품 - 소품(우)","216::장식":"장식 - 머리 - 머리","216::장식-머리":"장식 - 머리 - 머리","218::장식":"장식 - 목 - 목걸이","218::장식-목":"장식 - 목 - 목걸이","217::장식":"장식 - 손 - 장갑","217::장식-손":"장식 - 손 - 장갑","227::장식":"장식 - 머리 - 머리","227::장식-머리":"장식 - 머리 - 머리","230::장식":"장식 - 목 - 목걸이","230::장식-목":"장식 - 목 - 목걸이","228::장식":"장식 - 손 - 장갑","228::장식-손":"장식 - 손 - 장갑","229::장식":"장식 - 특수 - 가슴","229::장식-특수":"장식 - 특수 - 가슴","260::장식":"장식 - 목 - 목걸이","260::장식-목":"장식 - 목 - 목걸이","261::장식":"장식 - 소품 - 소품(우)","261::장식-소품":"장식 - 소품 - 소품(우)","259::장식":"장식 - 특수 - 얼굴","259::장식-특수":"장식 - 특수 - 얼굴","268::장식":"장식 - 머리 - 머리","268::장식-머리":"장식 - 머리 - 머리","270::장식":"장식 - 손 - 장갑","270::장식-손":"장식 - 손 - 장갑","269::장식":"장식 - 특수 - 가슴","269::장식-특수":"장식 - 특수 - 가슴","128::장식":"장식 - 머리 - 머리","128::장식-머리":"장식 - 머리 - 머리","129::장식":"장식 - 목 - 목걸이","129::장식-목":"장식 - 목 - 목걸이","130::장식":"장식 - 손 - 팔찌(우)","130::장식-손":"장식 - 손 - 팔찌(우)","249::장식":"장식 - 머리 - 베일","249::장식-머리":"장식 - 머리 - 베일","165::장식":"장식 - 머리 - 베일","165::장식-머리":"장식 - 머리 - 베일","166::장식":"장식 - 소품 - 소품(우)","166::장식-소품":"장식 - 소품 - 소품(우)","167::장식":"장식 - 소품 - 소품(좌)","167::장식-소품":"장식 - 소품 - 소품(좌)","164::장식":"장식 - 손 - 장갑","164::장식-손":"장식 - 손 - 장갑","267::장식":"장식 - 소품 - 소품(우)","267::장식-소품":"장식 - 소품 - 소품(우)","21::장식":"장식 - 머리 - 머리","21::장식-머리":"장식 - 머리 - 머리","19::장식":"장식 - 머리 - 머리","19::장식-머리":"장식 - 머리 - 머리","20::장식":"장식 - 머리 - 머리","20::장식-머리":"장식 - 머리 - 머리","24::장식":"장식 - 손 - 장갑","24::장식-손":"장식 - 손 - 장갑","22::장식":"장식 - 손 - 장갑","22::장식-손":"장식 - 손 - 장갑","23::장식":"장식 - 손 - 장갑","23::장식-손":"장식 - 손 - 장갑","27::장식":"장식 - 특수 - 꼬리","27::장식-특수":"장식 - 특수 - 꼬리","25::장식":"장식 - 특수 - 꼬리","25::장식-특수":"장식 - 특수 - 꼬리","26::장식":"장식 - 특수 - 꼬리","26::장식-특수":"장식 - 특수 - 꼬리","15::장식":"장식 - 손 - 장갑","15::장식-손":"장식 - 손 - 장갑","16::장식":"장식 - 머리 - 머리","16::장식-머리":"장식 - 머리 - 머리","9::장식":"장식 - 머리 - 머리","9::장식-머리":"장식 - 머리 - 머리","10::장식":"장식 - 머리 - 머리","10::장식-머리":"장식 - 머리 - 머리","11::장식":"장식 - 머리 - 머리","11::장식-머리":"장식 - 머리 - 머리","2::장식":"장식 - 머리 - 머리","2::장식-머리":"장식 - 머리 - 머리","3::장식":"장식 - 머리 - 머리","3::장식-머리":"장식 - 머리 - 머리","4::장식":"장식 - 머리 - 머리","4::장식-머리":"장식 - 머리 - 머리","5::장식":"장식 - 머리 - 머리","5::장식-머리":"장식 - 머리 - 머리","8::장식":"장식 - 머리 - 머리","8::장식-머리":"장식 - 머리 - 머리","34::장식":"장식 - 목 - 목도리","34::장식-목":"장식 - 목 - 목도리","69::장식":"장식 - 머리 - 머리","69::장식-머리":"장식 - 머리 - 머리","90::장식":"장식 - 소품 - 소품(좌)","90::장식-소품":"장식 - 소품 - 소품(좌)","30::장식":"장식 - 머리 - 머리","30::장식-머리":"장식 - 머리 - 머리","28::장식":"장식 - 머리 - 머리","28::장식-머리":"장식 - 머리 - 머리","29::장식":"장식 - 머리 - 머리","29::장식-머리":"장식 - 머리 - 머리","33::장식":"장식 - 머리 - 머리","33::장식-머리":"장식 - 머리 - 머리","31::장식":"장식 - 머리 - 머리","31::장식-머리":"장식 - 머리 - 머리","32::장식":"장식 - 머리 - 머리","32::장식-머리":"장식 - 머리 - 머리","465::장식":"장식 - 머리 - 머리","465::장식-머리":"장식 - 머리 - 머리","464::장식":"장식 - 머리 - 머리","464::장식-머리":"장식 - 머리 - 머리","486::장식":"장식 - 소품 - 소품(우)","486::장식-소품":"장식 - 소품 - 소품(우)","481::장식":"장식 - 머리 - 머리","481::장식-머리":"장식 - 머리 - 머리","483::장식":"장식 - 소품 - 소품(좌)","483::장식-소품":"장식 - 소품 - 소품(좌)","141::장식":"장식 - 머리 - 머리","141::장식-머리":"장식 - 머리 - 머리","487::장식":"장식 - 머리 - 머리","487::장식-머리":"장식 - 머리 - 머리","482::장식":"장식 - 특수 - 얼굴","482::장식-특수":"장식 - 특수 - 얼굴","139::장식":"장식 - 머리 - 베일","139::장식-머리":"장식 - 머리 - 베일","472::장식":"장식 - 손 - 팔찌(우)","472::장식-손":"장식 - 손 - 팔찌(우)","473::장식":"장식 - 허리","319::장식":"장식 - 머리 - 머리","319::장식-머리":"장식 - 머리 - 머리","490::장식":"장식 - 귀","491::장식":"장식 - 귀","66::장식":"장식 - 머리 - 머리","66::장식-머리":"장식 - 머리 - 머리","67::장식":"장식 - 머리 - 머리","67::장식-머리":"장식 - 머리 - 머리","140::장식":"장식 - 머리 - 베일","140::장식-머리":"장식 - 머리 - 베일","144::장식":"장식 - 머리 - 베일","144::장식-머리":"장식 - 머리 - 베일","142::장식":"장식 - 소품 - 소품(우)","142::장식-소품":"장식 - 소품 - 소품(우)","143::장식":"장식 - 소품 - 소품(좌)","143::장식-소품":"장식 - 소품 - 소품(좌)","151::장식":"장식 - 머리 - 머리","151::장식-머리":"장식 - 머리 - 머리","152::장식":"장식 - 머리 - 머리","152::장식-머리":"장식 - 머리 - 머리","131::장식":"장식 - 머리 - 머리","131::장식-머리":"장식 - 머리 - 머리","132::장식":"장식 - 머리 - 머리","132::장식-머리":"장식 - 머리 - 머리","153::장식":"장식 - 머리 - 머리","153::장식-머리":"장식 - 머리 - 머리","155::장식":"장식 - 귀","156::장식":"장식 - 손 - 장갑","156::장식-손":"장식 - 손 - 장갑","157::장식":"장식 - 목 - 목도리","157::장식-목":"장식 - 목 - 목도리","154::장식":"장식 - 특수 - 얼굴","154::장식-특수":"장식 - 특수 - 얼굴","159::장식":"장식 - 귀","172::장식":"장식 - 머리 - 베일","172::장식-머리":"장식 - 머리 - 베일","173::장식":"장식 - 귀","174::장식":"장식 - 목 - 목걸이","174::장식-목":"장식 - 목 - 목걸이","175::장식":"장식 - 손 - 장갑","175::장식-손":"장식 - 손 - 장갑","146::장식":"장식 - 목 - 목걸이","146::장식-목":"장식 - 목 - 목걸이","147::장식":"장식 - 목 - 목걸이","147::장식-목":"장식 - 목 - 목걸이","148::장식":"장식 - 특수 - 문신","148::장식-특수":"장식 - 특수 - 문신","94::장식":"장식 - 머리 - 머리","94::장식-머리":"장식 - 머리 - 머리","95::장식":"장식 - 머리 - 머리","95::장식-머리":"장식 - 머리 - 머리","96::장식":"장식 - 머리 - 머리","96::장식-머리":"장식 - 머리 - 머리","97::장식":"장식 - 귀","98::장식":"장식 - 귀","99::장식":"장식 - 귀","100::장식":"장식 - 목 - 목걸이","100::장식-목":"장식 - 목 - 목걸이","101::장식":"장식 - 목 - 목걸이","101::장식-목":"장식 - 목 - 목걸이","102::장식":"장식 - 목 - 목걸이","102::장식-목":"장식 - 목 - 목걸이","103::장식":"장식 - 손 - 팔찌(좌)","103::장식-손":"장식 - 손 - 팔찌(좌)","104::장식":"장식 - 손 - 팔찌(좌)","104::장식-손":"장식 - 손 - 팔찌(좌)","105::장식":"장식 - 손 - 팔찌(좌)","105::장식-손":"장식 - 손 - 팔찌(좌)","348::장식":"장식 - 머리 - 머리","348::장식-머리":"장식 - 머리 - 머리","276::장식":"장식 - 소품 - 소품(우)","276::장식-소품":"장식 - 소품 - 소품(우)","277::장식":"장식 - 소품 - 소품(우)","277::장식-소품":"장식 - 소품 - 소품(우)","278::장식":"장식 - 특수 - 가슴","278::장식-특수":"장식 - 특수 - 가슴","343::장식":"장식 - 귀","344::장식":"장식 - 귀","314::장식":"장식 - 귀","50::장식":"장식 - 머리 - 머리","50::장식-머리":"장식 - 머리 - 머리","51::장식":"장식 - 목 - 목도리","51::장식-목":"장식 - 목 - 목도리","55::장식":"장식 - 손 - 장갑","55::장식-손":"장식 - 손 - 장갑","46::장식":"장식 - 손 - 장갑","46::장식-손":"장식 - 손 - 장갑","404::장식":"장식 - 손 - 장갑","404::장식-손":"장식 - 손 - 장갑","54::장식":"장식 - 목 - 목걸이","54::장식-목":"장식 - 목 - 목걸이","52::장식":"장식 - 손 - 팔찌(우)","52::장식-손":"장식 - 손 - 팔찌(우)","53::장식":"장식 - 허리","48::장식":"장식 - 머리 - 머리","48::장식-머리":"장식 - 머리 - 머리","49::장식":"장식 - 소품 - 소품(우)","49::장식-소품":"장식 - 소품 - 소품(우)","45::장식":"장식 - 머리 - 머리","45::장식-머리":"장식 - 머리 - 머리","47::장식":"장식 - 목 - 목걸이","47::장식-목":"장식 - 목 - 목걸이","44::장식":"장식 - 소품 - 소품(좌)","44::장식-소품":"장식 - 소품 - 소품(좌)","40::장식":"장식 - 머리 - 머리","40::장식-머리":"장식 - 머리 - 머리","42::장식":"장식 - 소품 - 소품(우)","42::장식-소품":"장식 - 소품 - 소품(우)","41::장식":"장식 - 특수 - 얼굴","41::장식-특수":"장식 - 특수 - 얼굴","43::장식":"장식 - 허리","36::장식":"장식 - 머리 - 머리","36::장식-머리":"장식 - 머리 - 머리","37::장식":"장식 - 허리","219::장식":"장식 - 머리 - 머리","219::장식-머리":"장식 - 머리 - 머리","220::장식":"장식 - 소품 - 소품(우)","220::장식-소품":"장식 - 소품 - 소품(우)","136::장식":"장식 - 머리 - 머리","136::장식-머리":"장식 - 머리 - 머리","137::장식":"장식 - 귀","138::장식":"장식 - 손 - 장갑","138::장식-손":"장식 - 손 - 장갑","247::장식":"장식 - 머리 - 머리","247::장식-머리":"장식 - 머리 - 머리","248::장식":"장식 - 손 - 장갑","248::장식-손":"장식 - 손 - 장갑","466::장식":"장식 - 특수 - 얼굴","466::장식-특수":"장식 - 특수 - 얼굴","467::장식":"장식 - 특수 - 얼굴","467::장식-특수":"장식 - 특수 - 얼굴","468::장식":"장식 - 특수 - 얼굴","468::장식-특수":"장식 - 특수 - 얼굴","504::장식":"장식 - 머리 - 머리","504::장식-머리":"장식 - 머리 - 머리","484::장식":"장식 - 머리 - 머리","484::장식-머리":"장식 - 머리 - 머리","485::장식":"장식 - 머리 - 머리","485::장식-머리":"장식 - 머리 - 머리","469::장식":"장식 - 머리 - 머리","469::장식-머리":"장식 - 머리 - 머리","470::장식":"장식 - 머리 - 머리","470::장식-머리":"장식 - 머리 - 머리","471::장식":"장식 - 머리 - 머리","471::장식-머리":"장식 - 머리 - 머리","505::장식":"장식 - 손 - 장갑","505::장식-손":"장식 - 손 - 장갑","492::장식":"장식 - 특수 - 가슴","492::장식-특수":"장식 - 특수 - 가슴","493::장식":"장식 - 특수 - 가슴","493::장식-특수":"장식 - 특수 - 가슴","494::장식":"장식 - 특수 - 가슴","494::장식-특수":"장식 - 특수 - 가슴","495::장식":"장식 - 특수 - 가슴","495::장식-특수":"장식 - 특수 - 가슴","1007::장식":"장식 - 머리 - 머리","1007::장식-머리":"장식 - 머리 - 머리","497::장식":"장식 - 소품 - 소품(우)","497::장식-소품":"장식 - 소품 - 소품(우)","496::장식":"장식 - 소품 - 소품(우)","496::장식-소품":"장식 - 소품 - 소품(우)","1630::장식":"장식 - 목 - 목걸이","1630::장식-목":"장식 - 목 - 목걸이","1631::장식":"장식 - 머리 - 머리","1631::장식-머리":"장식 - 머리 - 머리","1632::장식":"장식 - 소품 - 소품(우)","1632::장식-소품":"장식 - 소품 - 소품(우)","222::장식":"장식 - 머리 - 머리","222::장식-머리":"장식 - 머리 - 머리","284::장식":"장식 - 귀","283::장식":"장식 - 손 - 장갑","283::장식-손":"장식 - 손 - 장갑","665::장식":"장식 - 소품 - 소품(우)","665::장식-소품":"장식 - 소품 - 소품(우)","668::장식":"장식 - 소품 - 소품(우)","668::장식-소품":"장식 - 소품 - 소품(우)","671::장식":"장식 - 소품 - 소품(우)","671::장식-소품":"장식 - 소품 - 소품(우)","877::장식":"장식 - 소품 - 소품(우)","877::장식-소품":"장식 - 소품 - 소품(우)","884::장식":"장식 - 머리 - 머리","884::장식-머리":"장식 - 머리 - 머리","885::장식":"장식 - 목 - 목걸이","885::장식-목":"장식 - 목 - 목걸이","886::장식":"장식 - 특수 - 가슴","886::장식-특수":"장식 - 특수 - 가슴","873::장식":"장식 - 머리 - 머리","873::장식-머리":"장식 - 머리 - 머리","875::장식":"장식 - 허리","876::장식":"장식 - 머리 - 머리","876::장식-머리":"장식 - 머리 - 머리","890::장식":"장식 - 소품 - 소품(우)","890::장식-소품":"장식 - 소품 - 소품(우)","891::장식":"장식 - 허리","887::장식":"장식 - 허리","882::장식":"장식 - 머리 - 머리","882::장식-머리":"장식 - 머리 - 머리","883::장식":"장식 - 목 - 목걸이","883::장식-목":"장식 - 목 - 목걸이","1070::장식":"장식 - 특수 - 가슴","1070::장식-특수":"장식 - 특수 - 가슴","893::장식":"장식 - 머리 - 머리","893::장식-머리":"장식 - 머리 - 머리","892::장식":"장식 - 손 - 장갑","892::장식-손":"장식 - 손 - 장갑","888::장식":"장식 - 손 - 장갑","888::장식-손":"장식 - 손 - 장갑","1619::장식":"장식 - 특수 - 전경","1619::장식-특수":"장식 - 특수 - 전경","1071::장식":"장식 - 머리 - 베일","1071::장식-머리":"장식 - 머리 - 베일","1072::장식":"장식 - 손 - 장갑","1072::장식-손":"장식 - 손 - 장갑","1069::장식":"장식 - 손 - 장갑","1069::장식-손":"장식 - 손 - 장갑","1073::장식":"장식 - 특수 - 가슴","1073::장식-특수":"장식 - 특수 - 가슴","1620::장식":"장식 - 머리 - 베일","1620::장식-머리":"장식 - 머리 - 베일","1622::장식":"장식 - 목 - 목걸이","1622::장식-목":"장식 - 목 - 목걸이","1621::장식":"장식 - 소품 - 소품(우)","1621::장식-소품":"장식 - 소품 - 소품(우)","1623::장식":"장식 - 소품 - 소품(좌)","1623::장식-소품":"장식 - 소품 - 소품(좌)","1008::장식":"장식 - 목 - 목걸이","1008::장식-목":"장식 - 목 - 목걸이","639::장식":"장식 - 소품 - 소품(우)","639::장식-소품":"장식 - 소품 - 소품(우)","638::장식":"장식 - 소품 - 소품(우)","638::장식-소품":"장식 - 소품 - 소품(우)","640::장식":"장식 - 소품 - 소품(우)","640::장식-소품":"장식 - 소품 - 소품(우)","816::장식":"장식 - 특수 - 가슴","816::장식-특수":"장식 - 특수 - 가슴","814::장식":"장식 - 특수 - 가슴","814::장식-특수":"장식 - 특수 - 가슴","815::장식":"장식 - 특수 - 가슴","815::장식-특수":"장식 - 특수 - 가슴","1009::장식":"장식 - 손 - 장갑","1009::장식-손":"장식 - 손 - 장갑","158::장식":"장식 - 특수 - 얼굴","158::장식-특수":"장식 - 특수 - 얼굴","212::장식":"장식 - 목 - 목걸이","212::장식-목":"장식 - 목 - 목걸이","666::장식":"장식 - 손 - 장갑","666::장식-손":"장식 - 손 - 장갑","669::장식":"장식 - 손 - 장갑","669::장식-손":"장식 - 손 - 장갑","672::장식":"장식 - 손 - 장갑","672::장식-손":"장식 - 손 - 장갑","664::장식":"장식 - 허리","667::장식":"장식 - 허리","670::장식":"장식 - 허리","650::장식":"장식 - 머리 - 머리","650::장식-머리":"장식 - 머리 - 머리","651::장식":"장식 - 머리 - 머리","651::장식-머리":"장식 - 머리 - 머리","653::장식":"장식 - 머리 - 머리","653::장식-머리":"장식 - 머리 - 머리","654::장식":"장식 - 목 - 목걸이","654::장식-목":"장식 - 목 - 목걸이","652::장식":"장식 - 소품 - 소품(우)","652::장식-소품":"장식 - 소품 - 소품(우)","643::장식":"장식 - 머리 - 머리","643::장식-머리":"장식 - 머리 - 머리","645::장식":"장식 - 머리 - 머리","645::장식-머리":"장식 - 머리 - 머리","648::장식":"장식 - 머리 - 머리","648::장식-머리":"장식 - 머리 - 머리","642::장식":"장식 - 손 - 팔찌(우)","642::장식-손":"장식 - 손 - 팔찌(우)","646::장식":"장식 - 손 - 팔찌(우)","646::장식-손":"장식 - 손 - 팔찌(우)","649::장식":"장식 - 손 - 장갑","649::장식-손":"장식 - 손 - 장갑","647::장식":"장식 - 소품 - 소품(우)","647::장식-소품":"장식 - 소품 - 소품(우)","644::장식":"장식 - 소품 - 소품(우)","644::장식-소품":"장식 - 소품 - 소품(우)","655::장식":"장식 - 머리 - 머리","655::장식-머리":"장식 - 머리 - 머리","641::장식":"장식 - 특수 - 얼굴","641::장식-특수":"장식 - 특수 - 얼굴","656::장식":"장식 - 목 - 목걸이","656::장식-목":"장식 - 목 - 목걸이","657::장식":"장식 - 손 - 장갑","657::장식-손":"장식 - 손 - 장갑","658::장식":"장식 - 머리 - 머리","658::장식-머리":"장식 - 머리 - 머리","659::장식":"장식 - 목 - 목걸이","659::장식-목":"장식 - 목 - 목걸이","660::장식":"장식 - 손 - 장갑","660::장식-손":"장식 - 손 - 장갑","663::장식":"장식 - 소품 - 소품(우)","663::장식-소품":"장식 - 소품 - 소품(우)","661::장식":"장식 - 머리 - 머리","661::장식-머리":"장식 - 머리 - 머리","189::장식":"장식 - 머리 - 머리","189::장식-머리":"장식 - 머리 - 머리","488::장식":"장식 - 귀","662::장식":"장식 - 소품 - 소품(우)","662::장식-소품":"장식 - 소품 - 소품(우)","636::장식":"장식 - 특수 - 가슴","636::장식-특수":"장식 - 특수 - 가슴","635::장식":"장식 - 특수 - 가슴","635::장식-특수":"장식 - 특수 - 가슴","637::장식":"장식 - 특수 - 가슴","637::장식-특수":"장식 - 특수 - 가슴","409::장식":"장식 - 머리 - 머리","409::장식-머리":"장식 - 머리 - 머리","620::장식":"장식 - 머리 - 머리","620::장식-머리":"장식 - 머리 - 머리","531::장식":"장식 - 머리 - 머리","531::장식-머리":"장식 - 머리 - 머리","533::장식":"장식 - 손 - 장갑","533::장식-손":"장식 - 손 - 장갑","619::장식":"장식 - 소품 - 소품(우)","619::장식-소품":"장식 - 소품 - 소품(우)","530::장식":"장식 - 소품 - 소품(우)","530::장식-소품":"장식 - 소품 - 소품(우)","621::장식":"장식 - 특수 - 얼굴","621::장식-특수":"장식 - 특수 - 얼굴","532::장식":"장식 - 특수 - 얼굴","532::장식-특수":"장식 - 특수 - 얼굴","510::장식":"장식 - 목 - 목걸이","510::장식-목":"장식 - 목 - 목걸이","506::장식":"장식 - 손 - 팔찌(우)","506::장식-손":"장식 - 손 - 팔찌(우)","477::장식":"장식 - 귀","502::장식":"장식 - 소품 - 소품(우)","502::장식-소품":"장식 - 소품 - 소품(우)","503::장식":"장식 - 소품 - 소품(우)","503::장식-소품":"장식 - 소품 - 소품(우)","501::장식":"장식 - 머리 - 머리","501::장식-머리":"장식 - 머리 - 머리","500::장식":"장식 - 귀","716::장식":"장식 - 머리 - 머리","716::장식-머리":"장식 - 머리 - 머리","712::장식":"장식 - 소품 - 소품(우)","712::장식-소품":"장식 - 소품 - 소품(우)","713::장식":"장식 - 소품 - 소품(우)","713::장식-소품":"장식 - 소품 - 소품(우)","714::장식":"장식 - 귀","708::장식":"장식 - 손 - 팔찌(우)","708::장식-손":"장식 - 손 - 팔찌(우)","709::장식":"장식 - 손 - 팔찌(우)","709::장식-손":"장식 - 손 - 팔찌(우)","706::장식":"장식 - 머리 - 머리","706::장식-머리":"장식 - 머리 - 머리","707::장식":"장식 - 머리 - 머리","707::장식-머리":"장식 - 머리 - 머리","715::장식":"장식 - 목 - 목걸이","715::장식-목":"장식 - 목 - 목걸이","710::장식":"장식 - 목 - 목걸이","710::장식-목":"장식 - 목 - 목걸이","711::장식":"장식 - 목 - 목걸이","711::장식-목":"장식 - 목 - 목걸이","1502::장식":"장식 - 머리 - 머리","1502::장식-머리":"장식 - 머리 - 머리","1500::장식":"장식 - 귀","336::장식":"장식 - 귀","1501::장식":"장식 - 손 - 장갑","1501::장식-손":"장식 - 손 - 장갑","320::장식":"장식 - 목 - 목걸이","320::장식-목":"장식 - 목 - 목걸이","1503::장식":"장식 - 소품 - 소품(우)","1503::장식-소품":"장식 - 소품 - 소품(우)","1504::장식":"장식 - 특수 - 배경","1504::장식-특수":"장식 - 특수 - 배경","1509::장식":"장식 - 손 - 장갑","1509::장식-손":"장식 - 손 - 장갑","1508::장식":"장식 - 소품 - 양손","1508::장식-소품":"장식 - 소품 - 양손","1507::장식":"장식 - 특수 - 얼굴","1507::장식-특수":"장식 - 특수 - 얼굴","1506::장식":"장식 - 특수 - 전경","1506::장식-특수":"장식 - 특수 - 전경","1505::장식":"장식 - 특수 - 배경","1505::장식-특수":"장식 - 특수 - 배경","406::장식":"장식 - 목 - 목걸이","406::장식-목":"장식 - 목 - 목걸이","1248::장식":"장식 - 머리 - 머리","1248::장식-머리":"장식 - 머리 - 머리","1251::장식":"장식 - 머리 - 머리","1251::장식-머리":"장식 - 머리 - 머리","1249::장식":"장식 - 손 - 장갑","1249::장식-손":"장식 - 손 - 장갑","1252::장식":"장식 - 손 - 장갑","1252::장식-손":"장식 - 손 - 장갑","1253::장식":"장식 - 특수 - 가슴","1253::장식-특수":"장식 - 특수 - 가슴","1254::장식":"장식 - 특수 - 가슴","1254::장식-특수":"장식 - 특수 - 가슴","1247::장식":"장식 - 특수 - 전경","1247::장식-특수":"장식 - 특수 - 전경","1250::장식":"장식 - 특수 - 전경","1250::장식-특수":"장식 - 특수 - 전경","913::장식":"장식 - 목 - 목걸이","913::장식-목":"장식 - 목 - 목걸이","912::장식":"장식 - 손 - 장갑","912::장식-손":"장식 - 손 - 장갑","910::장식":"장식 - 소품 - 소품(우)","910::장식-소품":"장식 - 소품 - 소품(우)","911::장식":"장식 - 소품 - 소품(좌)","911::장식-소품":"장식 - 소품 - 소품(좌)","759::장식":"장식 - 소품 - 소품(좌)","759::장식-소품":"장식 - 소품 - 소품(좌)","754::장식":"장식 - 머리 - 머리","754::장식-머리":"장식 - 머리 - 머리","755::장식":"장식 - 머리 - 머리","755::장식-머리":"장식 - 머리 - 머리","756::장식":"장식 - 머리 - 머리","756::장식-머리":"장식 - 머리 - 머리","753::장식":"장식 - 귀","757::장식":"장식 - 소품 - 소품(우)","757::장식-소품":"장식 - 소품 - 소품(우)","758::장식":"장식 - 허리","548::장식":"장식 - 머리 - 머리","548::장식-머리":"장식 - 머리 - 머리","555::장식":"장식 - 손 - 장갑","555::장식-손":"장식 - 손 - 장갑","556::장식":"장식 - 손 - 장갑","556::장식-손":"장식 - 손 - 장갑","557::장식":"장식 - 손 - 장갑","557::장식-손":"장식 - 손 - 장갑","549::장식":"장식 - 머리 - 머리","549::장식-머리":"장식 - 머리 - 머리","550::장식":"장식 - 머리 - 머리","550::장식-머리":"장식 - 머리 - 머리","551::장식":"장식 - 머리 - 머리","551::장식-머리":"장식 - 머리 - 머리","552::장식":"장식 - 목 - 목걸이","552::장식-목":"장식 - 목 - 목걸이","553::장식":"장식 - 목 - 목걸이","553::장식-목":"장식 - 목 - 목걸이","554::장식":"장식 - 목 - 목걸이","554::장식-목":"장식 - 목 - 목걸이","1178::장식":"장식 - 머리 - 베일","1178::장식-머리":"장식 - 머리 - 베일","1179::장식":"장식 - 손 - 장갑","1179::장식-손":"장식 - 손 - 장갑","1180::장식":"장식 - 목 - 목걸이","1180::장식-목":"장식 - 목 - 목걸이","1181::장식":"장식 - 특수 - 전경","1181::장식-특수":"장식 - 특수 - 전경","837::장식":"장식 - 머리 - 머리","837::장식-머리":"장식 - 머리 - 머리","836::장식":"장식 - 특수 - 가슴","836::장식-특수":"장식 - 특수 - 가슴","841::장식":"장식 - 머리 - 머리","841::장식-머리":"장식 - 머리 - 머리","845::장식":"장식 - 머리 - 머리","845::장식-머리":"장식 - 머리 - 머리","849::장식":"장식 - 머리 - 머리","849::장식-머리":"장식 - 머리 - 머리","840::장식":"장식 - 목 - 목걸이","840::장식-목":"장식 - 목 - 목걸이","844::장식":"장식 - 목 - 목걸이","844::장식-목":"장식 - 목 - 목걸이","848::장식":"장식 - 목 - 목걸이","848::장식-목":"장식 - 목 - 목걸이","838::장식":"장식 - 손 - 장갑","838::장식-손":"장식 - 손 - 장갑","842::장식":"장식 - 손 - 장갑","842::장식-손":"장식 - 손 - 장갑","846::장식":"장식 - 손 - 장갑","846::장식-손":"장식 - 손 - 장갑","839::장식":"장식 - 소품 - 소품(우)","839::장식-소품":"장식 - 소품 - 소품(우)","843::장식":"장식 - 소품 - 소품(우)","843::장식-소품":"장식 - 소품 - 소품(우)","847::장식":"장식 - 소품 - 소품(우)","847::장식-소품":"장식 - 소품 - 소품(우)","850::장식":"장식 - 머리 - 머리","850::장식-머리":"장식 - 머리 - 머리","854::장식":"장식 - 머리 - 머리","854::장식-머리":"장식 - 머리 - 머리","853::장식":"장식 - 귀","852::장식":"장식 - 목 - 목걸이","852::장식-목":"장식 - 목 - 목걸이","856::장식":"장식 - 목 - 목걸이","856::장식-목":"장식 - 목 - 목걸이","851::장식":"장식 - 특수 - 가슴","851::장식-특수":"장식 - 특수 - 가슴","855::장식":"장식 - 특수 - 가슴","855::장식-특수":"장식 - 특수 - 가슴","769::장식":"장식 - 머리 - 머리","769::장식-머리":"장식 - 머리 - 머리","770::장식":"장식 - 손 - 장갑","770::장식-손":"장식 - 손 - 장갑","768::장식":"장식 - 소품 - 소품(우)","768::장식-소품":"장식 - 소품 - 소품(우)","438::장식":"장식 - 머리 - 머리","438::장식-머리":"장식 - 머리 - 머리","440::장식":"장식 - 목 - 목걸이","440::장식-목":"장식 - 목 - 목걸이","441::장식":"장식 - 손 - 팔찌(우)","441::장식-손":"장식 - 손 - 팔찌(우)","439::장식":"장식 - 소품 - 소품(좌)","439::장식-소품":"장식 - 소품 - 소품(좌)","1054::장식":"장식 - 머리 - 머리","1054::장식-머리":"장식 - 머리 - 머리","1055::장식":"장식 - 목 - 목걸이","1055::장식-목":"장식 - 목 - 목걸이","1056::장식":"장식 - 손 - 팔찌(우)","1056::장식-손":"장식 - 손 - 팔찌(우)","1057::장식":"장식 - 손 - 장갑","1057::장식-손":"장식 - 손 - 장갑","1058::장식":"장식 - 소품 - 소품(우)","1058::장식-소품":"장식 - 소품 - 소품(우)","1035::장식":"장식 - 특수 - 꼬리","1035::장식-특수":"장식 - 특수 - 꼬리","1105::장식":"장식 - 손 - 장갑","1105::장식-손":"장식 - 손 - 장갑","720::장식":"장식 - 머리 - 머리","720::장식-머리":"장식 - 머리 - 머리","721::장식":"장식 - 머리 - 머리","721::장식-머리":"장식 - 머리 - 머리","722::장식":"장식 - 손 - 장갑","722::장식-손":"장식 - 손 - 장갑","723::장식":"장식 - 손 - 장갑","723::장식-손":"장식 - 손 - 장갑","739::장식":"장식 - 소품 - 소품(우)","739::장식-소품":"장식 - 소품 - 소품(우)","735::장식":"장식 - 머리 - 머리","735::장식-머리":"장식 - 머리 - 머리","737::장식":"장식 - 목 - 목걸이","737::장식-목":"장식 - 목 - 목걸이","736::장식":"장식 - 특수 - 얼굴","736::장식-특수":"장식 - 특수 - 얼굴","733::장식":"장식 - 귀","731::장식":"장식 - 머리 - 머리","731::장식-머리":"장식 - 머리 - 머리","732::장식":"장식 - 소품 - 소품(우)","732::장식-소품":"장식 - 소품 - 소품(우)","726::장식":"장식 - 머리 - 머리","726::장식-머리":"장식 - 머리 - 머리","728::장식":"장식 - 목 - 목도리","728::장식-목":"장식 - 목 - 목도리","727::장식":"장식 - 목 - 목걸이","727::장식-목":"장식 - 목 - 목걸이","729::장식":"장식 - 손 - 팔찌(우)","729::장식-손":"장식 - 손 - 팔찌(우)","730::장식":"장식 - 특수 - 가슴","730::장식-특수":"장식 - 특수 - 가슴","748::장식":"장식 - 머리 - 머리","748::장식-머리":"장식 - 머리 - 머리","747::장식":"장식 - 머리 - 머리","747::장식-머리":"장식 - 머리 - 머리","746::장식":"장식 - 머리 - 머리","746::장식-머리":"장식 - 머리 - 머리","743::장식":"장식 - 머리 - 머리","743::장식-머리":"장식 - 머리 - 머리","742::장식":"장식 - 머리 - 머리","742::장식-머리":"장식 - 머리 - 머리","740::장식":"장식 - 머리 - 머리","740::장식-머리":"장식 - 머리 - 머리","741::장식":"장식 - 머리 - 머리","741::장식-머리":"장식 - 머리 - 머리","744::장식":"장식 - 소품 - 소품(좌)","744::장식-소품":"장식 - 소품 - 소품(좌)","745::장식":"장식 - 소품 - 소품(좌)","745::장식-소품":"장식 - 소품 - 소품(좌)","678::장식":"장식 - 머리 - 머리","678::장식-머리":"장식 - 머리 - 머리","677::장식":"장식 - 목 - 목걸이","677::장식-목":"장식 - 목 - 목걸이","680::장식":"장식 - 손 - 장갑","680::장식-손":"장식 - 손 - 장갑","679::장식":"장식 - 특수 - 날개","679::장식-특수":"장식 - 특수 - 날개","684::장식":"장식 - 머리 - 머리","684::장식-머리":"장식 - 머리 - 머리","685::장식":"장식 - 머리 - 머리","685::장식-머리":"장식 - 머리 - 머리","681::장식":"장식 - 목 - 목걸이","681::장식-목":"장식 - 목 - 목걸이","682::장식":"장식 - 목 - 목걸이","682::장식-목":"장식 - 목 - 목걸이","683::장식":"장식 - 목 - 목걸이","683::장식-목":"장식 - 목 - 목걸이","697::장식":"장식 - 머리 - 머리","697::장식-머리":"장식 - 머리 - 머리","698::장식":"장식 - 머리 - 머리","698::장식-머리":"장식 - 머리 - 머리","699::장식":"장식 - 머리 - 머리","699::장식-머리":"장식 - 머리 - 머리","701::장식":"장식 - 목 - 목걸이","701::장식-목":"장식 - 목 - 목걸이","702::장식":"장식 - 목 - 목걸이","702::장식-목":"장식 - 목 - 목걸이","703::장식":"장식 - 손 - 팔찌(우)","703::장식-손":"장식 - 손 - 팔찌(우)","704::장식":"장식 - 손 - 팔찌(우)","704::장식-손":"장식 - 손 - 팔찌(우)","705::장식":"장식 - 손 - 팔찌(우)","705::장식-손":"장식 - 손 - 팔찌(우)","1066::장식":"장식 - 머리 - 머리","1066::장식-머리":"장식 - 머리 - 머리","1067::장식":"장식 - 머리 - 헤어핀","1067::장식-머리":"장식 - 머리 - 헤어핀","1065::장식":"장식 - 소품 - 소품(우)","1065::장식-소품":"장식 - 소품 - 소품(우)","2514::장식":"장식 - 머리 - 머리","2514::장식-머리":"장식 - 머리 - 머리","2516::장식":"장식 - 손 - 장갑","2516::장식-손":"장식 - 손 - 장갑","2490::장식":"장식 - 머리 - 머리","2490::장식-머리":"장식 - 머리 - 머리","2492::장식":"장식 - 특수 - 하단","2492::장식-특수":"장식 - 특수 - 하단","2515::장식":"장식 - 특수 - 문신","2515::장식-특수":"장식 - 특수 - 문신","2513::장식":"장식 - 특수 - 전경","2513::장식-특수":"장식 - 특수 - 전경","2491::장식":"장식 - 특수 - 전경","2491::장식-특수":"장식 - 특수 - 전경","1209::장식":"장식 - 머리 - 머리","1209::장식-머리":"장식 - 머리 - 머리","1312::장식":"장식 - 머리 - 머리","1312::장식-머리":"장식 - 머리 - 머리","1311::장식":"장식 - 귀","1310::장식":"장식 - 목 - 목걸이","1310::장식-목":"장식 - 목 - 목걸이","1313::장식":"장식 - 특수 - 배경","1313::장식-특수":"장식 - 특수 - 배경","1302::장식":"장식 - 머리 - 머리","1302::장식-머리":"장식 - 머리 - 머리","1306::장식":"장식 - 목 - 목걸이","1306::장식-목":"장식 - 목 - 목걸이","1300::장식":"장식 - 특수 - 전경","1300::장식-특수":"장식 - 특수 - 전경","300::장식":"장식 - 소품 - 소품(우)","300::장식-소품":"장식 - 소품 - 소품(우)","301::장식":"장식 - 소품 - 소품(우)","301::장식-소품":"장식 - 소품 - 소품(우)","302::장식":"장식 - 소품 - 소품(우)","302::장식-소품":"장식 - 소품 - 소품(우)","1301::장식":"장식 - 특수 - 배경","1301::장식-특수":"장식 - 특수 - 배경","1314::장식":"장식 - 특수 - 하단","1314::장식-특수":"장식 - 특수 - 하단","1303::장식":"장식 - 소품 - 양손","1303::장식-소품":"장식 - 소품 - 양손","1305::장식":"장식 - 손 - 장갑","1305::장식-손":"장식 - 손 - 장갑","1297::장식":"장식 - 소품 - 소품(우)","1297::장식-소품":"장식 - 소품 - 소품(우)","1299::장식":"장식 - 소품 - 소품(좌)","1299::장식-소품":"장식 - 소품 - 소품(좌)","1298::장식":"장식 - 특수 - 하단","1298::장식-특수":"장식 - 특수 - 하단","994::장식":"장식 - 머리 - 머리","994::장식-머리":"장식 - 머리 - 머리","1146::장식":"장식 - 머리 - 머리","1146::장식-머리":"장식 - 머리 - 머리","991::장식":"장식 - 목 - 목걸이","991::장식-목":"장식 - 목 - 목걸이","1143::장식":"장식 - 목 - 목걸이","1143::장식-목":"장식 - 목 - 목걸이","992::장식":"장식 - 손 - 팔찌(우)","992::장식-손":"장식 - 손 - 팔찌(우)","993::장식":"장식 - 소품 - 소품(우)","993::장식-소품":"장식 - 소품 - 소품(우)","1145::장식":"장식 - 소품 - 소품(우)","1145::장식-소품":"장식 - 소품 - 소품(우)","988::장식":"장식 - 머리 - 머리","988::장식-머리":"장식 - 머리 - 머리","1140::장식":"장식 - 머리 - 머리","1140::장식-머리":"장식 - 머리 - 머리","989::장식":"장식 - 목 - 목걸이","989::장식-목":"장식 - 목 - 목걸이","1141::장식":"장식 - 목 - 목걸이","1141::장식-목":"장식 - 목 - 목걸이","990::장식":"장식 - 소품 - 소품(좌)","990::장식-소품":"장식 - 소품 - 소품(좌)","1142::장식":"장식 - 소품 - 소품(좌)","1142::장식-소품":"장식 - 소품 - 소품(좌)","917::장식":"장식 - 머리 - 머리","917::장식-머리":"장식 - 머리 - 머리","916::장식":"장식 - 소품 - 소품(우)","916::장식-소품":"장식 - 소품 - 소품(우)","952::장식":"장식 - 머리 - 머리","952::장식-머리":"장식 - 머리 - 머리","954::장식":"장식 - 목 - 목걸이","954::장식-목":"장식 - 목 - 목걸이","953::장식":"장식 - 손 - 팔찌(우)","953::장식-손":"장식 - 손 - 팔찌(우)","1533::장식":"장식 - 특수 - 전경","1533::장식-특수":"장식 - 특수 - 전경","1534::장식":"장식 - 특수 - 하단","1534::장식-특수":"장식 - 특수 - 하단","598::장식":"장식 - 머리 - 머리","598::장식-머리":"장식 - 머리 - 머리","600::장식":"장식 - 목 - 목걸이","600::장식-목":"장식 - 목 - 목걸이","599::장식":"장식 - 손 - 팔찌(좌)","599::장식-손":"장식 - 손 - 팔찌(좌)","596::장식":"장식 - 소품 - 소품(좌)","596::장식-소품":"장식 - 소품 - 소품(좌)","597::장식":"장식 - 소품 - 소품(우)","597::장식-소품":"장식 - 소품 - 소품(우)","2853::장식":"장식 - 머리 - 머리","2853::장식-머리":"장식 - 머리 - 머리","2841::장식":"장식 - 귀","2842::장식":"장식 - 목 - 목걸이","2842::장식-목":"장식 - 목 - 목걸이","2840::장식":"장식 - 손 - 팔찌(우)","2840::장식-손":"장식 - 손 - 팔찌(우)","2844::장식":"장식 - 손 - 팔찌(좌)","2844::장식-손":"장식 - 손 - 팔찌(좌)","2843::장식":"장식 - 소품 - 소품(좌)","2843::장식-소품":"장식 - 소품 - 소품(좌)","2854::장식":"장식 - 특수 - 가슴","2854::장식-특수":"장식 - 특수 - 가슴","2845::장식":"장식 - 손 - 장갑","2845::장식-손":"장식 - 손 - 장갑","2846::장식":"장식 - 머리 - 머리","2846::장식-머리":"장식 - 머리 - 머리","2849::장식":"장식 - 손 - 장갑","2849::장식-손":"장식 - 손 - 장갑","2847::장식":"장식 - 소품 - 소품(우)","2847::장식-소품":"장식 - 소품 - 소품(우)","2850::장식":"장식 - 특수 - 얼굴","2850::장식-특수":"장식 - 특수 - 얼굴","2848::장식":"장식 - 특수 - 가슴","2848::장식-특수":"장식 - 특수 - 가슴","2851::장식":"장식 - 머리 - 머리","2851::장식-머리":"장식 - 머리 - 머리","1409::장식":"장식 - 머리 - 머리","1409::장식-머리":"장식 - 머리 - 머리","1411::장식":"장식 - 손 - 장갑","1411::장식-손":"장식 - 손 - 장갑","1410::장식":"장식 - 소품 - 소품(우)","1410::장식-소품":"장식 - 소품 - 소품(우)","2247::장식":"장식 - 머리 - 머리","2247::장식-머리":"장식 - 머리 - 머리","2248::장식":"장식 - 목 - 목걸이","2248::장식-목":"장식 - 목 - 목걸이","2249::장식":"장식 - 손 - 장갑","2249::장식-손":"장식 - 손 - 장갑","932::장식":"장식 - 목 - 목걸이","932::장식-목":"장식 - 목 - 목걸이","935::장식":"장식 - 목 - 목걸이","935::장식-목":"장식 - 목 - 목걸이","938::장식":"장식 - 목 - 목걸이","938::장식-목":"장식 - 목 - 목걸이","941::장식":"장식 - 목 - 목걸이","941::장식-목":"장식 - 목 - 목걸이","944::장식":"장식 - 목 - 목걸이","944::장식-목":"장식 - 목 - 목걸이","930::장식":"장식 - 손 - 팔찌(우)","930::장식-손":"장식 - 손 - 팔찌(우)","933::장식":"장식 - 손 - 팔찌(우)","933::장식-손":"장식 - 손 - 팔찌(우)","936::장식":"장식 - 손 - 팔찌(우)","936::장식-손":"장식 - 손 - 팔찌(우)","939::장식":"장식 - 손 - 팔찌(우)","939::장식-손":"장식 - 손 - 팔찌(우)","942::장식":"장식 - 손 - 팔찌(우)","942::장식-손":"장식 - 손 - 팔찌(우)","945::장식":"장식 - 머리 - 헤어핀","945::장식-머리":"장식 - 머리 - 헤어핀","947::장식":"장식 - 머리 - 헤어핀","947::장식-머리":"장식 - 머리 - 헤어핀","949::장식":"장식 - 머리 - 헤어핀","949::장식-머리":"장식 - 머리 - 헤어핀","946::장식":"장식 - 소품 - 소품(우)","946::장식-소품":"장식 - 소품 - 소품(우)","948::장식":"장식 - 소품 - 소품(우)","948::장식-소품":"장식 - 소품 - 소품(우)","950::장식":"장식 - 소품 - 소품(우)","950::장식-소품":"장식 - 소품 - 소품(우)","951::장식":"장식 - 소품 - 소품(우)","951::장식-소품":"장식 - 소품 - 소품(우)","894::장식":"장식 - 목 - 목걸이","894::장식-목":"장식 - 목 - 목걸이","895::장식":"장식 - 목 - 목걸이","895::장식-목":"장식 - 목 - 목걸이","896::장식":"장식 - 목 - 목걸이","896::장식-목":"장식 - 목 - 목걸이","897::장식":"장식 - 목 - 목걸이","897::장식-목":"장식 - 목 - 목걸이","904::장식":"장식 - 머리 - 머리","904::장식-머리":"장식 - 머리 - 머리","905::장식":"장식 - 목 - 목걸이","905::장식-목":"장식 - 목 - 목걸이","900::장식":"장식 - 머리 - 머리","900::장식-머리":"장식 - 머리 - 머리","902::장식":"장식 - 머리 - 머리","902::장식-머리":"장식 - 머리 - 머리","903::장식":"장식 - 머리 - 머리","903::장식-머리":"장식 - 머리 - 머리","817::장식":"장식 - 소품 - 소품(우)","817::장식-소품":"장식 - 소품 - 소품(우)","901::장식":"장식 - 머리 - 헤어핀","901::장식-머리":"장식 - 머리 - 헤어핀","898::장식":"장식 - 소품 - 소품(좌)","898::장식-소품":"장식 - 소품 - 소품(좌)","899::장식":"장식 - 소품 - 소품(우)","899::장식-소품":"장식 - 소품 - 소품(우)","908::장식":"장식 - 머리 - 머리","908::장식-머리":"장식 - 머리 - 머리","751::장식":"장식 - 소품 - 소품(우)","751::장식-소품":"장식 - 소품 - 소품(우)","749::장식":"장식 - 소품 - 소품(우)","749::장식-소품":"장식 - 소품 - 소품(우)","750::장식":"장식 - 소품 - 소품(우)","750::장식-소품":"장식 - 소품 - 소품(우)","906::장식":"장식 - 귀","909::장식":"장식 - 목 - 목걸이","909::장식-목":"장식 - 목 - 목걸이","907::장식":"장식 - 소품 - 소품(우)","907::장식-소품":"장식 - 소품 - 소품(우)","262::장식":"장식 - 머리 - 베일","262::장식-머리":"장식 - 머리 - 베일","329::장식":"장식 - 손 - 팔찌(좌)","329::장식-손":"장식 - 손 - 팔찌(좌)","345::장식":"장식 - 귀","346::장식":"장식 - 귀","347::장식":"장식 - 귀","1624::장식":"장식 - 허리","1901::장식":"장식 - 소품 - 소품(좌)","1901::장식-소품":"장식 - 소품 - 소품(좌)","1340::장식":"장식 - 목 - 목걸이","1340::장식-목":"장식 - 목 - 목걸이"};
 </script>
 </head>
 <body>
@@ -529,9 +548,9 @@ var stages = window.stages;
   <button class="tab" data-tab="quiz">퀴즈 이벤트</button>
   <button class="tab" data-tab="translate">스테이지 번역</button>
   <button class="tab" data-tab="calendar">이벤트 달력</button>
-  <button id="serverToggleBtn" onclick="toggleServer()" style="margin-left:4px;padding:4px 10px;border-radius:20px;border:1.5px solid #f8bbd0;background:#fff;cursor:pointer;font-size:13px;font-weight:700;color:#e91e8c">🌎 북미</button>
-  <button id="darkModeBtn" type="button" style="margin-left:auto;padding:6px 12px;border:1px solid #ddd;border-radius:10px;background:#fff;cursor:pointer;font-size:13px" title="다크모드 전환">🌙 다크</button>
-  <button id="shortcutHelpBtn" type="button" title="단축키 도움말" style="padding:5px 11px;border-radius:999px;border:1.5px solid var(--pk-border,#f8bbd0);background:#fff;cursor:pointer;font-size:14px;font-weight:800;color:var(--pk-1,#e91e8c)">?</button>
+  <button id="serverToggleBtn" onclick="toggleServer()" style="margin-left:4px;padding:4px 10px;border-radius:20px;border:1.5px solid #f8bbd0;background:#fff;cursor:pointer;font-size:16px;font-weight:500;color:#e91e8c">🌎 북미</button>
+  <button id="darkModeBtn" type="button" style="margin-left:auto;padding:6px 12px;border:1px solid #ddd;border-radius:10px;background:#fff;cursor:pointer;font-size:16px" title="다크모드 전환">🌙 다크</button>
+  <button id="shortcutHelpBtn" type="button" title="단축키 도움말" style="padding:5px 11px;border-radius:999px;border:1.5px solid var(--pk-border,#f8bbd0);background:#fff;cursor:pointer;font-size:17px;font-weight:500;color:var(--pk-1,#e91e8c)">?</button>
 </nav>
 
 <script>
@@ -628,7 +647,7 @@ var stages = window.stages;
 <input id="stageSearchInput" type="text" placeholder="하위 스테이지 검색"/>
 <label for="stageSelect">하위 스테이지</label>
 <select id="stageSelect"></select>
-<button id="stageFavBtn" type="button" title="즐겨찾기 추가/제거" style="padding:6px 10px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:16px">☆</button>
+<button id="stageFavBtn" type="button" title="즐겨찾기 추가/제거" style="padding:6px 10px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:19px">☆</button>
 <select id="stageFavSelect" style="display:none;min-width:160px;border-color:#f5c842"><option value="">⭐ 즐겨찾기</option></select>
 <label>부위 필터 (그룹)</label><select id="partFilter"><option value="">전체</option>
 <optgroup label="의상">
@@ -696,21 +715,21 @@ var stages = window.stages;
 <div class="tag-bar" id="activeTags"></div>
 <section class="panel active" id="panel-calc">
 <section id="ownedBox">
-<span class="badge" id="ownedSummary" style="margin-left:8px;background:#fce4ec;border:1.5px solid #f8bbd0;border-radius:999px;padding:3px 12px;font-size:12px;font-weight:700;color:#e91e8c">보유 0 / 전체 0</span>
+<span class="badge" id="ownedSummary" style="margin-left:8px;background:#fce4ec;border:1.5px solid #f8bbd0;border-radius:999px;padding:3px 12px;font-size:14px;font-weight:500;color:#e91e8c">보유 0 / 전체 0</span>
 <div id="ownedStatsBar" style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 4px 0;align-items:center">
   <div class="stat-card" id="sc-owned"><div class="sc-lbl">보유</div><div class="sc-num" id="sc-owned-n">0</div></div>
   <div class="stat-card" id="sc-total"><div class="sc-lbl">전체</div><div class="sc-num" id="sc-total-n">0</div></div>
   <div class="stat-card" id="sc-pct"><div class="sc-lbl">보유율</div><div class="sc-num" id="sc-pct-n">0%</div></div>
   <div class="stat-card" id="sc-miss"><div class="sc-lbl">미보유</div><div class="sc-num" id="sc-miss-n">0</div></div>
   <div id="ownedProgressWrap" style="flex:1;min-width:120px;max-width:260px" style="flex:1;min-width:120px;max-width:260px">
-    <div style="font-size:11px;color:#888;margin-bottom:3px" id="progressLabel">0%</div>
+    <div style="font-size:13px;color:#888;margin-bottom:3px" id="progressLabel">0%</div>
     <div style="height:8px;background:#fce4ec;border-radius:999px;overflow:hidden">
       <div id="ownedProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#e91e8c,#f06292);border-radius:999px;transition:width .4s"></div>
     </div>
   </div>
 </div>
 <div id="partContribChartWrap" style="margin:8px 0 4px 0;display:none">
-  <div style="font-size:12px;font-weight:600;color:#444;margin-bottom:4px">부위별 점수 기여도</div>
+  <div style="font-size:14px;font-weight:500;color:#444;margin-bottom:4px">부위별 점수 기여도</div>
   <div id="partContribChart" style="display:flex;flex-wrap:wrap;gap:4px 8px"></div>
 </div>
 <div class="row">
@@ -724,11 +743,11 @@ var stages = window.stages;
 </div>
 <div><label for="ownedInput" style="display:block;margin:4px 0;font-weight:500">보유 의상 코드 (줄바꿈/쉼표 구분, 형식: 코드번호::부위)</label></div>
 <div class="row" id="ownedModeRow" style="gap:10px; align-items:center; margin:6px 0;">
-<label style="font-size:13px;">입력 모드</label>
-<label style="font-size:13px;"><input checked="" name="ownedMode" type="radio" value="owned"/> 보유</label>
-<label style="font-size:13px;"><input name="ownedMode" type="radio" value="code"/> 코드</label>
+<label style="font-size:16px;">입력 모드</label>
+<label style="font-size:16px;"><input checked="" name="ownedMode" type="radio" value="owned"/> 보유</label>
+<label style="font-size:16px;"><input name="ownedMode" type="radio" value="code"/> 코드</label>
 <div class="row" id="codeInlineControls" style="display:none; gap:6px; align-items:center;">
-<label style="font-size:13px;">부위 선택</label>
+<label style="font-size:16px;">부위 선택</label>
 <select id="codePartSelectInline" style="min-width:160px;"></select>
 <button class="gtab" id="applyCodesBtnInline" type="button">코드 적용</button>
 </div>
@@ -747,8 +766,8 @@ var stages = window.stages;
 <div class="row" style="align-items:flex-start"></div>
 <section id="partSummary" style="margin:10px 0 4px 0">
 <div class="row" style="align-items:center;gap:8px">
-<h3 style="margin:0;font-size:14px">부위별 개수</h3>
-<span class="muted" style="font-size:12px">보유 / 전체(등록)</span>
+<h3 style="margin:0;font-size:17px">부위별 개수</h3>
+<span class="muted" style="font-size:14px">보유 / 전체(등록)</span>
 </div>
 <div class="table-wrap" style="margin-top:6px">
 <table class="table small" id="partSummaryTable" style="min-width:0;width:100%">
@@ -763,23 +782,23 @@ var stages = window.stages;
 <tbody></tbody>
 </table>
 </div>
-<div class="muted" style="font-size:12px">행을 클릭하면 해당 부위로 필터가 적용됩니다.</div>
+<div class="muted" style="font-size:14px">행을 클릭하면 해당 부위로 필터가 적용됩니다.</div>
 </section>
 </section>
 <div id="styleRadarWrap" style="display:none;margin:8px 20px 0 20px;padding:8px 12px;background:#fff;border:1px solid #eee;border-radius:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-  <span style="font-size:12px;color:#888;white-space:nowrap">필요 스탯</span>
+  <span style="font-size:14px;color:#888;white-space:nowrap">필요 스탯</span>
   <div id="styleStatChips" style="display:flex;gap:6px;flex-wrap:wrap"></div>
 </div>
 <section id="tips" style="display:none"></section><section id="skills"></section>
-<div id="reqUnownedBanner" style="display:none;margin:6px 20px;padding:10px 14px;background:#fff3f3;border:1px solid #ffc9c9;border-radius:10px;font-size:13px;color:#a30000;display:flex;align-items:center;gap:10px">
-  <span style="font-size:16px">⚠</span>
+<div id="reqUnownedBanner" style="display:none;margin:6px 20px;padding:10px 14px;background:#fff3f3;border:1px solid #ffc9c9;border-radius:10px;font-size:16px;color:#a30000;display:flex;align-items:center;gap:10px">
+  <span style="font-size:19px">⚠</span>
   <span id="reqUnownedText">추천 아이템 중 미보유 0개</span>
-  <span style="color:#888;font-size:12px" id="reqUnownedSub"></span>
+  <span style="color:#888;font-size:14px" id="reqUnownedSub"></span>
 </div>
-<div id="outfitCompareBanner" style="display:none;margin:6px 20px;padding:10px 14px;background:#f0f7ff;border:1px solid #cfe4ff;border-radius:10px;font-size:13px;color:#1a4b8c;align-items:center;gap:10px">
-  <span style="font-size:16px">👗</span>
+<div id="outfitCompareBanner" style="display:none;margin:6px 20px;padding:10px 14px;background:#f0f7ff;border:1px solid #cfe4ff;border-radius:10px;font-size:16px;color:#1a4b8c;align-items:center;gap:10px">
+  <span style="font-size:19px">👗</span>
   <span id="outfitCompareText"></span>
-  <span style="color:#555;font-size:12px" id="outfitCompareSub"></span>
+  <span style="color:#555;font-size:14px" id="outfitCompareSub"></span>
 </div>
 <div class="empty" id="emptyState">아직 내장된 데이터가 없습니다. 의상/스테이지/스킬을 보내주시면 이 파일에 반영해 드릴게요.</div>
 <section id="list" style="display:none"></section>
@@ -788,18 +807,18 @@ var stages = window.stages;
 <div id="imgLightbox"><img id="imgLightboxImg" src="" alt=""></div>
 <!-- 아이템 비교 바 -->
 <div id="compareBar">
-  <span style="font-size:13px;font-weight:600;white-space:nowrap">비교 <span id="cmpCount">0</span>/4</span>
+  <span style="font-size:16px;font-weight:500;white-space:nowrap">비교 <span id="cmpCount">0</span>/4</span>
   <div id="cmpSlots" style="display:flex;gap:6px"></div>
-  <button id="cmpGoBtn" type="button" style="padding:7px 16px;border-radius:8px;border:1px solid #3b82f6;background:#eff6ff;color:#1d4ed8;font-size:13px;cursor:pointer" disabled>비교하기</button>
-  <button id="cmpClearBtn" type="button" style="padding:7px 12px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:13px;cursor:pointer">초기화</button>
-  <span style="font-size:12px;color:#888;margin-left:auto">카드를 우클릭해서 추가</span>
+  <button id="cmpGoBtn" type="button" style="padding:7px 16px;border-radius:8px;border:1px solid #3b82f6;background:#eff6ff;color:#1d4ed8;font-size:16px;cursor:pointer" disabled>비교하기</button>
+  <button id="cmpClearBtn" type="button" style="padding:7px 12px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:16px;cursor:pointer">초기화</button>
+  <span style="font-size:14px;color:#888;margin-left:auto">카드를 우클릭해서 추가</span>
 </div>
 <!-- 비교 결과 모달 -->
 <div id="compareModal">
   <div class="cmp-table-wrap">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <b style="font-size:16px">아이템 비교</b>
-      <button id="cmpModalClose" type="button" style="border:1px solid #ddd;background:#fff;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px">✕</button>
+      <b style="font-size:19px">아이템 비교</b>
+      <button id="cmpModalClose" type="button" style="border:1px solid #ddd;background:#fff;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:19px">✕</button>
     </div>
     <div id="cmpTableContainer"></div>
   </div>
@@ -829,7 +848,7 @@ var stages = window.stages;
   <div style="padding:12px 20px">
     <div class="row" style="justify-content:space-between;align-items:center">
       <div>
-        <div style="font-weight:700;font-size:16px;margin-bottom:4px">퀴즈 이벤트</div>
+        <div style="font-weight:500;font-size:19px;margin-bottom:4px">퀴즈 이벤트</div>
         <div class="muted">이벤트 퀴즈가 있습니다.</div>
       </div>
       <div class="row">
@@ -847,193 +866,105 @@ var stages = window.stages;
 
 <!-- ===== 스테이지 번역 탭 ===== -->
 <style>
-/* ── 스테이지 번역 탭 (핑크 테마) ── */
-#panel-translate{padding:16px 20px}
+#panel-translate{padding:0}
 
-/* 헤더 영역 */
-.tl-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
-.tl-head label{font-size:13px;font-weight:700;color:var(--pk-1);white-space:nowrap}
-.tl-head select{min-width:200px;max-width:380px;border-color:var(--pk-border);border-radius:10px;font-size:13px}
-.tl-head select:focus{border-color:var(--pk-2);outline:none;box-shadow:0 0 0 3px rgba(233,30,140,.1)}
-.tl-search{
-  padding:7px 12px;border:1.5px solid var(--pk-border);border-radius:10px;
-  font-size:13px;width:180px;font-family:inherit;background:#fff;color:var(--pk-text);
-  transition:border-color .15s;
+/* 컨트롤 바 */
+.tl-controls{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  padding:10px 20px;background:#fff;
+  border-bottom:1.5px solid var(--pk-border);
+  position:sticky;top:138px;z-index:2;
 }
-.tl-search:focus{outline:none;border-color:var(--pk-2);box-shadow:0 0 0 3px rgba(233,30,140,.1)}
+.tl-controls label{font-size:11px;font-weight:700;color:var(--pk-muted);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.tl-controls select{padding:6px 10px;border:1.5px solid var(--pk-border);border-radius:8px;font-size:13px;font-family:inherit;background:#fff;color:var(--pk-text);min-width:100px;max-width:220px;cursor:pointer}
+.tl-controls select:focus{border-color:var(--pk-2);outline:none;box-shadow:0 0 0 3px rgba(233,30,140,.1)}
+.tl-search-wrap{display:flex;align-items:center;gap:6px;border:1.5px solid var(--pk-border);border-radius:8px;padding:0 10px;background:#fff}
+.tl-search-wrap:focus-within{border-color:var(--pk-2);box-shadow:0 0 0 3px rgba(233,30,140,.1)}
+.tl-search-wrap svg{opacity:.4;flex-shrink:0}
+.tl-search{padding:6px 0;border:none;background:transparent;font-size:13px;font-family:inherit;color:var(--pk-text);width:120px;outline:none}
 .tl-search::placeholder{color:var(--pk-muted)}
+body.dark .tl-controls{background:#1a1a1f;border-color:#3a1a2a}
+body.dark .tl-controls select{background:#23232a;border-color:#3a1a2a;color:#f5d5e5}
+body.dark .tl-search-wrap{background:#23232a;border-color:#3a1a2a}
+body.dark .tl-search{color:#f5d5e5}
 
-/* 스테이지 타이틀 */
-.tl-stage-title{
-  font-size:15px;font-weight:700;padding:10px 16px;
-  background:var(--pk-4);border:1.5px solid var(--pk-border);
-  border-radius:12px;margin-bottom:14px;color:var(--pk-1);
-  display:flex;align-items:center;gap:8px;
-  box-shadow:0 1px 4px rgba(233,30,140,.06);
-}
-.tl-stage-title::before{content:'📖';font-size:14px}
-body.dark .tl-stage-title{background:#3b0d1f;border-color:#9f1239;color:#fda4af}
+.tl-viewer{padding:0 20px 40px}
+.tl-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:64px 20px;color:var(--pk-muted);font-size:15px;text-align:center}
+.tl-empty-icon{font-size:38px;opacity:.45}
 
 /* 언어 탭 */
-.tl-lang-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
-.tl-ltab{
-  padding:6px 16px;border-radius:999px;
-  border:1.5px solid var(--pk-border);background:#fff;
-  font-size:12px;font-weight:700;cursor:pointer;color:var(--pk-muted);
-  transition:all .15s;
-}
-.tl-ltab:hover{background:var(--pk-4);border-color:var(--pk-3);color:var(--pk-1)}
-.tl-ltab.active{
-  background:var(--pk-grad);border-color:transparent;
-  color:#fff;box-shadow:var(--pk-shadow);
-}
-body.dark .tl-ltab{background:#27272a;border-color:#52253a;color:#c9a0b4}
-body.dark .tl-ltab:hover{background:#3b1a2a;color:#fda4af}
+.tl-lang-tabs{display:flex;gap:6px;padding:16px 0 14px;flex-wrap:wrap}
+.tl-ltab{display:flex;align-items:center;gap:5px;padding:6px 15px;border-radius:999px;border:1.5px solid var(--pk-border);background:#fff;color:var(--pk-muted);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.tl-ltab:hover{background:var(--pk-4);color:var(--pk-1);border-color:var(--pk-3)}
+.tl-ltab.active{background:var(--pk-grad);color:#fff;border-color:transparent;box-shadow:0 2px 10px rgba(233,30,140,.25)}
+body.dark .tl-ltab{background:#23232a;border-color:#3a1a2a;color:#c08098}
 body.dark .tl-ltab.active{background:var(--pk-grad);color:#fff;border-color:transparent}
 
-/* 대사 목록 */
-.tl-lines{display:flex;flex-direction:column;gap:0}
-.tl-line{
-  display:flex;gap:12px;align-items:flex-start;
-  border-bottom:1px solid var(--pk-border);padding:12px 6px;
-  transition:background .1s;
-}
-.tl-line:hover{background:var(--pk-5)}
-.tl-line:last-child{border-bottom:none}
-body.dark .tl-line{border-color:#3f2030}
-body.dark .tl-line:hover{background:#2a1020}
+/* 스테이지 제목 */
+.tl-stage-title{background:linear-gradient(135deg,#fff0f7,#fff8fc);border:1.5px solid var(--pk-border);border-radius:12px;padding:12px 16px;margin-bottom:18px;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px}
+.tl-title-id{font-size:11px;font-weight:700;color:var(--pk-muted);background:var(--pk-4);border-radius:999px;padding:2px 9px;letter-spacing:.05em;white-space:nowrap}
+.tl-title-sub{font-size:16px;font-weight:700;color:var(--pk-text);line-height:1.4}
+.tl-title-kr{font-size:13px;color:var(--pk-muted);font-weight:500}
+body.dark .tl-stage-title{background:linear-gradient(135deg,#1e1020,#1a0e1c);border-color:#3a1a2a}
+body.dark .tl-title-sub{color:#f5d5e5}
+.tl-no-data{text-align:center;padding:48px 20px;color:var(--pk-muted);font-size:15px;line-height:1.8}
+.tl-none{color:var(--pk-muted)!important;font-style:italic}
 
-/* 캐릭터 아이콘 */
-.tl-icon-wrap{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;width:90px}
-.tl-icon{width:80px;height:80px;border-radius:16px;object-fit:cover;object-position:top;border:2px solid var(--pk-border);background:var(--pk-4);display:block}
-body.dark .tl-icon{border-color:#52253a}
-.tl-icon-name{font-size:11px;color:var(--pk-muted);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px;font-weight:700}
-body.dark .tl-icon-name{color:#c9a0b4}
-.tl-icon-initials{
-  width:80px;height:80px;border-radius:16px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:24px;font-weight:800;color:#fff;flex-shrink:0;
-  box-shadow:0 2px 6px rgba(233,30,140,.25);
-}
+/* 조용한 레이블 */
+.tl-label{font-size:10px;font-weight:500;color:var(--pk-muted);letter-spacing:.04em;opacity:.7}
+body.dark .tl-label{color:#7a5060}
 
-/* 말풍선 */
-.tl-bubble{
-  flex:1;min-width:0;
-  background:#fff;border:1.5px solid var(--pk-border);
-  border-radius:14px;border-top-left-radius:4px;
-  padding:10px 14px;
-  box-shadow:0 1px 4px rgba(233,30,140,.05);
-}
-body.dark .tl-bubble{background:#27272a;border-color:#52253a}
-.tl-speaker{font-size:11px;font-weight:700;color:var(--pk-1);margin-bottom:4px;letter-spacing:.3px}
-body.dark .tl-speaker{color:#f48fb1}
-.tl-original{font-size:11.5px;color:var(--pk-muted);line-height:1.6;margin-bottom:4px;font-style:italic;padding-bottom:4px;border-bottom:1px dashed var(--pk-border)}
-body.dark .tl-original{color:#9e6070;border-color:#52253a}
-.tl-translated{font-size:13.5px;line-height:1.75;color:var(--pk-text);font-weight:500}
-body.dark .tl-translated{color:#f0d0da}
-body.dark .tl-text{color:#f0d0da}
-
-/* 빈 상태 */
-.tl-empty{
-  padding:48px 20px;text-align:center;color:var(--pk-muted);font-size:14px;
-  display:flex;flex-direction:column;align-items:center;gap:10px;
-}
-.tl-empty::before{content:'💬';font-size:36px;opacity:.4}
-
-/* 데이터 없음 */
-.tl-no-data{
-  padding:12px 16px;background:var(--pk-4);border:1.5px solid var(--pk-border);
-  border-radius:10px;font-size:13px;color:var(--pk-1);
-  display:flex;align-items:center;gap:8px;margin-bottom:10px;
-}
-body.dark .tl-no-data{background:#3b1a2a;border-color:#52253a;color:#fda4af}
-
-/* 액션 버튼 */
-.tl-actions{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-.tl-act-btn{
-  padding:6px 14px;border-radius:999px;
-  border:1.5px solid var(--pk-border);background:#fff;
-  cursor:pointer;font-size:12px;font-weight:700;color:var(--pk-1);
-  transition:all .15s;
-}
-.tl-act-btn:hover{background:var(--pk-4);border-color:var(--pk-3)}
-body.dark .tl-act-btn{background:#27272a;border-color:#52253a;color:#f48fb1}
-body.dark .tl-act-btn:hover{background:#3b1a2a}
-
-/* 모달 */
-#tlEditModal{display:none;position:fixed;inset:0;z-index:10003;background:rgba(45,10,25,.6);align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto}
-#tlEditModal.open{display:flex}
-.tl-modal-box{background:#fff;border-radius:16px;padding:22px;width:min(660px,95vw);max-height:82vh;overflow-y:auto;box-shadow:0 8px 32px rgba(233,30,140,.18)}
-body.dark .tl-modal-box{background:#1e0f18;color:#f0d0da;border:1.5px solid #52253a}
-.tl-modal-box h3{font-size:15px;font-weight:800;margin-bottom:4px;color:var(--pk-1)}
-body.dark .tl-modal-box h3{color:#f48fb1}
-.tl-modal-sub{font-size:12px;color:var(--pk-muted);margin-bottom:14px}
-body.dark .tl-modal-sub{color:#9e6070}
-.tl-modal-section{margin-bottom:14px}
-.tl-modal-section label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;margin-bottom:5px;color:var(--pk-1)}
-.tl-modal-section textarea{width:100%;min-height:120px;padding:8px 10px;border:1.5px solid var(--pk-border);border-radius:10px;font-size:12px;line-height:1.6;resize:vertical;font-family:inherit}
-.tl-modal-section textarea:focus{outline:none;border-color:var(--pk-2)}
-body.dark .tl-modal-section textarea{background:#2a1020;border-color:#52253a;color:#f0d0da}
-.tl-modal-hint{font-size:11px;color:var(--pk-muted);margin-top:4px}
-body.dark .tl-modal-hint{color:#9e6070}
-.tl-modal-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap}
-.tl-modal-foot button{padding:7px 18px;border-radius:999px;border:1.5px solid var(--pk-border);background:#fff;cursor:pointer;font-size:13px;font-weight:700;color:var(--pk-1);transition:all .15s}
-.tl-modal-foot button:hover{background:var(--pk-4)}
-body.dark .tl-modal-foot button{background:#2a1020;border-color:#52253a;color:#f48fb1}
-.tl-modal-save{background:var(--pk-grad) !important;color:#fff !important;border-color:transparent !important;box-shadow:var(--pk-shadow)}
-.tl-modal-save:hover{opacity:.88 !important}
-
-/* 나란히 보기 */
-.tl-all-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-bottom:10px}
-.tl-lang-col{background:var(--pk-5);border:1.5px solid var(--pk-border);border-radius:12px;padding:10px 14px}
-body.dark .tl-lang-col{background:#1e0f18;border-color:#52253a}
-.tl-lang-col-head{font-size:11px;font-weight:700;margin-bottom:8px;padding:2px 10px;border-radius:999px;display:inline-block}
-.tl-lang-col-head.kr{background:var(--pk-4);color:var(--pk-1);border:1.5px solid var(--pk-border)}
-.tl-lang-col-head.en{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
-.tl-lang-col-head.zh{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
-.tl-lang-col-head.ja{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
-body.dark .tl-lang-col-head.kr{background:#3b0d1f;border-color:#9f1239;color:#fda4af}
-body.dark .tl-lang-col-head.en{background:#1e3a5f;border-color:#2d5a9e;color:#93c5fd}
-body.dark .tl-lang-col-head.zh{background:#3b1a00;border-color:#9a3412;color:#fdba74}
-body.dark .tl-lang-col-head.ja{background:#0f2e1a;border-color:#166534;color:#86efac}
-.tl-line-pair{margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--pk-border)}
-body.dark .tl-line-pair{border-color:#3f2030}
-.tl-line-pair:last-child{border-bottom:none;margin-bottom:0}
-
-/* 제목 구조 */
-.tl-title-id{font-weight:800;color:var(--pk-1)}
-body.dark .tl-title-id{color:#fda4af}
-.tl-title-sub{font-weight:600;color:var(--pk-text);font-size:14px}
-body.dark .tl-title-sub{color:#f0d0da}
-.tl-title-kr{font-size:12px;font-weight:400;color:var(--pk-muted)}
-body.dark .tl-title-kr{color:#c9a0b4}
-
-/* 대사 - _kr 번역줄 */
-.tl-kr-trans{
-  font-size:13px;line-height:1.7;color:var(--pk-1);font-weight:600;
-  margin-top:4px;padding-top:4px;
-  border-top:1px solid var(--pk-border);
-}
-body.dark .tl-kr-trans{color:#f48fb1;border-color:#52253a}
-
-/* 화자 한국어 서브라벨 */
-.tl-speaker-kr{font-size:10px;font-weight:400;color:var(--pk-muted);margin-left:2px}
-body.dark .tl-speaker-kr{color:#9e6070}
-
-/* 번역 없음 */
-.tl-none{color:var(--pk-muted) !important;font-style:italic}
+/* ═══════════════════════════════════════
+   기존 게임 (라이트) — game
+═══════════════════════════════════════ */
+.tl-lines.theme-game{display:flex;flex-direction:column;gap:10px}
+.theme-game .tl-row{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--pk-border);border-radius:12px;padding:14px 16px;transition:box-shadow .15s}
+.theme-game .tl-row:hover{box-shadow:0 4px 14px rgba(233,30,140,.09)}
+.theme-game .tl-av-col{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;width:76px}
+.theme-game .tl-av-img{width:70px;height:70px;border-radius:14px;object-fit:cover;object-position:top;border:2px solid var(--pk-border);background:var(--pk-4)}
+.theme-game .tl-av-init{width:70px;height:70px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#fff}
+.theme-game .tl-av-names{display:flex;flex-direction:column;align-items:center;gap:2px;width:64px}
+.theme-game .tl-kr-name{font-size:12px;font-weight:700;color:var(--pk-text);text-align:center;white-space:nowrap}
+.theme-game .tl-lang-names{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
+.theme-game .tl-lang-name{font-size:10px;color:var(--pk-muted);white-space:nowrap}
+.theme-game .tl-lang-name+.tl-lang-name::before{content:"·";margin-right:4px;color:var(--pk-border)}
+/* 브라켓 + 텍스트 영역 */
+.theme-game .tl-main{flex:1;display:flex;gap:10px;align-items:stretch}
+.theme-game .tl-bracket{width:12px;flex-shrink:0;position:relative;display:flex;align-items:center}
+.theme-game .tl-bracket svg{width:12px;height:100%;overflow:visible}
+.theme-game .tl-body{flex:1;display:flex;flex-direction:column;gap:4px}
+.theme-game .tl-sp-name{font-size:14px;font-weight:700;color:var(--pk-text);margin-bottom:3px}
+.theme-game .tl-sp-name em{font-style:normal;color:var(--pk-muted);opacity:.7;font-weight:400}
+.theme-game .tl-orig{font-size:14px;line-height:1.8;color:var(--pk-text);font-weight:400}
+.theme-game .tl-trans{font-size:14px;line-height:1.75;color:var(--pk-1);font-weight:600}
+.theme-game .tl-kr-label{font-size:9px;font-weight:700;letter-spacing:.07em;color:var(--pk-muted);opacity:.55;margin-top:4px;padding-top:5px;border-top:1px dashed var(--pk-border);display:block}
+.theme-game .tl-kr-orig{font-size:12px;line-height:1.65;color:var(--pk-muted);font-style:italic}
+body.dark .theme-game .tl-row{background:#1e1e24;border-color:#3a1a2a}
+body.dark .theme-game .tl-orig{color:#f0d8e8}
+body.dark .theme-game .tl-trans{color:#f48fb1}
 </style>
 
 <section class="panel" id="panel-translate">
-  <div class="tl-head">
+  <div class="tl-controls">
     <label>챕터</label>
     <select id="tlGroupSelect"><option value="">전체</option></select>
     <label>스테이지</label>
     <select id="tlStageSelect"><option value="">선택하세요</option></select>
-    <input class="tl-search" id="tlSearch" type="text" placeholder="스테이지 검색…"/>
+    <div class="tl-search-wrap">
+      <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <circle cx="8.5" cy="8.5" r="5.5"/><line x1="13.5" y1="13.5" x2="18" y2="18"/>
+      </svg>
+      <input class="tl-search" id="tlSearch" type="text" placeholder="스테이지 검색…"/>
+    </div>
+
   </div>
-  <div id="tlContent">
-    <div class="tl-empty">스테이지를 선택하면 스토리가 표시됩니다.</div>
+  <div class="tl-viewer">
+    <div id="tlContent">
+      <div class="tl-empty">
+        <div class="tl-empty-icon">📖</div>
+        스테이지를 선택하면 스토리가 표시됩니다.
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1048,12 +979,23 @@ body.dark .tl-speaker-kr{color:#9e6070}
 
 window.STAGE_STORY = window.STAGE_STORY || {};
 
-// 캐릭터 아이콘 (한국어 이름 기준)
 var CHAR_ICONS = {
   '니키':                  'https://drive.google.com/thumbnail?id=1aKiLzrAO5ozn3_b0RwvZhIt8bBbl3DI3&sz=w1000',
+  '설아':                  'https://drive.google.com/thumbnail?id=1Fbr1I2oehLj5xqpoZmYd7iLSzYetyLwe&sz=w1000',
+  '실비아':                  'https://drive.google.com/thumbnail?id=1vFT-24gWe79GFejbghsQJM_x7lqNiu6H&sz=w1000',
+  '붙잡힌 여자':                  'https://drive.google.com/thumbnail?id=1vFT-24gWe79GFejbghsQJM_x7lqNiu6H&sz=w1000',
+  '취업준비생':                  'https://drive.google.com/thumbnail?id=1vFT-24gWe79GFejbghsQJM_x7lqNiu6H&sz=w1000',
+  '수정':                  'https://drive.google.com/thumbnail?id=1sosiNmIDu849Dw5bpGgOleeJV0uE8bM1&sz=w1000',
+  '지나가던 미소녀':                  'https://drive.google.com/thumbnail?id=1sosiNmIDu849Dw5bpGgOleeJV0uE8bM1&sz=w1000',
+  '아샤왕국의 소녀':                  'https://drive.google.com/thumbnail?id=1Fbr1I2oehLj5xqpoZmYd7iLSzYetyLwe&sz=w1000',
+  '길을 지나던 미소녀':                  'https://drive.google.com/thumbnail?id=1sosiNmIDu849Dw5bpGgOleeJV0uE8bM1&sz=w1000',
+  '귀여운 여자':                  'https://drive.google.com/thumbnail?id=1sosiNmIDu849Dw5bpGgOleeJV0uE8bM1&sz=w1000',
+  '길거리 미녀':                  'https://drive.google.com/thumbnail?id=1sosiNmIDu849Dw5bpGgOleeJV0uE8bM1&sz=w1000',
   '모모':                  'https://drive.google.com/thumbnail?id=1YVphSzW52Gmuo65amb8hKSDHlc5OeP0h&sz=w1000',
   '에이미':                'https://drive.google.com/thumbnail?id=1a-gqtpOyZvTgXugzdsCpUMjzS2gjbWW3&sz=w1000',
   '갑자기 나타난 소녀':    'https://drive.google.com/thumbnail?id=1a-gqtpOyZvTgXugzdsCpUMjzS2gjbWW3&sz=w1000',
+  '소민':    'https://drive.google.com/thumbnail?id=1n1MFgSMmKfbrStwpKeTu4bKK9UROCOi1&sz=w1000',
+  '문학소녀':    'https://drive.google.com/thumbnail?id=1n1MFgSMmKfbrStwpKeTu4bKK9UROCOi1&sz=w1000',
   '안나':                  'https://drive.google.com/thumbnail?id=1sqjuN12Knc5IPXDfkHFV9gZibTaneHQV&sz=w1000',
   '귀여운 외모의 여자아이':'https://drive.google.com/thumbnail?id=1sqjuN12Knc5IPXDfkHFV9gZibTaneHQV&sz=w1000',
 };
@@ -1065,191 +1007,195 @@ var LANGS = [
   { id:'ja', label:'日本語', flag:'🇯🇵' },
 ];
 var activeLang = 'kr';
+var activeTheme = localStorage.getItem('tl_theme') || 'game';
 
 function $(id){ return document.getElementById(id); }
 
-function getStages(){
-  return (window.stages||[]).filter(function(s){
-    return /^제\s*\d+장/.test(String(s.stage_id||''));
+function escHtml(s){
+  var d=document.createElement('div'); d.textContent=String(s||''); return d.innerHTML;
+}
+
+function charColor(name){
+  var P=['#e8619a','#7c6af7','#f5a623','#4caf82','#3b82f6','#ef4444','#8b5cf6','#ec4899'];
+  var h=0; for(var i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))&0xffff;
+  return P[h%P.length];
+}
+
+function getAvatar(name, imgCls, initCls){
+  var src=CHAR_ICONS[name];
+  var bg=charColor(name);
+  var ch=escHtml((name||'?').charAt(0));
+  if(src) return '<img class="'+imgCls+'" src="'+src+'" alt="'+escHtml(name)+'" loading="lazy" decoding="async"'
+    +' data-fb-cls="'+initCls+'" data-fb-bg="'+bg+'" data-fb-ch="'+ch+'"'
+    +' onerror="this.style.display=\'none\';var d=document.createElement(\'div\');d.className=this.dataset.fbCls;d.style.background=this.dataset.fbBg;d.textContent=this.dataset.fbCh;this.parentNode.insertBefore(d,this.nextSibling)">';
+  return '<div class="'+initCls+'" style="background:'+bg+'">'+ch+'</div>';
+}
+
+function getD(line){
+  var spKr  =(line.speaker&&line.speaker.kr)         ?line.speaker.kr  :'';
+  var spLang=(line.speaker&&line.speaker[activeLang]) ?line.speaker[activeLang]:spKr;
+  var orig='',trans='',krOrig='';
+  if(activeLang==='kr'){
+    orig=(line.text&&line.text.kr)?escHtml(line.text.kr):'';
+  } else {
+    orig  =(line.text&&line.text[activeLang])           ?escHtml(line.text[activeLang]):'';
+    trans =(line.text&&line.text[activeLang+'_kr'])     ?escHtml(line.text[activeLang+'_kr']):'';
+    krOrig=(line.text&&line.text.kr)                    ?escHtml(line.text.kr):'';
+  }
+  return {spKr:spKr, spLang:spLang, orig:orig, trans:trans, krOrig:krOrig};
+}
+
+function getLangLabel(){ return {en:'EN',zh:'ZH',ja:'JA',kr:'KR'}[activeLang]||activeLang.toUpperCase(); }
+
+function avCol(d, imgCls, initCls){
+  var av=getAvatar(d.spKr, imgCls, initCls);
+  var kr=escHtml(d.spKr||d.spLang);
+  var lang=(d.spLang!==d.spKr&&d.spKr)?escHtml(d.spLang):'';
+  return av+'<div class="tl-kr-name">'+kr+'</div>'+(lang?'<div class="tl-lang-name">'+lang+'</div>':'');
+}
+
+function badge(type, label){ return '<span class="tl-badge '+type+'">'+label+'</span>'; }
+
+/* ── 기존 게임 ── */
+function render_game(lines){
+  var ll=getLangLabel();
+  var h='<div class="tl-lines theme-game">';
+  lines.forEach(function(line){
+    var d=getD(line);
+    var av=getAvatar(d.spKr,'tl-av-img','tl-av-init');
+    var kr=escHtml(d.spKr||d.spLang);
+    // 원문 시작 전 화자 이름: 언어별이름 (한국어이름)
+    var spNameHtml='';
+    if(activeLang==='kr'){
+      spNameHtml='<div class="tl-sp-name">'+kr+'</div>';
+    } else {
+      var langName=escHtml(d.spLang);
+      var krSub=(d.spLang!==d.spKr&&d.spKr)?' <em>('+kr+')</em>':'';
+      spNameHtml='<div class="tl-sp-name">'+langName+krSub+'</div>';
+    }
+    var transHtml=(activeLang!=='kr'&&d.trans)?'<div class="tl-trans">'+d.trans+'</div>':'';
+    var krHtml=(activeLang!=='kr'&&d.krOrig)?'<span class="tl-kr-label">KR 한국어</span><div class="tl-kr-orig">'+d.krOrig+'</div>':'';
+    // 둥근 { 브라켓 — SVG로
+    var bracket='<div class="tl-bracket">'
+      +'<svg viewBox="0 0 12 100" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">'
+      +'<path d="M10 2 Q2 2 2 10 L2 90 Q2 98 10 98" stroke="var(--pk-border)" stroke-width="1.5" stroke-linecap="round" fill="none"/>'
+      +'</svg>'
+      +'</div>';
+    h+='<div class="tl-row">'
+      +'<div class="tl-av-col">'+av+'<div class="tl-kr-name">'+kr+'</div></div>'
+      +'<div class="tl-main">'+bracket
+      +'<div class="tl-body">'
+      +spNameHtml
+      +'<div class="tl-orig">'+(d.orig||'<span class="tl-none">—</span>')+'</div>'
+      +transHtml+krHtml
+      +'</div></div>'
+      +'</div>';
+  });
+  return h+'</div>';
+}
+
+var RENDERERS={game:render_game};
+
+function renderStory(stageId){
+  var wrap=$('tlContent');
+  if(!wrap) return;
+  if(!stageId){
+    wrap.innerHTML='<div class="tl-empty"><div class="tl-empty-icon">📖</div>스테이지를 선택하면 스토리가 표시됩니다.</div>';
+    return;
+  }
+  var story=window.STAGE_STORY[stageId];
+  var tabsHtml='<div class="tl-lang-tabs">';
+  LANGS.forEach(function(l){
+    tabsHtml+='<button class="tl-ltab'+(l.id===activeLang?' active':'')+'" data-lang="'+l.id+'">'+l.flag+' '+l.label+'</button>';
+  });
+  tabsHtml+='</div>';
+  var titleKr     =story&&story.title&&story.title.kr         ?story.title.kr:'';
+  var titleLang   =story&&story.title&&story.title[activeLang]?story.title[activeLang]:'';
+  var titleKrTrans=story&&story.title&&story.title[activeLang+'_kr']?story.title[activeLang+'_kr']:'';
+  var ti='<span class="tl-title-id">'+escHtml(stageId)+'</span>';
+  if(activeLang==='kr'){ if(titleKr) ti+=' <span class="tl-title-sub">'+escHtml(titleKr)+'</span>'; }
+  else{
+    if(titleLang) ti+=' <span class="tl-title-sub">'+escHtml(titleLang)+'</span>';
+    var tks=titleKrTrans||(titleKr!==titleLang?titleKr:'');
+    if(tks) ti+=' <span class="tl-title-kr">/ '+escHtml(tks)+'</span>';
+  }
+  var titleHtml='<div class="tl-stage-title">'+ti+'</div>';
+  var linesHtml;
+  if(!story||!story.lines||!story.lines.length){
+    linesHtml='<div class="tl-no-data">아직 이 스테이지의 번역 데이터가 없어요.<br><span style="font-size:14px;opacity:.7">stage_story.html 파일에 데이터를 추가해 주세요.</span></div>';
+  } else {
+    linesHtml=(RENDERERS[activeTheme]||RENDERERS.game)(story.lines);
+  }
+  wrap.innerHTML=tabsHtml+titleHtml+linesHtml;
+  wrap.querySelectorAll('.tl-ltab').forEach(function(btn){
+    btn.addEventListener('click',function(){ activeLang=btn.dataset.lang; renderStory(stageId); });
   });
 }
 
+function getStages(){
+  return (window.stages||[]).filter(function(s){ return /^제\s*\d+장/.test(String(s.stage_id||'')); });
+}
+
 function getGroups(stages){
-  var seen = new Set(), groups = [];
+  var seen=new Set(), groups=[];
   stages.forEach(function(s){
-    var m = String(s.stage_id||'').match(/^(제\s*\d+장)/);
-    var g = m ? m[1].replace(/\s+/g,' ') : String(s.stage_id||'').split(' ')[0];
-    if(g && !seen.has(g)){ seen.add(g); groups.push(g); }
+    var m=String(s.stage_id||'').match(/^(제\s*\d+장)/);
+    var g=m?m[1].replace(/\s+/g,' '):String(s.stage_id||'').split(' ')[0];
+    if(g&&!seen.has(g)){ seen.add(g); groups.push(g); }
   });
   return groups;
 }
 
 function buildSelects(){
-  var stages = getStages();
+  var stages=getStages();
   if(!stages.length) return;
-  var gSel = $('tlGroupSelect'), sSel = $('tlStageSelect');
-  if(!gSel || !sSel) return;
-
-  var groups = getGroups(stages);
-  gSel.innerHTML = '<option value="">전체</option>';
-  groups.forEach(function(g){
-    var o = document.createElement('option'); o.value = g; o.textContent = g;
-    gSel.appendChild(o);
-  });
-
-  function fillStages(fg, q){
-    sSel.innerHTML = '<option value="">선택하세요</option>';
+  var gSel=$('tlGroupSelect'), sSel=$('tlStageSelect');
+  if(!gSel||!sSel) return;
+  var groups=getGroups(stages);
+  gSel.innerHTML='<option value="">전체</option>';
+  groups.forEach(function(g){ var o=document.createElement('option'); o.value=g; o.textContent=g; gSel.appendChild(o); });
+  function fillStages(fg,q){
+    sSel.innerHTML='<option value="">선택하세요</option>';
     stages.forEach(function(s){
-      var id = String(s.stage_id||'');
-      var m = id.match(/^(제\s*\d+장)/);
-      var g = m ? m[1].replace(/\s+/g,' ') : '';
-      if(fg && g !== fg) return;
-      if(q && id.toLowerCase().indexOf(q.toLowerCase()) === -1) return;
-      var o = document.createElement('option'); o.value = id; o.textContent = id;
-      sSel.appendChild(o);
+      var id=String(s.stage_id||'');
+      var m=id.match(/^(제\s*\d+장)/);
+      var g=m?m[1].replace(/\s+/g,' '):'';
+      if(fg&&g!==fg) return;
+      if(q&&id.toLowerCase().indexOf(q.toLowerCase())===-1) return;
+      var o=document.createElement('option'); o.value=id; o.textContent=id; sSel.appendChild(o);
     });
   }
-
-  gSel.addEventListener('change', function(){ fillStages(gSel.value, $('tlSearch').value); });
-  $('tlSearch').addEventListener('input', function(ev){ fillStages(gSel.value, ev.target.value); });
-  sSel.addEventListener('change', function(){ renderStory(sSel.value); });
-  fillStages('', '');
-}
-
-function escHtml(s){
-  var d = document.createElement('div'); d.textContent = String(s||''); return d.innerHTML;
-}
-
-function renderIcon(speakerKr){
-  var name = speakerKr || '?';
-  var src = CHAR_ICONS[name];
-  if(src){
-    return '<div class="tl-icon-wrap">'
-      + '<img class="tl-icon" src="'+src+'" alt="'+escHtml(name)+'" loading="lazy" decoding="async" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'">'
-      + '<div class="tl-icon-initials" style="display:none;background:'+charColor(name)+'">'+escHtml(name.charAt(0))+'</div>'
-      + '<div class="tl-icon-name">'+escHtml(name)+'</div></div>';
-  }
-  return '<div class="tl-icon-wrap"><div class="tl-icon-initials" style="background:'+charColor(name)+'">'+escHtml(name.charAt(0))+'</div><div class="tl-icon-name">'+escHtml(name)+'</div></div>';
-}
-
-function charColor(name){
-  var PALETTE = ['#e8619a','#7c6af7','#f5a623','#4caf82','#3b82f6','#ef4444','#8b5cf6','#ec4899'];
-  var h = 0;
-  for(var i=0;i<name.length;i++) h = (h*31 + name.charCodeAt(i)) & 0xffff;
-  return PALETTE[h % PALETTE.length];
-}
-
-function renderStory(stageId){
-  var wrap = $('tlContent');
-  if(!wrap) return;
-  if(!stageId){
-    wrap.innerHTML = '<div class="tl-empty">스테이지를 선택하면 스토리가 표시됩니다.</div>';
-    return;
-  }
-
-  var story = window.STAGE_STORY[stageId];
-
-  // ── 언어 탭 ──
-  var tabsHtml = '<div class="tl-lang-tabs">';
-  LANGS.forEach(function(l){
-    var active = l.id === activeLang ? ' active' : '';
-    tabsHtml += '<button class="tl-ltab'+active+'" data-lang="'+l.id+'">'+l.flag+' '+l.label+'</button>';
-  });
-  tabsHtml += '</div>';
-
-  // ── 제목 ──
-  var titleKr  = (story && story.title && story.title.kr)  ? story.title.kr  : '';
-  var titleLang = (story && story.title && story.title[activeLang]) ? story.title[activeLang] : '';
-  var titleKrKey = activeLang + '_kr';
-  var titleKrTrans = (story && story.title && story.title[titleKrKey]) ? story.title[titleKrKey] : '';
-
-  var titleInner = '<span class="tl-title-id">'+escHtml(stageId)+'</span>';
-  if(activeLang === 'kr'){
-    if(titleKr) titleInner += ' <span class="tl-title-sub">'+escHtml(titleKr)+'</span>';
-  } else {
-    if(titleLang) titleInner += ' <span class="tl-title-sub">'+escHtml(titleLang)+'</span>';
-    if(titleKrTrans) titleInner += ' <span class="tl-title-kr">/ '+escHtml(titleKrTrans)+'</span>';
-    else if(titleKr && titleKr !== titleLang) titleInner += ' <span class="tl-title-kr">/ '+escHtml(titleKr)+'</span>';
-  }
-  var titleHtml = '<div class="tl-stage-title">'+titleInner+'</div>';
-
-  // ── 대사 ──
-  var linesHtml = '';
-  if(!story || !story.lines || !story.lines.length){
-    linesHtml = '<div class="tl-no-data">아직 이 스테이지의 번역 데이터가 없어요.<br><span style="font-size:12px;opacity:.7">stage_story.html 파일에 데이터를 추가해 주세요.</span></div>';
-  } else {
-    linesHtml = '<div class="tl-lines">';
-    story.lines.forEach(function(line){
-      var speakerKr   = (line.speaker && line.speaker.kr)          ? line.speaker.kr          : '';
-      var speakerLang = (line.speaker && line.speaker[activeLang])  ? line.speaker[activeLang] : speakerKr;
-
-      var iconHtml = renderIcon(speakerKr);
-
-      var bubbleHtml = '';
-      if(activeLang === 'kr'){
-        // 한국어: 한국어 대사만
-        var txt = (line.text && line.text.kr) ? escHtml(line.text.kr) : '';
-        bubbleHtml = '<div class="tl-translated">'+txt+'</div>';
-      } else {
-        // 영/중/일: 해당언어 원문 + _kr 번역 + 한국어 원문(이탤릭)
-        var langText  = (line.text && line.text[activeLang])              ? escHtml(line.text[activeLang])              : '';
-        var krTrans   = (line.text && line.text[activeLang+'_kr'])        ? escHtml(line.text[activeLang+'_kr'])        : '';
-        var krOriginal= (line.text && line.text.kr)                       ? escHtml(line.text.kr)                      : '';
-
-        bubbleHtml =
-          (langText   ? '<div class="tl-translated">'+langText+'</div>'           : '<div class="tl-translated tl-none">번역 없음</div>')
-        + (krTrans    ? '<div class="tl-kr-trans">▶ '+krTrans+'</div>'            : '')
-        + (krOriginal ? '<div class="tl-original">🇰🇷 '+krOriginal+'</div>'        : '');
-      }
-
-      linesHtml += '<div class="tl-line">'
-        + iconHtml
-        + '<div class="tl-bubble">'
-        +   '<div class="tl-speaker">'+escHtml(speakerLang)+(speakerLang !== speakerKr && speakerKr ? ' <span class="tl-speaker-kr">('+escHtml(speakerKr)+')</span>' : '')+'</div>'
-        +   bubbleHtml
-        + '</div>'
-        + '</div>';
-    });
-    linesHtml += '</div>';
-  }
-
-  wrap.innerHTML = tabsHtml + titleHtml + linesHtml;
-
-  wrap.querySelectorAll('.tl-ltab').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      activeLang = btn.dataset.lang;
-      renderStory(stageId);
-    });
-  });
+  gSel.addEventListener('change',function(){ fillStages(gSel.value,$('tlSearch').value); });
+  $('tlSearch').addEventListener('input',function(ev){ fillStages(gSel.value,ev.target.value); });
+  sSel.addEventListener('change',function(){ renderStory(sSel.value); });
+  fillStages('','');
 }
 
 function init(){
   function doInit(){
     if(getStages().length){ buildSelects(); return; }
-    var tries = 0;
-    var t = setInterval(function(){
-      if(getStages().length || ++tries > 40){ clearInterval(t); buildSelects(); }
-    }, 300);
+    var tries=0;
+    var t=setInterval(function(){ if(getStages().length||++tries>40){ clearInterval(t); buildSelects(); } },300);
   }
   doInit();
 }
 
 (function hookShow(){
-  if(typeof window.showPanel !== 'function'){ setTimeout(hookShow, 300); return; }
-  var orig = window.showPanel;
-  window.showPanel = function(key){
-    orig.apply(this, arguments);
-    if(key === 'translate') init();
-  };
+  if(typeof window.showPanel!=='function'){ setTimeout(hookShow,300); return; }
+  var orig=window.showPanel;
+  window.showPanel=function(key){ orig.apply(this,arguments); if(key==='translate') init(); };
 })();
 
-document.addEventListener('click', function(ev){
-  var btn = ev.target.closest && ev.target.closest('nav.tabs .tab[data-tab="translate"]');
+document.addEventListener('click',function(ev){
+  var btn=ev.target.closest&&ev.target.closest('nav.tabs .tab[data-tab="translate"]');
   if(btn) init();
 });
 
+
+
 })();
 </script>
+
 
 <script>
 /* Global de-duplication 비활성화 — 이름 같아도 다른 아이템 */
@@ -1402,8 +1348,11 @@ function toThumb(u){
 <script>
 (function(){
   var got = {items:false, stages:false, sets:false};
+  var _initDone = false;
   function maybeInit(){
+    if (_initDone) return;
     if (got.items && got.stages) {
+      _initDone = true;
       if (!window.items) window.items = [];
       if (!window.stages) window.stages = [];
       if (typeof init === 'function') init();
@@ -1469,13 +1418,13 @@ function toThumb(u){
       window.__cachedStages = window.stages; // 캐시 저장
       got.stages = true;
       try{ if(typeof __populateStages==='function') __populateStages(); }catch(e){};
-      try{ if(typeof renderAll==='function') renderAll(); }catch(e){}
+      maybeInit();
     }
     if (msg.key==='sets'){
       window.sets = msg.data;
       window.__cachedSets = window.sets;     // 캐시 저장
       got.sets = true;
-      try{ if(typeof renderAll==='function') renderAll(); }catch(e){};
+      maybeInit();
       try{ if(typeof window.renderSetsTab==='function') window.renderSetsTab(); }catch(e){}
     }
     if (msg.key==='sources'){
@@ -2468,7 +2417,7 @@ var ACC_OTHER    = ["반딧불의 영혼"];
 })();
 </script>
 <style>
-.badge.owned{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:6px;background:#4caf50;color:#fff;font-size:11px;}
+.badge.owned{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:6px;background:#4caf50;color:#fff;font-size:13px;}
 </style>
 <script>
 (function(){
@@ -2727,7 +2676,7 @@ var ACC_OTHER    = ["반딧불의 영혼"];
   });
 })();
 </script>
-<footer id="metaFooter" style="margin:24px 0 0; padding:12px; text-align:center; color:#666; font-size:12px; ">
+<footer id="metaFooter" style="margin:24px 0 0; padding:12px; text-align:center; color:#666; font-size:14px; ">
   제작자 : 윤드 · 
 </footer>
 <script>
@@ -3235,7 +3184,7 @@ document.addEventListener('DOMContentLoaded', function(){});
           </h3></div>
           <div class="badges"><span class="badge">${(typeof displayShort==='function'?displayShort(it.part):it.part)||'-'}</span><span class="badge">${stars}★</span>${it._owned?'<span class="badge owned">보유</span>':''}</div>
           <div class="badges tags">${tgs.map(x=>`<span class='badge tag'>#${x}</span>`).join('')}</div>
-          <div class="score">점수: ${Number(it.score).toFixed(2)}</div>
+          <div class="score">점수: ${Number(it.score).toLocaleString('ko-KR', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
         </div>`;
       }).join('');
     }catch(e){ /* swallow */ }
@@ -3336,7 +3285,7 @@ document.addEventListener('DOMContentLoaded', function(){});
           </h3>${reqBadge}</div>
           <div class="badges"><span class="badge">${(typeof displayShort==='function'?displayShort(it.part):it.part)||'-'}</span><span class="badge">${stars}★</span>${it._owned?'<span class="badge owned">보유</span>':''}</div>
           <div class="badges tags">${tgs.map(x=>`<span class='badge tag'>#${x}</span>`).join('')}</div>
-          <div class="score">점수: ${Number(it.score).toFixed(2)}</div>
+          <div class="score">점수: ${Number(it.score).toLocaleString('ko-KR', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
         </div>`;
       }).join('');
     }catch(e){ /* swallow */ }
@@ -6924,7 +6873,7 @@ document.addEventListener('DOMContentLoaded', function(){});
       wrap.style.gap = '6px';
       wrap.style.marginLeft = '8px';
       wrap.innerHTML = ''
-        + '<label style="font-size:13px;">가중치</label>'
+        + '<label style="font-size:16px;">가중치</label>'
         + '<select id="mainStyleSel" title="메인 스타일"></select>'
         + '<input id="mainWeightInp" type="number" step="0.01" value="1.33" style="width:64px" title="메인 가중치">'
         + '<span style="opacity:.7">/</span>'
@@ -7829,12 +7778,40 @@ document.addEventListener('DOMContentLoaded', function(){});
 
   // code::part 복합키 기반 보유 체크
   // ownedSet에 "코드::부위" 키가 있어야만 보유로 인정
+  // ownedSet에서 코드별 부위 목록을 캐싱 (렉 방지)
+  var _ownedCodeCache = null, _ownedCodeCacheSize = -1;
+  function getOwnedCodeMap(ownedSet){
+    if(_ownedCodeCache && _ownedCodeCacheSize === ownedSet.size) return _ownedCodeCache;
+    var map = Object.create(null);
+    var cidx = window.__CIDX || {};
+    ownedSet.forEach(function(k){
+      var sep = k.indexOf('::'); if(sep<0) return;
+      var code = k.slice(0,sep);
+      var realPart = cidx[k]; // __CIDX로 실제 part 조회
+      if(!map[code]) map[code] = [];
+      if(realPart) map[code].push(normOwnedName(realPart));
+      else map[code].push(k.slice(sep+2)); // fallback: 입력 부위norm
+    });
+    _ownedCodeCache = map;
+    _ownedCodeCacheSize = ownedSet.size;
+    return map;
+  }
+
   window.isItemOwned = function(it, ownedSet){
     try{
       if(!(ownedSet instanceof Set) || !it) return false;
       var code = String(it.code != null ? it.code : '').trim();
       var pt = normOwnedName(it.part||'');
-      if(code && ownedSet.has(code + '::' + pt)) return true;
+      if(!code) return false;
+      // 정확 매칭 (O(1))
+      if(ownedSet.has(code + '::' + pt)) return true;
+      // 캐시 맵으로 O(1) 조회
+      var map = getOwnedCodeMap(ownedSet);
+      var parts = map[code];
+      if(!parts) return false;
+      for(var i=0;i<parts.length;i++){
+        if(pt === parts[i] || pt.indexOf(parts[i]) === 0) return true;
+      }
       return false;
     }catch(e){ return false; }
   };
@@ -7866,6 +7843,8 @@ document.addEventListener('DOMContentLoaded', function(){});
       var ta = document.getElementById('ownedInput');
       var names = ta ? Array.from(new Set(parseOwned(ta.value))) : [];
       window.ownedNameSet = new Set(names.map(normOwnedName).filter(function(k){ return k.indexOf('::') >= 0; }));
+      // isItemOwned 캐시 무효화
+      if(typeof _ownedCodeCache !== 'undefined'){ _ownedCodeCache = null; _ownedCodeCacheSize = -1; }
     }catch(e){ window.ownedNameSet = new Set(); }
   }
   window.rebuildOwnedSet = rebuildOwnedSet;
@@ -8348,7 +8327,8 @@ document.addEventListener('DOMContentLoaded', function(){});
   }
   function parseOwned(t){return String(t||'').split(/[\n\r;,]+|\s{2,}/g).map(s=>s.trim()).filter(Boolean);}
   function getStats(){
-    var items = Array.isArray(window.items)?window.items:(Array.isArray(window.ITEMS)?window.ITEMS:[]);
+    var items = Array.isArray(window.items)&&window.items.length ? window.items
+               : Array.isArray(window.ITEMS)&&window.ITEMS.length ? window.ITEMS : [];
     var FIXED = ["헤어","원피스","아우터","상의","하의","양말","양말장식","신발","뷰티","반딧불의 영혼"];
     var totals = Object.create(null);
     FIXED.forEach(function(p){ totals[p]=0; });
@@ -8356,14 +8336,18 @@ document.addEventListener('DOMContentLoaded', function(){});
     var ta=$('ownedInput');
     var lines = ta ? ta.value.split(/[\n\r]+/).map(function(s){return s.trim();}).filter(Boolean) : [];
     var ownedPer = Object.create(null);
+    var _cidx = window.__CIDX || {};
     for (var j=0;j<lines.length;j++){
       var sep=lines[j].lastIndexOf('::'); if(sep<0) continue;
+      var codeStr=lines[j].slice(0,sep).trim();
       var partRaw=lines[j].slice(sep+2).trim();
-      for (var p2 in totals){
-        if(p2.toLowerCase().replace(/\s+/g,'')=== partRaw.toLowerCase().replace(/\s+/g,'')){
-          ownedPer[p2]=(ownedPer[p2]||0)+1; break;
-        }
-      }
+      var _pn=partRaw.toLowerCase().replace(/\s+/g,'');
+      var _realPart=null;
+      // 1) prefix 인덱스로 찾기 (1::장식 → 장식-머리-머리)
+      if(_cidx[codeStr+'::'+_pn]) _realPart=_cidx[codeStr+'::'+_pn];
+      // 2) 정확 매칭
+      if(!_realPart){ for(var p2 in totals){ if(p2.toLowerCase().replace(/\s+/g,'')===_pn){_realPart=p2;break;} } }
+      if(_realPart) ownedPer[_realPart]=(ownedPer[_realPart]||0)+1;
     }
     return {totals: totals, ownedPer: ownedPer};
   }
@@ -8376,18 +8360,25 @@ document.addEventListener('DOMContentLoaded', function(){});
   function renderAcc(){ renderChips(ACC_HEAD.concat(ACC_HAND, ACC_PROP)); }
   function renderSpecial(){ renderChips(ACC_SPECIAL); }
   function renderSoul(){ renderChips(ACC_OTHER); }
+  window.__renderAcc = renderAcc;
+  window.__renderSpecial = renderSpecial;
 
   // Preserve original behavior but ensure our chips render
   var __origSetGroup = window.setGroup;
   window.setGroup = function(g){
-    // call original first to keep any side-effects (like class toggles)
-    if (typeof __origSetGroup === 'function') { try { __origSetGroup(g); } catch(e){} }
-    // then normalize filter options and render the right chips
+    // 탭 클래스 토글 (class toggle side-effect)
+    try{
+      document.querySelectorAll('#partTabs .gtab').forEach(function(b){
+        b.classList.toggle('is-on', b.getAttribute('data-g')===g);
+      });
+    }catch(e){}
     try { normalizeAccessoryFilterOptions(); } catch(e){}
+    // acc/special/soul은 수정된 getStats 가진 렌더러로 직접 처리
     if (g === 'acc') return renderAcc();
     if (g === 'special') return renderSpecial();
     if (g === 'soul') return renderSoul();
-    // fallthrough for others
+    // wear 등: 기존 체인 실행
+    if (typeof __origSetGroup === 'function') { try { __origSetGroup(g); } catch(e){} }
   };
 
   // Clicking a chip selects the matching partFilter option
@@ -8613,6 +8604,7 @@ document.addEventListener('DOMContentLoaded', function(){});
       }
       ta.value = owned.join('\n');
       try{ if(typeof window.rebuildOwnedSet==='function') window.rebuildOwnedSet(); }catch(e){}
+      try{ var _on=document.querySelector('#partTabs .gtab.is-on'); var _g=_on?_on.getAttribute('data-g'):'wear'; if(_g==='acc'&&typeof window.__renderAcc==='function') window.__renderAcc(); else if(_g==='special'&&typeof window.__renderSpecial==='function') window.__renderSpecial(); else if(typeof window.setGroup==='function') window.setGroup(_g); }catch(e){}
       try{ if (typeof window.updateOwnedBadges==='function') window.updateOwnedBadges(); }catch(e){}
       try{ if(typeof window.updateStatsBar==='function') window.updateStatsBar(); }catch(e){}
       try{ if(typeof window.renderPartBar==='function') window.renderPartBar(); }catch(e){}
@@ -9270,32 +9262,6 @@ document.addEventListener('DOMContentLoaded', function(){});
 })();
 </script>
 
-<script>
-(function(){
-  window.__SCORING_VERSION = "scoring_v20260125_231951";
-  function addBadge(){
-    try{
-      if(document.getElementById('__scoringVersionBadge')) return;
-      const d=document.createElement('div');
-      d.id='__scoringVersionBadge';
-      d.textContent='SCORING VERSION: scoring_v20260125_231951';
-      d.style.position='fixed';
-      d.style.bottom='8px';
-      d.style.right='8px';
-      d.style.zIndex='99999';
-      d.style.background='rgba(0,0,0,0.75)';
-      d.style.color='#fff';
-      d.style.font='12px/1.2 sans-serif';
-      d.style.padding='6px 8px';
-      d.style.borderRadius='8px';
-      d.style.pointerEvents='none';
-      document.body.appendChild(d);
-    }catch(e){}
-  }
-  setTimeout(addBadge, 500); // deferred — cosmetic only
-})();
-</script>
-
 <!-- === FINAL SCORING OVERRIDE (single source of truth) === -->
 <script>
 (function(){
@@ -9808,7 +9774,7 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
       }
       if (row.type === 'header'){
         td.style.borderBottom = '0';
-        td.innerHTML = '<div class="muted" style="font-size:12px;padding:4px 10px 0 10px">'+row.label+'</div>';
+        td.innerHTML = '<div class="muted" style="font-size:14px;padding:4px 10px 0 10px">'+row.label+'</div>';
         tr.appendChild(td);
         tbody.appendChild(tr);
         continue;
@@ -10010,11 +9976,11 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
 <!-- === Pagination patch (2026-01-07): show 24 items per page in 추천/점수 card list === -->
 <style>
   #pagerBar{padding:6px 20px 12px 20px; display:none; align-items:center; gap:8px; flex-wrap:wrap;}
-  #pagerBar .pinfo{font-size:12px;color:#666;margin-right:6px}
+  #pagerBar .pinfo{font-size:14px;color:#666;margin-right:6px}
   #pagerBar button{padding:6px 10px;border:1px solid #ddd;border-radius:999px;background:#fff;cursor:pointer}
   #pagerBar button:hover{background:#fafafa}
   #pagerBar button[disabled]{opacity:.5;cursor:not-allowed}
-  #pagerBar button.is-on{background:#f0f7ff;border-color:#cfe4ff;font-weight:700}
+  #pagerBar button.is-on{background:#f0f7ff;border-color:#cfe4ff;font-weight:500}
 </style>
 <script>
 (function(){
@@ -10321,7 +10287,7 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
           // 점수
           var scoreDiv = document.createElement('div');
           scoreDiv.className = 'score';
-          scoreDiv.textContent = '점수: ' + Number(it.score||0).toFixed(2);
+          scoreDiv.textContent = '점수: ' + Number(it.score||0).toLocaleString('ko-KR', {minimumFractionDigits:2, maximumFractionDigits:2});
           card.appendChild(scoreDiv);
 
           frag.appendChild(card);
@@ -10445,6 +10411,8 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
         if(ta){
           var name = String(msg.name).trim();
           var part = String(msg.part||'').trim();
+          // "장식 - 머리 - 머리" 등 세부 부위는 "장식"으로 정규화
+          if (part.startsWith('장식')) part = '장식';
           var code = msg.code != null ? String(msg.code).trim() : '';
           if(!part) return;
           // 코드가 있으면 코드::부위, 없으면 이름::부위 (fallback)
@@ -10828,16 +10796,16 @@ if (msg.type === 'FIND_ITEM_BY_IMG_RESULT'){
 #codeNotFoundModal.open{display:flex}
 .cnf-box{background:#fff;border-radius:14px;padding:0;width:min(420px,90vw);box-shadow:0 8px 32px rgba(0,0,0,.18);overflow:hidden}
 .cnf-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #eee}
-.cnf-head b{font-size:15px}
-.cnf-close{border:1px solid #ddd;background:#fff;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px}
+.cnf-head b{font-size:18px}
+.cnf-close{border:1px solid #ddd;background:#fff;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:19px}
 .cnf-close:hover{background:#fafafa}
 .cnf-body{padding:14px 16px}
-.cnf-desc{font-size:13px;color:#444;margin-bottom:10px;line-height:1.6}
+.cnf-desc{font-size:16px;color:#444;margin-bottom:10px;line-height:1.6}
 .cnf-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-.cnf-chip{font-size:12px;padding:3px 10px;border-radius:999px;background:#ffecec;border:1px solid #ffc9c9;color:#a30000;font-family:monospace}
-.cnf-ok{font-size:12px;color:#2a7a2a;background:#eaffea;border:1px solid #c2e8c2;border-radius:999px;padding:3px 10px}
+.cnf-chip{font-size:14px;padding:3px 10px;border-radius:999px;background:#ffecec;border:1px solid #ffc9c9;color:#a30000;font-family:monospace}
+.cnf-ok{font-size:14px;color:#2a7a2a;background:#eaffea;border:1px solid #c2e8c2;border-radius:999px;padding:3px 10px}
 .cnf-foot{padding:10px 16px;border-top:1px solid #eee;display:flex;justify-content:flex-end}
-.cnf-btn{padding:7px 18px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:13px}
+.cnf-btn{padding:7px 18px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:16px}
 .cnf-btn:hover{background:#fafafa}
 </style>
 <div id="codeNotFoundModal">
@@ -11079,7 +11047,7 @@ function renderContribChart(){
     row.className = 'contrib-row';
     var shortPart = e.part.replace('장식 - ','').replace('특수 - ','');
     row.innerHTML =
-      '<span style="font-size:11px;color:#555;min-width:70px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+e.part+'">'+shortPart+'</span>'+
+      '<span style="font-size:13px;color:#555;min-width:70px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+e.part+'">'+shortPart+'</span>'+
       '<div class="contrib-bar-wrap"><div class="contrib-bar" style="width:'+pct+'%"></div></div>'+
       '<span class="contrib-lbl">'+Math.round(e.score).toLocaleString()+'</span>';
     chart.appendChild(row);
@@ -11285,21 +11253,21 @@ function updateOutfitBanner(){
     banner.style.background = '#f0f7ff';
     banner.style.borderColor = '#cfe4ff';
     banner.style.color = '#1a4b8c';
-    textEl.textContent = '👗 상의+하의 조합이 원피스보다 유리해요! (+' + diff.toFixed(2) + '점)';
+    textEl.textContent = '상의+하의 조합이 원피스보다 유리해요! (+' + diff.toLocaleString('ko-KR', {minimumFractionDigits:2, maximumFractionDigits:2}) + '점)';
     subEl.textContent  = bestTopName + ' + ' + bestBottomName
-      + ' (' + combined.toFixed(2) + '점) vs 원피스 ' + bestOnePieceName
-      + ' (' + bestOnePiece.toFixed(2) + '점)';
+      + ' (' + combined.toLocaleString('ko-KR', {minimumFractionDigits:2, maximumFractionDigits:2}) + '점) vs 원피스 ' + bestOnePieceName
+      + ' (' + bestOnePiece.toLocaleString('ko-KR', {minimumFractionDigits:2, maximumFractionDigits:2}) + '점)';
   } else if(diff < 0){
     // 원피스가 유리
     banner.style.display = 'flex';
     banner.style.background = '#fff7ed';
     banner.style.borderColor = '#fed7aa';
     banner.style.color = '#92400e';
-    textEl.textContent = '👗 원피스가 상의+하의 조합보다 유리해요! (+' + Math.abs(diff).toFixed(2) + '점)';
+    textEl.textContent = '원피스가 상의+하의 조합보다 유리해요! (+' + Math.abs(diff).toLocaleString('ko-KR', {minimumFractionDigits:2, maximumFractionDigits:2}) + '점)';
     subEl.textContent  = '원피스 ' + bestOnePieceName
-      + ' (' + bestOnePiece.toFixed(2) + '점) vs '
+      + ' (' + bestOnePiece.toLocaleString('ko-KR', {minimumFractionDigits:2, maximumFractionDigits:2}) + '점) vs '
       + bestTopName + ' + ' + bestBottomName
-      + ' (' + combined.toFixed(2) + '점)';
+      + ' (' + combined.toLocaleString('ko-KR', {minimumFractionDigits:2, maximumFractionDigits:2}) + '점)';
   } else {
     banner.style.display = 'none';
   }
@@ -11466,7 +11434,7 @@ setTimeout(updateOutfitBanner, 900);
     list.forEach(function(it){ html+='<th>'+String(getItemName(it)||'-')+'</th>'; });
     html+='</tr></thead><tbody>';
     rows.forEach(function(row){
-      html+='<tr><td style="text-align:left;font-weight:600;white-space:nowrap">'+row.label+'</td>';
+      html+='<tr><td style="text-align:left;font-weight:500;white-space:nowrap">'+row.label+'</td>';
       list.forEach(function(it){
         var v=it[row.key];
         var best=(row.key==='score' && Number(v)===maxScore && maxScore>0);
@@ -11474,8 +11442,8 @@ setTimeout(updateOutfitBanner, 900);
         if(row.key==='img') cell=v?'<img src="'+v+'" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid #eee" loading="lazy" decoding="async">':'-';
         else if(row.key==='stars') cell=Number(v||0)+'★';
         else if(row.key==='score') cell='<b>'+Number(v||0).toFixed(2)+'</b>';
-        else if(row.key==='_owned') cell=v?'<span style="color:#2a7a2a;font-weight:700">✓ 보유</span>':'<span style="color:#aaa">미보유</span>';
-        else if(row.key==='tags') cell=(Array.isArray(v)&&v.length)?v.map(function(t){ return '<span style="font-size:11px;background:#f0f0ff;padding:1px 6px;border-radius:999px;margin:1px">'+t+'</span>'; }).join(' '):'-';
+        else if(row.key==='_owned') cell=v?'<span style="color:#2a7a2a;font-weight:500">✓ 보유</span>':'<span style="color:#aaa">미보유</span>';
+        else if(row.key==='tags') cell=(Array.isArray(v)&&v.length)?v.map(function(t){ return '<span style="font-size:13px;background:#f0f0ff;padding:1px 6px;border-radius:999px;margin:1px">'+t+'</span>'; }).join(' '):'-';
         else cell=String(v||'-');
         html+='<td class="'+(best?'cmp-best':'')+'">'+cell+'</td>';
       });
@@ -11653,7 +11621,7 @@ function updateRadar(){
   present.forEach(function(x){
     var chip = document.createElement('span');
     var col = ATTR_COLOR[x.attr] || '#888';
-    chip.style.cssText = 'display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;'
+    chip.style.cssText = 'display:inline-block;padding:3px 10px;border-radius:999px;font-size:14px;font-weight:500;'
       + 'background:' + col + '22;border:1px solid ' + col + '66;color:' + col;
     chip.textContent = ATTR_KR[x.attr] || x.attr;
     chips.appendChild(chip);
@@ -11693,7 +11661,7 @@ function showToast(msg){
   style="display:none;position:fixed;bottom:24px;right:24px;z-index:9990;
          width:42px;height:42px;border-radius:50%;
          border:none;background:linear-gradient(135deg,#e91e8c,#f06292);
-         cursor:pointer;font-size:18px;color:#fff;
+         cursor:pointer;font-size:22px;color:#fff;
          box-shadow:0 3px 12px rgba(233,30,140,.35);transition:opacity .2s,transform .2s">↑</button>
 
 <script>
@@ -11809,20 +11777,20 @@ document.addEventListener('keydown', function(ev){
 body.dark .sc-box{background:#27202a;border:1px solid #4a2d3a}
 .sc-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--pk-4,#fce4ec)}
 body.dark .sc-head{border-color:#4a2d3a}
-.sc-head-title{font-size:15px;font-weight:800;color:var(--pk-1,#e91e8c);display:flex;align-items:center;gap:8px}
-.sc-close{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--pk-border,#f8bbd0);background:#fff;cursor:pointer;font-size:16px;color:var(--pk-1,#e91e8c);font-weight:700}
+.sc-head-title{font-size:18px;font-weight:500;color:var(--pk-1,#e91e8c);display:flex;align-items:center;gap:8px}
+.sc-close{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--pk-border,#f8bbd0);background:#fff;cursor:pointer;font-size:19px;color:var(--pk-1,#e91e8c);font-weight:500}
 .sc-close:hover{background:var(--pk-4,#fce4ec)}
 body.dark .sc-close{background:#27202a;border-color:#4a2d3a;color:#f48fb1}
 .sc-body{padding:14px 20px 20px;display:flex;flex-direction:column;gap:6px}
-.sc-section{font-size:11px;font-weight:800;color:var(--pk-1,#e91e8c);text-transform:uppercase;letter-spacing:.08em;margin:10px 0 4px}
+.sc-section{font-size:13px;font-weight:500;color:var(--pk-1,#e91e8c);text-transform:uppercase;letter-spacing:.08em;margin:10px 0 4px}
 .sc-section:first-child{margin-top:0}
 .sc-row{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:10px;background:var(--pk-5,#fff5f8);border:1px solid var(--pk-4,#fce4ec)}
 body.dark .sc-row{background:#1a1018;border-color:#4a2d3a}
 .sc-keys{display:flex;gap:4px;align-items:center;flex-shrink:0}
-.sc-key{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:26px;padding:0 8px;border-radius:6px;background:#fff;border:1.5px solid var(--pk-border,#f8bbd0);font-size:12px;font-weight:700;color:var(--pk-text,#2d1a22);box-shadow:0 2px 0 var(--pk-border,#f8bbd0);font-family:monospace}
+.sc-key{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:26px;padding:0 8px;border-radius:6px;background:#fff;border:1.5px solid var(--pk-border,#f8bbd0);font-size:14px;font-weight:500;color:var(--pk-text,#2d1a22);box-shadow:0 2px 0 var(--pk-border,#f8bbd0);font-family:monospace}
 body.dark .sc-key{background:#27202a;border-color:#4a2d3a;color:#f0e4ec;box-shadow:0 2px 0 #4a2d3a}
-.sc-plus{font-size:11px;color:var(--pk-muted,#a06080);font-weight:700}
-.sc-desc{font-size:13px;color:var(--pk-text,#2d1a22);margin-left:12px}
+.sc-plus{font-size:13px;color:var(--pk-muted,#a06080);font-weight:500}
+.sc-desc{font-size:16px;color:var(--pk-text,#2d1a22);margin-left:12px}
 body.dark .sc-desc{color:#f0e4ec}
 </style>
 
@@ -11861,15 +11829,15 @@ body.dark .sc-desc{color:#f0e4ec}
       </div>
       <div class="sc-row">
         <span class="sc-desc">맨 위로 이동</span>
-        <div class="sc-keys"><span class="sc-key">↑</span><span style="font-size:11px;color:var(--pk-muted,#a06080);margin-left:4px">버튼 클릭</span></div>
+        <div class="sc-keys"><span class="sc-key">↑</span><span style="font-size:13px;color:var(--pk-muted,#a06080);margin-left:4px">버튼 클릭</span></div>
       </div>
       <div class="sc-row">
         <span class="sc-desc">카드 이미지 크게 보기</span>
-        <div class="sc-keys"><span class="sc-key" style="font-size:11px">썸네일 클릭</span></div>
+        <div class="sc-keys"><span class="sc-key" style="font-size:13px">썸네일 클릭</span></div>
       </div>
       <div class="sc-row">
         <span class="sc-desc">아이템 비교에 추가</span>
-        <div class="sc-keys"><span class="sc-key" style="font-size:11px">우클릭</span></div>
+        <div class="sc-keys"><span class="sc-key" style="font-size:13px">우클릭</span></div>
       </div>
 
     </div>
@@ -11971,6 +11939,45 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 
 <script>
+/* ===== 아이템 상세(item_detail.html)에서 보유 등록/확인 요청 처리 ===== */
+window.addEventListener('message', function(ev){
+  if(ev.origin && ev.origin !== location.origin && ev.origin !== 'null') return;
+  var msg = ev.data;
+  if (!msg || typeof msg !== 'object') return;
+
+  if (msg.type === 'OWNED_REGISTER_BY_CODE'){
+    try{
+      var part = String(msg.part || '').trim();
+      if (part.startsWith('장식')) part = '장식';
+      var code = msg.code != null ? String(msg.code).trim() : '';
+      if (!part || !code) return;
+      var key = code + '::' + part;
+      var ta = document.getElementById('ownedInput');
+      if (!ta) return;
+      var cur = ta.value.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+      var idx = cur.findIndex(function(l){ return l.toLowerCase() === key.toLowerCase(); });
+      if (idx === -1){ cur.push(key); ta.value = cur.join('\n'); ta.dispatchEvent(new Event('input', {bubbles: true})); }
+      try{ ev.source && ev.source.postMessage({ type:'OWNED_REGISTER_ACK', code: code, part: part, owned: true }, '*'); }catch(e){}
+    }catch(e){}
+    return;
+  }
+
+  if (msg.type === 'OWNED_CHECK_BY_CODE'){
+    try{
+      var part = String(msg.part || '').trim();
+      if (part.startsWith('장식')) part = '장식';
+      var code = msg.code != null ? String(msg.code).trim() : '';
+      if (!part || !code) return;
+      var key = code + '::' + part;
+      var ta = document.getElementById('ownedInput');
+      var cur = ta ? ta.value.split('\n').map(function(s){ return s.trim(); }).filter(Boolean) : [];
+      var owned = cur.some(function(l){ return l.toLowerCase() === key.toLowerCase(); });
+      try{ ev.source && ev.source.postMessage({ type:'OWNED_CHECK_RESULT', code: code, part: part, owned: owned }, '*'); }catch(e){}
+    }catch(e){}
+    return;
+  }
+});
+
 /* itemsinfo_frame 페이지 이동 시 해당 iframe 위치로 스크롤 */
 window.addEventListener('message', function(ev){
   if(!ev.data || ev.data.type !== 'ITEMSINFO_SCROLL_TOP') return;
@@ -12006,7 +12013,10 @@ window.addEventListener('message', function(ev){
     try{
       var on=document.querySelector('#partTabs .gtab.is-on,[data-g].active');
       var g=on?on.getAttribute('data-g'):'wear';
-      if(typeof window.setGroup==='function') window.setGroup(g);
+      // setGroup 체인 우회 — 장식/특수/반딧불은 직접 렌더러 호출
+      if(g==='acc'&&typeof window.__renderAcc==='function') window.__renderAcc();
+      else if(g==='special'&&typeof window.__renderSpecial==='function') window.__renderSpecial();
+      else if(typeof window.setGroup==='function') window.setGroup(g);
     }catch(e){}
 
     // localStorage 저장: 별도 타이머
