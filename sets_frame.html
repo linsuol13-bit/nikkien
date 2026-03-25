@@ -62,6 +62,17 @@
   .owned-badge{font-size:12px;font-weight:500;padding:2px 7px;border-radius:999px;margin-left:auto;flex-shrink:0}
   .owned-badge.yes{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0}
   .owned-badge.no{background:#fee2e2;color:#dc2626;border:1px solid #fecaca}
+  /* 변형(리폼/포즈) 완성도 칩 */
+  .variant-chip{display:inline-block;font-size:12px;font-weight:500;padding:2px 8px;border-radius:999px;margin-top:2px}
+  /* 미보유 필터 토글 */
+  .filter-toggle{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;border:1.5px solid var(--pk-border);background:#fff;font-size:14px;font-weight:500;color:var(--pk-muted);cursor:pointer;transition:background .13s,border-color .13s,color .13s;user-select:none}
+  .filter-toggle.active{background:var(--pk-grad);border-color:transparent;color:#fff}
+  /* variants 완성도 헤더 */
+  .vgroup-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px 0;flex-wrap:wrap}
+  .vgroup-pct{font-size:13px;font-weight:500;padding:2px 10px;border-radius:999px;background:var(--pk-4);color:var(--pk-1)}
+  /* 미보유 섹션 */
+  #missingSection{display:none}
+  .missing-count-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:#fee2e2;color:#dc2626;font-size:13px;font-weight:500;border:1px solid #fecaca;margin-left:6px}
   /* 텍스트 */
   .name{font-weight:500;font-size:17px;line-height:1.2;color:var(--pk-text)}
   .sub{font-size:14px;color:var(--pk-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -150,6 +161,9 @@
   <div class="topbar">
     <div class="title">세트 목록</div>
     <input id="q" type="text" placeholder="세트 이름 검색 (한/중/영/북미)"/>
+    <label class="filter-toggle" id="missingFilterToggle">
+      <input type="checkbox" id="missingFilterCb"> ✗ 미보유 있는 세트만
+    </label>
     <div class="muted" id="status">로딩중...</div>
   </div>
 
@@ -197,6 +211,12 @@
         <h3>리폼 · 진화 · 포즈</h3>
         <div class="muted" style="margin-bottom:8px">파생 의상을 클릭하면 해당 아이템 상세페이지가 열려.</div>
         <div class="vlist" id="variants"></div>
+      </div>
+
+      <div class="section" id="missingSection" style="display:none;border:2px solid #fecaca;background:#fff5f5">
+        <h3 style="color:#dc2626">✗ 미보유 아이템 <span id="missingCount" class="missing-count-badge"></span></h3>
+        <div class="muted" style="margin-bottom:8px">아직 등록되지 않은 아이템 목록이야.</div>
+        <div class="parts" id="missingList"></div>
       </div>
 
     </div>
@@ -268,28 +288,60 @@
 
   const zoomDlg = $("zoomDlg");
   const zoomImg = $("zoomImg");
+  const missingFilterToggle = $("missingFilterToggle");
+  const missingFilterCb = $("missingFilterCb");
+  const missingSection = $("missingSection");
+  const missingList = $("missingList");
+  const missingCount = $("missingCount");
 
   let SETS = [];
   let ITEMS = [];
   let OWNED_NAMES = new Set(); // 보유 의상 이름 목록 (fallback)
   let OWNED_CODES = new Set(); // 보유 의상 코드 목록 (코드::부위 or 코드 형식)
 
+  // 세트의 기본 파츠 + 모든 변형 파츠를 합산해서 반환
+  function getAllSetParts(set){
+    const result = [];
+    const base = Array.isArray(set.parts) ? set.parts : [];
+    base.forEach(p => result.push(p));
+    const vlist = Array.isArray(set.variants) ? set.variants : [];
+    vlist.forEach(v => {
+      if(v.type === "evolve" && Array.isArray(v.stages)){
+        v.stages.forEach(stg => {
+          (Array.isArray(stg.items)?stg.items:[]).forEach(it => result.push(it));
+          (Array.isArray(stg.reform)?stg.reform:[]).forEach(it => result.push(it));
+        });
+      } else {
+        (Array.isArray(v.items)?v.items:[]).forEach(it => result.push(it));
+      }
+    });
+    return result;
+  }
+
   // 이름 정규화 (공백·특수문자 제거, 소문자)
   function normName(s){ return String(s||'').replace(/[\s\-·・''`]/g,'').toLowerCase(); }
   function isOwned(name){ return OWNED_NAMES.has(normName(name)); }
 
-  // 코드 기반 보유 확인 (코드번호 단독으로도 체크)
+  // 코드 기반 보유 확인
   function isOwnedByCode(code, part){
     if(code === null || code === undefined || code === '') return false;
     const c = String(code);
     const p = String(part || '');
-    // "코드::부위" 형식으로 체크
+    // "코드::부위" 형식으로 정확히 체크
     if(p && OWNED_CODES.has(c + '::' + p)) return true;
-    // 코드만으로도 체크 (부위 무관)
-    if(OWNED_CODES.has(c)) return true;
-    // OWNED_CODES 중 같은 코드번호가 있는지 확인 (부위가 다를 수 있으므로)
+    // OWNED_CODES 내에 같은 코드+부위 항목 확인
     for(const entry of OWNED_CODES){
-      if(entry === c || entry.startsWith(c + '::')) return true;
+      if(entry.startsWith(c + '::')){
+        // 부위가 지정된 경우: 입력 부위와 일치해야만 보유로 인정
+        if(p){
+          const entryPart = entry.slice(c.length + 2);
+          if(entryPart === p) return true;
+        } else {
+          return true;
+        }
+      }
+      // 코드만 단독으로 저장된 경우 (숫자만 입력된 케이스)
+      if(entry === c) return true;
     }
     return false;
   }
@@ -302,12 +354,12 @@
     (names || []).forEach(function(s){
       s = String(s || '').trim();
       if(!s) return;
-      // "숫자::부위" 형식이면 코드 기반
-      if(/^\d+::/.test(s) || /^\d+$/.test(s)){
+      // "숫자::부위" 형식이면 코드 기반 (코드 단독은 추가하지 않음 - 다른 부위 오매칭 방지)
+      if(/^\d+::/.test(s)){
         codeEntries.push(s);
-        // 숫자 부분만 추출해서도 추가
-        const numPart = s.split('::')[0];
-        if(numPart) codeEntries.push(numPart);
+      } else if(/^\d+$/.test(s)){
+        // 숫자만 입력된 경우도 코드로 처리 (코드::'' 형태로 저장하지 않고 단독 유지)
+        codeEntries.push(s);
       } else {
         nameEntries.push(normName(s));
       }
@@ -409,6 +461,7 @@ function trim(s){ return norm(s).trim(); }
     const na = trim(set.name_na);
     const cn = trim(set.name_cn);
     const en = trim(set.name_en);
+    const jp = trim(set.name_jp);
     let kr = trim(set.name_kr);
 
     // fallback: if KR missing, show "(번역)" using CN -> EN -> NA
@@ -420,6 +473,7 @@ function trim(s){ return norm(s).trim(); }
     if(na) lines.push("북미: " + na);
     if(cn) lines.push("중국: " + cn);
     if(en) lines.push("영어: " + en);
+    if(jp) lines.push("일본: " + jp);
     if(kr) lines.push("한국: " + kr);
     return lines;
   }
@@ -453,7 +507,22 @@ function trim(s){ return norm(s).trim(); }
 
   function renderList(){
     const query = trim(q.value);
-    const full = SETS.filter(s=>matchesQuery(s, query));
+    const showMissingOnly = missingFilterCb && missingFilterCb.checked;
+    let full = SETS.filter(s=>matchesQuery(s, query));
+
+    // 미보유 필터: 보유 데이터가 있을 때만 활성화
+    if(showMissingOnly && (OWNED_CODES.size > 0 || OWNED_NAMES.size > 0)){
+      full = full.filter(s => {
+        const allParts = getAllSetParts(s);
+        return allParts.some(p => {
+          const code = (p.code==null)?"":String(p.code);
+          const name = trim(p.name) || "";
+          if(OWNED_CODES.size>0) return !isOwnedByCode(code, p.part);
+          return name && !isOwned(name);
+        });
+      });
+    }
+
     const total = full.length;
 
     // empty + normalize page
@@ -475,26 +544,46 @@ function trim(s){ return norm(s).trim(); }
       const img = trim(s.thumb) || (Array.isArray(s.images) && s.images[0]) || "";
       const sub = listSubName(s);
 
-      // 완성도 계산
+      // 기본 파츠 완성도
       const parts = Array.isArray(s.parts) ? s.parts : [];
       let ownedCount = 0;
       parts.forEach(p => {
-        const resolved = resolvePartAndItem(p.part, (p.code==null)?"":(p.code));
-        const name = trim(p.name) || trim(resolved.item && resolved.item.name) || "";
         const code = (p.code == null) ? "" : String(p.code);
-        if(OWNED_CODES.size > 0){
-          if(isOwnedByCode(code, p.part)) ownedCount++;
-        } else if(name && isOwned(name)){
-          ownedCount++;
-        }
+        const name = trim(p.name) || "";
+        if(OWNED_CODES.size > 0){ if(isOwnedByCode(code, p.part)) ownedCount++; }
+        else if(name && isOwned(name)){ ownedCount++; }
       });
-      const total = parts.length;
-      const pct = total > 0 ? Math.round(ownedCount / total * 100) : 0;
+      const partTotal = parts.length;
+      const pct = partTotal > 0 ? Math.round(ownedCount / partTotal * 100) : 0;
       const barColor = pct === 100 ? '#22c55e' : pct >= 50 ? '#f59e0b' : '#f43f5e';
-      const completionHtml = total > 0 ? `
+
+      // 변형(리폼/포즈) 완성도 칩
+      const variants = Array.isArray(s.variants) ? s.variants : [];
+      let variantChipsHtml = '';
+      if(variants.length > 0 && (OWNED_CODES.size > 0 || OWNED_NAMES.size > 0)){
+        variantChipsHtml = variants.map(v => {
+          const vitems = Array.isArray(v.items) ? v.items : [];
+          if(!vitems.length) return '';
+          let vo=0;
+          vitems.forEach(it=>{
+            const c=(it.code==null)?"":String(it.code);
+            const n=trim(it.name)||"";
+            if(OWNED_CODES.size>0){if(isOwnedByCode(c,it.part)) vo++;}
+            else if(n && isOwned(n)) vo++;
+          });
+          const vt=vitems.length;
+          const vp=vt>0?Math.round(vo/vt*100):0;
+          const vc=vp===100?'#22c55e':vp>=50?'#f59e0b':'#f43f5e';
+          const vlabel=trim(v.label)||trim(v.type)||"변형";
+          return `<span class="variant-chip" style="background:${vc}22;color:${vc};border:1px solid ${vc}55">${escapeHtml(vlabel)} ${vo}/${vt} (${vp}%)</span>`;
+        }).join('');
+      }
+
+      const completionHtml = partTotal > 0 ? `
         <div class="completion-bar-wrap">
-          <div class="completion-text" style="color:${barColor}">${ownedCount}/${total} 보유 (${pct}%)</div>
+          <div class="completion-text" style="color:${barColor}">${ownedCount}/${partTotal} 보유 (${pct}%)</div>
           <div class="completion-bar-bg"><div class="completion-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+          ${variantChipsHtml ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${variantChipsHtml}</div>` : ''}
         </div>` : '';
 
       card.innerHTML = `
@@ -781,11 +870,63 @@ function trim(s){ return norm(s).trim(); }
 
         // variants
     renderVariants(set);
+    renderMissingSection(set);
 
     if(dlg && dlg.showModal) try{ parent && parent.postMessage && parent.postMessage({type:'SETS_DIALOG_OPEN'}, '*'); }catch(e){}
     dlg.showModal();
   }
 
+  // 미보유 아이템 섹션 렌더링
+  function renderMissingSection(set){
+    if(!missingSection || !missingList) return;
+    const hasOwned = OWNED_CODES.size > 0 || OWNED_NAMES.size > 0;
+    if(!hasOwned){ missingSection.style.display="none"; return; }
+
+    const allParts = getAllSetParts(set);
+    // 코드+부위 기준 중복 제거 (리폼/포즈에서 기본 파츠와 같은 코드가 겹치는 경우 방지)
+    const seenKeys = new Set();
+    const uniqueParts = allParts.filter(p=>{
+      const code=(p.code==null)?"":String(p.code);
+      const key=code+"::"+trim(p.part||"");
+      if(code && seenKeys.has(key)) return false;
+      if(code) seenKeys.add(key);
+      return true;
+    });
+    const missing = uniqueParts.filter(p=>{
+      const code=(p.code==null)?"":String(p.code);
+      const name=trim(p.name)||"";
+      if(OWNED_CODES.size>0) return code && !isOwnedByCode(code, p.part);
+      return name && !isOwned(name);
+    });
+
+    if(!missing.length){ missingSection.style.display="none"; return; }
+    missingSection.style.display="block";
+    missingCount.textContent = missing.length + "개";
+    missingList.innerHTML="";
+    const frag=document.createDocumentFragment();
+    missing.forEach(p=>{
+      const code=(p.code==null)?"":p.code;
+      const resolved=resolvePartAndItem(p.part, code);
+      const part=resolved.part;
+      const fromItems=resolved.item;
+      const img=trim(p.img)||trim(fromItems&&fromItems.img)||"";
+      const name=trim(p.name)||trim(fromItems&&fromItems.name)||"-";
+      const div=document.createElement("div");
+      div.className="pitem owned-no";
+      div.innerHTML=`
+        ${img?`<img class="pimg" src="${img}" alt="" loading="lazy" decoding="async">`:`<div class="pimg"></div>`}
+        <div class="pmeta">
+          <div class="pname">${escapeHtml(name)}</div>
+          <div class="ppart">${escapeHtml(part||"-")}</div>
+          <div class="code">code: ${escapeHtml(String(code||"-"))}</div>
+        </div>
+        <span class="owned-badge no">✗ 미보유</span>
+      `;
+      div.addEventListener("click",()=>openItemDetail({part, code}));
+      frag.appendChild(div);
+    });
+    missingList.appendChild(frag);
+  }
 
 
 
@@ -810,36 +951,64 @@ function trim(s){ return norm(s).trim(); }
       const group = document.createElement("div");
       group.className = "vgroup";
 
-      const vt = document.createElement("div");
-      vt.className = "vtitle";
-      vt.textContent = trim(v.label) || trim(v.type) || "파생";
-      group.appendChild(vt);
+      // 완성도 계산
+      const vitems = Array.isArray(v.items) ? v.items : [];
+      let vo=0;
+      const hasOwned2 = OWNED_CODES.size>0 || OWNED_NAMES.size>0;
+      if(hasOwned2){
+        vitems.forEach(it=>{
+          const c=(it.code==null)?"":String(it.code);
+          const n=trim(it.name)||"";
+          if(OWNED_CODES.size>0){if(isOwnedByCode(c,it.part)) vo++;}
+          else if(n && isOwned(n)) vo++;
+        });
+      }
+      const vt2=vitems.length;
+      const vp2=vt2>0?Math.round(vo/vt2*100):0;
+      const vc2=vp2===100?'#22c55e':vp2>=50?'#f59e0b':'#f43f5e';
+
+      const headDiv = document.createElement("div");
+      headDiv.className = "vgroup-head";
+      headDiv.innerHTML = `
+        <div class="vtitle" style="margin:0">${escapeHtml(trim(v.label)||trim(v.type)||"파생")}</div>
+        ${(hasOwned2 && vt2>0) ? `<span class="vgroup-pct" style="color:${vc2};background:${vc2}18;border:1px solid ${vc2}44">${vo}/${vt2} 보유 (${vp2}%)</span>` : ''}
+      `;
+      group.appendChild(headDiv);
 
       // --- evolve: stages -> items + reform per stage
       if(vtype === "evolve" && Array.isArray(v.stages)){
-        // ✅ "리폼처럼" 단계별로 아래로 쌓기 (스크롤/진화결과/완료 문구 없음)
         v.stages.forEach(stg=>{
           const stageGroup = document.createElement("div");
           stageGroup.className = "vgroup";
 
-          const st = document.createElement("div");
-          st.className = "vtitle";
-          st.textContent = trim(stg.label) || (`진화 ${stg.stage || ""}단계`).trim();
-          stageGroup.appendChild(st);
+          // evolve 단계 완성도
+          const sitems=[...(Array.isArray(stg.items)?stg.items:[]),...(Array.isArray(stg.reform)?stg.reform:[])];
+          let svo=0;
+          if(hasOwned2) sitems.forEach(it=>{
+            const c=(it.code==null)?"":String(it.code);
+            const n=trim(it.name)||"";
+            if(OWNED_CODES.size>0){if(isOwnedByCode(c,it.part)) svo++;}
+            else if(n && isOwned(n)) svo++;
+          });
+          const svt=sitems.length;
+          const svp=svt>0?Math.round(svo/svt*100):0;
+          const svc=svp===100?'#22c55e':svp>=50?'#f59e0b':'#f43f5e';
+
+          const sh = document.createElement("div");
+          sh.className = "vgroup-head";
+          sh.innerHTML = `
+            <div class="vtitle" style="margin:0">${escapeHtml(trim(stg.label)||(`진화 ${stg.stage||""}단계`).trim())}</div>
+            ${(hasOwned2 && svt>0)?`<span class="vgroup-pct" style="color:${svc};background:${svc}18;border:1px solid ${svc}44">${svo}/${svt} 보유 (${svp}%)</span>`:''}
+          `;
+          stageGroup.appendChild(sh);
 
           const wrap = document.createElement("div");
           wrap.className = "vlist";
-
-          const items = Array.isArray(stg.items) ? stg.items : [];
-          items.forEach(it => wrap.appendChild(makeVariantCard(it)));
-
-          const reforms = Array.isArray(stg.reform) ? stg.reform : [];
-          reforms.forEach(it => wrap.appendChild(makeVariantCard(it)));
-
+          (Array.isArray(stg.items)?stg.items:[]).forEach(it => wrap.appendChild(makeVariantCard(it)));
+          (Array.isArray(stg.reform)?stg.reform:[]).forEach(it => wrap.appendChild(makeVariantCard(it)));
           stageGroup.appendChild(wrap);
           frag.appendChild(stageGroup);
         });
-
         continue;
       }
 
@@ -872,8 +1041,16 @@ function trim(s){ return norm(s).trim(); }
     const chain = (it.chain_from!=null && it.chain_from!=="") ? ` / from:${it.chain_from}` : "";
     const color = trim(it.color) ? ` / ${trim(it.color)}` : "";
 
+    // 보유 판정 (리폼/포즈 등 variants에도 표시)
+    let ownedFlag = null;
+    if(OWNED_CODES.size > 0){
+      ownedFlag = isOwnedByCode(code, part);
+    } else if(name && name !== '-'){
+      ownedFlag = isOwned(name);
+    }
+
     const div = document.createElement("div");
-    div.className = "pitem";
+    div.className = "pitem" + (ownedFlag === true ? " owned-yes" : ownedFlag === false ? " owned-no" : "");
     div.innerHTML = `
       ${img ? `<img class="pimg" src="${img}" alt="" loading="lazy" decoding="async">` : `<div class="pimg"></div>`}
       <div class="pmeta">
@@ -881,6 +1058,7 @@ function trim(s){ return norm(s).trim(); }
         <div class="ppart">${escapeHtml(part || "-")}</div>
         <div class="code">code: ${escapeHtml(String(code||"-"))}${escapeHtml(color)}${escapeHtml(base)}${escapeHtml(chain)}</div>
       </div>
+      ${ownedFlag !== null ? `<span class="owned-badge ${ownedFlag ? 'yes' : 'no'}">${ownedFlag ? '✓ 보유' : '✗ 미보유'}</span>` : ''}
     `;
     div.addEventListener("click", ()=>openItemDetail({part, code}));
     return div;
@@ -937,6 +1115,15 @@ function trim(s){ return norm(s).trim(); }
   }
 
   q.addEventListener("input", ()=>{ currentPage = 1; renderList(); });
+
+  // 미보유 필터 토글
+  if(missingFilterCb && missingFilterToggle){
+    missingFilterCb.addEventListener("change", ()=>{
+      missingFilterToggle.classList.toggle("active", missingFilterCb.checked);
+      currentPage = 1;
+      renderList();
+    });
+  }
 
   // receive data from iframes
   window.addEventListener("message", (ev)=>{

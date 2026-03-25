@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>세트 보유 체크</title>
+<style>
+/* ── 폰트 ── */
+@font-face {
+  font-family: "AngyeongGothic";
+  src: url("Ba안경고딕_김영화_cej8784_naver_com_.ttf") format("truetype");
+  font-weight: normal; font-style: normal; font-display: swap;
+}
+* { font-family: "AngyeongGothic", system-ui, AppleSDGothicNeo, sans-serif !important; box-sizing: border-box; }
+
+/* ── 변수 ── */
+:root {
+  --pk-1:#e91e8c; --pk-2:#f06292; --pk-3:#f48fb1;
+  --pk-4:#fce4ec; --pk-5:#fff5f8;
+  --pk-border:#f8bbd0;
+  --pk-grad:linear-gradient(135deg,#e91e8c,#f06292);
+  --pk-muted:#a06080;
+  --pk-text:#2d1a22;
+}
+::-webkit-scrollbar{width:7px;height:7px}
+::-webkit-scrollbar-track{background:var(--pk-5);border-radius:999px}
+::-webkit-scrollbar-thumb{background:var(--pk-3);border-radius:999px}
+::-webkit-scrollbar-thumb:hover{background:var(--pk-2)}
+*{scrollbar-width:thin;scrollbar-color:var(--pk-3) var(--pk-5)}
+
+body { margin:0; background:var(--pk-5); color:var(--pk-text); }
+
+/* ── 헤더 ── */
+.header {
+  background: var(--pk-grad);
+  padding: 16px 20px;
+  display: flex; align-items: center; gap: 12px;
+  position: sticky; top: 0; z-index: 10;
+  box-shadow: 0 2px 12px rgba(233,30,140,.2);
+}
+.header-title { font-size: 20px; font-weight: 500; color: #fff; }
+.header-sub { font-size: 13px; color: rgba(255,255,255,.8); margin-top: 2px; }
+
+/* ── 입력 영역 ── */
+.input-section {
+  background: #fff;
+  border-bottom: 1.5px solid var(--pk-border);
+  padding: 14px 20px;
+}
+.input-label { font-size: 15px; font-weight: 500; color: var(--pk-1); margin-bottom: 6px; }
+.input-sub { font-size: 13px; color: var(--pk-muted); margin-bottom: 8px; }
+.input-row { display: flex; gap: 8px; align-items: flex-start; flex-wrap: wrap; }
+#ownedInput {
+  flex: 1; min-width: 260px; min-height: 80px;
+  padding: 10px 12px; border: 1.5px solid var(--pk-border);
+  border-radius: 12px; font-size: 15px; color: var(--pk-text);
+  background: var(--pk-5); resize: vertical; outline: none;
+  transition: border-color .15s;
+}
+#ownedInput:focus { border-color: var(--pk-2); box-shadow: 0 0 0 3px rgba(233,30,140,.1); }
+.btn {
+  padding: 10px 18px; border-radius: 12px; border: none; cursor: pointer;
+  font-size: 15px; font-weight: 500; transition: opacity .13s, transform .1s;
+}
+.btn:active { transform: scale(.97); }
+.btn-primary { background: var(--pk-grad); color: #fff; }
+.btn-ghost { background: var(--pk-4); color: var(--pk-1); border: 1.5px solid var(--pk-border); }
+.btn:hover { opacity: .88; }
+
+/* ── 통계 바 ── */
+.stat-bar {
+  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  padding: 10px 20px; background: #fff;
+  border-bottom: 1.5px solid var(--pk-border);
+}
+.stat-chip {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 6px 14px; border-radius: 12px;
+  background: var(--pk-5); border: 1.5px solid var(--pk-border);
+  min-width: 70px;
+}
+.stat-chip .lbl { font-size: 12px; color: var(--pk-muted); }
+.stat-chip .num { font-size: 20px; font-weight: 700; color: var(--pk-1); line-height: 1.2; }
+.stat-chip.green .num { color: #16a34a; }
+.stat-chip.red .num { color: #dc2626; }
+.progress-wrap { flex: 1; min-width: 160px; }
+.progress-bg { height: 8px; border-radius: 999px; background: var(--pk-4); overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 999px; background: var(--pk-grad); transition: width .5s; }
+.progress-label { font-size: 13px; font-weight: 500; color: var(--pk-1); margin-bottom: 3px; }
+
+/* ── 필터 탭 ── */
+.filter-row {
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  padding: 10px 20px; background: var(--pk-5);
+  border-bottom: 1.5px solid var(--pk-border);
+  position: sticky; top: 62px; z-index: 9;
+}
+.ftab {
+  padding: 6px 14px; border-radius: 999px;
+  border: 1.5px solid var(--pk-border); background: #fff;
+  font-size: 14px; font-weight: 500; color: var(--pk-muted);
+  cursor: pointer; transition: all .13s;
+}
+.ftab:hover { background: var(--pk-4); border-color: var(--pk-2); color: var(--pk-1); }
+.ftab.active { background: var(--pk-grad); border-color: transparent; color: #fff; }
+.search-input {
+  padding: 6px 12px; border: 1.5px solid var(--pk-border);
+  border-radius: 999px; font-size: 14px; color: var(--pk-text);
+  background: #fff; outline: none; min-width: 180px;
+}
+.search-input:focus { border-color: var(--pk-2); }
+
+/* ── 세트 카드 ── */
+.main { padding: 16px 20px; }
+.set-card {
+  background: #fff; border: 1.5px solid var(--pk-border);
+  border-radius: 18px; margin-bottom: 14px;
+  overflow: hidden; box-shadow: 0 2px 8px rgba(233,30,140,.06);
+}
+.set-card-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .13s;
+}
+.set-card-head:hover { background: var(--pk-5); }
+.set-card-head.expanded { border-bottom-color: var(--pk-border); background: var(--pk-5); }
+.set-thumb {
+  width: 52px; height: 52px; border-radius: 10px;
+  object-fit: cover; border: 1.5px solid var(--pk-border);
+  background: var(--pk-5); flex-shrink: 0;
+}
+.set-info { flex: 1; min-width: 0; }
+.set-name { font-size: 16px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.set-sub { font-size: 13px; color: var(--pk-muted); }
+.set-completion { min-width: 120px; text-align: right; }
+.comp-bar-bg { height: 5px; border-radius: 999px; background: var(--pk-4); overflow: hidden; margin-top: 3px; width: 100px; margin-left: auto; }
+.comp-bar-fill { height: 100%; border-radius: 999px; transition: width .4s; }
+.comp-text { font-size: 13px; font-weight: 500; }
+.toggle-icon { font-size: 18px; color: var(--pk-muted); flex-shrink: 0; transition: transform .2s; }
+.toggle-icon.open { transform: rotate(180deg); }
+
+/* ── 파츠 그리드 ── */
+.set-body { padding: 10px 14px 14px; display: none; }
+.set-body.show { display: block; }
+.section-title {
+  font-size: 14px; font-weight: 500; color: var(--pk-muted);
+  margin: 10px 0 6px 0; display: flex; align-items: center; gap: 8px;
+}
+.section-title::after { content: ''; flex: 1; height: 1px; background: var(--pk-border); }
+.section-pct {
+  font-size: 12px; font-weight: 500; padding: 2px 8px;
+  border-radius: 999px;
+}
+.parts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 6px;
+}
+.pitem {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 12px;
+  border: 1.5px solid var(--pk-border); background: #fff;
+  font-size: 14px;
+}
+.pitem.owned { border-color: #bbf7d0; background: #f0fdf4; }
+.pitem.missing { border-color: #fecaca; background: #fff5f5; }
+.pitem.unknown { opacity: .6; }
+.part-icon { font-size: 15px; flex-shrink: 0; }
+.part-info { flex: 1; min-width: 0; }
+.part-name { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.part-code { font-size: 12px; color: var(--pk-muted); }
+.owned-badge {
+  font-size: 12px; font-weight: 500; padding: 2px 7px;
+  border-radius: 999px; flex-shrink: 0;
+}
+.badge-owned { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+.badge-missing { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+.badge-unknown { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
+
+/* ── 빈 상태 ── */
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  color: var(--pk-muted); font-size: 16px;
+}
+.empty-icon { font-size: 48px; margin-bottom: 10px; }
+
+/* ── 반응형 ── */
+@media(max-width:480px){
+  .input-row { flex-direction: column; }
+  #ownedInput { min-width: 0; width: 100%; }
+  .parts-grid { grid-template-columns: 1fr; }
+  .filter-row { top: 56px; }
+}
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="header">
+  <div>
+    <div class="header-title">🔍 세트 아이템 보유 체크</div>
+    <div class="header-sub">세트별로 등록/미등록 아이템을 한눈에 확인해</div>
+  </div>
+</div>
+
+<!-- 입력 영역 -->
+<div class="input-section">
+  <div class="input-label">보유 의상 코드 입력</div>
+  <div class="input-sub">형식: <code>코드번호::부위</code> (예: <code>1077::뷰티</code>, <code>4477::헤어</code>) — 줄바꿈 또는 쉼표로 구분</div>
+  <div class="input-row">
+    <textarea id="ownedInput" placeholder="예)&#10;4477::헤어&#10;3920::원피스&#10;1077::뷰티&#10;17900::장식 - 머리 - 머리"></textarea>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <button class="btn btn-primary" id="applyBtn">✓ 적용</button>
+      <button class="btn btn-ghost" id="clearBtn">✕ 초기화</button>
+      <button class="btn btn-ghost" id="expandAllBtn">▾ 전체 펼치기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 통계 바 -->
+<div class="stat-bar" id="statBar" style="display:none">
+  <div class="stat-chip">
+    <div class="lbl">전체 세트</div>
+    <div class="num" id="statTotal">0</div>
+  </div>
+  <div class="stat-chip green">
+    <div class="lbl">완성</div>
+    <div class="num" id="statComplete">0</div>
+  </div>
+  <div class="stat-chip red">
+    <div class="lbl">미완성</div>
+    <div class="num" id="statIncomplete">0</div>
+  </div>
+  <div class="stat-chip">
+    <div class="lbl">전체 아이템</div>
+    <div class="num" id="statItems">0</div>
+  </div>
+  <div class="stat-chip green">
+    <div class="lbl">보유</div>
+    <div class="num" id="statOwned">0</div>
+  </div>
+  <div class="stat-chip red">
+    <div class="lbl">미보유</div>
+    <div class="num" id="statMissing">0</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label" id="statPctLabel">0%</div>
+    <div class="progress-bg">
+      <div class="progress-fill" id="statProgressFill" style="width:0%"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 필터 탭 -->
+<div class="filter-row">
+  <button class="ftab active" data-filter="all">전체</button>
+  <button class="ftab" data-filter="incomplete">⚠ 미완성만</button>
+  <button class="ftab" data-filter="complete">✓ 완성만</button>
+  <input class="search-input" id="searchInput" placeholder="세트 이름 검색…" type="text"/>
+</div>
+
+<!-- 세트 목록 -->
+<div class="main" id="main">
+  <div class="empty-state">
+    <div class="empty-icon">📋</div>
+    <div>보유 코드를 입력하고 <strong>적용</strong>을 눌러줘!</div>
+    <div style="font-size:14px;margin-top:6px;color:var(--pk-muted)">세트별 등록/미등록 아이템이 표시돼</div>
+  </div>
+</div>
+
+<!-- 데이터 로더 -->
+<iframe id="setsLoader" src="sets_data.html" style="display:none"></iframe>
+
+<script>
+(function(){
+  // ── 상태 ──
+  let SETS = [];
+  let OWNED_CODES = new Set();
+  let OWNED_NAMES = new Set();
+  let currentFilter = 'all';
+  let currentSearch = '';
+  let allExpanded = false;
+
+  // ── 유틸 ──
+  function trim(s){ return String(s||'').trim(); }
+  function esc(s){ return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function normName(s){ return String(s||'').replace(/[\s\-·・''`]/g,'').toLowerCase(); }
+
+  // ── 보유 판정 ──
+  function isOwnedByCode(code, part){
+    if(!code && code !== 0) return null; // 코드 없으면 판정 불가
+    const c = String(code);
+    const p = String(part||'');
+    if(p && OWNED_CODES.has(c + '::' + p)) return true;
+    for(const entry of OWNED_CODES){
+      if(entry.startsWith(c + '::')){
+        if(p){ if(entry.slice(c.length+2)===p) return true; }
+        else return true;
+      }
+      if(entry === c) return true;
+    }
+    return false;
+  }
+  function isOwnedByName(name){
+    if(!name) return null;
+    return OWNED_NAMES.has(normName(name)) ? true : false;
+  }
+  function checkOwned(code, part, name){
+    if(OWNED_CODES.size > 0) return isOwnedByCode(code, part);
+    if(OWNED_NAMES.size > 0) return isOwnedByName(name);
+    return null; // 보유 데이터 없음
+  }
+
+  // ── 세트에서 모든 파츠 추출 (기본 + variants) ──
+  function getVariantGroups(set){
+    const groups = [];
+    const vlist = Array.isArray(set.variants) ? set.variants : [];
+    for(const v of vlist){
+      if(!v) continue;
+      const vtype = String(v.type||'').toLowerCase();
+      if(vtype === 'evolve' && Array.isArray(v.stages)){
+        for(const stg of v.stages){
+          const items = [
+            ...(Array.isArray(stg.items)?stg.items:[]),
+            ...(Array.isArray(stg.reform)?stg.reform:[])
+          ];
+          groups.push({ label: trim(stg.label)||(('진화 '+(stg.stage||'')).trim()), items });
+        }
+      } else {
+        const items = Array.isArray(v.items) ? v.items : [];
+        groups.push({ label: trim(v.label)||trim(v.type)||'변형', items });
+      }
+    }
+    return groups;
+  }
+
+  // ── 완성도 계산 ──
+  function calcCompletion(items){
+    if(!items.length) return { owned:0, total:0, pct:0, hasData:false };
+    const hasData = OWNED_CODES.size > 0 || OWNED_NAMES.size > 0;
+    if(!hasData) return { owned:0, total:items.length, pct:0, hasData:false };
+    let owned = 0;
+    for(const p of items){
+      const r = checkOwned(p.code, p.part, p.name);
+      if(r === true) owned++;
+    }
+    const pct = Math.round(owned / items.length * 100);
+    return { owned, total: items.length, pct, hasData: true };
+  }
+
+  // ── 부위 표시이름 ──
+  const PART_ICONS = {
+    '헤어':'💇','원피스':'👗','아우터':'🧥','상의':'👕','하의':'👖',
+    '양말':'🧦','신발':'👟','뷰티':'💄','반딧불의 영혼':'✨',
+    '장식':'💍','default':'🔹'
+  };
+  function partIcon(part){
+    const s = String(part||'');
+    for(const k of Object.keys(PART_ICONS)){
+      if(s.startsWith(k)) return PART_ICONS[k];
+    }
+    return PART_ICONS.default;
+  }
+  function partShort(part){
+    return String(part||'').replace('장식 - ','').replace('특수 - ','').replace('머리 - ','').replace('목 - ','').replace('손 - ','').replace('소품 - ','');
+  }
+
+  // ── 파츠 카드 HTML 렌더 ──
+  function renderPartItem(p){
+    const code = (p.code==null)?'':p.code;
+    const part = trim(p.part);
+    const name = trim(p.name)||'-';
+    const r = checkOwned(code, part, p.name);
+    const cls = r===true ? 'owned' : r===false ? 'missing' : 'unknown';
+    const badgeCls = r===true ? 'badge-owned' : r===false ? 'badge-missing' : 'badge-unknown';
+    const badgeTxt = r===true ? '✓ 보유' : r===false ? '✗ 미보유' : '? 미확인';
+    return `
+      <div class="pitem ${cls}">
+        <span class="part-icon">${esc(partIcon(part))}</span>
+        <div class="part-info">
+          <div class="part-name">${esc(name)}</div>
+          <div class="part-code">${esc(partShort(part))} · code ${esc(String(code||'-'))}</div>
+        </div>
+        <span class="owned-badge ${badgeCls}">${badgeTxt}</span>
+      </div>`;
+  }
+
+  // ── 섹션 타이틀 HTML ──
+  function sectionTitle(label, comp){
+    const hasData = comp.hasData;
+    const color = !hasData ? '#6b7280' : comp.pct===100 ? '#16a34a' : comp.pct>=50 ? '#d97706' : '#dc2626';
+    const bg = !hasData ? '#f3f4f6' : comp.pct===100 ? '#dcfce7' : comp.pct>=50 ? '#fef9c3' : '#fee2e2';
+    const pctHtml = hasData
+      ? `<span class="section-pct" style="color:${color};background:${bg};border:1px solid ${color}44">${comp.owned}/${comp.total} (${comp.pct}%)</span>`
+      : '';
+    return `<div class="section-title">${esc(label)}${pctHtml}</div>`;
+  }
+
+  // ── 세트 카드 HTML 렌더 ──
+  function renderSetCard(set, idx){
+    const name = trim(set.name_kr || set.name_en || set.name_cn || set.id || '?');
+    const sub = [set.name_en, set.name_cn].filter(Boolean).filter(s=>s!==name).join(' / ');
+    const thumb = trim(set.thumb) || (Array.isArray(set.images)&&set.images[0]) || '';
+    const baseParts = Array.isArray(set.parts) ? set.parts : [];
+    const baseComp = calcCompletion(baseParts);
+    const varGroups = getVariantGroups(set);
+
+    // 색상
+    const color = !baseComp.hasData ? 'var(--pk-1)'
+      : baseComp.pct===100 ? '#16a34a'
+      : baseComp.pct>=50 ? '#d97706' : '#dc2626';
+
+    const compHtml = baseComp.hasData
+      ? `<div class="comp-text" style="color:${color}">${baseComp.owned}/${baseComp.total} (${baseComp.pct}%)</div>
+         <div class="comp-bar-bg"><div class="comp-bar-fill" style="width:${baseComp.pct}%;background:${color}"></div></div>`
+      : `<div class="comp-text" style="color:var(--pk-muted)">부위 ${baseParts.length}개</div>`;
+
+    // body
+    let bodyHtml = '';
+    // 기본 파츠
+    if(baseParts.length){
+      bodyHtml += sectionTitle('기본 파츠', baseComp);
+      bodyHtml += `<div class="parts-grid">`;
+      bodyHtml += baseParts.map(renderPartItem).join('');
+      bodyHtml += `</div>`;
+    }
+    // 변형 그룹
+    for(const g of varGroups){
+      if(!g.items.length) continue;
+      const gComp = calcCompletion(g.items);
+      bodyHtml += sectionTitle(g.label, gComp);
+      bodyHtml += `<div class="parts-grid">`;
+      bodyHtml += g.items.map(renderPartItem).join('');
+      bodyHtml += `</div>`;
+    }
+
+    const isExpanded = allExpanded;
+
+    return `
+      <div class="set-card" data-idx="${idx}">
+        <div class="set-card-head${isExpanded?' expanded':''}" onclick="toggleCard(this)">
+          ${thumb ? `<img class="set-thumb" src="${esc(thumb)}" alt="" loading="lazy">` : `<div class="set-thumb"></div>`}
+          <div class="set-info">
+            <div class="set-name">${esc(name)}</div>
+            ${sub ? `<div class="set-sub">${esc(sub)}</div>` : ''}
+          </div>
+          <div class="set-completion">${compHtml}</div>
+          <span class="toggle-icon${isExpanded?' open':''}">▾</span>
+        </div>
+        <div class="set-body${isExpanded?' show':''}">
+          ${bodyHtml || '<div style="color:var(--pk-muted);font-size:14px">부위 데이터가 없어.</div>'}
+        </div>
+      </div>`;
+  }
+
+  // ── 필터/검색 적용 후 렌더 ──
+  function render(){
+    const main = document.getElementById('main');
+    const hasOwned = OWNED_CODES.size > 0 || OWNED_NAMES.size > 0;
+
+    if(!SETS.length){
+      main.innerHTML = `<div class="empty-state"><div class="empty-icon">⏳</div><div>세트 데이터 로딩 중...</div></div>`;
+      return;
+    }
+    if(!hasOwned){
+      main.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div>보유 코드를 입력하고 <strong>적용</strong>을 눌러줘!</div><div style="font-size:14px;margin-top:6px;color:var(--pk-muted)">세트별 등록/미등록 아이템이 표시돼</div></div>`;
+      document.getElementById('statBar').style.display = 'none';
+      return;
+    }
+
+    // 필터 적용
+    let list = SETS.map((s, i) => {
+      const baseParts = Array.isArray(s.parts) ? s.parts : [];
+      const comp = calcCompletion(baseParts);
+      return { set: s, idx: i, comp };
+    });
+
+    // 검색
+    if(currentSearch){
+      const q = normName(currentSearch);
+      list = list.filter(({set:s}) => {
+        return normName(s.name_kr).includes(q)
+          || normName(s.name_en).includes(q)
+          || normName(s.name_cn).includes(q)
+          || normName(s.id).includes(q);
+      });
+    }
+
+    // 탭 필터
+    if(currentFilter === 'incomplete'){
+      list = list.filter(({comp}) => comp.pct < 100);
+    } else if(currentFilter === 'complete'){
+      list = list.filter(({comp}) => comp.pct === 100);
+    }
+
+    // 통계 (검색/필터 전 전체 기준)
+    let totalItems=0, totalOwned=0, completeSets=0;
+    SETS.forEach(s=>{
+      const parts = Array.isArray(s.parts)?s.parts:[];
+      const c = calcCompletion(parts);
+      totalItems += c.total;
+      totalOwned += c.owned;
+      if(c.pct===100 && c.total>0) completeSets++;
+    });
+    const totalMissing = totalItems - totalOwned;
+    const overallPct = totalItems>0 ? Math.round(totalOwned/totalItems*100) : 0;
+
+    const sb = document.getElementById('statBar');
+    sb.style.display = 'flex';
+    document.getElementById('statTotal').textContent = SETS.length;
+    document.getElementById('statComplete').textContent = completeSets;
+    document.getElementById('statIncomplete').textContent = SETS.length - completeSets;
+    document.getElementById('statItems').textContent = totalItems;
+    document.getElementById('statOwned').textContent = totalOwned;
+    document.getElementById('statMissing').textContent = totalMissing;
+    document.getElementById('statPctLabel').textContent = overallPct + '% 보유';
+    document.getElementById('statProgressFill').style.width = overallPct + '%';
+
+    if(!list.length){
+      main.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><div>검색 결과가 없어.</div></div>`;
+      return;
+    }
+
+    main.innerHTML = list.map(({set:s, idx}) => renderSetCard(s, idx)).join('');
+  }
+
+  // ── 카드 토글 ──
+  window.toggleCard = function(head){
+    const card = head.closest('.set-card');
+    const body = card.querySelector('.set-body');
+    const icon = head.querySelector('.toggle-icon');
+    const expanded = body.classList.toggle('show');
+    head.classList.toggle('expanded', expanded);
+    icon.classList.toggle('open', expanded);
+  };
+
+  // ── 보유 파싱 ──
+  function parseAndApply(){
+    const raw = document.getElementById('ownedInput').value;
+    const lines = raw.split(/[\n\r;,]+/).map(s=>s.trim()).filter(Boolean);
+    const codeEntries = [];
+    const nameEntries = [];
+    for(const s of lines){
+      if(/^\d+::/.test(s)){
+        codeEntries.push(s);
+      } else if(/^\d+$/.test(s)){
+        codeEntries.push(s);
+      } else {
+        nameEntries.push(normName(s));
+      }
+    }
+    OWNED_CODES = new Set(codeEntries);
+    OWNED_NAMES = new Set(nameEntries.filter(Boolean));
+    // 로컬스토리지 저장
+    try{ localStorage.setItem('nikki_check_owned_v1', raw); }catch(e){}
+    render();
+  }
+
+  // ── 이벤트 ──
+  document.getElementById('applyBtn').addEventListener('click', parseAndApply);
+  document.getElementById('ownedInput').addEventListener('keydown', e=>{
+    if(e.ctrlKey && e.key==='Enter') parseAndApply();
+  });
+  document.getElementById('clearBtn').addEventListener('click', ()=>{
+    document.getElementById('ownedInput').value = '';
+    OWNED_CODES = new Set();
+    OWNED_NAMES = new Set();
+    try{ localStorage.removeItem('nikki_check_owned_v1'); }catch(e){}
+    render();
+  });
+  document.getElementById('expandAllBtn').addEventListener('click', ()=>{
+    allExpanded = !allExpanded;
+    document.getElementById('expandAllBtn').textContent = allExpanded ? '▴ 전체 접기' : '▾ 전체 펼치기';
+    render();
+  });
+  document.getElementById('searchInput').addEventListener('input', e=>{
+    currentSearch = e.target.value;
+    render();
+  });
+  document.querySelectorAll('.ftab').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      render();
+    });
+  });
+
+  // ── 데이터 수신 ──
+  window.addEventListener('message', e=>{
+    const msg = e && e.data;
+    if(!msg || typeof msg !== 'object') return;
+    if(msg.__splitData && msg.key === 'sets' && Array.isArray(msg.data)){
+      SETS = msg.data.filter(x=>x && typeof x==='object');
+      // 저장된 코드 복원
+      try{
+        const saved = localStorage.getItem('nikki_check_owned_v1');
+        if(saved){ document.getElementById('ownedInput').value = saved; }
+      }catch(e){}
+      render();
+    }
+  });
+
+  // ── sets_data.html에서 직접도 수신 ──
+  const loader = document.getElementById('setsLoader');
+  loader.onload = function(){
+    try{
+      const w = loader.contentWindow;
+      if(w && w.SETS && Array.isArray(w.SETS)){
+        SETS = w.SETS.filter(x=>x && typeof x==='object');
+        try{
+          const saved = localStorage.getItem('nikki_check_owned_v1');
+          if(saved){ document.getElementById('ownedInput').value = saved; }
+        }catch(e){}
+        render();
+      }
+    }catch(e){}
+  };
+
+})();
+</script>
+</body>
+</html>

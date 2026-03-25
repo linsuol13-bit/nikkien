@@ -606,12 +606,16 @@ var stages = window.stages;
           if(sfEl && sfEl.contentWindow) sfEl.contentWindow.postMessage({type:'SETS_OWNED_UPDATE', owned:owned},'*');
         }
         // iframe이 이미 로드됐으면 바로, 아직이면 load 이벤트 후 전송
+        function sendSetsServer(){
+          var sfEl = document.getElementById('setsViewFrame');
+          if(sfEl && sfEl.contentWindow) sfEl.contentWindow.postMessage({type:'NIKKI_SERVER_CHANGE', server: window.NIKKI_SERVER||'na'}, '*');
+        }
         if(sf && sf.dataset.loaded && sf.contentWindow){
-          setTimeout(sendSetsOwned, 100);
+          setTimeout(function(){ sendSetsServer(); sendSetsOwned(); }, 100);
         } else if(sf){
           sf.addEventListener('load', function onSetsLoad(){
             sf.removeEventListener('load', onSetsLoad);
-            setTimeout(sendSetsOwned, 100);
+            setTimeout(function(){ sendSetsServer(); sendSetsOwned(); }, 100);
           });
         }
       }
@@ -997,6 +1001,12 @@ var CHAR_ICONS = {
   '소민':    'https://drive.google.com/thumbnail?id=1n1MFgSMmKfbrStwpKeTu4bKK9UROCOi1&sz=w1000',
   '문학소녀':    'https://drive.google.com/thumbnail?id=1n1MFgSMmKfbrStwpKeTu4bKK9UROCOi1&sz=w1000',
   '안나':                  'https://drive.google.com/thumbnail?id=1sqjuN12Knc5IPXDfkHFV9gZibTaneHQV&sz=w1000',
+  '리아':                  'https://drive.google.com/thumbnail?id=1l4U8DtqWxJFKPhMDC6VW0D_zhATHBG2u&sz=w1000',
+  '멜라니':                  'https://drive.google.com/thumbnail?id=19o_ToDCnIAzgZYz5hcRVnxsaoFb1LtfX&sz=w1000',
+  '엄청 멋있는 보컬':                  'https://drive.google.com/thumbnail?id=1l4U8DtqWxJFKPhMDC6VW0D_zhATHBG2u&sz=w1000',
+  '여자가 봐도 반할 보컬':                  'https://drive.google.com/thumbnail?id=1l4U8DtqWxJFKPhMDC6VW0D_zhATHBG2u&sz=w1000',
+  '카리스마 넘치는 리드 보컬':                  'https://drive.google.com/thumbnail?id=1l4U8DtqWxJFKPhMDC6VW0D_zhATHBG2u&sz=w1000',
+  '매혹적이고 눈길을 사로잡는 보컬':                  'https://drive.google.com/thumbnail?id=1l4U8DtqWxJFKPhMDC6VW0D_zhATHBG2u&sz=w1000',
   '귀여운 외모의 여자아이':'https://drive.google.com/thumbnail?id=1sqjuN12Knc5IPXDfkHFV9gZibTaneHQV&sz=w1000',
 };
 
