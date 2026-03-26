@@ -3,130 +3,586 @@
 @font-face {
   font-family: "AngyeongGothic";
   src: url("Ba안경고딕_김영화_cej8784_naver_com_.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+  font-weight: normal; font-style: normal; font-display: swap;
 }
 * { font-family: "AngyeongGothic", system-ui, AppleSDGothicNeo, sans-serif !important; }
-.badge, .pill, .pill-small, .tag-pill, .tag-chip,
-.chip, .gtab, .skill, .countpill { font-size: 14px !important; }
-.sc-num, .chip .v, .pill-small .v { font-weight: 700 !important; }
-.tl-title-id, .tl-title-sub, .tl-speaker, .tl-kr-trans { font-weight: 700 !important; }
-.score, .badge { font-weight: 700 !important; }
-.badge.tag, .tag-pill, .tag-chip { font-weight: 400 !important; }
+.badge,.pill,.pill-small,.tag-pill,.tag-chip,.chip,.gtab,.skill,.countpill{font-size:14px!important}
+.sc-num,.chip .v,.pill-small .v{font-weight:700!important}
+.tl-title-id,.tl-title-sub,.tl-speaker,.tl-kr-trans{font-weight:700!important}
+.score,.badge{font-weight:700!important}
+.badge.tag,.tag-pill,.tag-chip{font-weight:400!important}
 </style>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>아이템 상세</title>
 <style>
-  :root{
-    --pk-1:#e91e8c;--pk-2:#f06292;--pk-3:#f48fb1;
-    --pk-4:#fce4ec;--pk-5:#fff5f8;
-    --pk-border:#f8bbd0;
-    --pk-grad:linear-gradient(135deg,#e91e8c,#f06292);
-    --pk-muted:#a06080;
-    --pk-shadow:0 6px 24px rgba(233,30,140,.10);
-    --pk-text:#2d1a22;
+:root {
+  --pk-1:#e91e8c; --pk-2:#f06292; --pk-3:#f48fb1;
+  --pk-4:#fce4ec; --pk-5:#fff5f8;
+  --pk-border:#f8bbd0;
+  --pk-grad:linear-gradient(135deg,#e91e8c,#f06292);
+  --pk-muted:#a06080;
+  --pk-shadow:0 4px 20px rgba(233,30,140,.10);
+  --pk-text:#2d1a22;
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+body {
+  background: var(--pk-5);
+  color: var(--pk-text);
+  min-height: 100vh;
+}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--pk-5);border-radius:999px}
+::-webkit-scrollbar-thumb{background:var(--pk-3);border-radius:999px}
+::-webkit-scrollbar-thumb:hover{background:var(--pk-2)}
+*{scrollbar-width:thin;scrollbar-color:var(--pk-3) var(--pk-5)}
+
+/* ── 최상단 네비바 ── */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,245,248,.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--pk-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+}
+.navbar-btn {
+  width: 32px; height: 32px;
+  border: 1.5px solid var(--pk-border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--pk-muted);
+  font-size: 17px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .12s, border-color .12s, color .12s;
+}
+.navbar-btn:hover { background:var(--pk-4); border-color:var(--pk-2); color:var(--pk-1); }
+.navbar-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--pk-text);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#btnRegisterOwned {
+  margin-left: auto;
+  height: 32px;
+  padding: 0 12px;
+  border: 1.5px solid var(--pk-border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--pk-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+  white-space: nowrap;
+  transition: background .12s, border-color .12s, color .12s;
+}
+#btnRegisterOwned:hover { background:var(--pk-4); border-color:var(--pk-2); color:var(--pk-1); }
+
+/* 언어 선택 */
+.lang-switcher {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+.lang-btn {
+  height: 28px;
+  padding: 0 10px;
+  border: 1.5px solid var(--pk-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--pk-muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .12s, border-color .12s, color .12s;
+}
+.lang-btn:hover { background: var(--pk-4); border-color: var(--pk-2); color: var(--pk-1); }
+.lang-btn.active { background: var(--pk-grad); border-color: transparent; color: #fff; }
+
+/* ── 2단 레이아웃 ── */
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: calc(100vh - 53px);
+}
+
+/* ── 왼쪽 사이드바 ── */
+.sidebar {
+  border-right: 1px solid var(--pk-border);
+  background: #fff;
+  padding: 24px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  position: sticky;
+  top: 53px;
+  height: calc(100vh - 53px);
+  overflow-y: auto;
+}
+
+/* 큰 썸네일 */
+.sidebar-thumb {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 16px;
+  border: 1.5px solid var(--pk-border);
+  background: var(--pk-5);
+  object-fit: cover;
+  display: block;
+  cursor: zoom-in;
+  transition: box-shadow .18s, transform .18s;
+}
+.sidebar-thumb:hover {
+  box-shadow: 0 8px 28px rgba(233,30,140,.2);
+  transform: scale(1.02);
+}
+
+/* 사이드바 아이템 정보 */
+.sidebar-name {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--pk-text);
+  line-height: 1.3;
+  word-break: break-word;
+}
+.sidebar-sub {
+  font-size: 12px;
+  color: var(--pk-muted);
+  margin-top: 3px;
+}
+
+/* 사이드바 칩들 */
+.sidebar-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.s-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: var(--pk-5);
+  border: 1.5px solid var(--pk-border);
+  font-size: 13px;
+}
+.s-chip-label {
+  font-size: 11px;
+  color: var(--pk-muted);
+  white-space: nowrap;
+  min-width: 28px;
+}
+.s-chip-val {
+  font-weight: 500;
+  color: var(--pk-text);
+  word-break: break-all;
+}
+
+/* ── 오른쪽 메인 콘텐츠 ── */
+.main {
+  background: var(--pk-5);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── 섹션 스타일 (기존 클래스 그대로 호환) ── */
+.sec-title {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--pk-1);
+  margin: 0 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sec-title::before {
+  content: '';
+  display: block;
+  width: 3px; height: 14px;
+  background: var(--pk-grad);
+  border-radius: 999px;
+}
+.sec-title small {
+  font-weight: 400;
+  color: var(--pk-muted);
+  font-size: 11px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.box {
+  background: #fff;
+  border: 1.5px solid var(--pk-border);
+  border-radius: 14px;
+  padding: 14px;
+}
+.box-plain { background:transparent; border:none; padding:0; }
+
+/* 각 섹션을 하나의 카드로 */
+.sec-wrap {
+  background: #fff;
+  border: 1.5px solid var(--pk-border);
+  border-radius: 16px;
+  padding: 24px 22px;
+  animation: fadeUp .3s cubic-bezier(.22,1,.36,1) both;
+}
+.sec-wrap:nth-child(1){animation-delay:.04s}
+.sec-wrap:nth-child(2){animation-delay:.07s}
+.sec-wrap:nth-child(3){animation-delay:.10s}
+.sec-wrap:nth-child(4){animation-delay:.13s}
+.sec-wrap:nth-child(5){animation-delay:.16s}
+@keyframes fadeUp {
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ── 다국어 ── */
+.lang-list {
+  display: flex;
+  flex-direction: column;
+}
+.lang-divider {
+  height: 1px;
+  background: var(--pk-border);
+  margin: 12px 0;
+}
+.lang { display:grid; grid-template-columns:52px 1fr; gap:6px 10px; align-items:start; transition: background .15s; border-radius: 8px; padding: 4px 6px; margin: -4px -6px; }
+.lang.lang-active { background: var(--pk-4); }
+.lang+.lang { margin-top:0; }
+.pill {
+  display:inline-flex; align-items:center; justify-content:center;
+  height:22px; padding:0 9px; border-radius:6px;
+  font-size:11px; font-weight:500; border:1.5px solid; width:max-content;
+}
+.pill.ko{background:var(--pk-5);border-color:var(--pk-border);color:var(--pk-1)}
+.pill.zh{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+.pill.ja{background:#eef2ff;border-color:#c7d2fe;color:#3730a3}
+.pill.en{background:#ecfeff;border-color:#a5f3fc;color:#0e7490}
+.text{white-space:pre-wrap;line-height:1.65;font-size:14px;color:var(--pk-text)}
+
+/* ── 이미지 그리드 ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.imgcard{
+  border:1.5px solid var(--pk-border);border-radius:12px;
+  background:var(--pk-5);overflow:hidden;
+  min-height:130px;display:flex;align-items:center;justify-content:center;
+  transition:box-shadow .15s;
+}
+.imgcard:hover{box-shadow:0 6px 18px rgba(233,30,140,.12)}
+.imgcard img{max-width:100%;height:auto;display:block;cursor:zoom-in;transition:transform .15s}
+.imgcard:hover img{transform:scale(1.03)}
+
+/* ── 스탯 ── */
+.stats{display:flex;flex-wrap:wrap;gap:12px}
+.stat{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:10px;border:1.5px solid var(--pk-border);background:var(--pk-5);font-size:13px}
+.grade{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;border:1.5px solid transparent;font-size:12px;flex:0 0 auto}
+.grade.grade-SSS{background:linear-gradient(135deg,#e91e8c,#c2185b);color:#fff;border-color:#e91e8c}
+.grade.grade-SS{background:linear-gradient(135deg,#f06292,#e91e8c);color:#fff;border-color:#f06292}
+.grade.grade-S{background:linear-gradient(135deg,#f48fb1,#f06292);color:#fff;border-color:#f48fb1}
+.grade.grade-A{background:linear-gradient(135deg,#fce4ec,#f8bbd0);color:#880e4f;border-color:#f8bbd0}
+.grade.grade-B{background:linear-gradient(135deg,#fff0f5,#fce4ec);color:#ad1457;border-color:#fce4ec}
+.grade.grade-C{background:#fff5f8;color:#c2185b;border-color:var(--pk-border)}
+.grade.grade-D{background:#fff;color:var(--pk-muted);border-color:var(--pk-border)}
+.grade.grade-{background:var(--pk-4);color:var(--pk-muted);border-color:var(--pk-border)}
+
+/* ── 출처 ── */
+.source-box{border:none;background:transparent;padding:0}
+.source-list{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:7px}
+.source-list li{padding:6px 12px;border-radius:999px;background:var(--pk-5);border:1.5px solid var(--pk-border);font-weight:500;color:var(--pk-1);font-size:13px;transition:background .12s,border-color .12s}
+.source-list li:hover{background:var(--pk-4);border-color:var(--pk-2)}
+.source-list li::before{content:none}
+
+/* ── 재료/염색 ── */
+.materials{display:flex;flex-wrap:wrap;gap:16px}
+.mat{width:64px;text-align:center}
+.mat .mimg{width:56px;height:56px;border-radius:12px;border:1.5px solid var(--pk-border);background:var(--pk-5);object-fit:cover;display:block;margin:0 auto}
+.matname{font-size:11px;margin-top:4px;color:var(--pk-muted);text-align:center;line-height:1.3}
+.qty{margin-top:3px;font-size:12px;color:var(--pk-1);font-weight:500}
+.matbtn{all:unset;cursor:pointer;width:64px;text-align:center;display:block}
+.matbtn:focus{outline:2px solid rgba(233,30,140,.35);outline-offset:2px;border-radius:12px}
+.matbtn:hover .mimg,.mimg{transition:transform .12s,box-shadow .12s}
+.matbtn:hover .mimg{transform:translateY(-3px);box-shadow:0 8px 18px rgba(233,30,140,.18)}
+.dyegrid{display:flex;flex-wrap:wrap;gap:14px}
+.dyeitem{width:72px;text-align:center}
+.dyename{font-size:11px;margin-top:5px;color:var(--pk-muted);text-align:center;line-height:1.3;word-break:keep-all}
+.dyeitem img{width:56px;height:56px;border-radius:12px;object-fit:cover;display:block;border:1.5px solid var(--pk-border);background:var(--pk-5)}
+.imgbtn{all:unset;cursor:pointer;display:block}
+.imgbtn:hover img{transform:translateY(-3px);box-shadow:0 8px 18px rgba(233,30,140,.18)}
+.imgbtn img{transition:transform .12s,box-shadow .12s}
+
+.muted{color:var(--pk-muted);font-size:14px}
+.clickable{cursor:pointer}
+
+/* ── 라이트박스 ── */
+#imgLightbox{display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.82);align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(3px)}
+#imgLightbox.open{display:flex}
+#imgLightbox img{max-width:90vw;max-height:90vh;border-radius:16px;object-fit:contain}
+
+/* ── 모바일: 1단으로 전환 ── */
+@media(max-width:700px){
+  .layout{ grid-template-columns:1fr; }
+  .sidebar{
+    position:static;
+    height:auto;
+    flex-direction:row;
+    flex-wrap:wrap;
+    align-items:flex-start;
+    border-right:none;
+    border-bottom:1px solid var(--pk-border);
+    padding:14px;
+    gap:12px;
   }
-  *{box-sizing:border-box}
-  body{margin:0;padding:16px;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--pk-5);color:var(--pk-text)}
-  ::-webkit-scrollbar{width:7px;height:7px}
-  ::-webkit-scrollbar-track{background:var(--pk-5);border-radius:999px}
-  ::-webkit-scrollbar-thumb{background:var(--pk-3);border-radius:999px}
-  ::-webkit-scrollbar-thumb:hover{background:var(--pk-2)}
-  *{scrollbar-width:thin;scrollbar-color:var(--pk-3) var(--pk-5)}
-  .wrap{max-width:980px;margin:0 auto}
-  .card{background:#fff;border:1.5px solid var(--pk-border);border-radius:20px;box-shadow:var(--pk-shadow);position:relative;overflow:hidden}
-  .card::before{content:'';display:block;height:4px;background:var(--pk-grad)}
-  .head{display:flex;gap:14px;align-items:flex-start;padding:16px}
-  .thumb{width:86px;height:86px;border-radius:16px;border:2px solid var(--pk-border);background:var(--pk-5);object-fit:cover;flex:0 0 auto;box-shadow:0 4px 12px rgba(233,30,140,.12)}
-  .hcol{flex:1 1 auto;min-width:240px}
-  .title{font-size:26px;font-weight:500;margin:0 0 2px;color:var(--pk-text)}
-  .sub{font-size:16px;color:var(--pk-muted);margin:0 0 10px}
-  .chips{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:var(--pk-5);border:1.5px solid var(--pk-border);font-size:14px;color:var(--pk-text)}
-  .chip b{font-weight:500;color:var(--pk-1)}
-  .section{padding:0 16px 16px}
-  .sec-title{display:flex;align-items:center;gap:8px;font-weight:500;margin:14px 0 10px;color:var(--pk-1);font-size:17px}
-  .sec-title::before{content:'';display:block;width:3px;height:16px;background:var(--pk-grad);border-radius:999px}
-  .sec-title small{font-weight:500;color:var(--pk-muted);font-size:14px}
-  .box{border:1.5px solid var(--pk-border);border-radius:14px;background:#fff;padding:12px}
-  .box-plain{border:0;background:transparent;padding:0}
-  .rowline{height:1px;background:var(--pk-border);margin:0 16px}
-  .lang{display:grid;grid-template-columns:74px 1fr;gap:10px 12px;align-items:start}
-  .lang+.lang{margin-top:10px}
-  .pill{display:inline-flex;align-items:center;justify-content:center;height:24px;padding:0 10px;border-radius:999px;font-size:14px;border:1.5px solid var(--pk-border);background:#fff;color:var(--pk-text);width:max-content;font-weight:500}
-  .pill.ko{background:var(--pk-5);border-color:var(--pk-border);color:var(--pk-1)}
-  .pill.zh{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
-  .pill.ja{background:#eef2ff;border-color:#c7d2fe;color:#3730a3}
-  .pill.en{background:#ecfeff;border-color:#a5f3fc;color:#0e7490}
-  .text{white-space:pre-wrap;line-height:1.5;font-size:16px}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .imgcard{border:1.5px solid var(--pk-border);border-radius:14px;background:var(--pk-5);overflow:hidden;min-height:180px;display:flex;align-items:center;justify-content:center}
-  .imgcard img{max-width:100%;height:auto;display:block}
-  .dyegrid{display:flex;flex-wrap:wrap;gap:12px}
-  .dyeitem{width:62px;text-align:center}
-  .dyeitem img{width:56px;height:56px;border-radius:12px;object-fit:cover;display:block;border:1.5px solid var(--pk-border);background:var(--pk-5)}
-  .muted{color:var(--pk-muted);font-size:16px}
-  .stats{display:flex;flex-wrap:wrap;gap:10px}
-  .stat{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--pk-border);background:#fff;font-size:16px}
-  .grade{width:28px;height:28px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:500;border:1.5px solid transparent;background:var(--pk-5);font-size:13px}
-  .grade.grade-SSS{background:linear-gradient(135deg,#ffb3b3,#ff7c7c);color:#7f0000;border-color:#ffb3b3}
-  .grade.grade-SS{background:linear-gradient(135deg,#fbb6ce,#f687b3);color:#831843;border-color:#fbb6ce}
-  .grade.grade-S{background:linear-gradient(135deg,#fde68a,#fbbf24);color:#78350f;border-color:#fde68a}
-  .grade.grade-A{background:linear-gradient(135deg,#a7f3d0,#6ee7b7);color:#064e3b;border-color:#a7f3d0}
-  .grade.grade-B{background:linear-gradient(135deg,#bae6fd,#7dd3fc);color:#0c4a6e;border-color:#bae6fd}
-  .grade.grade-C{background:linear-gradient(135deg,#ddd6fe,#c4b5fd);color:#3b0764;border-color:#ddd6fe}
-  .grade.grade-D{background:linear-gradient(135deg,#e5e7eb,#d1d5db);color:#374151;border-color:#e5e7eb}
-  .list{margin:0;padding-left:18px}
-  .materials{display:flex;flex-wrap:wrap;gap:12px}
-  .mat{width:62px;text-align:center}
-  .mat .mimg{width:56px;height:56px;border-radius:12px;border:1.5px solid var(--pk-border);background:var(--pk-5);object-fit:cover}
-  .matname{font-size:14px;margin-top:4px;color:var(--pk-muted);text-align:center;line-height:1.2}
-  .qty{margin-top:6px;font-size:14px;color:var(--pk-muted)}
-  .clickable{cursor:pointer}
-  .matbtn{all:unset;cursor:pointer;width:62px;text-align:center}
-  .matbtn:focus{outline:2px solid rgba(233,30,140,.35);outline-offset:2px;border-radius:12px}
-  .matbtn:hover .mimg{transform:translateY(-2px);box-shadow:0 8px 18px rgba(233,30,140,.15)}
-  .mimg{transition:transform .12s ease,box-shadow .12s ease}
-  .imgbtn{all:unset;cursor:pointer;display:block}
-  .imgbtn:hover img{transform:translateY(-2px);box-shadow:0 8px 18px rgba(233,30,140,.15)}
-  .imgbtn img{transition:transform .12s ease,box-shadow .12s ease}
-  .controls{position:absolute;top:14px;right:14px;display:flex;gap:6px;z-index:5}
-  .ctrl-btn{width:32px;height:32px;border:1.5px solid var(--pk-border);border-radius:10px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--pk-muted);padding:0;transition:background .13s,border-color .13s}
-  .ctrl-btn:hover{background:var(--pk-4);border-color:var(--pk-2);color:var(--pk-1)}
-  .source-box{border:1.5px solid var(--pk-border);background:linear-gradient(135deg,var(--pk-5),#fff);padding:12px;border-radius:14px}
-  .source-list{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px}
-  .source-list li{padding:6px 12px;border-radius:999px;background:#fff;border:1.5px solid var(--pk-border);font-weight:500;color:var(--pk-1);font-size:14px}
-  .source-list li::before{content:none}
+  .sidebar-thumb{ width:80px; height:80px; aspect-ratio:unset; border-radius:12px; flex:0 0 auto; }
+  .sidebar-info{ flex:1; min-width:0; }
+  .sidebar-chips{ flex-direction:row; flex-wrap:wrap; }
+  .s-chip{ padding:5px 8px; }
+  .main{ padding:14px; }
+  .grid2{ grid-template-columns:1fr; }
+}
 </style>
 
-<div class="wrap">
-  <div class="card">
-  <div class="controls">
-    <button class="ctrl-btn" id="btnBack" title="뒤로가기" aria-label="뒤로가기">←</button>
-    <button id="btnRegisterOwned" title="보유 등록" style="height:32px;padding:0 12px;border:1.5px solid var(--pk-border);border-radius:10px;background:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:14px;font-weight:500;color:var(--pk-muted);transition:background .13s,border-color .13s,color .13s">
-      <span style="font-size:18px">👗</span> 보유 등록
-    </button>
-    <button class="ctrl-btn" id="btnClose" title="닫기" aria-label="닫기">×</button>
+<!-- 네비바 -->
+<nav class="navbar">
+  <button class="navbar-btn" id="btnBack" title="뒤로가기">←</button>
+  <button class="navbar-btn" id="btnClose" title="닫기">×</button>
+  <span class="navbar-title" id="title">아이템 상세</span>
+  <div class="lang-switcher">
+    <button class="lang-btn active" data-lang="ko">한국어</button>
+    <button class="lang-btn" data-lang="en">EN</button>
+    <button class="lang-btn" data-lang="ja">日</button>
   </div>
+  <button id="btnRegisterOwned">
+    <span style="font-size:15px">👗</span> 보유 등록
+  </button>
+</nav>
 
-    <div class="head">
-      <img id="thumb" class="thumb" alt="" />
-      <div class="hcol">
-        <h1 class="title" id="title">아이템 상세</h1>
-        <p class="sub" id="subtitle">불러오는 중…</p>
-        <div class="chips" id="chips"></div>
-      </div>
+<div class="layout">
+
+  <!-- 왼쪽 사이드바 -->
+  <aside class="sidebar">
+    <img id="thumb" class="sidebar-thumb" alt="" />
+    <div class="sidebar-info">
+      <div class="sidebar-name" id="sidebarName">—</div>
+      <div class="sidebar-sub" id="subtitle">—</div>
     </div>
+    <div class="sidebar-chips" id="chips"></div>
+  </aside>
 
-    <div class="rowline"></div>
+  <!-- 오른쪽 콘텐츠 -->
+  <main class="main">
+    <div id="content" class="muted" style="display:flex;flex-direction:column;gap:16px;">불러오는 중…</div>
+  </main>
 
-    <div class="section">
-      <div id="content" class="muted" style="padding:10px 2px;">불러오는 중…</div>
-    </div>
-  </div>
 </div>
 
+<script>
+/* 구글 드라이브 썸네일 실패 시 uc?export=view 로 재시도 */
+document.addEventListener('error', function(ev) {
+  var img = ev.target;
+  if (!(img && img.tagName === 'IMG')) return;
+  if (img.dataset.fallbackTried) return;
+  try {
+    var u = new URL(img.src);
+    if (u.hostname === 'drive.google.com') {
+      var id = u.searchParams.get('id');
+      if (id) {
+        img.dataset.fallbackTried = '1';
+        img.src = 'https://drive.google.com/uc?export=view&id=' + id;
+      }
+    }
+  } catch(e) {}
+}, true);
+</script>
+<script>
+/* ── 언어 선택 ── */
+window.__activeLang = (function(){
+  try { return localStorage.getItem('nikki_detail_lang') || 'ko'; } catch(e){ return 'ko'; }
+})();
+
+function getLocalizedName(detail){
+  if(!detail || !detail.names) return '';
+  const lang = window.__activeLang;
+  const n = detail.names;
+  return n[lang] || n.ko || n.en || n.ja || '';
+}
+window.getLocalizedName = getLocalizedName;
+
+document.addEventListener('DOMContentLoaded', function(){
+  // 초기 버튼 상태 반영
+  document.querySelectorAll('.lang-btn').forEach(function(btn){
+    btn.classList.toggle('active', btn.dataset.lang === window.__activeLang);
+  });
+
+  // 버튼 클릭 시 언어 변경
+  document.querySelectorAll('.lang-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      window.__activeLang = btn.dataset.lang;
+      try { localStorage.setItem('nikki_detail_lang', btn.dataset.lang); } catch(e){}
+
+      // 버튼 active 상태
+      document.querySelectorAll('.lang-btn').forEach(function(b){
+        b.classList.toggle('active', b.dataset.lang === window.__activeLang);
+      });
+
+      // 타이틀 즉시 반영
+      var titleEl = document.getElementById('title');
+      var sidebarNameEl = document.getElementById('sidebarName');
+      var nm = getLocalizedName(window.__currentDetail);
+      if(titleEl) titleEl.textContent = nm || '아이템 상세';
+      if(sidebarNameEl) sidebarNameEl.textContent = nm || '—';
+
+      // 섹션 전체 재렌더 (이름/설명/재료/염색 이름 모두 반영)
+      if(window.__currentDetail && typeof window.__rerenderSections === 'function'){
+        window.__rerenderSections(window.__currentDetail);
+      } else {
+        // 재렌더 없으면 lang-active 클래스만 갱신
+        document.querySelectorAll('.lang').forEach(function(row){
+          var pill = row.querySelector('.pill');
+          if(!pill) return;
+          var cls = pill.classList[1];
+          row.classList.toggle('lang-active', cls === window.__activeLang);
+        });
+      }
+    });
+  });
+});
+</script>
+<!-- 라이트박스 -->
+<div id="imgLightbox"><img id="lbImg" src="" alt=""></div>
+
+<script>
+// 라이트박스
+(function(){
+  document.addEventListener('click', function(ev){
+    var img = ev.target.closest('.imgcard img, #thumb.sidebar-thumb');
+    if(img && img.src){
+      document.getElementById('lbImg').src = img.src;
+      document.getElementById('imgLightbox').classList.add('open');
+    }
+    if(ev.target === document.getElementById('imgLightbox')){
+      document.getElementById('imgLightbox').classList.remove('open');
+    }
+  });
+  document.addEventListener('keydown', function(ev){
+    if(ev.key==='Escape') document.getElementById('imgLightbox').classList.remove('open');
+  });
+})();
+
+// render 완료 후 각 섹션을 sec-wrap 카드로 감싸기
+(function(){
+  function wrapSections(){
+    window.wrapSections = wrapSections;
+    var content = document.getElementById('content');
+    if(!content) return;
+
+    // 이미 sec-wrap으로 감싸져 있으면 스킵 (언어 재렌더 시 중복 방지)
+    if(content.querySelector('.sec-wrap')) return;
+    // 직접 자식에 sec-title 없으면 스킵
+    var hasTitleDirectChild = Array.from(content.childNodes).some(function(n){
+      return n.nodeType === 1 && n.classList && n.classList.contains('sec-title');
+    });
+    if(!hasTitleDirectChild) return;
+
+    var nodes = Array.from(content.childNodes);
+    var groups = [];
+    var cur = null;
+
+    nodes.forEach(function(n){
+      var el = n.nodeType === 1 ? n : null;
+      var isTitle = el && el.classList && el.classList.contains('sec-title');
+      if(isTitle){
+        cur = [el];
+        groups.push(cur);
+      } else if(cur){
+        cur.push(n);
+      }
+    });
+
+    if(!groups.length) return;
+
+    var frag = document.createDocumentFragment();
+    groups.forEach(function(grp){
+      var wrap = document.createElement('div');
+      wrap.className = 'sec-wrap';
+      grp.forEach(function(n){ wrap.appendChild(n); });
+      frag.appendChild(wrap);
+    });
+    content.innerHTML = '';
+    content.appendChild(frag);
+    content.className = '';
+    content.style.cssText = 'display:flex;flex-direction:column;gap:16px;';
+  }
+
+  // MutationObserver로 content 변경 감지
+  var obs = new MutationObserver(function(){
+    var content = document.getElementById('content');
+    if(content && content.querySelector('.sec-title')){
+      obs.disconnect();
+      wrapSections();
+    }
+  });
+  var contentEl = document.getElementById('content');
+  if(contentEl) obs.observe(contentEl, {childList:true, subtree:false});
+})();
+
+// 타이틀을 사이드바 이름 칸에도 동기화
+(function(){
+  var origTitle = document.getElementById('title');
+  var sidebarName = document.getElementById('sidebarName');
+  if(!origTitle || !sidebarName) return;
+  var mo = new MutationObserver(function(){
+    sidebarName.textContent = origTitle.textContent;
+  });
+  mo.observe(origTitle, {childList:true, characterData:true, subtree:true});
+})();
+
+// 칩을 사이드바형 s-chip으로 변환
+(function(){
+  var chipsEl = document.getElementById('chips');
+  if(!chipsEl) return;
+  var mo = new MutationObserver(function(){
+    // chip → s-chip 변환
+    Array.from(chipsEl.querySelectorAll('.chip:not(.s-chip-done)')).forEach(function(c){
+      c.classList.add('s-chip-done');
+      c.className = 's-chip';
+      // b 태그 → label, 나머지 → val
+      var b = c.querySelector('b');
+      if(b){
+        var label = document.createElement('span');
+        label.className = 's-chip-label';
+        label.textContent = b.textContent;
+        var val = document.createElement('span');
+        val.className = 's-chip-val';
+        // b 다음 텍스트 노드 수집
+        var rest = '';
+        c.childNodes.forEach(function(n){
+          if(n !== b) rest += n.textContent || '';
+        });
+        val.textContent = rest.trim();
+        c.innerHTML = '';
+        c.appendChild(label);
+        c.appendChild(val);
+      }
+    });
+  });
+  mo.observe(chipsEl, {childList:true, subtree:true});
+})();
+</script>
 <script>
 
 (function(){
@@ -219,9 +675,25 @@
     return imgs[0] || "";
   }
 
+  function __rerenderSections(detail){
+    if(!detail) return;
+    const elContent = document.getElementById("content");
+    if(!elContent) return;
+    const sections = [];
+    buildSections(detail, sections);
+    elContent.className = "";
+    elContent.style.cssText = "display:flex;flex-direction:column;gap:16px;";
+    elContent.innerHTML = sections.join("");
+    // 언어 재렌더 시 sec-wrap이 없는 새 HTML이 들어오므로 바로 감싸기
+    if(typeof window.wrapSections === "function") window.wrapSections();
+    try{ __hydrateReformNames(); }catch(e){}
+  }
+  window.__rerenderSections = __rerenderSections;
+
   function render(detail){
-    // header
-    const nm = (detail.names && (detail.names.ko || detail.names.en || detail.names.zh || detail.names.ja)) || "";
+    // 현재 선택 언어 반영
+    window.__currentDetail = detail;
+    const nm = getLocalizedName(detail);
     elTitle.textContent = nm || "아이템 상세";
     elSub.textContent = (detail.part || part || "") + " · 코드 " + (detail.code ?? code);
 
@@ -243,32 +715,50 @@
 
     // content sections
     const sections = [];
+    buildSections(detail, sections);
+
+    elContent.className = "";
+    elContent.style.cssText = "display:flex;flex-direction:column;gap:16px;";
+    elContent.innerHTML = sections.join("");
+    try{ __hydrateReformNames(); }catch(e){}
+  }
+
+  function buildSections(detail, sections){
+    function esc(s){ return String(s ?? "").replace(/[&<>"]/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c])); }
 
     // Names
     if (detail.names){
       const n = detail.names || {};
+      const activeLang = window.__activeLang || "ko";
+      const makeLangRow = (cls, label, val) => val
+        ? `<div class="lang${activeLang===cls?' lang-active':''}"><span class="pill ${cls}">${label}</span><div class="text">${esc(val)}</div></div>`
+        : "";
+      const rows = [
+        makeLangRow("ko","한국",n.ko),
+        makeLangRow("en","영어",n.en),
+        makeLangRow("ja","일본",n.ja),
+      ].filter(Boolean).join('<div class="lang-divider"></div>');
       sections.push(`
-        <div class="sec-title">이름 <small>4개 언어</small></div>
-        <div class="box">
-          <div class="lang"><span class="pill ko">한국</span><div class="text">${esc(n.ko||"")}</div></div>
-          <div class="lang"><span class="pill en">영어</span><div class="text">${esc(n.en||"")}</div></div>
-          <div class="lang"><span class="pill zh">중국</span><div class="text">${esc(n.zh||"")}</div></div>
-          <div class="lang"><span class="pill ja">일본</span><div class="text">${esc(n.ja||"")}</div></div>
-        </div>
+        <div class="sec-title">이름 <small>3개 언어</small></div>
+        <div class="lang-list">${rows}</div>
       `);
     }
 
     // Description
     if (detail.desc){
       const d = detail.desc || {};
+      const activeLang = window.__activeLang || "ko";
+      const makeLangRow = (cls, label, val) => val
+        ? `<div class="lang${activeLang===cls?' lang-active':''}"><span class="pill ${cls}">${label}</span><div class="text">${esc(val)}</div></div>`
+        : "";
+      const rows = [
+        makeLangRow("ko","한국",d.ko),
+        makeLangRow("en","영어",d.en),
+        makeLangRow("ja","일본",d.ja),
+      ].filter(Boolean).join('<div class="lang-divider"></div>');
       sections.push(`
         <div class="sec-title">아이템 설명</div>
-        <div class="box">
-          ${d.ko ? `<div class="lang"><span class="pill ko">한국</span><div class="text">${esc(d.ko)}</div></div>` : ""}
-          ${d.zh ? `<div class="lang"><span class="pill zh">중국</span><div class="text">${esc(d.zh)}</div></div>` : ""}
-          ${d.ja ? `<div class="lang"><span class="pill ja">일본</span><div class="text">${esc(d.ja)}</div></div>` : ""}
-          ${d.en ? `<div class="lang"><span class="pill en">영어</span><div class="text">${esc(d.en)}</div></div>` : ""}
-        </div>
+        <div class="lang-list">${rows}</div>
       `);
     }
 
@@ -319,14 +809,17 @@ if (detail.reform && detail.reform.enabled){
     const img = esc(m.img || "");
     const qty = esc(m.qty || "");
     const codeVal = esc(m.code ?? m.itemCode ?? "");
-    // Always render placeholder; name will be hydrated after render (async-safe)
+    const _mn = m.name || "";
+    const matName = esc(typeof _mn === "object"
+      ? (_mn[window.__activeLang || "ko"] || _mn.ko || _mn.en || _mn.ja || "")
+      : _mn);
     return `<div class="mat">
       <button class="matbtn" type="button"
               data-img="${img}"
               ${codeVal ? ` data-code="${codeVal}"` : ``}
               ${m.part ? ` data-part="${esc(m.part)}"` : ``}>
         <img class="mimg" src="${img}" alt="" loading="lazy" decoding="async">
-        <div class="matname" data-mimg="${img}" data-mcode="${codeVal}"></div>
+        <div class="matname" data-mimg="${img}" data-mcode="${codeVal}">${matName}</div>
         <div class="qty">× ${qty}</div>
       </button>
     </div>`;
@@ -343,11 +836,21 @@ if (detail.reform && detail.reform.enabled){
     if (detail.dye && detail.dye.enabled){
       const dimgs = Array.isArray(detail.dye.images) ? detail.dye.images : [];
       const dpages = Array.isArray(detail.dye.pages) ? detail.dye.pages : [];
+      const dnames = Array.isArray(detail.dye.names) ? detail.dye.names : [];
       const dHtml = dimgs.length ? dimgs.map((src, i)=>{
         const s = esc(src);
         const page = dpages[i] ? esc(dpages[i]) : "";
+        const _dn = dnames[i];
+        const dyeName = _dn
+          ? esc(typeof _dn === "object"
+            ? (_dn[window.__activeLang || "ko"] || _dn.ko || _dn.en || _dn.ja || "")
+            : _dn)
+          : "";
         const dataAttr = page ? ` data-page="${page}"` : ` data-img="${s}"`;
-        return `<div class="dyeitem"><button class="imgbtn" type="button"${dataAttr}><img src="${s}" alt=""></button></div>`;
+        return `<div class="dyeitem">
+          <button class="imgbtn" type="button"${dataAttr}><img src="${s}" alt=""></button>
+          ${dyeName ? `<div class="dyename">${dyeName}</div>` : ""}
+        </div>`;
       }).join("") : `<div class="muted">염색 이미지가 없어.</div>`;
       sections.push(`
         <div class="sec-title">염색</div>
@@ -360,12 +863,7 @@ if (detail.reform && detail.reform.enabled){
       sections.push(`<div class="muted">표시할 상세 정보가 없어.</div>`);
     }
 
-    elContent.className = "";
-    elContent.innerHTML = sections.join("");
-
-    // Fill reform material names (async)
-    try{ __hydrateReformNames(); }catch(e){}
-  }
+  }  // end buildSections
 
   
   function getParentItems(){
