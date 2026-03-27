@@ -56,7 +56,32 @@
   tr:last-child td{border-bottom:none}
   .muted{color:var(--pk-muted);font-size:14px}
   .badge-owned{font-size:13px;background:#eaffea;border:1px solid #cdeccc;border-radius:999px;padding:1px 7px;color:#2e7d32;font-weight:500}
+  .badge-craft-ok{font-size:12px;background:#dcfce7;border:1px solid #86efac;border-radius:999px;padding:1px 7px;color:#15803d;font-weight:600;cursor:pointer;transition:box-shadow .12s}
+  .badge-craft-ok:hover{box-shadow:0 2px 8px rgba(21,128,61,.2)}
+  .badge-craft-no{font-size:12px;background:#fff1f2;border:1px solid #fecdd3;border-radius:999px;padding:1px 7px;color:#be123c;font-weight:500;cursor:pointer;transition:box-shadow .12s}
+  .badge-craft-no:hover{box-shadow:0 2px 8px rgba(190,18,60,.15)}
   .itembtn.owned-only-on{background:#eaffea;border-color:#cdeccc}
+  .itembtn.reform-only-on{background:#fef9c3;border-color:#fde047;color:#92400e}
+
+  /* 재료 팝오버 */
+  .mat-pop{
+    position:fixed;z-index:9999;
+    background:#fff;border:1.5px solid var(--pk-border);
+    border-radius:14px;padding:12px 14px;
+    box-shadow:0 8px 28px rgba(233,30,140,.18);
+    min-width:200px;max-width:320px;
+    pointer-events:none;opacity:0;
+    transition:opacity .15s;
+  }
+  .mat-pop.visible{opacity:1;pointer-events:auto}
+  .mat-pop-title{font-size:12px;font-weight:600;color:var(--pk-1);margin-bottom:8px}
+  .mat-pop-list{display:flex;flex-wrap:wrap;gap:8px}
+  .mat-pop-item{display:flex;flex-direction:column;align-items:center;gap:3px;width:54px}
+  .mat-pop-img{width:44px;height:44px;border-radius:10px;object-fit:cover;border:1.5px solid var(--pk-border)}
+  .mat-pop-img.ok{border-color:#86efac;box-shadow:0 0 0 2px #bbf7d0}
+  .mat-pop-qty{font-size:11px;color:var(--pk-muted);font-weight:500}
+  .mat-pop-qty.ok{color:#16a34a;font-weight:700}
+  .mat-pop-qty.partial{color:#d97706;font-weight:700}
   #pager{display:flex;gap:6px;align-items:center;justify-content:flex-end;padding:10px 2px;flex-wrap:wrap}
   .page-btn{min-width:34px;height:34px;padding:0 8px;border-radius:10px;border:1.5px solid var(--pk-border);background:#fff;font-weight:500;font-size:14px;cursor:pointer;transition:background .13s,border-color .13s,color .13s;display:inline-flex;align-items:center;justify-content:center}
   .page-btn:hover:not(:disabled){background:var(--pk-4);border-color:var(--pk-2);color:var(--pk-1)}
@@ -128,7 +153,7 @@
 
   <main class="main">
     <div class="toolbar">
-      <input id="q" type="text" placeholder="이름/태그 검색" />
+      <input id="q" type="text" placeholder="이름 / 태그 검색 (예: 리폼, 와인)" />
       <select id="starFilter">
         <option value="">별★ 전체</option>
         <option value="6">6★</option>
@@ -145,6 +170,7 @@
         <option value="stars">별순</option>
       </select>
       <button id="ownedOnlyBtn" type="button" title="보유 아이템만 보기">보유만</button>
+      <button id="reformOnlyBtn" type="button" title="지금 제작 가능한 아이템만 보기">🔨 제작 가능만</button>
       <button id="clear">지우기</button>
     </div>
 
@@ -185,6 +211,134 @@
 
 </main>
 </div>
+
+<!-- 재료 팝오버 -->
+<div class="mat-pop" id="matPop">
+  <div class="mat-pop-title" id="matPopTitle">재료</div>
+  <div class="mat-pop-list" id="matPopList"></div>
+</div>
+
+<script>
+/* ★ REFORM_MAP — 키: "코드::부위" (같은 코드번호가 다른 부위에 있어도 충돌 없음) */
+window.__REFORM_MAP = {
+  "17::헤어": {
+    enabled: true,
+    materials: [
+      { name: { ko: "재봉사카키", en: "Tailor Class·Khaki", ja: "縫製クラス(カーキ)" }, code: 45, part: "하의", img: "https://drive.google.com/thumbnail?id=1HFBNGNSNkg9VXBwdZtvWokQVed9IXkvd&sz=w1000", qty: 3 },
+      { name: { ko: "과학자", en: "Scientist", ja: "科学者" }, code: 13, part: "헤어", img: "https://drive.google.com/thumbnail?id=1ifJwttsoD3v-tMYoBTvhvxEL3JXHhAsg&sz=w1000", qty: 4 }
+    ]
+  },
+  "5::헤어": {
+    enabled: true,
+    materials: [
+      { img: "https://drive.google.com/thumbnail?id=1LSQx7JhGyH9exdng7C8mVeokbIIhyEyU&sz=w1000", qty: 1 },
+      { img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000", qty: 3 }
+    ],
+    choices: [
+      { name: { ko: "체육소년", en: "Sporty Teenager", ja: "スポーツ少年" }, code: 4, part: "헤어", img: "https://drive.google.com/thumbnail?id=1K4jr_czjlTNi1ASrAVJpR62f6umk4_8S&sz=w1000", qty: 1 },
+      { name: { ko: "국민아이돌", en: "Rising Star", ja: "国民的アイドル" }, code: 6, part: "헤어", img: "https://drive.google.com/thumbnail?id=1wOaJne7Ci_b5Cf6cHUtjaThMb5EvOM6u&sz=w1000", qty: 1 }
+    ]
+  },
+  "6::헤어": {
+    enabled: true,
+    materials: [
+      { img: "https://drive.google.com/thumbnail?id=1wyp64JiAn7u8xh0zuO4sYgvaEvx7g2b5&sz=w1000", qty: 1 },
+      { img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000", qty: 3 }
+    ],
+    choices: [
+      { name: { ko: "체육소년", en: "Sporty Teenager", ja: "スポーツ少年" }, code: 4, part: "헤어", img: "https://drive.google.com/thumbnail?id=1K4jr_czjlTNi1ASrAVJpR62f6umk4_8S&sz=w1000", qty: 1 },
+      { name: { ko: "자유소년", en: "Untamed Heart", ja: "自由人" }, code: 5, part: "헤어", img: "https://drive.google.com/thumbnail?id=1SqUP0T3vpd68MG1noBomO_iHJ4H1qCkj&sz=w1000", qty: 1 }
+    ]
+  },
+  "8::헤어": {
+    enabled: true,
+    materials: [
+      { img: "https://drive.google.com/thumbnail?id=1LSQx7JhGyH9exdng7C8mVeokbIIhyEyU&sz=w1000", qty: 1 },
+      { img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000", qty: 3 }
+    ],
+    choices: [
+      { name: { ko: "도련님헤어", en: "Elegant Nobleman", ja: "貴公子" }, code: 7, part: "헤어", img: "https://drive.google.com/thumbnail?id=1zxxZzu3_WnznpxhzyWPKGbjxND2JVGet&sz=w1000", qty: 1 },
+      { name: { ko: "눈꽃울프", en: "Snow Wolf", ja: "孤独な狼" }, code: 9, part: "헤어", img: "https://drive.google.com/thumbnail?id=1tVNc6_o4ubmLGYW1olxMpoY0JTqbXb_g&sz=w1000", qty: 1 }
+    ]
+  },
+  "9::헤어": {
+    enabled: true,
+    materials: [
+      { img: "https://drive.google.com/thumbnail?id=1OkKMsEUxaPAAAZGJ41nOb1D6EVSRX6N2&sz=w1000", qty: 1 },
+      { img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000", qty: 3 }
+    ],
+    choices: [
+      { name: { ko: "도련님헤어", en: "Elegant Nobleman", ja: "貴公子" }, code: 7, part: "헤어", img: "https://drive.google.com/thumbnail?id=1zxxZzu3_WnznpxhzyWPKGbjxND2JVGet&sz=w1000", qty: 1 },
+      { name: { ko: "옆집오빠", en: "Brother Next Door", ja: "近所のお兄ちゃん" }, code: 8, part: "헤어", img: "https://drive.google.com/thumbnail?id=1uWBCKdzV9UYGL0py8dVBFkwdyTYR94o-&sz=w1000", qty: 1 }
+    ]
+  },
+  "11::헤어": {
+    enabled: true,
+    materials: [
+      { img: "https://drive.google.com/thumbnail?id=1Dgs4j21oACBY-GwFKqj-MyVEx3Mjksc-&sz=w1000", qty: 1 },
+      { img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000", qty: 3 }
+    ],
+    choices: [
+      { name: { ko: "완벽한선배", en: "Perfect Senior", ja: "憧れの先輩" }, code: 10, part: "헤어", img: "https://drive.google.com/thumbnail?id=1N3s1OlCCn3onTN4Tp7LxlbnEafXHQMEI&sz=w1000", qty: 1 },
+      { name: { ko: "모험가", en: "Fantasy Emissary", ja: "不思議な使者" }, code: 12, part: "헤어", img: "https://drive.google.com/thumbnail?id=1oCOX9pM1QnyPOdpWDi8remJeouEYZF5O&sz=w1000", qty: 1 }
+    ]
+  },
+  "12::헤어": {
+    enabled: true,
+    materials: [
+      { img: "https://drive.google.com/thumbnail?id=1wyp64JiAn7u8xh0zuO4sYgvaEvx7g2b5&sz=w1000", qty: 1 },
+      { img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000", qty: 3 }
+    ],
+    choices: [
+      { name: { ko: "완벽한선배", en: "Perfect Senior", ja: "憧れの先輩" }, code: 10, part: "헤어", img: "https://drive.google.com/thumbnail?id=1N3s1OlCCn3onTN4Tp7LxlbnEafXHQMEI&sz=w1000", qty: 1 },
+      { name: { ko: "신비한손님", en: "Mysterious Guest", ja: "謎の訪問者" }, code: 11, part: "헤어", img: "https://drive.google.com/thumbnail?id=1eS3tck3-TOInGTJEr9xgywIxySUvFB1X&sz=w1000", qty: 1 }
+    ]
+  },
+  "14::헤어": {
+    enabled: true,
+    materials: [
+      { img: "https://drive.google.com/thumbnail?id=1LSQx7JhGyH9exdng7C8mVeokbIIhyEyU&sz=w1000", qty: 1 },
+      { img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000", qty: 3 }
+    ],
+    choices: [
+      { name: { ko: "과학자", en: "Scientist", ja: "科学者" }, code: 13, part: "헤어", img: "https://drive.google.com/thumbnail?id=1ifJwttsoD3v-tMYoBTvhvxEL3JXHhAsg&sz=w1000", qty: 1 }
+    ]
+  },
+  "18::헤어": {
+    enabled: true,
+    materials: [
+      { img: "https://drive.google.com/thumbnail?id=1wyp64JiAn7u8xh0zuO4sYgvaEvx7g2b5&sz=w1000", qty: 1 },
+      { img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000", qty: 3 }
+    ],
+    choices: [
+      { name: { ko: "게으름뱅이", en: "Shallow Laziness", ja: "うっかりさん" }, code: 17, part: "헤어", img: "https://drive.google.com/thumbnail?id=1zpXmsZJr9tYFBo1iz3XzpWaNG7AyxQAM&sz=w1000", qty: 1 },
+      { name: { ko: "와인", en: "Wine Red", ja: "ワインレッド" }, code: 19, part: "헤어", img: "https://drive.google.com/thumbnail?id=1uzpT06qLBML42gJEEr4_wGcMEsO_EOW0&sz=w1000", qty: 1 }
+    ]
+  },
+  "19::헤어": {
+    enabled: true,
+    materials: [
+      { img: "https://drive.google.com/thumbnail?id=1AMu4VvEpA010CMpcMDOVCCqEiXvzJdH9&sz=w1000", qty: 1 },
+      { img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000", qty: 3 }
+    ],
+    choices: [
+      { name: { ko: "게으름뱅이", en: "Shallow Laziness", ja: "うっかりさん" }, code: 17, part: "헤어", img: "https://drive.google.com/thumbnail?id=1zpXmsZJr9tYFBo1iz3XzpWaNG7AyxQAM&sz=w1000", qty: 1 },
+      { name: { ko: "반짝골드", en: "Golden Glow", ja: "ゴールドキャット" }, code: 18, part: "헤어", img: "https://drive.google.com/thumbnail?id=11SJhmsuRzvMk3IANGwitaXGq2Oj_Zsd0&sz=w1000", qty: 1 }
+    ]
+  },
+  "21::헤어": {
+    enabled: true,
+    materials: [
+      { img: "https://drive.google.com/thumbnail?id=1h1w9cSABiBZ6MLkh-ZaD2_cGi86gMVzr&sz=w1000", qty: 2 },
+      { img: "https://drive.google.com/thumbnail?id=1IcUt5gWncSj-pT5PVqLzvn7SWLP1ZmbO&sz=w1000", qty: 3 }
+    ],
+    choices: [
+      { name: { ko: "핑크웨이브", en: "Pinky·white Curls", ja: "桃白カール" }, code: 20, part: "헤어", img: "https://drive.google.com/thumbnail?id=1LKeJrJ2NbivFKTCGlyyrxsw6JETmacVJ&sz=w1000", qty: 1 },
+      { name: { ko: "블루블랙웨이브", en: "Dark·blue Curls", ja: "青黒カール" }, code: 22, part: "헤어", img: "https://drive.google.com/thumbnail?id=1mYzBz0pr78EqvKX-o2s-5ffwtczzPItF&sz=w1000", qty: 1 }
+    ]
+  }
+};
+</script>
 
 <script>
 (function(){
@@ -283,6 +437,130 @@ function getItemTags(it){
   let ITEMS = [];
   let active = 0;
   let ownedOnly = false;
+  let reformOnly = false;
+  let MAT_INV = {}; // 재료 보유 인벤토리 (localStorage: nikki_mat_inventory)
+
+  function loadMatInv(){
+    try{ MAT_INV = JSON.parse(localStorage.getItem('nikki_mat_inventory') || '{}'); }catch(e){ MAT_INV = {}; }
+  }
+  loadMatInv();
+
+  function _driveIdInv(url){
+    const s = String(url||'');
+    let m = s.match(/[?&]id=([a-zA-Z0-9_-]{10,})/);
+    if(m) return m[1];
+    m = s.match(/\/file\/d\/([a-zA-Z0-9_-]{10,})/);
+    if(m) return m[1];
+    m = s.match(/thumbnail\?id=([a-zA-Z0-9_-]{10,})/);
+    if(m) return m[1];
+    return url;
+  }
+
+  // item의 reform 제작 가능 여부 반환 (null = 등록 안 됨)
+  // mats: 전부 있어야 함 (AND), choices: 1개만 있으면 됨 (OR)
+  function getReformInfo(it){
+    const code = it && it.code != null ? String(it.code) : '';
+    const part = it && it.part ? String(it.part) : '';
+    const key = code + '::' + part;
+    if(!code || !part || !window.__REFORM_MAP || !window.__REFORM_MAP[key]) return null;
+    const reform = window.__REFORM_MAP[key];
+    if(!reform.enabled) return null;
+    const mats    = Array.isArray(reform.materials) ? reform.materials : [];
+    const choices = Array.isArray(reform.choices)   ? reform.choices   : [];
+    const allMats = [...mats, ...choices];
+    if(!allMats.length) return { canCraft: false, hasMats: false };
+
+    const matsOk = mats.length === 0 || mats.every(m => {
+      const have = Number(MAT_INV[_driveIdInv(m.img||'')]) || 0;
+      return have >= (Number(m.qty) || 1);
+    });
+    const choicesOk = choices.length === 0 || choices.some(m => {
+      const have = Number(MAT_INV[_driveIdInv(m.img||'')]) || 0;
+      return have >= (Number(m.qty) || 1);
+    });
+    const canCraft = matsOk && choicesOk;
+    return { canCraft, hasMats: true, mats: allMats, matsOnly: mats, choices };
+  }
+
+  // 재료 이름 다국어 반환
+  function getMatName(m){
+    const lang = window.NIKKI_SERVER === 'jp' ? 'ja' : (window.NIKKI_SERVER === 'na' ? 'en' : 'ko');
+    if(!m.name) return '';
+    if(typeof m.name === 'object') return m.name[lang] || m.name.ko || m.name.en || m.name.ja || '';
+    return String(m.name);
+  }
+
+  // 팝오버 제어
+  const matPop = document.getElementById('matPop');
+  const matPopTitle = document.getElementById('matPopTitle');
+  const matPopList = document.getElementById('matPopList');
+  let _popHideTimer = null;
+
+  function showMatPop(badge, ri){
+    clearTimeout(_popHideTimer);
+    loadMatInv();
+    const lang = window.NIKKI_SERVER === 'jp' ? 'ja' : (window.NIKKI_SERVER === 'na' ? 'en' : 'ko');
+    matPopTitle.textContent = '도안 재료' + (ri.canCraft ? ' ✓' : '');
+    matPopTitle.style.color = ri.canCraft ? '#15803d' : 'var(--pk-1)';
+
+    matPopList.innerHTML = '';
+
+    function makeItem(m){
+      const id   = _driveIdInv(m.img || '');
+      const need = Number(m.qty) || 1;
+      const have = Number(MAT_INV[id]) || 0;
+      const ok   = have >= need;
+      const partial = have > 0 && !ok;
+      const name = getMatName(m);
+      const el = document.createElement('div');
+      el.className = 'mat-pop-item';
+      el.innerHTML = `
+        <img class="mat-pop-img${ok?' ok':''}" src="${String(m.img||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}" alt="" loading="lazy">
+        ${name ? `<div style="font-size:10px;color:var(--pk-muted);text-align:center;line-height:1.2;max-width:54px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</div>` : ''}
+        <div class="mat-pop-qty ${ok?'ok':partial?'partial':''}">${have}/${need}</div>
+      `;
+      return el;
+    }
+
+    // 필수 재료
+    const matsOnly = ri.matsOnly || [];
+    const choices  = ri.choices  || [];
+    if(matsOnly.length && choices.length){
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'font-size:10px;color:var(--pk-muted);font-weight:600;width:100%;margin-bottom:2px';
+      lbl.textContent = '필수 재료';
+      matPopList.appendChild(lbl);
+    }
+    matsOnly.forEach(m => matPopList.appendChild(makeItem(m)));
+
+    if(choices.length){
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'font-size:10px;color:var(--pk-1);font-weight:700;width:100%;margin-top:6px;margin-bottom:2px';
+      lbl.textContent = '이 중 1개';
+      matPopList.appendChild(lbl);
+      choices.forEach(m => matPopList.appendChild(makeItem(m)));
+    }
+
+    // 위치 계산
+    const rect = badge.getBoundingClientRect();
+    matPop.style.left = Math.min(rect.left, window.innerWidth - 340) + 'px';
+    const topPos = rect.bottom + 6;
+    if(window.innerHeight - topPos < 180){
+      matPop.style.top = (rect.top - matPop.offsetHeight - 6) + 'px';
+    } else {
+      matPop.style.top = topPos + 'px';
+    }
+    matPop.classList.add('visible');
+  }
+
+  function hideMatPop(delay=200){
+    _popHideTimer = setTimeout(()=> matPop.classList.remove('visible'), delay);
+  }
+
+  // 팝오버 내부 hover 유지
+  matPop.addEventListener('mouseenter', ()=> clearTimeout(_popHideTimer));
+  matPop.addEventListener('mouseleave', ()=> hideMatPop());
+
   let OWNED_SET = new Set(); // 보유 이름 집합 (parent에서 수신)
   // normOwnedName과 동일한 정규화 (index.html과 키 일치)
   function normN(s){ return String(s||'').normalize('NFKC').toLowerCase().replace(/\s+/g,''); }
@@ -408,6 +686,14 @@ function getItemTags(it){
       list = list.filter(it => it._owned === true);
     }
 
+    if (reformOnly){
+      loadMatInv();
+      list = list.filter(it => {
+        const ri = getReformInfo(it);
+        return ri && ri.hasMats && ri.canCraft;
+      });
+    }
+
     if (sort === 'stars'){
       list.sort((a,b)=>(Number(b.stars)||0)-(Number(a.stars)||0));
     }else if (sort === 'name'){
@@ -485,6 +771,18 @@ function getItemTags(it){
         badge.textContent = '보유';
         tdName.appendChild(badge);
       }
+      // 제작 가능 배지 — 이름 옆에 인라인으로
+      const ri = getReformInfo(it);
+      if(ri && ri.hasMats){
+        const b = document.createElement('span');
+        b.className = ri.canCraft ? 'badge-craft-ok' : 'badge-craft-no';
+        b.textContent = ri.canCraft ? '🔨 제작가능' : '🔨 재료부족';
+        b.addEventListener('mouseenter', (e)=>{ e.stopPropagation(); showMatPop(b, ri); });
+        b.addEventListener('mouseleave', ()=> hideMatPop());
+        b.addEventListener('click', (e)=>{ e.stopPropagation(); showMatPop(b, ri); });
+        tdName.appendChild(b);
+      }
+
       const tdStars = document.createElement('td');
       tdStars.textContent = it.stars ?? '';
       const tdPart = document.createElement('td');
@@ -564,13 +862,26 @@ function getItemTags(it){
     }
   }
 
+  const reformOnlyBtn = $('reformOnlyBtn');
+  if(reformOnlyBtn){
+    reformOnlyBtn.addEventListener('click', ()=>{
+      reformOnly = !reformOnly;
+      reformOnlyBtn.classList.toggle('reform-only-on', reformOnly);
+      loadMatInv(); // 최신 인벤토리 반영
+      page = 1; render();
+    });
+  }
+
   $('clear').addEventListener('click', ()=>{
     $('q').value = '';
     $('sort').value = 'part_code';
     $('starFilter').value = '';
     ownedOnly = false;
+    reformOnly = false;
     const ob = $('ownedOnlyBtn');
     if(ob) ob.classList.remove('owned-only-on');
+    const rb = $('reformOnlyBtn');
+    if(rb) rb.classList.remove('reform-only-on');
     active = 0;
     buildSidebar();
     render();
@@ -621,9 +932,7 @@ function getItemTags(it){
     }
     if (msg.type === 'ITEMSINFO_DATA'){
       if(msg.server) window.NIKKI_SERVER = msg.server;
-      // 서버 설정 먼저 적용 후 _owned 계산됨
       const arr = Array.isArray(msg.items) ? msg.items : [];
-      // owned 이름 셋 업데이트
       if (Array.isArray(msg.ownedNames)){
         OWNED_SET = new Set(msg.ownedNames.map(n => normN(n)).filter(k => k.indexOf('::') >= 0));
       }
@@ -641,6 +950,15 @@ function getItemTags(it){
       page = 1;
       buildSidebar();
       render();
+      // ★ item_details_frame.html에서 reform 데이터 로드해서 ITEMS에 머지
+      loadReformData();
+    }
+    // 재료 인벤토리 업데이트 (재료 보유 현황 저장 시)
+    if(msg.type === 'MAT_INVENTORY_UPDATE'){
+      if(msg.inventory) MAT_INV = msg.inventory;
+      else loadMatInv();
+      render();   // 배지 + 필터 모두 재계산
+      return;
     }
     // 보유 목록만 별도로 업데이트 (ownedInput 변경 시)
     if (msg.type === 'ITEMSINFO_OWNED_UPDATE' && Array.isArray(msg.ownedNames)){
@@ -655,6 +973,12 @@ function getItemTags(it){
       render();
     }
   });
+
+  // reform 데이터는 __REFORM_MAP에 직접 내장됨 → 인벤토리만 최신화하고 재렌더
+  function loadReformData(){
+    loadMatInv();
+    render();
+  }
 
   // 페이지네이션 리스너 — 초기화 시 한 번만 등록 (__bind 패턴 제거)
   function stt(){try{window.scrollTo({top:0,behavior:'smooth'});}catch(e){}try{window.parent.postMessage({type:'ITEMSINFO_SCROLL_TOP'},'*');}catch(e){}}

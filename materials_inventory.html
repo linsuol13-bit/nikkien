@@ -3,28 +3,312 @@
 @font-face {
   font-family: "AngyeongGothic";
   src: url("Ba안경고딕_김영화_cej8784_naver_com_.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+  font-weight: normal; font-style: normal; font-display: swap;
 }
 * { font-family: "AngyeongGothic", system-ui, AppleSDGothicNeo, sans-serif !important; }
-.badge, .pill, .pill-small, .tag-pill, .tag-chip,
-.chip, .gtab, .skill, .countpill { font-size: 14px !important; }
-.sc-num, .chip .v, .pill-small .v { font-weight: 700 !important; }
-.tl-title-id, .tl-title-sub, .tl-speaker, .tl-kr-trans { font-weight: 700 !important; }
-.score, .badge { font-weight: 700 !important; }
-.badge.tag, .tag-pill, .tag-chip { font-weight: 400 !important; }
 </style>
 <meta charset="utf-8">
-<title>Item Details (Merged)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>재료 보유 현황</title>
+<style>
+:root {
+  --pk-1:#e91e8c; --pk-2:#f06292; --pk-3:#f48fb1;
+  --pk-4:#fce4ec; --pk-5:#fff5f8;
+  --pk-border:#f8bbd0;
+  --pk-grad:linear-gradient(135deg,#e91e8c,#f06292);
+  --pk-muted:#a06080;
+  --pk-text:#2d1a22;
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--pk-5); color:var(--pk-text); min-height:100vh; }
+
+/* 네비바 */
+.navbar {
+  position:sticky; top:0; z-index:100;
+  background:rgba(255,245,248,.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--pk-border);
+  display:flex; align-items:center; gap:10px;
+  padding:10px 16px;
+}
+.navbar-title { font-size:15px; font-weight:500; flex:1; }
+.save-btn {
+  height:32px; padding:0 16px;
+  background:var(--pk-grad); color:#fff;
+  border:none; border-radius:8px;
+  font-size:13px; font-weight:500;
+  cursor:pointer;
+  transition:opacity .12s;
+}
+.save-btn:hover { opacity:.85; }
+.save-notice {
+  font-size:12px; color:var(--pk-muted);
+  opacity:0; transition:opacity .3s;
+}
+.save-notice.show { opacity:1; }
+
+/* 메인 */
+.wrap { max-width:760px; margin:0 auto; padding:20px 16px; }
+
+/* 상태 */
+.status-bar {
+  background:#fff; border:1.5px solid var(--pk-border);
+  border-radius:14px; padding:14px 18px;
+  margin-bottom:20px;
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+}
+.status-item { font-size:13px; color:var(--pk-muted); }
+.status-item b { color:var(--pk-1); font-weight:500; }
+
+/* 재료 그리드 */
+.mat-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(120px, 1fr));
+  gap:12px;
+}
+.mat-card {
+  background:#fff;
+  border:1.5px solid var(--pk-border);
+  border-radius:14px;
+  padding:12px;
+  display:flex; flex-direction:column;
+  align-items:center; gap:8px;
+  transition:border-color .12s, box-shadow .12s;
+}
+.mat-card:hover { border-color:var(--pk-2); box-shadow:0 4px 14px rgba(233,30,140,.1); }
+.mat-card.has-stock { border-color:#86efac; background:#f0fdf4; }
+.mat-img {
+  width:72px; height:72px;
+  border-radius:12px;
+  object-fit:cover;
+  border:1.5px solid var(--pk-border);
+  background:var(--pk-5);
+}
+.mat-name {
+  font-size:11px; color:var(--pk-muted);
+  text-align:center; line-height:1.3;
+  min-height:28px;
+  display:flex; align-items:center; justify-content:center;
+}
+.mat-qty-wrap {
+  display:flex; align-items:center; gap:4px;
+}
+.qty-btn {
+  width:24px; height:24px;
+  border:1.5px solid var(--pk-border);
+  border-radius:6px;
+  background:#fff; color:var(--pk-1);
+  font-size:15px; font-weight:700;
+  cursor:pointer; display:flex;
+  align-items:center; justify-content:center;
+  transition:background .1s, border-color .1s;
+  line-height:1;
+}
+.qty-btn:hover { background:var(--pk-4); border-color:var(--pk-2); }
+.qty-input {
+  width:44px; height:28px;
+  border:1.5px solid var(--pk-border);
+  border-radius:8px;
+  text-align:center;
+  font-size:14px; font-weight:500;
+  color:var(--pk-text);
+  background:#fff;
+  outline:none;
+}
+.qty-input:focus { border-color:var(--pk-1); }
+
+/* 로딩 */
+.loading {
+  text-align:center; padding:40px;
+  color:var(--pk-muted); font-size:14px;
+}
+
+/* 빈 상태 */
+.empty {
+  text-align:center; padding:40px;
+  color:var(--pk-muted); font-size:14px;
+}
+
+/* 검색 */
+.search-wrap {
+  display:flex; align-items:center; gap:8px;
+  margin-left:auto; flex-wrap:wrap;
+}
+#matSearch {
+  height:32px; padding:0 12px;
+  border:1.5px solid var(--pk-border);
+  border-radius:999px;
+  font-size:13px; color:var(--pk-text);
+  background:#fff; outline:none;
+  width:180px; transition:border-color .12s, width .2s;
+}
+#matSearch:focus { border-color:var(--pk-1); width:220px; }
+.owned-toggle {
+  display:flex; align-items:center; gap:4px;
+  font-size:13px; color:var(--pk-muted); cursor:pointer;
+  white-space:nowrap;
+}
+.owned-toggle input { accent-color:var(--pk-1); cursor:pointer; }
+
+/* 재료 이름 표시 개선 */
+.mat-name {
+  font-size:11px; color:var(--pk-muted);
+  text-align:center; line-height:1.3;
+  min-height:28px;
+  display:flex; align-items:center; justify-content:center;
+  word-break:keep-all;
+}
+.mat-card.hidden { display:none; }
+
+@media(max-width:500px){
+  .mat-grid { grid-template-columns:repeat(auto-fill, minmax(100px, 1fr)); gap:8px; }
+  .mat-img { width:60px; height:60px; }
+  #matSearch { width:140px; }
+  #matSearch:focus { width:170px; }
+}
+</style>
+
+<nav class="navbar">
+  <span class="navbar-title">🧵 재료 보유 현황</span>
+  <span class="save-notice" id="saveNotice">저장됨 ✓</span>
+  <button class="save-btn" id="saveBtn">저장</button>
+</nav>
+
+<div class="wrap">
+  <div class="status-bar">
+    <div class="status-item">전체 재료 <b id="totalCount">0</b>종</div>
+    <div class="status-item">보유중 <b id="ownedCount">0</b>종</div>
+    <div class="search-wrap">
+      <input type="text" id="matSearch" placeholder="🔍 재료 이름 검색…" autocomplete="off">
+      <label class="owned-toggle">
+        <input type="checkbox" id="showOwnedOnly"> 보유만
+      </label>
+    </div>
+  </div>
+  <div id="matGrid" class="mat-grid">
+    <div class="loading">재료 데이터 불러오는 중…</div>
+  </div>
+</div>
+
+
 
 <script>
-/**
- * window.ITEM_DETAILS
- * - code(string) -> detail object
- * - 개별 상세 HTML에서 item-data(JSON)만 추출해 합친 버전
- */
-window.ITEM_DETAILS = {
+(function(){
+  // ★ NIKKI_SERVER 초기화 - 가장 먼저 실행 (renderGrid보다 앞서야 이름이 맞게 표시됨)
+  window.NIKKI_SERVER = (function(){
+    try{ return localStorage.getItem('nikki_server') || 'ko'; }catch(e){ return 'ko'; }
+  })();
+
+  const STORAGE_KEY = 'nikki_mat_inventory';
+
+  // localStorage에서 보유 수량 로드
+  function loadInventory(){
+    try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }catch(e){ return {}; }
+  }
+  function saveInventory(inv){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(inv)); }catch(e){}
+  }
+
+  // 구글 드라이브 ID 추출
+  function driveId(url){
+    if(!url) return null;
+    let m = url.match(/[?&]id=([a-zA-Z0-9_-]{10,})/);
+    if(m) return m[1];
+    m = url.match(/\/file\/d\/([a-zA-Z0-9_-]{10,})/);
+    if(m) return m[1];
+    m = url.match(/thumbnail\?id=([a-zA-Z0-9_-]{10,})/);
+    if(m) return m[1];
+    return url; // fallback: URL 그대로
+  }
+
+  let inventory = loadInventory();
+  let materials = []; // { id, img, nameObj:{ko,en,ja,...} }
+  let _searchQ = '';
+  let _ownedOnly = false;
+
+  // 현재 서버/언어에 맞는 이름 반환
+  function getMatDisplayName(nameObj){
+    if(!nameObj) return '';
+    if(typeof nameObj === 'string') return nameObj;
+    const server = window.NIKKI_SERVER || 'ko';
+    if(server === 'jp') return nameObj.ja || nameObj.ko || nameObj.en || '';
+    if(server === 'na') return nameObj.en || nameObj.ko || nameObj.ja || '';
+    return nameObj.ko || nameObj.en || nameObj.ja || '';
+  }
+
+  function extractMaterials(DETAILS){
+    const consumableSeen = new Map(); // 1순위: 소모품 (code 없음)
+    const itemMatSeen    = new Map(); // 2순위: 필수 아이템 재료 (code 있음, materials)
+    const choiceSeen     = new Map(); // 3순위: 선택 재료 (choices)
+
+    function addToMap(m, target, skipIfInOther){
+      const img = m.img || '';
+      if(!img) return;
+      const id = driveId(img) || img;
+      // 이미 상위 그룹에 있으면 추가 안 함
+      for(const other of skipIfInOther){ if(other.has(id)) return; }
+      if(target.has(id)) return;
+      const nameObj = typeof m.name === 'object'
+        ? m.name
+        : (m.name ? { ko: m.name, en: m.name, ja: m.name } : null);
+      target.set(id, { img, nameObj });
+    }
+
+    const items = Object.values(DETAILS).filter(item =>
+      item.reform && item.reform.enabled
+    );
+
+    // 1패스: materials 중 code 없는 것 (소모품)
+    items.forEach(item => {
+      const mats = Array.isArray(item.reform.materials) ? item.reform.materials : [];
+      mats.filter(m => !m.code && !m.itemCode).forEach(m =>
+        addToMap(m, consumableSeen, [])
+      );
+    });
+
+    // 2패스: materials 중 code 있는 것 (아이템 필수재료)
+    items.forEach(item => {
+      const mats = Array.isArray(item.reform.materials) ? item.reform.materials : [];
+      mats.filter(m => m.code || m.itemCode).forEach(m =>
+        addToMap(m, itemMatSeen, [consumableSeen])
+      );
+    });
+
+    // 3패스: choices (선택재료)
+    items.forEach(item => {
+      const choices = Array.isArray(item.reform.choices) ? item.reform.choices : [];
+      choices.forEach(m =>
+        addToMap(m, choiceSeen, [consumableSeen, itemMatSeen])
+      );
+    });
+
+    if(!consumableSeen.size && !itemMatSeen.size && !choiceSeen.size){
+      renderEmpty(); return;
+    }
+
+    const itemList = [
+      ...Array.from(itemMatSeen.entries()).map(([id, v]) => ({ id, ...v, tier: 'item' })),
+      ...Array.from(choiceSeen.entries()).map(([id, v])  => ({ id, ...v, tier: 'item' }))
+    ];
+    // 의상 아이템은 현재 서버 기준 이름순 정렬
+    itemList.sort((a, b) => {
+      const na = getMatDisplayName(a.nameObj) || '';
+      const nb = getMatDisplayName(b.nameObj) || '';
+      return na.localeCompare(nb);
+    });
+
+    materials = [
+      ...Array.from(consumableSeen.entries()).map(([id, v]) => ({ id, ...v, tier: 'consumable' })),
+      ...itemList
+    ];
+    renderGrid();
+  }
+
+  // index.html(부모)에 ITEM_DETAILS 요청
+  // script 태그로 item_details_frame.html의 ITEM_DETAILS 직접 로드
+  // ITEM_DETAILS 인라인 로드
+  (function(){
+    window.ITEM_DETAILS = {
 
   "1": {
     code: 1,
@@ -1106,48 +1390,183 @@ window.ITEM_DETAILS = {
 }
 
 };
+    if(window.ITEM_DETAILS && Object.keys(window.ITEM_DETAILS).length > 0){
+      extractMaterials(window.ITEM_DETAILS);
+    } else {
+      renderEmpty();
+    }
+  })();
 
-// ---- postMessage API (cross-origin/file:// safe) ----
-(function(){
-  function sendReady(){
-    // 기존 code키 데이터를 code_part 복합키로도 등록
-    try {
-      Object.keys(window.ITEM_DETAILS).forEach(function(k){
-        var d = window.ITEM_DETAILS[k];
-        if(d && d.part){
-          var ck = String(d.code||k) + "_" + String(d.part);
-          if(!window.ITEM_DETAILS[ck]) window.ITEM_DETAILS[ck] = d;
-        }
-      });
-    }catch(e){}
-    try {
-      (window.parent || window.opener || window).postMessage(
-        { type: "ITEM_DETAILS_LOADED" },
-        "*"
-      );
-    } catch(e) {}
+  function renderEmpty(){
+    document.getElementById('matGrid').innerHTML = '<div class="empty">재료 데이터가 없어요.<br>item_details_frame.html에 reform 재료를 추가해줘요!</div>';
   }
 
-  window.addEventListener("message", function(ev){
-    var d = ev.data || {};
-    if (d.type === "GET_ITEM_DETAIL") {
-      var code = String(d.code ?? "");
-      var part = String(d.part ?? "");
-      // code+part 복합키로 먼저 찾고, 없으면 code만으로 찾되 part가 일치할 때만 반환
-      var compositeKey = code + "_" + part;
-      var byComposite = window.ITEM_DETAILS[compositeKey] || null;
-      var byCode = window.ITEM_DETAILS[code] || null;
-      // part가 제공된 경우, code 단독 fallback은 part가 일치할 때만 허용
-      var detail = byComposite || (byCode && (!part || !byCode.part || String(byCode.part) === String(part)) ? byCode : null) || null;
-      try {
-        ev.source && ev.source.postMessage(
-          { type: "ITEM_DETAIL", code: code, detail: detail },
-          "*"
-        );
-      } catch(e) {}
+  function updateStatus(){
+    const total = materials.length;
+    const owned = materials.filter(m => (inventory[m.id] || 0) > 0).length;
+    document.getElementById('totalCount').textContent = total;
+    document.getElementById('ownedCount').textContent = owned;
+  }
+
+  function applyFilter(){
+    const q = _searchQ.trim().toLowerCase();
+    let visCount = 0;
+    document.querySelectorAll('.mat-card[data-mat-id]').forEach(card => {
+      const id = card.dataset.matId;
+      const mat = materials.find(m => m.id === id);
+      if(!mat){ card.classList.add('hidden'); return; }
+      const name = getMatDisplayName(mat.nameObj).toLowerCase();
+      const qty = inventory[mat.id] || 0;
+      const matchSearch = !q || name.includes(q);
+      const matchOwned = !_ownedOnly || qty > 0;
+      const hidden = !(matchSearch && matchOwned);
+      card.classList.toggle('hidden', hidden);
+      if(!hidden) visCount++;
+    });
+    // 검색 결과 없음 메시지
+    const emptyEl = document.getElementById('matEmptyMsg');
+    if(emptyEl) emptyEl.style.display = visCount === 0 ? 'block' : 'none';
+  }
+
+  // 이름 라벨 다시 그리기 (서버 변경 시)
+  function refreshNames(){
+    // 의상 아이템 재정렬 (언어 변경 후 이름 기준)
+    const consumables = materials.filter(m => m.tier === 'consumable');
+    const items = materials.filter(m => m.tier === 'item');
+    items.sort((a, b) => {
+      const na = getMatDisplayName(a.nameObj) || '';
+      const nb = getMatDisplayName(b.nameObj) || '';
+      return na.localeCompare(nb);
+    });
+    materials = [...consumables, ...items];
+    renderGrid();
+  }
+
+  function renderGrid(){
+    const grid = document.getElementById('matGrid');
+    if(!materials.length){ renderEmpty(); return; }
+
+    grid.innerHTML = '';
+    let shownDivider = false;
+
+    materials.forEach(mat => {
+      // 소모품 → 의상 전환 시 구분선 1개만
+      if(mat.tier === 'item' && !shownDivider){
+        shownDivider = true;
+        const divider = document.createElement('div');
+        divider.style.cssText = 'grid-column:1/-1;border-top:1.5px dashed var(--pk-border);margin-top:4px;';
+        grid.appendChild(divider);
+      }
+
+      const qty = inventory[mat.id] || 0;
+      const displayName = getMatDisplayName(mat.nameObj);
+      const card = document.createElement('div');
+      card.className = 'mat-card' + (qty > 0 ? ' has-stock' : '');
+      card.dataset.matId = mat.id;
+
+      card.innerHTML = `
+        <img class="mat-img" src="${esc(mat.img)}" alt="" loading="lazy">
+        <div class="mat-name">${esc(displayName) || '—'}</div>
+        <div class="mat-qty-wrap">
+          <button class="qty-btn minus" data-id="${esc(mat.id)}">−</button>
+          <input class="qty-input" type="number" min="0" max="9999"
+            value="${qty}" data-id="${esc(mat.id)}">
+          <button class="qty-btn plus" data-id="${esc(mat.id)}">+</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    // 검색 결과 없음 메시지
+    const emptyMsg = document.createElement('div');
+    emptyMsg.id = 'matEmptyMsg';
+    emptyMsg.className = 'empty';
+    emptyMsg.style.display = 'none';
+    emptyMsg.style.cssText = 'grid-column:1/-1;text-align:center;padding:40px;color:var(--pk-muted);font-size:14px;';
+    emptyMsg.textContent = '검색 결과가 없어요.';
+    grid.appendChild(emptyMsg);
+
+    // 이벤트 (이벤트 위임)
+    grid.addEventListener('click', function(ev){
+      const btn = ev.target.closest('.qty-btn');
+      if(!btn) return;
+      const id = btn.dataset.id;
+      const input = grid.querySelector(`.qty-input[data-id="${id}"]`);
+      if(!input) return;
+      let val = parseInt(input.value) || 0;
+      if(btn.classList.contains('plus')) val = Math.min(9999, val + 1);
+      if(btn.classList.contains('minus')) val = Math.max(0, val - 1);
+      input.value = val;
+      inventory[id] = val;
+      saveInventory(inventory);
+      const card = btn.closest('.mat-card');
+      if(card) card.classList.toggle('has-stock', val > 0);
+      updateStatus();
+      applyFilter();
+    });
+
+    grid.addEventListener('change', function(ev){
+      const input = ev.target.closest('.qty-input');
+      if(!input) return;
+      const id = input.dataset.id;
+      let val = Math.max(0, Math.min(9999, parseInt(input.value) || 0));
+      input.value = val;
+      inventory[id] = val;
+      saveInventory(inventory);
+      const card = input.closest('.mat-card');
+      if(card) card.classList.toggle('has-stock', val > 0);
+      updateStatus();
+      applyFilter();
+    });
+
+    updateStatus();
+    applyFilter();
+
+    // 검색 이벤트 (한 번만 등록)
+    const searchEl = document.getElementById('matSearch');
+    const ownedCb = document.getElementById('showOwnedOnly');
+    if(searchEl && !searchEl.dataset.bound){
+      searchEl.dataset.bound = '1';
+      searchEl.addEventListener('input', ()=>{ _searchQ = searchEl.value; applyFilter(); });
+      searchEl.addEventListener('keydown', e=>{ if(e.key==='Escape'){ searchEl.value=''; _searchQ=''; applyFilter(); } });
+    }
+    if(ownedCb && !ownedCb.dataset.bound){
+      ownedCb.dataset.bound = '1';
+      ownedCb.addEventListener('change', ()=>{ _ownedOnly = ownedCb.checked; applyFilter(); });
+    }
+  }
+
+  // 저장 버튼
+  document.getElementById('saveBtn').addEventListener('click', function(){
+    saveInventory(inventory);
+    // 부모 창 + 모든 iframe에 알림 (아이템 목록 제작 가능 갱신용)
+    const msg = { type: 'MAT_INVENTORY_UPDATE', inventory };
+    try{ window.top.postMessage(msg, '*'); }catch(e){}
+    try{ if(window.parent !== window.top) window.parent.postMessage(msg, '*'); }catch(e){}
+    try{
+      const frames = window.top.document.querySelectorAll('iframe');
+      frames.forEach(function(fr){
+        try{ fr.contentWindow.postMessage(msg, '*'); }catch(e){}
+      });
+    }catch(e){}
+    const notice = document.getElementById('saveNotice');
+    notice.classList.add('show');
+    setTimeout(() => notice.classList.remove('show'), 2000);
+  });
+
+  // 자동저장 제거 (버튼 클릭 시에만 저장, 수량 변경은 renderGrid 이벤트에서 처리)
+
+  // NIKKI_SERVER 변경 수신 → 이름 언어 갱신
+  window.addEventListener('message', function(ev){
+    if(ev.origin && ev.origin !== location.origin && ev.origin !== 'null') return;
+    const msg = ev.data;
+    if(!msg) return;
+    if(msg.type === 'NIKKI_SERVER_CHANGE'){
+      window.NIKKI_SERVER = msg.server;
+      refreshNames();
     }
   });
 
-  sendReady();
+  function esc(s){ return String(s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 })();
 </script>

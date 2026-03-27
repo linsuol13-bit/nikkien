@@ -164,6 +164,13 @@
     <label class="filter-toggle" id="missingFilterToggle">
       <input type="checkbox" id="missingFilterCb"> ✗ 미보유 있는 세트만
     </label>
+    <select id="sortSel" style="height:32px;padding:0 8px;border:1.5px solid var(--pk-border);border-radius:8px;background:#fff;font-size:13px;color:var(--pk-text);cursor:pointer;">
+      <option value="default">기본 순서</option>
+      <option value="owned_desc">보유 많은 순</option>
+      <option value="owned_asc">보유 적은 순</option>
+      <option value="pct_desc">완성도 높은 순</option>
+      <option value="pct_asc">완성도 낮은 순</option>
+    </select>
     <div class="muted" id="status">로딩중...</div>
   </div>
 
@@ -290,6 +297,7 @@
   const zoomImg = $("zoomImg");
   const missingFilterToggle = $("missingFilterToggle");
   const missingFilterCb = $("missingFilterCb");
+  const sortSel = $("sortSel");
   const missingSection = $("missingSection");
   const missingList = $("missingList");
   const missingCount = $("missingCount");
@@ -521,6 +529,29 @@ function trim(s){ return norm(s).trim(); }
           return name && !isOwned(name);
         });
       });
+    }
+
+    // 정렬
+    const sortVal = sortSel ? sortSel.value : 'default';
+    if(sortVal !== 'default' && (OWNED_CODES.size > 0 || OWNED_NAMES.size > 0)){
+      full = full.map(s => {
+        const parts = Array.isArray(s.parts) ? s.parts : [];
+        let ownedCount = 0;
+        parts.forEach(p => {
+          const code = (p.code == null) ? "" : String(p.code);
+          const name = trim(p.name) || "";
+          if(OWNED_CODES.size > 0){ if(isOwnedByCode(code, p.part)) ownedCount++; }
+          else if(name && isOwned(name)){ ownedCount++; }
+        });
+        const pct = parts.length > 0 ? ownedCount / parts.length : 0;
+        return { s, ownedCount, pct };
+      }).sort((a, b) => {
+        if(sortVal === 'owned_desc') return b.ownedCount - a.ownedCount;
+        if(sortVal === 'owned_asc') return a.ownedCount - b.ownedCount;
+        if(sortVal === 'pct_desc') return b.pct - a.pct;
+        if(sortVal === 'pct_asc') return a.pct - b.pct;
+        return 0;
+      }).map(x => x.s);
     }
 
     const total = full.length;
@@ -1117,6 +1148,10 @@ function trim(s){ return norm(s).trim(); }
   q.addEventListener("input", ()=>{ currentPage = 1; renderList(); });
 
   // 미보유 필터 토글
+  if(sortSel){
+    sortSel.addEventListener("change", ()=>{ currentPage=1; renderList(); });
+  }
+
   if(missingFilterCb && missingFilterToggle){
     missingFilterCb.addEventListener("change", ()=>{
       missingFilterToggle.classList.toggle("active", missingFilterCb.checked);
@@ -1143,6 +1178,12 @@ function trim(s){ return norm(s).trim(); }
       buildItemIndex();
       // keep status if sets already loaded
       renderList();
+      return;
+    }
+
+    if(msg.type === 'SETS_OPEN_BY_ID' && msg.setId){
+      const target = SETS.find(s => s.id === msg.setId);
+      if(target) openSet(target);
       return;
     }
 

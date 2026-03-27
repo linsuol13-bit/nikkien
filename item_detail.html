@@ -11,6 +11,66 @@
 .tl-title-id,.tl-title-sub,.tl-speaker,.tl-kr-trans{font-weight:700!important}
 .score,.badge{font-weight:700!important}
 .badge.tag,.tag-pill,.tag-chip{font-weight:400!important}
+
+/* 등급 배지 스탯별 색 */
+.grade-stat-심플 { background:#788ea1; color:#fff; border-color:#fff; }
+.grade-stat-활발 { background:#ff6f4f; color:#fff; border-color:#fff; }
+.grade-stat-큐티 { background:#ff6b71; color:#fff; border-color:#fff; }
+.grade-stat-청순 { background:#53aa9c; color:#fff; border-color:#fff; }
+.grade-stat-따뜻 { background:#fd763c; color:#fff; border-color:#fff; }
+.grade-stat-성숙 { background:#e2595a; color:#fff; border-color:#fff; }
+.grade-stat-섹시 { background:#9490a7; color:#fff; border-color:#fff; }
+.grade-stat-시원 { background:#7bbdd6; color:#fff; border-color:#fff; }
+.grade-stat-화려 { background:#e8954a; color:#fff; border-color:#fff; }
+.grade-stat-우아 { background:#9088c0; color:#fff; border-color:#fff; }
+
+/* ── 세트 섹션 ── */
+.set-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--pk-border);
+  border-radius: 16px;
+  background: #fff;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color .15s, box-shadow .15s;
+  text-decoration: none;
+}
+.set-card:hover {
+  border-color: var(--pk-2);
+  box-shadow: 0 6px 20px rgba(233,30,140,.12);
+}
+.set-thumb {
+  width: 72px; height: 72px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1.5px solid var(--pk-border);
+  background: var(--pk-5);
+  flex: 0 0 auto;
+}
+
+.set-info { flex: 1; min-width: 0; }
+.set-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--pk-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.set-sub {
+  font-size: 12px;
+  color: var(--pk-muted);
+  margin-top: 2px;
+}
+.set-arrow {
+  font-size: 20px;
+  color: var(--pk-2);
+  flex: 0 0 auto;
+}
 </style>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -288,17 +348,59 @@ body {
 .imgcard:hover img{transform:scale(1.03)}
 
 /* ── 스탯 ── */
-.stats{display:flex;flex-wrap:wrap;gap:12px}
-.stat{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:10px;border:1.5px solid var(--pk-border);background:var(--pk-5);font-size:13px}
-.grade{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;border:1.5px solid transparent;font-size:12px;flex:0 0 auto}
-.grade.grade-SSS{background:linear-gradient(135deg,#e91e8c,#c2185b);color:#fff;border-color:#e91e8c}
-.grade.grade-SS{background:linear-gradient(135deg,#f06292,#e91e8c);color:#fff;border-color:#f06292}
-.grade.grade-S{background:linear-gradient(135deg,#f48fb1,#f06292);color:#fff;border-color:#f48fb1}
-.grade.grade-A{background:linear-gradient(135deg,#fce4ec,#f8bbd0);color:#880e4f;border-color:#f8bbd0}
-.grade.grade-B{background:linear-gradient(135deg,#fff0f5,#fce4ec);color:#ad1457;border-color:#fce4ec}
-.grade.grade-C{background:#fff5f8;color:#c2185b;border-color:var(--pk-border)}
-.grade.grade-D{background:#fff;color:var(--pk-muted);border-color:var(--pk-border)}
-.grade.grade-{background:var(--pk-4);color:var(--pk-muted);border-color:var(--pk-border)}
+.stats{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;justify-content:space-evenly}
+.stat-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.stat {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 500;
+  position: relative;
+  /* 바깥 테두리 + 안쪽 흰선 */
+  box-shadow: 0 0 0 2px #fff inset;
+}
+.stat-grade {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pk-text);
+}
+.grade{
+  font-weight:700;
+  font-size:18px;
+  font-weight:800;
+  flex:0 0 auto;
+  background:none;
+  border:none;
+}
+.grade.grade-SSS{color:#ffa916}
+.grade.grade-SS{color:#ffa916}
+.grade.grade-S{color:#ffa916}
+.grade.grade-A{color:#da597f}
+.grade.grade-B{color:#9b7fd4}
+.grade.grade-C{color:#53a5d6}
+.grade.grade-D{color:#a0a0a0}
+.grade.grade-{color:#c0c0c0}
+
+/* ── 스탯 카드 배경색 (게임 내 색상) ── */
+/* 배경: 연한색, outline: 진한 테두리색, inset shadow: 흰선 */
+.stat-심플 { background:#d1dee6; outline:2px solid #788ea1; color:#788ea1; }
+.stat-활발 { background:#ffe683; outline:2px solid #ff6f4f; color:#b85000; }
+.stat-큐티 { background:#ffe4e0; outline:2px solid #ff6b71; color:#ff6b71; }
+.stat-청순 { background:#def3d6; outline:2px solid #53aa9c; color:#53aa9c; }
+.stat-따뜻 { background:#ffdcb5; outline:2px solid #fd763c; color:#fd763c; }
+.stat-성숙 { background:#ff7878; outline:2px solid #ff7878; color:#ffffff; }
+.stat-섹시 { background:#aaa3ca; outline:2px solid #aaa3ca; color:#ffffff; }
+.stat-시원 { background:#cfeefb; outline:2px solid #66a9c7; color:#66a9c7; }
+.stat-화려 { background:#eeb362; outline:2px solid #eeb362; color:#ffffff; }
+.stat-우아 { background:#ebe9ff; outline:2px solid #aa93c3; color:#aa93c3; }
 
 /* ── 출처 ── */
 .source-box{border:none;background:transparent;padding:0}
@@ -311,12 +413,28 @@ body {
 .materials{display:flex;flex-wrap:wrap;gap:16px}
 .mat{width:64px;text-align:center}
 .mat .mimg{width:56px;height:56px;border-radius:12px;border:1.5px solid var(--pk-border);background:var(--pk-5);object-fit:cover;display:block;margin:0 auto}
+.mimg-ok{border-color:#86efac !important;box-shadow:0 0 0 2px #bbf7d0}
 .matname{font-size:11px;margin-top:4px;color:var(--pk-muted);text-align:center;line-height:1.3}
 .qty{margin-top:3px;font-size:12px;color:var(--pk-1);font-weight:500}
+.qty-ok{color:#16a34a !important}
+.qty-partial{color:#d97706 !important}
+.mat-have{font-size:11px;color:var(--pk-muted);margin-top:1px}
+.mat-have.have-ok{color:#16a34a;font-weight:600}
 .matbtn{all:unset;cursor:pointer;width:64px;text-align:center;display:block}
 .matbtn:focus{outline:2px solid rgba(233,30,140,.35);outline-offset:2px;border-radius:12px}
 .matbtn:hover .mimg,.mimg{transition:transform .12s,box-shadow .12s}
 .matbtn:hover .mimg{transform:translateY(-3px);box-shadow:0 8px 18px rgba(233,30,140,.18)}
+
+/* 제작 가능 배지 */
+.craft-badge{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;vertical-align:middle;margin-left:7px}
+.craft-ok{background:#dcfce7;color:#15803d;border:1.5px solid #86efac}
+.craft-no{background:#fff1f2;color:#be123c;border:1.5px solid #fecdd3}
+
+/* 선택 재료 (OR) 구분선 */
+.mat-or-wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.mat-or-label{font-size:11px;font-weight:700;color:var(--pk-muted);background:var(--pk-4);border:1px solid var(--pk-border);border-radius:999px;padding:2px 8px;white-space:nowrap;align-self:center}
+.mat-section-label{font-size:12px;color:var(--pk-muted);font-weight:500;margin-bottom:4px}
+
 .dyegrid{display:flex;flex-wrap:wrap;gap:14px}
 .dyeitem{width:72px;text-align:center}
 .dyename{font-size:11px;margin-top:5px;color:var(--pk-muted);text-align:center;line-height:1.3;word-break:keep-all}
@@ -364,6 +482,7 @@ body {
   <div class="lang-switcher">
     <button class="lang-btn active" data-lang="ko">한국어</button>
     <button class="lang-btn" data-lang="en">EN</button>
+    <button class="lang-btn" data-lang="zh">中</button>
     <button class="lang-btn" data-lang="ja">日</button>
   </div>
   <button id="btnRegisterOwned">
@@ -418,7 +537,7 @@ function getLocalizedName(detail){
   if(!detail || !detail.names) return '';
   const lang = window.__activeLang;
   const n = detail.names;
-  return n[lang] || n.ko || n.en || n.ja || '';
+  return n[lang] || n.ko || n.en || n.zh || n.ja || '';
 }
 window.getLocalizedName = getLocalizedName;
 
@@ -736,10 +855,11 @@ document.addEventListener('DOMContentLoaded', function(){
       const rows = [
         makeLangRow("ko","한국",n.ko),
         makeLangRow("en","영어",n.en),
+        makeLangRow("zh","중국",n.zh),
         makeLangRow("ja","일본",n.ja),
       ].filter(Boolean).join('<div class="lang-divider"></div>');
       sections.push(`
-        <div class="sec-title">이름 <small>3개 언어</small></div>
+        <div class="sec-title">이름 <small>4개 언어</small></div>
         <div class="lang-list">${rows}</div>
       `);
     }
@@ -754,6 +874,7 @@ document.addEventListener('DOMContentLoaded', function(){
       const rows = [
         makeLangRow("ko","한국",d.ko),
         makeLangRow("en","영어",d.en),
+        makeLangRow("zh","중국",d.zh),
         makeLangRow("ja","일본",d.ja),
       ].filter(Boolean).join('<div class="lang-divider"></div>');
       sections.push(`
@@ -774,15 +895,36 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     // Stats
+    const __STAT_NAMES = {
+      "화려": { en: "Gorgeous", zh: "", ja: "" },
+      "우아": { en: "Elegant",  zh: "", ja: "" },
+      "성숙": { en: "Mature",   zh: "", ja: "" },
+      "섹시": { en: "Sexy",     zh: "", ja: "" },
+      "시원": { en: "Cool",     zh: "", ja: "" },
+      "따뜻": { en: "Warm",     zh: "", ja: "" },
+      "활발": { en: "Lively",   zh: "", ja: "" },
+      "큐티": { en: "Cute",     zh: "", ja: "" },
+      "심플": { en: "Simple",   zh: "", ja: "" },
+      "청순": { en: "Pure",     zh: "", ja: "" },
+    };
+    function getStatLabel(koName){
+      const lang = window.__activeLang || "ko";
+      if(lang === "ko") return koName;
+      const map = __STAT_NAMES[koName];
+      if(!map) return koName;
+      return map[lang] || koName;
+    }
+
     const statCards = Array.isArray(detail.statCards) ? detail.statCards : [];
     if (statCards.length){
       const statsHtml = statCards.map(s=>{
-        const name = esc(s.name || "");
+        const name = s.name || "";
         const grade = esc(s.grade || "");
-        const txt = esc(s.text || "");
-        const label = name ? name : (txt ? txt.split("/")[0].trim() : "");
+        const txt = s.text || "";
+        const koLabel = name ? name : (txt ? txt.split("/")[0].trim() : "");
+        const label = esc(getStatLabel(koLabel) || koLabel || "스탯");
         const g = grade || (txt.match(/\[([A-Z]{1,3})\]/)?.[1] || "");
-        return `<div class="stat"><div class="grade grade-${g||""}">${g||"?"}</div><div>${esc(label||"스탯")}</div></div>`;
+        return `<div class="stat-wrap"><div class="stat stat-${esc(koLabel)}">${label}</div><div class="grade grade-${g||""}">${g||"?"}</div></div>`;
       }).join("");
       sections.push(`
         <div class="sec-title">스펙</div>
@@ -804,30 +946,90 @@ document.addEventListener('DOMContentLoaded', function(){
     
 // Reform / materials (도안 재료)
 if (detail.reform && detail.reform.enabled){
-  const mats = Array.isArray(detail.reform.materials) ? detail.reform.materials : [];
-  const matsHtml = mats.length ? mats.map(m=>{
-    const img = esc(m.img || "");
-    const qty = esc(m.qty || "");
-    const codeVal = esc(m.code ?? m.itemCode ?? "");
-    const _mn = m.name || "";
-    const matName = esc(typeof _mn === "object"
-      ? (_mn[window.__activeLang || "ko"] || _mn.ko || _mn.en || _mn.ja || "")
+  const mats    = Array.isArray(detail.reform.materials) ? detail.reform.materials : [];
+  const choices = Array.isArray(detail.reform.choices)   ? detail.reform.choices   : [];
+
+  // 인벤토리 로드
+  let inv = {};
+  try{ inv = JSON.parse(localStorage.getItem('nikki_mat_inventory') || '{}'); }catch(e){}
+
+  function _driveId(url){
+    const s = String(url||'');
+    let m = s.match(/[?&]id=([a-zA-Z0-9_-]{10,})/);
+    if(m) return m[1];
+    m = s.match(/\/file\/d\/([a-zA-Z0-9_-]{10,})/);
+    if(m) return m[1];
+    m = s.match(/thumbnail\?id=([a-zA-Z0-9_-]{10,})/);
+    if(m) return m[1];
+    return url;
+  }
+
+  // 제작 가능 여부 계산
+  // mats: 전부 있어야 함 (AND)
+  // choices: 1개 이상 있으면 됨 (OR) — choices가 없으면 조건 충족으로 간주
+  let matsOk = mats.length === 0 || mats.every(m => {
+    const have = Number(inv[_driveId(m.img||'')] ) || 0;
+    return have >= (Number(m.qty) || 1);
+  });
+  let choicesOk = choices.length === 0 || choices.some(m => {
+    const have = Number(inv[_driveId(m.img||'')]) || 0;
+    return have >= (Number(m.qty) || 1);
+  });
+  const canCraft = (mats.length > 0 || choices.length > 0) && matsOk && choicesOk;
+
+  const craftBadgeHtml = (mats.length > 0 || choices.length > 0)
+    ? (canCraft
+        ? `<span class="craft-badge craft-ok">✓ 제작 가능</span>`
+        : `<span class="craft-badge craft-no">재료 부족</span>`)
+    : '';
+
+  // 재료 카드 렌더 헬퍼
+  function matCard(m, isChoice){
+    const img     = esc(m.img || '');
+    const qty     = Number(m.qty) || 1;
+    const codeVal = esc(m.code ?? m.itemCode ?? '');
+    const _mn     = m.name || '';
+    const matName = esc(typeof _mn === 'object'
+      ? (_mn[window.__activeLang || 'ko'] || _mn.ko || _mn.en || _mn.zh || _mn.ja || '')
       : _mn);
+    const have   = Number(inv[_driveId(m.img||'')]) || 0;
+    const enough = have >= qty;
+    const qtyClass  = enough ? 'qty qty-ok' : (have > 0 ? 'qty qty-partial' : 'qty');
+    const haveHint  = `<div class="mat-have ${enough?'have-ok':''}">${have}/${qty}</div>`;
     return `<div class="mat">
       <button class="matbtn" type="button"
               data-img="${img}"
-              ${codeVal ? ` data-code="${codeVal}"` : ``}
-              ${m.part ? ` data-part="${esc(m.part)}"` : ``}>
-        <img class="mimg" src="${img}" alt="" loading="lazy" decoding="async">
+              ${codeVal ? ` data-code="${codeVal}"` : ''}
+              ${m.part  ? ` data-part="${esc(m.part)}"` : ''}>
+        <img class="mimg ${enough?'mimg-ok':''}" src="${img}" alt="" loading="lazy" decoding="async">
         <div class="matname" data-mimg="${img}" data-mcode="${codeVal}">${matName}</div>
-        <div class="qty">× ${qty}</div>
+        <div class="${qtyClass}">× ${qty}</div>
+        ${haveHint}
       </button>
     </div>`;
-  }).join("") : `<div class="muted">재료 정보가 없어.</div>`;
+  }
+
+  // 필수 재료 HTML
+  const requiredHtml = mats.length
+    ? `${choices.length ? `<div class="mat-section-label">필수 재료</div>` : ''}
+       <div class="materials">${mats.map(m => matCard(m, false)).join('')}</div>`
+    : '';
+
+  // 선택 재료 HTML (OR — 1개만 있으면 됨)
+  const choicesHtml = choices.length
+    ? `<div class="mat-section-label" style="margin-top:${mats.length?10:0}px">
+         선택 재료 <span class="mat-or-label">이 중 1개</span>
+       </div>
+       <div class="mat-or-wrap">${choices.map(m => matCard(m, true)).join('')}</div>`
+    : '';
+
+  const emptyHtml = (!mats.length && !choices.length)
+    ? `<div class="muted">재료 정보가 없어.</div>` : '';
+
   sections.push(`
-    <div class="sec-title">도안 재료</div>
+    <div class="sec-title">도안 재료 ${craftBadgeHtml}</div>
     <div class="box box-plain">
-      <div class="materials">${matsHtml}</div>
+      ${requiredHtml}${choicesHtml}${emptyHtml}
     </div>
   `);
 }
@@ -843,7 +1045,7 @@ if (detail.reform && detail.reform.enabled){
         const _dn = dnames[i];
         const dyeName = _dn
           ? esc(typeof _dn === "object"
-            ? (_dn[window.__activeLang || "ko"] || _dn.ko || _dn.en || _dn.ja || "")
+            ? (_dn[window.__activeLang || "ko"] || _dn.ko || _dn.en || _dn.zh || _dn.ja || "")
             : _dn)
           : "";
         const dataAttr = page ? ` data-page="${page}"` : ` data-img="${s}"`;
@@ -855,6 +1057,28 @@ if (detail.reform && detail.reform.enabled){
       sections.push(`
         <div class="sec-title">염색</div>
         <div class="dyegrid">${dHtml}</div>
+      `);
+    }
+
+    // Set
+    if (detail.set){
+      const s = detail.set;
+      const setName = typeof s.name === 'object'
+        ? (s.name[window.__activeLang||'ko'] || s.name.ko || s.name.en || s.name.ja || '')
+        : (s.name || '');
+      const thumbSrc = esc(s.thumb || (detail.imgs ? (Array.isArray(detail.imgs) ? detail.imgs[0] : detail.imgs) : '') || '');
+      const thumb = thumbSrc ? `<img class="set-thumb" src="${thumbSrc}" alt="">` : '';
+      const subText = s.sub ? esc(s.sub) : '세트 전체 보기 →';
+      sections.push(`
+        <div class="sec-title">세트</div>
+        <div class="set-card" data-setid="${esc(s.id||'')}" data-setname="${esc(setName)}">
+          ${thumb}
+          <div class="set-info">
+            <div class="set-name">${esc(setName)}</div>
+            <div class="set-sub">${subText}</div>
+          </div>
+          <div class="set-arrow">›</div>
+        </div>
       `);
     }
 
@@ -1074,6 +1298,29 @@ function parsePageToTarget(page){
 
   // Delegate clicks for materials/dye thumbnails
   elContent.addEventListener("click", (ev)=>{
+    // 세트 카드 클릭
+    const setCard = ev.target.closest(".set-card[data-setid]");
+    if(setCard){
+      const setId = setCard.getAttribute("data-setid");
+      const setName = setCard.getAttribute("data-setname");
+      const msg = setId
+        ? { type: "CALENDAR_OPEN_SET_BY_ID", setId: setId }
+        : { type: "CALENDAR_OPEN_SET", setName: setName };
+
+      // 1) 즉시 전송 — 탭 전환 + sets frame 로드 유발
+      function sendMsg(){
+        try{ if(window.top && window.top !== window) window.top.postMessage(msg, "*"); }catch(e){}
+        try{ if(window.parent && window.parent !== window) window.parent.postMessage(msg, "*"); }catch(e){}
+      }
+      sendMsg();
+
+      // 2) sets frame lazy load 완료 후 재전송 (500ms, 1200ms)
+      // index.html이 __showPanel('sets') 후 setsViewFrame src 할당 → 로드에 시간 필요
+      setTimeout(sendMsg, 500);
+      setTimeout(sendMsg, 1200);
+      return;
+    }
+
     const btn = ev.target.closest("button[data-page], button[data-img], [data-code]");
     if (!btn) return;
     const page = btn.getAttribute("data-page");
@@ -1115,6 +1362,38 @@ function parsePageToTarget(page){
       return;
     }
     render(res.detail);
+  });
+})();
+
+/* ===== 서버 변경(NA/JP) → 언어 자동 동기화 ===== */
+(function(){
+  // NIKKI_SERVER → __activeLang 매핑
+  function serverToLang(server){
+    if(server === 'jp') return 'ja';
+    return 'en'; // na 기본
+  }
+  window.addEventListener('message', function(ev){
+    if(ev.origin && ev.origin !== location.origin && ev.origin !== 'null') return;
+    var msg = ev.data;
+    if(!msg || msg.type !== 'NIKKI_SERVER_CHANGE') return;
+    var lang = serverToLang(msg.server);
+    if(lang === window.__activeLang) return;
+    window.__activeLang = lang;
+    try{ localStorage.setItem('nikki_detail_lang', lang); }catch(e){}
+    // 버튼 active 상태 갱신
+    document.querySelectorAll('.lang-btn').forEach(function(b){
+      b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    // 타이틀 반영
+    var titleEl = document.getElementById('title');
+    var sidebarNameEl = document.getElementById('sidebarName');
+    var nm = getLocalizedName(window.__currentDetail);
+    if(titleEl) titleEl.textContent = nm || '아이템 상세';
+    if(sidebarNameEl) sidebarNameEl.textContent = nm || '—';
+    // 섹션 전체 재렌더
+    if(window.__currentDetail && typeof window.__rerenderSections === 'function'){
+      window.__rerenderSections(window.__currentDetail);
+    }
   });
 })();
 
