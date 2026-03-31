@@ -301,10 +301,13 @@ tbody tr:hover{background:#fff5f8}
   #controls .filter-row input[type=text]{box-sizing:border-box;max-width:100%}
   label[for="stageGroupSelect"]{flex-shrink:0;white-space:nowrap}
   label[for="stageSearchInput"]{flex-shrink:0;white-space:nowrap}
-  label[for="stageSelect"]{flex-shrink:0;white-space:nowrap;width:100%;margin-top:2px}
+  label[for="stageSelect"]{flex-shrink:0;white-space:nowrap;width:100%}
   #stageGroupSelect{flex:1;min-width:0;max-width:140px}
-  #stageSearchInput{flex:1;min-width:0;max-width:100%}
-  #stageSelect{width:100% !important;max-width:100%;box-sizing:border-box}
+  #stageSearchInput{flex:1;min-width:0}
+  #stageSelect{flex:1;min-width:0;width:0 !important;box-sizing:border-box}
+
+  label[data-i18n="lbl.sort"]{flex-shrink:0;white-space:nowrap}
+  #sortBy{flex:1;min-width:0}
   #controls .filter-row .owned-only-label{
     order:-1;
     width:100%;
