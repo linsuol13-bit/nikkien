@@ -298,9 +298,11 @@ tbody tr:hover{background:#fff5f8}
   .group{margin:8px 10px}
   #controls .filter-row{flex-wrap:wrap;align-items:center}
   #controls .filter-row select{max-width:calc(100vw - 24px);box-sizing:border-box}
-  #controls .filter-row input[type=text]{max-width:calc(100vw - 24px);width:calc(100vw - 24px);box-sizing:border-box}
+  #controls .filter-row input[type=text]{box-sizing:border-box}
   #stageSelect{width:calc(100vw - 24px) !important}
-  #stageGroupSelect{width:calc(50vw - 16px) !important}
+  #stageGroupSelect{width:calc(45vw - 16px) !important;flex-shrink:0}
+  #stageSearchInput{width:calc(55vw - 20px) !important;flex-shrink:0}
+  label[for="stageSearchInput"]{display:none !important}
   #controls .filter-row .owned-only-label{
     order:-1;
     width:100%;
