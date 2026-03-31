@@ -30,11 +30,11 @@
   ::-webkit-scrollbar-thumb:hover{background:var(--pk-2)}
   *{scrollbar-width:thin;scrollbar-color:var(--pk-3) var(--pk-5)}
   .wrap{display:flex;gap:12px;padding:12px}
-  .sidebar{width:200px;max-width:38vw;background:#fff;border:1.5px solid var(--pk-border);border-radius:16px;overflow:hidden;box-shadow:var(--pk-shadow);align-self:flex-start;position:sticky;top:0}
+  .sidebar{width:200px;max-width:38vw;background:#fff;border:1.5px solid var(--pk-border);border-radius:16px;overflow:hidden;box-shadow:var(--pk-shadow);align-self:flex-start;position:sticky;top:0;max-height:100vh;display:flex;flex-direction:column}
   .side-head{padding:10px 12px 8px;border-bottom:1.5px solid var(--pk-border);display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#fff5f8,#fce4ec)}
   .side-head b{font-size:16px;color:var(--pk-1);font-weight:500}
   .side-head .total{font-size:13px;color:var(--pk-muted)}
-  .list{padding:5px}
+  .list{padding:5px;overflow-y:auto;flex:1}
   .itembtn{display:flex;justify-content:space-between;align-items:center;gap:6px;width:100%;padding:7px 9px;border:1.5px solid transparent;background:transparent;border-radius:10px;cursor:pointer;font-size:14px;font-family:inherit;color:var(--pk-text);transition:background .13s,border-color .13s;text-align:left}
   .itembtn:hover{background:var(--pk-4);border-color:var(--pk-border)}
   .itembtn.active{background:var(--pk-grad);border-color:transparent;color:#fff;font-weight:500;box-shadow:0 2px 8px rgba(233,30,140,.2)}
@@ -145,7 +145,7 @@
 <div class="wrap">
   <aside class="sidebar">
     <div class="side-head">
-      <b>아이템 정보</b>
+      <b id="ii_title">아이템 정보</b>
       <span class="total" id="totalText">Total 0</span>
     </div>
     <div class="list" id="partList"></div>
@@ -153,9 +153,9 @@
 
   <main class="main">
     <div class="toolbar">
-      <input id="q" type="text" placeholder="이름 / 태그 검색 (예: 리폼, 와인)" />
+      <input id="q" type="text" placeholder="이름 / 태그 검색 (예: 리폼, 와인)" data-ii="ii_q_input" />
       <select id="starFilter">
-        <option value="">별★ 전체</option>
+        <option value="" id="ii_starAll">별★ 전체</option>
         <option value="6">6★</option>
         <option value="5">5★</option>
         <option value="4">4★</option>
@@ -164,13 +164,13 @@
         <option value="1">1★</option>
       </select>
       <select id="sort">
-        <option value="part_code" selected>부위→코드</option>
-        <option value="code">코드순</option>
-        <option value="name">이름순</option>
-        <option value="stars">별순</option>
+        <option value="part_code" selected id="ii_sortPartCode">부위→코드</option>
+        <option value="code" id="ii_sortCode">코드순</option>
+        <option value="name" id="ii_sortName">이름순</option>
+        <option value="stars" id="ii_sortStars">별순</option>
       </select>
-      <button id="ownedOnlyBtn" type="button" title="보유 아이템만 보기">보유만</button>
-      <button id="reformOnlyBtn" type="button" title="지금 제작 가능한 아이템만 보기">🔨 제작 가능만</button>
+      <button id="ownedOnlyBtn" type="button" title="보유 아이템만 보기" data-ii="ii_ownedOnly">보유만</button>
+      <button id="reformOnlyBtn" type="button" title="지금 제작 가능한 아이템만 보기" data-ii="ii_reformOnly">🔨 제작 가능만</button>
       <button id="clear">지우기</button>
     </div>
 
@@ -178,17 +178,17 @@
       <table>
         <thead>
           <tr>
-            <th style="width:64px">이미지</th>
-            <th style="width:80px">코드</th>
-            <th>이름</th>
-            <th style="width:70px">별</th>
-            <th style="width:220px">부위</th>
+            <th style="width:64px" id="ii_thImg">이미지</th>
+            <th style="width:80px" id="ii_thCode">코드</th>
+            <th id="ii_thName">이름</th>
+            <th style="width:70px" id="ii_thStar">별</th>
+            <th style="width:220px" id="ii_thPart">부위</th>
             <th style="width:36px;text-align:center">+</th>
           </tr>
         </thead>
         <tbody id="rows"></tbody>
       </table>
-      <div class="empty" id="empty" style="display:none">표시할 아이템이 없어요.</div>
+      <div class="empty" id="empty" style="display:none" id="ii_empty">표시할 아이템이 없어요.</div>
     </div>
     <div id="pager" style="margin-top:10px">
       <span class="muted" id="pageInfo"></span>
@@ -196,13 +196,13 @@
       <span id="pageNumbers"></span>
       <button id="nextPage" type="button" class="page-btn">›</button>
     </div>
-    <div class="muted" style="padding:8px 2px">※ 이 탭은 스테이지/추천 필터와 완전히 분리되어 있어.</div>
+    <div class="muted" style="padding:8px 2px" id="ii_note">※ 이 탭은 스테이지/추천 필터와 완전히 분리되어 있어.</div>
 
     <!-- ✅ 아이템 상세 팝업: 새 창 없이 여기서만 뜸 -->
     <dialog id="detailDialog" class="detailDialog">
       <form method="dialog" class="detailDialogBox">
         <div class="detailDialogHead">
-          <b>아이템 상세</b>
+          <b id="ii_detailTitle">아이템 상세</b>
           <button type="submit" class="detailClose" aria-label="닫기">✕</button>
         </div>
         <iframe id="detailFrame" class="detailFrame" src=""></iframe>
@@ -342,6 +342,117 @@ window.__REFORM_MAP = {
 
 <script>
 (function(){
+
+/* ── 다국어 헬퍼 (IIFE 내부) ── */
+var II_EN = {
+  ii_title:'Item Info', ii_q_input_ph:'Search name / tag (e.g. reform, wine)',
+  ii_starAll:'Stars ★ All', ii_sortPartCode:'Part→Code', ii_sortCode:'By Code',
+  ii_sortName:'By Name', ii_sortStars:'By Stars',
+  ii_ownedOnly:'Owned only', ii_reformOnly:'🔨 Craftable only', clear_btn:'Clear',
+  ii_thImg:'Image', ii_thCode:'Code', ii_thName:'Name', ii_thStar:'Stars', ii_thPart:'Part',
+  ii_empty:'No items to display.',
+  ii_note:'※ This tab is separate from stage / score filters.',
+  ii_detailTitle:'Item Detail',
+  badge_owned:'Owned', badge_craft_ok:'🔨 Craftable', badge_craft_no:'🔨 Need materials',
+};
+var II_KO = {
+  ii_title:'아이템 정보', ii_q_input_ph:'이름 / 태그 검색 (예: 리폼, 와인)',
+  ii_starAll:'별★ 전체', ii_sortPartCode:'부위→코드', ii_sortCode:'코드순',
+  ii_sortName:'이름순', ii_sortStars:'별순',
+  ii_ownedOnly:'보유만', ii_reformOnly:'🔨 제작 가능만', clear_btn:'지우기',
+  ii_thImg:'이미지', ii_thCode:'코드', ii_thName:'이름', ii_thStar:'별', ii_thPart:'부위',
+  ii_empty:'표시할 아이템이 없어요.',
+  ii_note:'※ 이 탭은 스테이지/추천 필터와 완전히 분리되어 있어.',
+  ii_detailTitle:'아이템 상세',
+  badge_owned:'보유', badge_craft_ok:'🔨 제작가능', badge_craft_no:'🔨 재료부족',
+};
+
+function __getLang(){ try{ return window.__II_LANG || (window.parent && window.parent.UI_LANG) || localStorage.getItem('nikki_ui_lang') || 'ko'; }catch(e){ return 'ko'; } }
+function __getTP(){ try{ return (window.parent && window.parent.translatePart) || null; }catch(e){ return null; } }
+
+function __applyStaticTranslation(){
+  var lang = __getLang();
+  var d = lang === 'en' ? II_EN : II_KO;
+  // id로 직접 접근 가능한 것들
+  var ids = ['ii_title','ii_starAll','ii_sortPartCode','ii_sortCode','ii_sortName','ii_sortStars',
+             'ii_thImg','ii_thCode','ii_thName','ii_thStar','ii_thPart',
+             'ii_empty','ii_note','ii_detailTitle'];
+  ids.forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=d[id]||''; });
+  // data-ii 속성으로 접근 (id 충돌 방지)
+  document.querySelectorAll('[data-ii]').forEach(function(el){
+    var key = el.getAttribute('data-ii');
+    if(key === 'ii_q_input'){ el.placeholder = d.ii_q_input_ph||''; }
+    else if(d[key] != null){ el.textContent = d[key]; }
+  });
+  var clr = document.getElementById('clear'); if(clr) clr.textContent = d.clear_btn||'지우기';
+}
+
+function __applyRowTranslation(){
+  var lang = __getLang();
+  var d = lang === 'en' ? II_EN : II_KO;
+  var tp = __getTP();
+  document.querySelectorAll('#rows tr').forEach(function(tr){
+    // 부위 컬럼 (5번째, index 4)
+    var td = tr.cells[4]; if(!td) return;
+    var ko = td.getAttribute('data-ko');
+    if(!ko){ ko = td.textContent.trim(); td.setAttribute('data-ko', ko); }
+    td.textContent = (lang==='en' && tp) ? (tp(ko)||ko) : ko;
+    // 배지
+    tr.querySelectorAll('.badge-owned').forEach(function(b){ b.textContent = d.badge_owned; });
+    tr.querySelectorAll('.badge-craft-ok').forEach(function(b){ b.textContent = d.badge_craft_ok; });
+    tr.querySelectorAll('.badge-craft-no').forEach(function(b){ b.textContent = d.badge_craft_no; });
+  });
+}
+
+function __applySidebarTranslation(){
+  var lang = __getLang();
+  var tp = __getTP();
+  // 내장 번역 맵 (tp 없을 때 fallback)
+  var SMAP = {
+    '헤어':'Hair','원피스':'Dress','아우터':'Coat','상의':'Top','하의':'Bottom',
+    '양말':'Hosiery','양말장식':'Sock Deco','신발':'Shoes','뷰티':'Makeup',
+    '반딧불의 영혼':'Spirit of Sheen',
+    '머리':'Hair ornament','베일':'Veil','헤어핀':'Hairpin','귀장식':'Ear ornament',
+    '귀':'Earring','목도리':'Scarf','목걸이':'Necklace',
+    '팔찌(우)':'R. Bracelet','팔찌(좌)':'L. Bracelet','장갑':'Glove',
+    '소품(우)':'R. Handheld','소품(좌)':'L. Handheld','양손':'Both hands',
+    '허리':'Waist','얼굴':'Face','가슴':'Brooch','문신':'Tattoo',
+    '날개':'Wings','꼬리':'Tail','전경':'Foreground','배경':'Background',
+    '상단':'Head ornament','하단':'Ground','스킨':'Skin',
+  };
+  function translate(ko){
+    if(!ko) return ko;
+    var r = tp ? tp(ko) : null;
+    return (r && r !== ko) ? r : (SMAP[ko] || ko);
+  }
+  document.querySelectorAll('#partList .itembtn').forEach(function(btn){
+    var span = btn.querySelector('span:first-child'); if(!span) return;
+    var ko = span.getAttribute('data-ko');
+    if(!ko){ ko = span.textContent.replace(/[▶]/g,'').trim(); span.setAttribute('data-ko', ko); }
+    if(lang === 'en'){
+      if(ko === '전체') span.textContent = 'All';
+      else if(btn.classList.contains('group-btn')) span.innerHTML = 'Accessories <span class="toggle-arrow">▶</span>';
+      else if(ko === '장식 전체') span.textContent = 'All Accessories';
+      else span.textContent = translate(ko);
+    } else {
+      if(ko === '전체') span.textContent = '전체';
+      else if(btn.classList.contains('group-btn')) span.innerHTML = '장식 <span class="toggle-arrow">▶</span>';
+      else if(ko === '장식 전체') span.textContent = '장식 전체';
+      else span.textContent = ko;
+    }
+  });
+}
+
+// NIKKI_LANG_CHANGE 수신
+window.addEventListener('message', function(ev){
+  if(ev.origin!==location.origin && ev.origin!=='null') return;
+  var msg = ev.data;
+  if(!msg || msg.type!=='NIKKI_LANG_CHANGE') return;
+  window.__II_LANG = msg.lang || 'ko';
+  __applyStaticTranslation();
+  __applySidebarTranslation();
+  __applyRowTranslation();
+});
 
 window.NIKKI_SERVER = window.NIKKI_SERVER || 'na';
 function getItemName(it){
@@ -626,9 +737,18 @@ function getItemTags(it){
         cnt = ITEMS.length;
       }
       if(isGroup){
-        btn.innerHTML = '<span>장식 <span class="toggle-arrow">▶</span></span><span class="badge">'+cnt+'</span>';
+        btn.innerHTML = '<span data-ko="장식">장식 <span class="toggle-arrow">▶</span></span><span class="badge">'+cnt+'</span>';
       } else {
-        btn.innerHTML = '<span>'+p.label+'</span><span class="badge">'+cnt+'</span>';
+        btn.innerHTML = '<span data-ko="'+p.label+'">'+p.label+'</span><span class="badge">'+cnt+'</span>';
+      }
+      // 빌드 직후 번역 적용
+      var _s=btn.querySelector('span:first-child');
+      if(_s && __getLang()==='en'){
+        var _ko=_s.getAttribute('data-ko')||'';
+        if(_ko==='전체') _s.textContent='All';
+        else if(_ko==='장식 전체') _s.textContent='All Accessories';
+        else if(isGroup) _s.innerHTML='Accessories <span class="toggle-arrow">▶</span>';
+        else { var _SMAP={'헤어':'Hair','원피스':'Dress','아우터':'Coat','상의':'Top','하의':'Bottom','양말':'Hosiery','양말장식':'Sock Deco','신발':'Shoes','뷰티':'Makeup','반딧불의 영혼':'Spirit of Sheen','머리':'Hair ornament','베일':'Veil','헤어핀':'Hairpin','귀장식':'Ear ornament','귀':'Earring','목도리':'Scarf','목걸이':'Necklace','팔찌(우)':'R. Bracelet','팔찌(좌)':'L. Bracelet','장갑':'Glove','소품(우)':'R. Handheld','소품(좌)':'L. Handheld','양손':'Both hands','허리':'Waist','얼굴':'Face','가슴':'Brooch','문신':'Tattoo','날개':'Wings','꼬리':'Tail','전경':'Foreground','배경':'Background','상단':'Head ornament','하단':'Ground','스킨':'Skin'}; var _tp2=__getTP(); var _t=(_tp2?_tp2(_ko):null)||_SMAP[_ko]; if(_t&&_t!==_ko) _s.textContent=_t; }
       }
       btn.addEventListener('click', function(){
         if(isGroup){
@@ -655,6 +775,7 @@ function getItemTags(it){
       partList.appendChild(btn);
     });
     totalText.textContent = 'Total ' + ITEMS.length;
+    __applySidebarTranslation();
   }
 
   function getFiltered(){
@@ -860,6 +981,8 @@ function getItemTags(it){
         }
       }
     }
+    // 언어 번역 적용
+    __applyRowTranslation();
   }
 
   const reformOnlyBtn = $('reformOnlyBtn');
@@ -987,6 +1110,10 @@ function getItemTags(it){
 
   // Request data on load
   window.parent && window.parent.postMessage({type:'ITEMSINFO_REQUEST_DATA'}, '*');
+
+  // 초기 언어 적용
+  window.__II_LANG = __getLang();
+  document.addEventListener('DOMContentLoaded', function(){ __applyStaticTranslation(); });
 })();
 </script>
 </body>

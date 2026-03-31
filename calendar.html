@@ -125,6 +125,11 @@ select:focus{outline:none;border-color:var(--p2)}
     <option value="na">🌎 북미</option>
     <option value="all">공통</option>
   </select>
+  <div class="vtog" id="statusTog">
+    <button class="on" data-st="">전체</button>
+    <button data-st="active">진행중</button>
+    <button data-st="ended">종료됨</button>
+  </div>
   <div class="vtog">
     <button class="on" id="bCal">📅</button>
     <button id="bList">📋</button>
@@ -300,6 +305,42 @@ var EVENTS = [
     note:'일반 맵에서 두근두근 사진을 모아 화려한 세트 코디를 획득해 보세요!\n이벤트 기간 중, 할인된 두근두근 사진 BOX도 판매될 예정이에요 ♪\n\n기간: 3/26 오전 6:00 ~ 4/2 오전 0:59 (KST)'
   },
   {
+    id:'ev18',
+    name:'🎭 복각: 怪しき劇場 驚きの舞台',
+    nameEn:'Revival: Ayashiki Gekijou',
+    start:'2026-03-31',
+    end:'2026-04-06',
+    server:'jp',
+    color:'#5c6bc0',
+    img:'https://drive.google.com/thumbnail?id=1R9uRxKRo_leOicdBshJacATzpEY72Xbh&sz=w1000',
+    sets:[{id:'Ayashiki_Gekijou', name:'怪しき劇場'},{id:'Odoroki_no_Butai', name:'驚きの舞台'}],
+    note:'극장으로 향해 푸른 불꽃 양초를 모아 세트 코디와 교환해 보세요!\n\n기간: 3/31 오전 5:00 ~ 4/6 오후 11:59 (KST)'
+  },
+  {
+    id:'ev17',
+    name:'🎪 Wonder Gashapon: Cascading Sparkles',
+    nameEn:'Wonder Gashapon: Cascading Sparkles',
+    start:'2026-04-04',
+    end:'2026-04-14',
+    server:'na',
+    color:'#ff7043',
+    img:'https://drive.google.com/thumbnail?id=1fl1WftoVOwnkZzjoSj9gbcrJYq3CHtRo&sz=w1000',
+    sets:[{id:'Cascading_Sparkles', name:'Cascading Sparkles'}],
+    note:'이벤트 임무를 완료해 Quirky Coin을 획득하거나, 다이아로 구매할 수 있어요.\nFirework Gashapon에서 캡슐을 뽑아 코디 조각, Star Coin, Princess Reset Card 등 다양한 보상 획득!\n중복 보상 없음\n\n📋 임무 안내\n▸ 일일 임무 (매일 05:00 초기화): 매일 Quirky Coin 5개 무료 획득 (기간 총 50개)\n▸ 누적 임무:\n1. 스태미나 총 3500 소모 → Quirky Coin 18개\n2. 누적 10일 로그인 → Quirky Coin 11개\n3. 캡슐 총 30회 뽑기 → Quirky Coin 15개\n4. Around the World 명소 8곳 방문 → Quirky Coin 8개\n5. 홈에서 일상 조각 퀘스트 8회 완료 → Quirky Coin 8개\n6. 협력 콘테스트 3회 완료 → Quirky Coin 10개\n\n※ 이벤트 종료 후 가챠 진행도는 유지되지만, 미사용 Quirky Coin은 소멸됩니다.\n※ 이벤트 재등장 시 임무는 제공되지 않을 수 있습니다.\n\n기간: 4/4 오후 10:00 ~ 4/14 오후 4:59 (KST)'
+  },
+  {
+    id:'ev16',
+    name:'모모의 퀘스트: Magic Principles',
+    nameEn:"Momo's Quest: Magic Principles",
+    start:'2026-04-02',
+    end:'2026-04-09',
+    server:'na',
+    color:'#f57f17',
+    img:'https://drive.google.com/thumbnail?id=1suB8vnB7TZ6zOGghkjSGthc2uIruNzRv&sz=w1000',
+    sets:[{id:'Magic_Principles', name:'Magic Principles'}],
+    note:'Momo\'s Quest를 완료하고 다양한 보상을 받아 가세요!\n\n보상: 하트×120 + 골드×28,888 + 클럽코인×6 + Lucky Boost×6\n\n기간: 4/2 오후 10:00 ~ 4/9 오후 4:59 (KST)'
+  },
+  {
     id:'ev15',
     name:'🏝️ 신비한섬: Puppet Fairy Tale',
     nameEn:'Mysterious Island: Puppet Fairy Tale',
@@ -372,9 +413,25 @@ function fmt(d){ if(!d)return''; var p=d.split('-'); return p[0]+'.'+p[1]+'.'+p[
 function srvLabel(id){ return id==='jp'?'🇯🇵 일본':id==='na'?'🌎 북미':'공통'; }
 function srvCss(id){ return id==='jp'?'sj':id==='na'?'sn':'sa'; }
 
+var curStatus = '';
+
 function filtered(){
   var sv = document.getElementById('fSrv').value;
-  return EVENTS.filter(function(e){ return !sv || e.server===sv; });
+  var today = new Date();
+  today.setHours(0,0,0,0);
+  return EVENTS.filter(function(e){
+    if(sv && e.server !== sv) return false;
+    if(curStatus === 'active'){
+      var s = new Date(e.start+'T00:00:00');
+      var en = new Date(e.end+'T00:00:00');
+      return s <= today && today <= en;
+    }
+    if(curStatus === 'ended'){
+      var en2 = new Date(e.end+'T00:00:00');
+      return en2 < today;
+    }
+    return true;
+  });
 }
 
 function renderCal(){
@@ -489,15 +546,19 @@ function renderList(){
 
   var evs=filtered().filter(function(ev){
     if(!ev.start||!ev.end) return false;
-    // 이벤트가 이번 달과 겹치는지 (start <= monthEnd AND end >= monthStart)
+    // 상태 필터가 있으면 달 제한 없이 전체 표시
+    if(curStatus) return true;
     return ev.start<=monthEnd && ev.end>=monthStart;
   }).slice().sort(function(a,b){return a.start>b.start?1:-1;});
 
-  if(!evs.length){el.innerHTML='<div style="color:var(--pm);padding:20px;text-align:center">이 달에는 이벤트가 없어요</div>';return;}
+  if(!evs.length){el.innerHTML='<div style="color:var(--pm);padding:20px;text-align:center">'+(curStatus?'해당하는 이벤트가 없어요':'이 달에는 이벤트가 없어요')+'</div>';return;}
   el.innerHTML=evs.map(function(ev){
     var col=ev.color||'#f06292';
     var th=ev.img?'<img class="lth" src="'+esc(ev.img)+'" alt="" onerror="this.style.display=\'none\'">':'<div class="lph" style="background:'+col+'22">🌸</div>';
-    return '<div class="litem" data-id="'+ev.id+'">'+th+'<div><div style="font-weight:700;font-size:13px;margin-bottom:2px">'+esc(ev.name)+(ev.nameEn&&ev.nameEn!==ev.name?' <span style="font-size:11px;color:var(--pm)">'+esc(ev.nameEn)+'</span>':'')+'</div><div style="font-size:11px;color:var(--pm);margin-bottom:3px">'+fmt(ev.start)+' ~ '+fmt(ev.end)+'</div><span class="badge '+srvCss(ev.server)+'">'+srvLabel(ev.server)+'</span></div></div>';
+    var today2=new Date(); today2.setHours(0,0,0,0);
+    var s2=new Date(ev.start+'T00:00:00'); var e2=new Date(ev.end+'T00:00:00');
+    var stLabel=e2<today2?'<span class="badge" style="background:#f5f5f5;color:#999;border-color:#ddd">종료</span>':s2<=today2?'<span class="badge" style="background:#e8f5e9;color:#2e7d32;border-color:#c8e6c9">진행중</span>':'<span class="badge" style="background:#fff8e1;color:#f57f17;border-color:#ffe082">예정</span>';
+    return '<div class="litem" data-id="'+ev.id+'">'+th+'<div><div style="font-weight:700;font-size:13px;margin-bottom:2px">'+esc(ev.name)+(ev.nameEn&&ev.nameEn!==ev.name?' <span style="font-size:11px;color:var(--pm)">'+esc(ev.nameEn)+'</span>':'')+'</div><div style="font-size:11px;color:var(--pm);margin-bottom:3px">'+fmt(ev.start)+' ~ '+fmt(ev.end)+'</div>'+stLabel+' <span class="badge '+srvCss(ev.server)+'">'+srvLabel(ev.server)+'</span></div></div>';
   }).join('');
   el.querySelectorAll('.litem').forEach(function(el2){ el2.addEventListener('click',function(){ openDetail(el2.dataset.id); }); });
 }
@@ -609,6 +670,14 @@ document.getElementById('bPrev').addEventListener('click',function(){curM--;if(c
 document.getElementById('bNext').addEventListener('click',function(){curM++;if(curM>11){curM=0;curY++;}renderCal();if(document.getElementById('lv').classList.contains('on')) renderList();});
 document.getElementById('bToday').addEventListener('click',function(){curY=new Date().getFullYear();curM=new Date().getMonth();showCal();renderCal();});
 document.getElementById('fSrv').addEventListener('change',function(){renderCal();renderList();});
+document.getElementById('statusTog').addEventListener('click',function(e){
+  var btn = e.target.closest('[data-st]');
+  if(!btn) return;
+  curStatus = btn.dataset.st;
+  document.querySelectorAll('#statusTog [data-st]').forEach(function(b){ b.classList.toggle('on', b===btn); });
+  renderCal();
+  if(document.getElementById('lv').classList.contains('on')) renderList();
+});
 document.getElementById('bCal').addEventListener('click',showCal);
 document.getElementById('bList').addEventListener('click',showList);
 document.getElementById('bAdd').addEventListener('click',function(){openForm(null);});

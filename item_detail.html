@@ -331,8 +331,8 @@ body {
 }
 .pill.ko{background:var(--pk-5);border-color:var(--pk-border);color:var(--pk-1)}
 .pill.zh{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
-.pill.ja{background:#eef2ff;border-color:#c7d2fe;color:#3730a3}
 .pill.en{background:#ecfeff;border-color:#a5f3fc;color:#0e7490}
+.pill.ja{background:#eef2ff;border-color:#c7d2fe;color:#3730a3}
 .text{white-space:pre-wrap;line-height:1.65;font-size:14px;color:var(--pk-text)}
 
 /* ── 이미지 그리드 ── */
@@ -541,6 +541,43 @@ function getLocalizedName(detail){
 }
 window.getLocalizedName = getLocalizedName;
 
+// ── 부위 이름 번역 맵 ──
+const __PART_NAMES = {
+  "헤어":    { en: "Hair",        zh: "发型" },
+  "드레스":  { en: "Dress",       zh: "礼服" },
+  "원피스":  { en: "One-piece",   zh: "连衣裙" },
+  "상의":    { en: "Top",         zh: "上衣" },
+  "하의":    { en: "Pants",       zh: "裤子" },
+  "신발":    { en: "Shoes",       zh: "鞋子" },
+  "양말":    { en: "Socks",       zh: "袜子" },
+  "외투":    { en: "Coat",        zh: "外套" },
+  "장갑":    { en: "Gloves",      zh: "手套" },
+  "목걸이":  { en: "Necklace",    zh: "项链" },
+  "귀걸이":  { en: "Earrings",    zh: "耳环" },
+  "반지":    { en: "Ring",        zh: "戒指" },
+  "팔찌":    { en: "Bracelet",    zh: "手镯" },
+  "장식":    { en: "Accessory",   zh: "饰品" },
+  "안경":    { en: "Glasses",     zh: "眼镜" },
+  "모자":    { en: "Hat",         zh: "帽子" },
+  "가방":    { en: "Bag",         zh: "包包" },
+  "스타킹":  { en: "Stockings",   zh: "丝袜" },
+  "속옷":    { en: "Lingerie",    zh: "内衣" },
+};
+function getLocalizedPart(koPart){
+  if(!koPart) return koPart;
+  const lang = window.__activeLang || "ko";
+  if(lang === "ko") return koPart;
+  // "장식 - 머리" 형태인 경우 앞부분만 번역
+  const base = koPart.split(/\s*[-·]\s*/)[0].trim();
+  const map = __PART_NAMES[base];
+  if(!map) return koPart;
+  const translated = map[lang] || koPart;
+  // 뒤에 서브카테고리가 있으면 그대로 붙이기
+  const rest = koPart.slice(base.length);
+  return rest ? translated + rest : translated;
+}
+window.getLocalizedPart = getLocalizedPart;
+
 document.addEventListener('DOMContentLoaded', function(){
   // 초기 버튼 상태 반영
   document.querySelectorAll('.lang-btn').forEach(function(btn){
@@ -561,9 +598,16 @@ document.addEventListener('DOMContentLoaded', function(){
       // 타이틀 즉시 반영
       var titleEl = document.getElementById('title');
       var sidebarNameEl = document.getElementById('sidebarName');
+      var subEl = document.getElementById('subtitle');
       var nm = getLocalizedName(window.__currentDetail);
       if(titleEl) titleEl.textContent = nm || '아이템 상세';
       if(sidebarNameEl) sidebarNameEl.textContent = nm || '—';
+      // 부위 번역 갱신
+      if(subEl && window.__currentDetail){
+        var rawPart = (window.__currentDetail.part || '') || new URLSearchParams(location.search).get('part') || '';
+        var rawCode = window.__currentDetail.code || new URLSearchParams(location.search).get('code') || '';
+        subEl.textContent = getLocalizedPart(rawPart) + ' · 코드 ' + rawCode;
+      }
 
       // 섹션 전체 재렌더 (이름/설명/재료/염색 이름 모두 반영)
       if(window.__currentDetail && typeof window.__rerenderSections === 'function'){
@@ -806,6 +850,20 @@ document.addEventListener('DOMContentLoaded', function(){
     // 언어 재렌더 시 sec-wrap이 없는 새 HTML이 들어오므로 바로 감싸기
     if(typeof window.wrapSections === "function") window.wrapSections();
     try{ __hydrateReformNames(); }catch(e){}
+    // 칩의 부위 이름도 갱신
+    const elChipsEl = document.getElementById("chips");
+    if(elChipsEl){
+      const partChip = elChipsEl.querySelector('.s-chip:has(.s-chip-label)');
+      if(partChip){
+        // s-chip으로 변환된 칩 전체를 다시 그리기
+        elChipsEl.innerHTML = "";
+        if(detail.heart) elChipsEl.appendChild(chip("<b>❤</b> " + esc(detail.heart)));
+        if(detail.part || part) elChipsEl.appendChild(chip("<b>부위</b> " + esc(getLocalizedPart(detail.part || part))));
+        elChipsEl.appendChild(chip("<b>코드</b> " + esc(detail.code ?? code)));
+        const tags = Array.isArray(detail.tags) ? detail.tags.filter(Boolean) : [];
+        for(const t of tags.slice(0, 12)) elChipsEl.appendChild(chip(esc(t)));
+      }
+    }
   }
   window.__rerenderSections = __rerenderSections;
 
@@ -814,7 +872,7 @@ document.addEventListener('DOMContentLoaded', function(){
     window.__currentDetail = detail;
     const nm = getLocalizedName(detail);
     elTitle.textContent = nm || "아이템 상세";
-    elSub.textContent = (detail.part || part || "") + " · 코드 " + (detail.code ?? code);
+    elSub.textContent = getLocalizedPart(detail.part || part || "") + " · 코드 " + (detail.code ?? code);
 
     // thumb
     const th = pickThumb(detail);
@@ -824,7 +882,7 @@ document.addEventListener('DOMContentLoaded', function(){
     // chips
     elChips.innerHTML = "";
     if (detail.heart) elChips.appendChild(chip("<b>❤</b> " + esc(detail.heart)));
-    if (detail.part || part) elChips.appendChild(chip("<b>부위</b> " + esc(detail.part || part)));
+    if (detail.part || part) elChips.appendChild(chip("<b>부위</b> " + esc(getLocalizedPart(detail.part || part))));
     elChips.appendChild(chip("<b>코드</b> " + esc(detail.code ?? code)));
 
     const tags = Array.isArray(detail.tags) ? detail.tags.filter(Boolean) : [];
@@ -1387,9 +1445,16 @@ function parsePageToTarget(page){
     // 타이틀 반영
     var titleEl = document.getElementById('title');
     var sidebarNameEl = document.getElementById('sidebarName');
+    var subEl2 = document.getElementById('subtitle');
     var nm = getLocalizedName(window.__currentDetail);
     if(titleEl) titleEl.textContent = nm || '아이템 상세';
     if(sidebarNameEl) sidebarNameEl.textContent = nm || '—';
+    // 부위 번역 갱신
+    if(subEl2 && window.__currentDetail){
+      var rawPart2 = (window.__currentDetail.part || '') || new URLSearchParams(location.search).get('part') || '';
+      var rawCode2 = window.__currentDetail.code || new URLSearchParams(location.search).get('code') || '';
+      subEl2.textContent = getLocalizedPart(rawPart2) + ' · 코드 ' + rawCode2;
+    }
     // 섹션 전체 재렌더
     if(window.__currentDetail && typeof window.__rerenderSections === 'function'){
       window.__rerenderSections(window.__currentDetail);

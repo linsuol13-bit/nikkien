@@ -159,23 +159,23 @@
 <body>
 <div class="wrap">
   <div class="topbar">
-    <div class="title">세트 목록</div>
+    <div class="title" id="sf_listTitle">세트 목록</div>
     <input id="q" type="text" placeholder="세트 이름 검색 (한/중/영/북미)"/>
     <label class="filter-toggle" id="missingFilterToggle">
-      <input type="checkbox" id="missingFilterCb"> ✗ 미보유 있는 세트만
+      <input type="checkbox" id="missingFilterCb"> <span id="sf_missingFilter">✗ 미보유 있는 세트만</span>
     </label>
     <select id="sortSel" style="height:32px;padding:0 8px;border:1.5px solid var(--pk-border);border-radius:8px;background:#fff;font-size:13px;color:var(--pk-text);cursor:pointer;">
-      <option value="default">기본 순서</option>
-      <option value="owned_desc">보유 많은 순</option>
-      <option value="owned_asc">보유 적은 순</option>
-      <option value="pct_desc">완성도 높은 순</option>
-      <option value="pct_asc">완성도 낮은 순</option>
+      <option value="default" id="sf_sortDefault">기본 순서</option>
+      <option value="owned_desc" id="sf_sortOwnedDesc">보유 많은 순</option>
+      <option value="owned_asc" id="sf_sortOwnedAsc">보유 적은 순</option>
+      <option value="pct_desc" id="sf_sortPctDesc">완성도 높은 순</option>
+      <option value="pct_asc" id="sf_sortPctAsc">완성도 낮은 순</option>
     </select>
     <div class="muted" id="status">로딩중...</div>
   </div>
 
   <div id="grid" class="grid"></div>
-  <div id="empty" class="empty" style="display:none">세트 데이터가 비어있어. (sets_data.html에 세트 추가해줘)</div>
+  <div id="empty" class="empty" style="display:none"><span id="sf_emptyMsg">세트 데이터가 비어있어. (sets_data.html에 세트 추가해줘)</span></div>
   <div id="pager" class="pager" style="display:none"></div>
 </div>
 
@@ -191,14 +191,14 @@
     </div>
     <div class="dlgBody">
       <div class="section">
-        <h3>세트사진</h3>
+        <h3 id="sf_h3Photo">세트사진</h3>
         <div class="gallery" id="gallery"></div>
         <div id="setDesc" class="setDesc" style="display:none"></div>
       </div>
 
       <div class="section acqSection" id="acqSection">
         <div class="acqHead">
-          <span class="acqBadge">📍 세트 획득경로</span>
+          <span class="acqBadge" id="sf_acqBadge">📍 세트 획득경로</span>
         </div>
         <div class="sources" id="sources"></div>
       </div>
@@ -209,20 +209,20 @@
       </div>
 
       <div class="section">
-        <h3>세트 부위별 정보</h3>
-        <div class="muted" style="margin-bottom:8px">부위를 클릭하면 해당 의상 상세페이지가 열려.</div>
+        <h3 id="sf_h3Parts">세트 부위별 정보</h3>
+        <div class="muted" style="margin-bottom:8px" id="sf_partsHint">부위를 클릭하면 해당 의상 상세페이지가 열려.</div>
         <div class="parts" id="parts"></div>
       </div>
 
       <div class="section" id="variantsSection" style="display:none">
-        <h3>리폼 · 진화 · 포즈</h3>
-        <div class="muted" style="margin-bottom:8px">파생 의상을 클릭하면 해당 아이템 상세페이지가 열려.</div>
+        <h3 id="sf_h3Variants">리폼 · 진화 · 포즈</h3>
+        <div class="muted" style="margin-bottom:8px" id="sf_variantsHint">파생 의상을 클릭하면 해당 아이템 상세페이지가 열려.</div>
         <div class="vlist" id="variants"></div>
       </div>
 
       <div class="section" id="missingSection" style="display:none;border:2px solid #fecaca;background:#fff5f5">
-        <h3 style="color:#dc2626">✗ 미보유 아이템 <span id="missingCount" class="missing-count-badge"></span></h3>
-        <div class="muted" style="margin-bottom:8px">아직 등록되지 않은 아이템 목록이야.</div>
+        <h3 style="color:#dc2626" id="sf_h3Missing">✗ <span id="sf_missingTitle">미보유 아이템</span> <span id="missingCount" class="missing-count-badge"></span></h3>
+        <div class="muted" style="margin-bottom:8px" id="sf_missingDesc">아직 등록되지 않은 아이템 목록이야.</div>
         <div class="parts" id="missingList"></div>
       </div>
 
@@ -239,6 +239,33 @@
 <!-- Loaders (file:// safe) -->
 <iframe id="setsLoader" src="sets_data.html" style="display:none"></iframe>
 <iframe id="itemsLoader" src="items.html" style="display:none"></iframe>
+<script>
+(function(){
+  // fallback: iframe onload에서 직접 contentWindow.SETS 읽기 (postMessage 실패 대비)
+  function tryReadFrame(frameId, key, delay){
+    setTimeout(function(){
+      try{
+        var f = document.getElementById(frameId);
+        if(!f || !f.contentWindow) return;
+        var data = key==='sets' ? f.contentWindow.SETS : f.contentWindow.ITEMS;
+        if(Array.isArray(data) && data.length > 0){
+          window.dispatchEvent(new MessageEvent('message', {
+            data: {__splitData:true, key:key, data:data}
+          }));
+        }
+      }catch(e){}
+    }, delay||800);
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var sl = document.getElementById('setsLoader');
+    var il = document.getElementById('itemsLoader');
+    if(sl) sl.addEventListener('load', function(){ tryReadFrame('setsLoader','sets',300); });
+    if(il) il.addEventListener('load', function(){ tryReadFrame('itemsLoader','items',300); });
+    // 추가 안전망: 2초 후에도 SETS가 비어있으면 재시도
+    setTimeout(function(){ tryReadFrame('setsLoader','sets',0); tryReadFrame('itemsLoader','items',0); }, 2000);
+  });
+})();
+</script>
 
 <script>
 (function(){
@@ -344,6 +371,8 @@
         if(p){
           const entryPart = entry.slice(c.length + 2);
           if(entryPart === p) return true;
+          if(entryPart.startsWith(p + ' -') || entryPart.startsWith(p + '-')) return true;
+          if(p.startsWith(entryPart + ' -') || p.startsWith(entryPart + '-')) return true;
         } else {
           return true;
         }
@@ -605,14 +634,22 @@ function trim(s){ return norm(s).trim(); }
           const vt=vitems.length;
           const vp=vt>0?Math.round(vo/vt*100):0;
           const vc=vp===100?'#22c55e':vp>=50?'#f59e0b':'#f43f5e';
-          const vlabel=trim(v.label)||trim(v.type)||"변형";
+          const _vlabelRaw=trim(v.label)||trim(v.type)||"변형";
+          const _vlabelMap={'포즈':'Pose','리폼':'Reform','진화':'Evolve','변형':'Variant','pose':'Pose','reform':'Reform','evolve':'Evolve'};
+          // "리폼 I" → "Reform I" 처럼 앞 단어만 번역하고 뒷부분 유지
+          const vlabel=(function(){
+            if(window.__SF_LANG!=='en') return _vlabelRaw;
+            var parts=_vlabelRaw.split(/\s+/);
+            var translated=_vlabelMap[parts[0]]||parts[0];
+            return parts.length>1?translated+' '+parts.slice(1).join(' '):translated;
+          })();
           return `<span class="variant-chip" style="background:${vc}22;color:${vc};border:1px solid ${vc}55">${escapeHtml(vlabel)} ${vo}/${vt} (${vp}%)</span>`;
         }).join('');
       }
 
       const completionHtml = partTotal > 0 ? `
         <div class="completion-bar-wrap">
-          <div class="completion-text" style="color:${barColor}">${ownedCount}/${partTotal} 보유 (${pct}%)</div>
+          <div class="completion-text" style="color:${barColor}">${ownedCount}/${partTotal} ${window.__SF_LANG==='en'?'owned':'보유'} (${pct}%)</div>
           <div class="completion-bar-bg"><div class="completion-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
           ${variantChipsHtml ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${variantChipsHtml}</div>` : ''}
         </div>` : '';
@@ -623,8 +660,8 @@ function trim(s){ return norm(s).trim(); }
           <div class="name">${escapeHtml(listMainName(s))}</div>
           ${sub ? `<div class="sub">${escapeHtml(sub)}</div>` : ``}
           <div class="pillrow">
-            ${Array.isArray(s.parts) ? `<span class="pill">부위 ${s.parts.length}</span>` : ``}
-            ${Array.isArray(s.images) ? `<span class="pill">사진 ${s.images.length}</span>` : ``}
+            ${Array.isArray(s.parts) ? `<span class="pill">${window.__SF_LANG==='en'?'Parts':'부위'} ${s.parts.length}</span>` : ``}
+            ${Array.isArray(s.images) ? `<span class="pill">${window.__SF_LANG==='en'?'Photos':'사진'} ${s.images.length}</span>` : ``}
           </div>
           ${completionHtml}
         </div>
@@ -640,7 +677,7 @@ function trim(s){ return norm(s).trim(); }
     const end = Math.min(total, start + PER_PAGE);
     const range = (total===0) ? "" : ` · ${start+1}-${end}`;
     const pageInfo = (totalPages>1) ? ` · ${currentPage}/${totalPages}` : "";
-    status.textContent = `세트 ${total} / 전체 ${SETS.length}${pageInfo}${range}`;
+    status.textContent = window.__SF_LANG==='en' ? `Sets ${total} / Total ${SETS.length}${pageInfo}${range}` : `세트 ${total} / 전체 ${SETS.length}${pageInfo}${range}`;
 
     schedulePostHeight(true);
   }
@@ -735,7 +772,7 @@ function trim(s){ return norm(s).trim(); }
           <div style="flex:1;height:6px;border-radius:999px;background:#f0f0f0;overflow:hidden">
             <div style="height:100%;border-radius:999px;width:${pct2}%;background:${col2};transition:width .4s"></div>
           </div>
-          <span style="font-size:14px;font-weight:500;color:${col2};white-space:nowrap">${owned2}/${tot2} 보유 (${pct2}%)</span>
+          <span style="font-size:14px;font-weight:500;color:${col2};white-space:nowrap">${owned2}/${tot2} ${window.__SF_LANG==='en'?'owned':'보유'} (${pct2}%)</span>
         `;
       } else {
         dlgCompletion.style.display = 'none';
@@ -761,11 +798,11 @@ function trim(s){ return norm(s).trim(); }
         gallery.appendChild(im);
       }
     }else{
-      gallery.innerHTML = `<div class="muted">사진 데이터가 없어.</div>`;
+      gallery.innerHTML = `<div class="muted">${window.__SF_LANG==='en'?'No photo data.':`사진 데이터가 없어.`}</div>`;
     }
 
-    // ✅ 세트 설명 (한국어)
-    const desc = trim(set.desc);
+    // 세트 설명 (언어에 따라 desc_en 우선)
+    const desc = trim((window.__SF_LANG==='en' && set.desc_en) ? set.desc_en : set.desc);
     if(desc){
       setDesc.textContent = desc;
       setDesc.style.display = "block";
@@ -780,8 +817,16 @@ function trim(s){ return norm(s).trim(); }
       for(const s of srcs){
         const row = document.createElement("div");
         row.className = "src";
-        const k = trim(s.label || s.type || "획득");
-        const v = trim(s.text || s.desc || s.value || "");
+        const _srcLabelMap = {
+          '이벤트':'Event','소원의문':'Wish Gate','상점':'Shop','제작':'Craft',
+          '리폼':'Reform','획득':'Source','퀘스트':'Quest','업적':'Achievement',
+          '로그인':'Login','패스':'Pass','시즌패스':'Season Pass',
+          '교환소':'Exchange','뽑기':'Gacha','콜라보':'Collab',
+        };
+        const k = trim((window.__SF_LANG==='en' && s.label_en) ? s.label_en
+          : (window.__SF_LANG==='en' ? (_srcLabelMap[s.label||s.type||'']||(s.label||s.type||'Source'))
+          : (s.label || s.type || '획득')));
+        const v = trim((window.__SF_LANG==='en' && s.text_en) ? s.text_en : (s.text || s.desc || s.value || ""));
         row.innerHTML = `<div class="k">${escapeHtml(k)}</div><div class="v">${escapeHtml(v||"-")}</div>`;
         sources.appendChild(row);
         const guideText = trim(s.guide || s.tips || "");
@@ -793,7 +838,7 @@ function trim(s){ return norm(s).trim(); }
         }
       }
     }else{
-      sources.innerHTML = `<div class="muted">획득경로 데이터가 없어.</div>`;
+      sources.innerHTML = `<div class="muted">${window.__SF_LANG==='en'?'No source data.':`획득경로 데이터가 없어.`}</div>`;
     }
 
     // event section (optional)
@@ -801,9 +846,12 @@ function trim(s){ return norm(s).trim(); }
     if(ev && (trim(ev.desc)||trim(ev.guide)||trim(ev.title))){
       eventSection.style.display = "block";
       eventInfo.innerHTML = "";
-      const title = trim(ev.title) || "이벤트";
-      const desc = trim(ev.desc) || "-";
-      const guide = trim(ev.guide) || "";
+      const title = trim(ev.title) || (window.__SF_LANG==='en'?'Event':'이벤트');
+      const evDesc = trim((window.__SF_LANG==='en' && ev.desc_en) ? ev.desc_en : ev.desc) || "-";
+      const evGuide = trim((window.__SF_LANG==='en' && ev.guide_en) ? ev.guide_en : ev.guide) || "";
+      const evLabel = window.__SF_LANG==='en' ? 'Event Info' : '이벤트 설명';
+      const guideLabel = window.__SF_LANG==='en' ? 'Guide' : '공략';
+      const guideTitle = window.__SF_LANG==='en' ? 'Key Points' : '핵심 포인트';
 
       // 🎉 이벤트 설명 박스
       const eBox = document.createElement("div");
@@ -811,24 +859,24 @@ function trim(s){ return norm(s).trim(); }
       eBox.innerHTML = `
         <div class="hdr">
           <span class="ico">🎉</span>
-          <span class="tag tag-event">이벤트 설명</span>
+          <span class="tag tag-event">${escapeHtml(evLabel)}</span>
           <span class="title">${escapeHtml(title)}</span>
         </div>
-        <div class="body">${escapeHtml(desc)}</div>
+        <div class="body">${escapeHtml(evDesc)}</div>
       `;
       eventInfo.appendChild(eBox);
 
       // 🧭 공략 박스 (있을 때만)
-      if(guide){
+      if(evGuide){
         const gBox = document.createElement("div");
         gBox.className = "guideBox";
         gBox.innerHTML = `
           <div class="hdr">
             <span class="ico">🧭</span>
-            <span class="tag tag-guide">공략</span>
-            <span class="title">핵심 포인트</span>
+            <span class="tag tag-guide">${escapeHtml(guideLabel)}</span>
+            <span class="title">${escapeHtml(guideTitle)}</span>
           </div>
-          <div class="body">${escapeHtml(guide)}</div>
+          <div class="body">${escapeHtml(evGuide)}</div>
         `;
         eventInfo.appendChild(gBox);
       }
@@ -886,17 +934,17 @@ function trim(s){ return norm(s).trim(); }
           ${img ? `<img class="pimg" src="${img}" alt="" loading="lazy" decoding="async">` : `<div class="pimg"></div>`}
           <div class="pmeta">
             <div class="pname">${escapeHtml(name)}</div>
-            <div class="ppart">${escapeHtml(part || "-")}</div>
+            <div class="ppart">${escapeHtml(((function(){if(window.__SF_LANG!=='en') return part||'-';var _tp=window.__SF_TP||(window.parent&&window.parent.translatePart)||null;var _r=_tp?_tp(part||''):null;if(_r&&_r!==(part||'')) return _r;var _m={'헤어':'Hair','원피스':'Dress','아우터':'Coat','상의':'Top','하의':'Bottom','양말':'Hosiery','양말장식':'Sock Deco','신발':'Shoes','뷰티':'Makeup','반딧불의 영혼':'Spirit of Sheen','장식':'Accessory','장식 - 머리 - 머리':'Hair ornament','장식 - 머리 - 베일':'Veil','장식 - 머리 - 헤어핀':'Hairpin','장식 - 머리 - 귀장식':'Ear ornament','장식 - 귀':'Earring','장식 - 목 - 목도리':'Scarf','장식 - 목 - 목걸이':'Necklace','장식 - 손 - 팔찌(우)':'R. Bracelet','장식 - 손 - 팔찌(좌)':'L. Bracelet','장식 - 손 - 장갑':'Glove','장식 - 소품 - 소품(우)':'R. Handheld','장식 - 소품 - 소품(좌)':'L. Handheld','장식 - 소품 - 양손':'Both hands','장식 - 허리':'Waist','장식 - 특수 - 얼굴':'Face','장식 - 특수 - 가슴':'Brooch','장식 - 특수 - 문신':'Tattoo','장식 - 특수 - 날개':'Wings','장식 - 특수 - 꼬리':'Tail','장식 - 특수 - 전경':'Foreground','장식 - 특수 - 배경':'Background','장식 - 특수 - 상단':'Head ornament','장식 - 특수 - 하단':'Ground','장식 - 특수 - 스킨':'Skin'};return _m[part||'']||(part||'-');})())||"-")}</div>
             <div class="code">code: ${escapeHtml(String(code||"-"))}</div>
           </div>
-          ${ownedFlag !== null ? `<span class="owned-badge ${ownedFlag ? 'yes' : 'no'}">${ownedFlag ? '✓ 보유' : '✗ 미보유'}</span>` : ''}
+          ${ownedFlag !== null ? `<span class="owned-badge ${ownedFlag ? 'yes' : 'no'}">${ownedFlag ? (window.__SF_LANG==='en'?'✓ Owned':'✓ 보유') : (window.__SF_LANG==='en'?'✗ Missing':'✗ 미보유')}</span>` : ''}
         `;
         div.addEventListener("click", ()=>openItemDetail({part, code}));
         frag.appendChild(div);
       }
       parts.appendChild(frag);
     }else{
-      parts.innerHTML = `<div class="muted">세트 부위 데이터가 없어.</div>`;
+      parts.innerHTML = `<div class="muted">${window.__SF_LANG==='en'?'No parts data.':`세트 부위 데이터가 없어.`}</div>`;
     }
 
         // variants
@@ -932,7 +980,7 @@ function trim(s){ return norm(s).trim(); }
 
     if(!missing.length){ missingSection.style.display="none"; return; }
     missingSection.style.display="block";
-    missingCount.textContent = missing.length + "개";
+    missingCount.textContent = missing.length + (window.__SF_LANG==='en'?' items':' 개');
     missingList.innerHTML="";
     const frag=document.createDocumentFragment();
     missing.forEach(p=>{
@@ -948,10 +996,10 @@ function trim(s){ return norm(s).trim(); }
         ${img?`<img class="pimg" src="${img}" alt="" loading="lazy" decoding="async">`:`<div class="pimg"></div>`}
         <div class="pmeta">
           <div class="pname">${escapeHtml(name)}</div>
-          <div class="ppart">${escapeHtml(part||"-")}</div>
+          <div class="ppart">${escapeHtml(((function(){if(window.__SF_LANG!=='en') return part||'-';var _tp=window.__SF_TP||(window.parent&&window.parent.translatePart)||null;var _r=_tp?_tp(part||''):null;if(_r&&_r!==(part||'')) return _r;var _m={'헤어':'Hair','원피스':'Dress','아우터':'Coat','상의':'Top','하의':'Bottom','양말':'Hosiery','양말장식':'Sock Deco','신발':'Shoes','뷰티':'Makeup','반딧불의 영혼':'Spirit of Sheen','장식':'Accessory','장식 - 머리 - 머리':'Hair ornament','장식 - 머리 - 베일':'Veil','장식 - 머리 - 헤어핀':'Hairpin','장식 - 머리 - 귀장식':'Ear ornament','장식 - 귀':'Earring','장식 - 목 - 목도리':'Scarf','장식 - 목 - 목걸이':'Necklace','장식 - 손 - 팔찌(우)':'R. Bracelet','장식 - 손 - 팔찌(좌)':'L. Bracelet','장식 - 손 - 장갑':'Glove','장식 - 소품 - 소품(우)':'R. Handheld','장식 - 소품 - 소품(좌)':'L. Handheld','장식 - 소품 - 양손':'Both hands','장식 - 허리':'Waist','장식 - 특수 - 얼굴':'Face','장식 - 특수 - 가슴':'Brooch','장식 - 특수 - 문신':'Tattoo','장식 - 특수 - 날개':'Wings','장식 - 특수 - 꼬리':'Tail','장식 - 특수 - 전경':'Foreground','장식 - 특수 - 배경':'Background','장식 - 특수 - 상단':'Head ornament','장식 - 특수 - 하단':'Ground','장식 - 특수 - 스킨':'Skin'};return _m[part||'']||(part||'-');})())||"-")}</div>
           <div class="code">code: ${escapeHtml(String(code||"-"))}</div>
         </div>
-        <span class="owned-badge no">✗ 미보유</span>
+        <span class="owned-badge no">${window.__SF_LANG==='en'?'✗ Missing':'✗ 미보유'}</span>
       `;
       div.addEventListener("click",()=>openItemDetail({part, code}));
       frag.appendChild(div);
@@ -1001,8 +1049,14 @@ function trim(s){ return norm(s).trim(); }
       const headDiv = document.createElement("div");
       headDiv.className = "vgroup-head";
       headDiv.innerHTML = `
-        <div class="vtitle" style="margin:0">${escapeHtml(trim(v.label)||trim(v.type)||"파생")}</div>
-        ${(hasOwned2 && vt2>0) ? `<span class="vgroup-pct" style="color:${vc2};background:${vc2}18;border:1px solid ${vc2}44">${vo}/${vt2} 보유 (${vp2}%)</span>` : ''}
+        <div class="vtitle" style="margin:0">${escapeHtml((function(){
+            var _raw=trim(v.label)||trim(v.type)||"파생";
+            if(window.__SF_LANG!=='en') return _raw;
+            var _map={'포즈':'Pose','리폼':'Reform','진화':'Evolve','파생':'Variant','pose':'Pose','reform':'Reform','evolve':'Evolve'};
+            var _parts=_raw.split(/\s+/);
+            return (_map[_parts[0]]||_parts[0])+(_parts.length>1?' '+_parts.slice(1).join(' '):'');
+          })())}</div>
+        ${(hasOwned2 && vt2>0) ? `<span class="vgroup-pct" style="color:${vc2};background:${vc2}18;border:1px solid ${vc2}44">${vo}/${vt2} ${window.__SF_LANG==='en'?'owned':'보유'} (${vp2}%)</span>` : ''}
       `;
       group.appendChild(headDiv);
 
@@ -1029,7 +1083,7 @@ function trim(s){ return norm(s).trim(); }
           sh.className = "vgroup-head";
           sh.innerHTML = `
             <div class="vtitle" style="margin:0">${escapeHtml(trim(stg.label)||(`진화 ${stg.stage||""}단계`).trim())}</div>
-            ${(hasOwned2 && svt>0)?`<span class="vgroup-pct" style="color:${svc};background:${svc}18;border:1px solid ${svc}44">${svo}/${svt} 보유 (${svp}%)</span>`:''}
+            ${(hasOwned2 && svt>0)?`<span class="vgroup-pct" style="color:${svc};background:${svc}18;border:1px solid ${svc}44">${svo}/${svt} ${window.__SF_LANG==='en'?'owned':'보유'} (${svp}%)</span>`:''}
           `;
           stageGroup.appendChild(sh);
 
@@ -1086,10 +1140,10 @@ function trim(s){ return norm(s).trim(); }
       ${img ? `<img class="pimg" src="${img}" alt="" loading="lazy" decoding="async">` : `<div class="pimg"></div>`}
       <div class="pmeta">
         <div class="pname">${escapeHtml(name)}</div>
-        <div class="ppart">${escapeHtml(part || "-")}</div>
+        <div class="ppart">${escapeHtml(((function(){if(window.__SF_LANG!=='en') return part||'-';var _tp=window.__SF_TP||(window.parent&&window.parent.translatePart)||null;var _r=_tp?_tp(part||''):null;if(_r&&_r!==(part||'')) return _r;var _m={'헤어':'Hair','원피스':'Dress','아우터':'Coat','상의':'Top','하의':'Bottom','양말':'Hosiery','양말장식':'Sock Deco','신발':'Shoes','뷰티':'Makeup','반딧불의 영혼':'Spirit of Sheen','장식':'Accessory','장식 - 머리 - 머리':'Hair ornament','장식 - 머리 - 베일':'Veil','장식 - 머리 - 헤어핀':'Hairpin','장식 - 머리 - 귀장식':'Ear ornament','장식 - 귀':'Earring','장식 - 목 - 목도리':'Scarf','장식 - 목 - 목걸이':'Necklace','장식 - 손 - 팔찌(우)':'R. Bracelet','장식 - 손 - 팔찌(좌)':'L. Bracelet','장식 - 손 - 장갑':'Glove','장식 - 소품 - 소품(우)':'R. Handheld','장식 - 소품 - 소품(좌)':'L. Handheld','장식 - 소품 - 양손':'Both hands','장식 - 허리':'Waist','장식 - 특수 - 얼굴':'Face','장식 - 특수 - 가슴':'Brooch','장식 - 특수 - 문신':'Tattoo','장식 - 특수 - 날개':'Wings','장식 - 특수 - 꼬리':'Tail','장식 - 특수 - 전경':'Foreground','장식 - 특수 - 배경':'Background','장식 - 특수 - 상단':'Head ornament','장식 - 특수 - 하단':'Ground','장식 - 특수 - 스킨':'Skin'};return _m[part||'']||(part||'-');})())||"-")}</div>
         <div class="code">code: ${escapeHtml(String(code||"-"))}${escapeHtml(color)}${escapeHtml(base)}${escapeHtml(chain)}</div>
       </div>
-      ${ownedFlag !== null ? `<span class="owned-badge ${ownedFlag ? 'yes' : 'no'}">${ownedFlag ? '✓ 보유' : '✗ 미보유'}</span>` : ''}
+      ${ownedFlag !== null ? `<span class="owned-badge ${ownedFlag ? 'yes' : 'no'}">${ownedFlag ? (window.__SF_LANG==='en'?'✓ Owned':'✓ 보유') : (window.__SF_LANG==='en'?'✗ Missing':'✗ 미보유')}</span>` : ''}
     `;
     div.addEventListener("click", ()=>openItemDetail({part, code}));
     return div;
@@ -1167,7 +1221,7 @@ function trim(s){ return norm(s).trim(); }
 
     if(msg.__splitData === true && msg.key === "sets" && Array.isArray(msg.data)){
       SETS = msg.data.filter(x=>x && typeof x === "object");
-      status.textContent = SETS.length ? ("세트 로드 완료: " + SETS.length + "개") : "세트 데이터가 비어있어.";
+      status.textContent = SETS.length ? (window.__SF_LANG==='en' ? "Sets loaded: " + SETS.length : "세트 로드 완료: " + SETS.length + "개") : (window.__SF_LANG==='en'?"Set data is empty.":"세트 데이터가 비어있어.");
       renderList();
   schedulePostHeight(true);
       return;
@@ -1187,6 +1241,11 @@ function trim(s){ return norm(s).trim(); }
       return;
     }
 
+    if(msg.type === 'NIKKI_LANG_CHANGE'){
+      window.__SF_LANG = msg.lang || 'ko';
+      if(typeof applySfLang === 'function') applySfLang(window.__SF_LANG);
+      return;
+    }
     if(msg.type === 'SETS_OWNED_UPDATE' && Array.isArray(msg.owned)){
       updateOwned(msg.owned);
       return;
@@ -1212,6 +1271,118 @@ function trim(s){ return norm(s).trim(); }
   }
   window.addEventListener("load", ()=>{ hookImages(); schedulePostHeight(true); });
   window.addEventListener("resize", ()=>schedulePostHeight(true));
+
+  /* ── 세트정보 다국어 ── */
+  window.__SF_LANG = (function(){ try{ return window.parent.UI_LANG||localStorage.getItem('nikki_ui_lang')||'ko'; }catch(e){ return 'ko'; } })();
+
+  var SF_EN = {
+    sortDefault:'Default order', sortOwnedDesc:'Most owned', sortOwnedAsc:'Least owned',
+    sortPctDesc:'Highest completion', sortPctAsc:'Lowest completion',
+    missingFilter:'✗ Sets with missing items only',
+    h3Photo:'Set Photos', h3Parts:'Set Parts Info',
+    partsHint:'Click a part to open its item detail page.',
+    h3Variants:'Reform · Evolve · Pose', missingTitle:'Missing Items',
+    searchPh:'Search set name (EN/KO/ZH)',
+  };
+  var SF_KO = {
+    sortDefault:'기본 순서', sortOwnedDesc:'보유 많은 순', sortOwnedAsc:'보유 적은 순',
+    sortPctDesc:'완성도 높은 순', sortPctAsc:'완성도 낮은 순',
+    missingFilter:'✗ 미보유 있는 세트만',
+    h3Photo:'세트사진', h3Parts:'세트 부위별 정보',
+    partsHint:'부위를 클릭하면 해당 의상 상세페이지가 열려.',
+    h3Variants:'리폼 · 진화 · 포즈', missingTitle:'미보유 아이템',
+    searchPh:'세트 이름 검색 (한/중/영/북미)',
+  };
+
+  var _VLABEL_MAP = {'포즈':'Pose','리폼':'Reform','진화':'Evolve','변형':'Variant','pose':'Pose','reform':'Reform','evolve':'Evolve'};
+
+  function applySfLang(lang){
+    window.__SF_LANG = lang;
+    // translatePart 캐시 + 내장 맵 fallback
+    try{ window.__SF_TP = (window.parent&&window.parent.translatePart)||null; }catch(e){ window.__SF_TP=null; }
+    if(!window.__SF_TP){
+      var _fallbackMap={
+        '헤어':'Hair','원피스':'Dress','아우터':'Coat','상의':'Top','하의':'Bottom',
+        '양말':'Hosiery','양말장식':'Sock Deco','신발':'Shoes','뷰티':'Makeup',
+        '반딧불의 영혼':'Spirit of Sheen','장식':'Accessory',
+        '장식 - 머리 - 머리':'Hair ornament','장식 - 머리 - 베일':'Veil',
+        '장식 - 머리 - 헤어핀':'Hairpin','장식 - 머리 - 귀장식':'Ear ornament',
+        '장식 - 귀':'Earring','장식 - 목 - 목도리':'Scarf','장식 - 목 - 목걸이':'Necklace',
+        '장식 - 손 - 팔찌(우)':'R. Bracelet','장식 - 손 - 팔찌(좌)':'L. Bracelet',
+        '장식 - 손 - 장갑':'Glove','장식 - 소품 - 소품(우)':'R. Handheld',
+        '장식 - 소품 - 소품(좌)':'L. Handheld','장식 - 소품 - 양손':'Both hands',
+        '장식 - 허리':'Waist','장식 - 특수 - 얼굴':'Face','장식 - 특수 - 가슴':'Brooch',
+        '장식 - 특수 - 문신':'Tattoo','장식 - 특수 - 날개':'Wings','장식 - 특수 - 꼬리':'Tail',
+        '장식 - 특수 - 전경':'Foreground','장식 - 특수 - 배경':'Background',
+        '장식 - 특수 - 상단':'Head ornament','장식 - 특수 - 하단':'Ground','장식 - 특수 - 스킨':'Skin',
+      };
+      window.__SF_TP = function(k){ return _fallbackMap[k]||k; };
+    }
+    var d = lang==='en' ? SF_EN : SF_KO;
+    // 세트 목록 타이틀
+    var lt = document.getElementById('sf_listTitle'); if(lt) lt.textContent = lang==='en'?'Set List':'세트 목록';
+    // 획득경로 배지
+    var ab = document.getElementById('sf_acqBadge'); if(ab) ab.textContent = lang==='en'?'📍 Set Sources':'📍 세트 획득경로';
+    // 파생 의상 힌트
+    var vh = document.getElementById('sf_variantsHint'); if(vh) vh.textContent = lang==='en'?'Click an item to open its detail page.':'파생 의상을 클릭하면 해당 아이템 상세페이지가 열려.';
+    // missing 섹션 설명
+    var md = document.getElementById('sf_missingDesc'); if(md) md.textContent = lang==='en'?'Items not yet registered as owned.':'아직 등록되지 않은 아이템 목록이야.';
+    // 검색창
+    var qEl = document.getElementById('q'); if(qEl) qEl.placeholder = d.searchPh;
+    // 미보유 필터 텍스트
+    var mf = document.getElementById('sf_missingFilter'); if(mf) mf.textContent = d.missingFilter;
+    // 정렬 select
+    var sortEl = document.querySelector('select');
+    if(sortEl){
+      Array.from(sortEl.options).forEach(function(opt){
+        var map = {default:d.sortDefault, owned_desc:d.sortOwnedDesc, owned_asc:d.sortOwnedAsc, pct_desc:d.sortPctDesc, pct_asc:d.sortPctAsc};
+        if(map[opt.value]) opt.textContent = map[opt.value];
+      });
+    }
+    // 다이얼로그 내 고정 텍스트
+    ['sf_h3Photo','sf_h3Parts','sf_partsHint','sf_h3Variants','sf_missingTitle'].forEach(function(id){
+      var el = document.getElementById(id); if(el) el.textContent = d[{sf_h3Photo:'h3Photo',sf_h3Parts:'h3Parts',sf_partsHint:'partsHint',sf_h3Variants:'h3Variants',sf_missingTitle:'missingTitle'}[id]];
+    });
+    // variant 칩 (카드에 이미 렌더된 것) 번역
+    document.querySelectorAll('.variant-chip').forEach(function(chip){
+      var ko = chip.getAttribute('data-vlabel');
+      if(!ko){
+        var txt = chip.textContent.trim();
+        var m = txt.match(/^(.+?)\s+\d+\//);
+        ko = m ? m[1].trim() : txt;
+        chip.setAttribute('data-vlabel', ko);
+      }
+      var nums = chip.textContent.replace(/^.+?(\s+\d+\/.*)$/, '$1');
+      if(lang==='en'){
+        var parts = ko.split(/\s+/);
+        var translated = (_VLABEL_MAP[parts[0]]||parts[0]);
+        if(parts.length>1) translated += ' ' + parts.slice(1).join(' ');
+        chip.textContent = translated + nums;
+      } else {
+        chip.textContent = ko + nums;
+      }
+    });
+    // 이미 렌더된 owned-badge 번역
+    document.querySelectorAll('.owned-badge.yes').forEach(function(b){
+      b.textContent = lang==='en' ? '✓ Owned' : '✓ 보유';
+    });
+    document.querySelectorAll('.owned-badge.no').forEach(function(b){
+      b.textContent = lang==='en' ? '✗ Missing' : '✗ 미보유';
+    });
+    // 카드 재렌더 (variant 칩 포함)
+    if(typeof renderList==='function') renderList();
+  }
+
+  // 초기 적용
+  (function(){
+    var lang = (function(){ try{ return window.parent.UI_LANG||localStorage.getItem('nikki_ui_lang')||'ko'; }catch(e){ return 'ko'; } })();
+    window.__SF_LANG = lang;
+    if(document.readyState==='loading'){
+      document.addEventListener('DOMContentLoaded', function(){ applySfLang(lang); });
+    } else {
+      applySfLang(lang);
+    }
+  })();
 
 </script>
 

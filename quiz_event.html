@@ -137,13 +137,12 @@
 </head>
 <body>
 <header>
-  <h1>퀴즈 이벤트</h1>
-  <div class="sub">이 파일(quiz_event.html)에 문제/답을 직접 추가하면, 인덱스의 “퀴즈 이벤트” 탭에서 자동으로 보여.</div>
+  <h1 id="qz_title">퀴즈 이벤트</h1>
 </header>
 
 <main>
   <div class="toolbar">
-    <input id="qSearch" type="text" placeholder="문제 검색 (제목/내용)" />
+    <input id="qSearch" type="text" placeholder="문제 검색 (제목/내용)" id="qz_search_input" />
     <button id="btnExpand">전부 열기</button>
     <button id="btnCollapse">전부 닫기</button>
   </div>
@@ -3863,7 +3862,7 @@ function resolveAnswerText(q){
 function render(list){
   const root = document.getElementById('quizList');
   if(!list.length){
-    root.innerHTML = '<div class="empty">해당 없음</div>';
+    root.innerHTML = '<div class="empty">'+(window.__QZ_LANG==='en'?'No results':'해당 없음')+'</div>';
     return;
   }
 
@@ -3890,9 +3889,10 @@ function render(list){
 
     const exp = q.explanation ? '<div class="exp">'+esc(q.explanation)+'</div>' : '';
 
-    let answerLabel = '(정답 미설정)';
+    var _qlang = window.__QZ_LANG||'ko';
+  let answerLabel = _qlang==='en'?'(No answer set)':'(정답 미설정)';
     if(answerText && choices.length){
-      answerLabel = (answerPos >= 0) ? `${answerPos+1}번) ${answerText}` : `${answerText} (⚠ 보기와 불일치)`;
+      answerLabel = (answerPos >= 0) ? `${answerPos+1}번) ${answerText}` : `${answerText} (⚠ ${_qlang==="en"?"Mismatch with choices":"보기와 불일치"})`;
     }else if(answerText){
       answerLabel = answerText; // 주관식
     }
@@ -3907,10 +3907,10 @@ function render(list){
         <div class="qtext">${esc(q.question || '')}</div>
 
         <details class="detail">
-          <summary>정답 보기</summary>
+          <summary id='qz_summary_'+idx data-qz='summary'>정답 보기</summary>
           ${choiceHtml}
           <div class="answer">
-            <b>정답</b>
+            <b data-qz="answer_label">정답</b>
             ${esc(answerLabel)}
             ${exp}
           </div>
@@ -3940,6 +3940,50 @@ document.getElementById('btnCollapse').addEventListener('click', ()=>{
 
 // initial
 render(QUIZ_QUESTIONS.slice());
+
+/* ── 퀴즈 다국어 ── */
+window.__QZ_LANG = (function(){ try{ return window.parent.UI_LANG||localStorage.getItem('nikki_ui_lang')||'ko'; }catch(e){ return 'ko'; } })();
+
+var QZ_EN = {
+  qz_title: 'Quiz Event',
+  qSearch_ph: 'Search (title/content)',
+  btnExpand: 'Expand All',
+  btnCollapse: 'Collapse All',
+  summary: '▶ Show Answer',
+  answer_label: 'Answer',
+};
+var QZ_KO = {
+  qz_title: '퀴즈 이벤트',
+  qSearch_ph: '문제 검색 (제목/내용)',
+  btnExpand: '전부 열기',
+  btnCollapse: '전부 닫기',
+  summary: '▶ 정답 보기',
+  answer_label: '정답',
+};
+
+function applyQzLang(lang){
+  window.__QZ_LANG = lang;
+  var d = lang==='en' ? QZ_EN : QZ_KO;
+  var t = document.getElementById('qz_title'); if(t) t.textContent = d.qz_title;
+  var si = document.getElementById('qz_search_input')||document.getElementById('qSearch'); if(si) si.placeholder = d.qSearch_ph;
+  var be = document.getElementById('btnExpand'); if(be) be.textContent = d.btnExpand;
+  var bc = document.getElementById('btnCollapse'); if(bc) bc.textContent = d.btnCollapse;
+  // summary, answer_label 은 render로 재생성
+  render(getFiltered());
+  // render 후 summary/answer 텍스트 교체
+  document.querySelectorAll('details.detail summary').forEach(function(s){ s.textContent = d.summary; });
+  document.querySelectorAll('[data-qz="answer_label"]').forEach(function(b){ b.textContent = d.answer_label; });
+}
+
+window.addEventListener('message', function(ev){
+  if(ev.origin!==location.origin && ev.origin!=='null') return;
+  var msg = ev.data;
+  if(!msg || msg.type!=='NIKKI_LANG_CHANGE') return;
+  applyQzLang(msg.lang||'ko');
+});
+
+// 초기 언어 적용
+applyQzLang(window.__QZ_LANG);
 </script>
 
 </body>

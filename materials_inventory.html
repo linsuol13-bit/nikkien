@@ -169,24 +169,24 @@ body { background:var(--pk-5); color:var(--pk-text); min-height:100vh; }
 </style>
 
 <nav class="navbar">
-  <span class="navbar-title">🧵 재료 보유 현황</span>
-  <span class="save-notice" id="saveNotice">저장됨 ✓</span>
-  <button class="save-btn" id="saveBtn">저장</button>
+  <span class="navbar-title" id="mi_title">🧵 재료 보유 현황</span>
+  <span class="save-notice" id="saveNotice" data-mi="saveNotice">저장됨 ✓</span>
+  <button class="save-btn" id="saveBtn" data-mi="saveBtn">저장</button>
 </nav>
 
 <div class="wrap">
   <div class="status-bar">
-    <div class="status-item">전체 재료 <b id="totalCount">0</b>종</div>
-    <div class="status-item">보유중 <b id="ownedCount">0</b>종</div>
+    <div class="status-item" id="mi_totalLabel">전체 재료 <b id="totalCount">0</b>종</div>
+    <div class="status-item" id="mi_ownedLabel">보유중 <b id="ownedCount">0</b>종</div>
     <div class="search-wrap">
-      <input type="text" id="matSearch" placeholder="🔍 재료 이름 검색…" autocomplete="off">
+      <input type="text" id="matSearch" placeholder="🔍 재료 이름 검색…" id="mi_search" autocomplete="off">
       <label class="owned-toggle">
-        <input type="checkbox" id="showOwnedOnly"> 보유만
+        <input type="checkbox" id="showOwnedOnly"> <span id="mi_ownedOnly">보유만</span>
       </label>
     </div>
   </div>
   <div id="matGrid" class="mat-grid">
-    <div class="loading">재료 데이터 불러오는 중…</div>
+    <div class="loading" id="mi_loading">재료 데이터 불러오는 중…</div>
   </div>
 </div>
 
@@ -1398,7 +1398,7 @@ body { background:var(--pk-5); color:var(--pk-text); min-height:100vh; }
   })();
 
   function renderEmpty(){
-    document.getElementById('matGrid').innerHTML = '<div class="empty">재료 데이터가 없어요.<br>item_details_frame.html에 reform 재료를 추가해줘요!</div>';
+    document.getElementById('matGrid').innerHTML = window.__MI_LANG==='en' ? '<div class="empty">No material data found.<br>Add reform materials to item_details_frame.html!</div>' : '<div class="empty">재료 데이터가 없어요.<br>item_details_frame.html에 reform 재료를 추가해줘요!</div>';
   }
 
   function updateStatus(){
@@ -1406,6 +1406,12 @@ body { background:var(--pk-5); color:var(--pk-text); min-height:100vh; }
     const owned = materials.filter(m => (inventory[m.id] || 0) > 0).length;
     document.getElementById('totalCount').textContent = total;
     document.getElementById('ownedCount').textContent = owned;
+    // 라벨 텍스트 갱신
+    const tl = document.getElementById('mi_totalLabel');
+    const ol = document.getElementById('mi_ownedLabel');
+    const lang = window.__MI_LANG || 'ko';
+    if(tl) tl.innerHTML = (lang==='en'?'Total <b id="totalCount">':'전체 재료 <b id="totalCount">') + total + (lang==='en'?'</b> types':'</b>종');
+    if(ol) ol.innerHTML = (lang==='en'?'Owned <b id="ownedCount">':'보유중 <b id="ownedCount">') + owned + (lang==='en'?'</b> types':'</b>종');
   }
 
   function applyFilter(){
@@ -1483,7 +1489,7 @@ body { background:var(--pk-5); color:var(--pk-text); min-height:100vh; }
     emptyMsg.className = 'empty';
     emptyMsg.style.display = 'none';
     emptyMsg.style.cssText = 'grid-column:1/-1;text-align:center;padding:40px;color:var(--pk-muted);font-size:14px;';
-    emptyMsg.textContent = '검색 결과가 없어요.';
+    emptyMsg.textContent = window.__MI_LANG==='en' ? 'No results found.' : '검색 결과가 없어요.';
     grid.appendChild(emptyMsg);
 
     // 이벤트 (이벤트 위임)
@@ -1556,7 +1562,30 @@ body { background:var(--pk-5); color:var(--pk-text); min-height:100vh; }
 
   // 자동저장 제거 (버튼 클릭 시에만 저장, 수량 변경은 renderGrid 이벤트에서 처리)
 
-  // NIKKI_SERVER 변경 수신 → 이름 언어 갱신
+  // 다국어 적용
+  window.__MI_LANG = (function(){ try{ return window.parent.UI_LANG||localStorage.getItem('nikki_ui_lang')||'ko'; }catch(e){ return 'ko'; } })();
+
+  var MI_EN = {
+    title:'🧵 Materials Inventory', saveBtn:'Save', saveNotice:'Saved ✓',
+    search:'🔍 Search material name…', ownedOnly:'Owned only',
+  };
+  var MI_KO = {
+    title:'🧵 재료 보유 현황', saveBtn:'저장', saveNotice:'저장됨 ✓',
+    search:'🔍 재료 이름 검색…', ownedOnly:'보유만',
+  };
+
+  function applyMiLang(lang){
+    window.__MI_LANG = lang;
+    var d = lang==='en' ? MI_EN : MI_KO;
+    var t = document.getElementById('mi_title'); if(t) t.textContent = d.title;
+    var sb = document.getElementById('saveBtn'); if(sb) sb.textContent = d.saveBtn;
+    var sn = document.getElementById('saveNotice'); if(sn) sn.textContent = d.saveNotice;
+    var ms = document.getElementById('mi_search')||document.getElementById('matSearch'); if(ms) ms.placeholder = d.search;
+    var oo = document.getElementById('mi_ownedOnly'); if(oo) oo.textContent = d.ownedOnly;
+    updateStatus();
+  }
+
+  // NIKKI_SERVER / NIKKI_LANG_CHANGE 수신
   window.addEventListener('message', function(ev){
     if(ev.origin && ev.origin !== location.origin && ev.origin !== 'null') return;
     const msg = ev.data;
@@ -1565,7 +1594,13 @@ body { background:var(--pk-5); color:var(--pk-text); min-height:100vh; }
       window.NIKKI_SERVER = msg.server;
       refreshNames();
     }
+    if(msg.type === 'NIKKI_LANG_CHANGE'){
+      applyMiLang(msg.lang || 'ko');
+    }
   });
+
+  // 초기 적용
+  document.addEventListener('DOMContentLoaded', function(){ applyMiLang(window.__MI_LANG); });
 
   function esc(s){ return String(s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 })();
