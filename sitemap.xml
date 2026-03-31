@@ -1,74 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-  <!-- 메인 -->
   <url>
     <loc>https://linsuol13-bit.github.io/nikkien/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
-
-  <!-- 이벤트 캘린더 -->
   <url>
     <loc>https://linsuol13-bit.github.io/nikkien/calendar.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
-
-  <!-- 의상 세트 정보 -->
   <url>
     <loc>https://linsuol13-bit.github.io/nikkien/sets_data.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
-
-  <!-- 세트 체크 -->
   <url>
     <loc>https://linsuol13-bit.github.io/nikkien/sets_check.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-
-  <!-- 아이템 목록 -->
   <url>
     <loc>https://linsuol13-bit.github.io/nikkien/items.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-
-  <!-- 아이템 상세 -->
   <url>
     <loc>https://linsuol13-bit.github.io/nikkien/item_detail.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
-
-  <!-- 재료 인벤토리 -->
   <url>
     <loc>https://linsuol13-bit.github.io/nikkien/materials_inventory.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-
-  <!-- 스테이지 -->
   <url>
     <loc>https://linsuol13-bit.github.io/nikkien/stages.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-
-  <!-- 스테이지 스토리 번역 -->
   <url>
     <loc>https://linsuol13-bit.github.io/nikkien/stage_story.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-
-  <!-- 퀴즈 이벤트 -->
   <url>
     <loc>https://linsuol13-bit.github.io/nikkien/quiz_event.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
-
 </urlset>
