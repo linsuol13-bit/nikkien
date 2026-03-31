@@ -296,6 +296,14 @@ tbody tr:hover{background:#fff5f8}
   table{min-width:0}
   th,td{padding:6px;font-size:14px}
   .group{margin:8px 10px}
+  #controls .filter-row{flex-wrap:wrap;align-items:center}
+  #controls .filter-row .owned-only-label{
+    order:-1;
+    width:100%;
+    padding:4px 0 2px 0;
+    border-bottom:1px solid var(--pk-border);
+    margin-bottom:2px;
+  }
 }
 @media(max-width:480px){
   nav.tabs{top:0}
@@ -794,7 +802,7 @@ var stages = window.stages;
 </optgroup>
 </select>
 <label data-i18n="lbl.sort">정렬</label><select id="sortBy"><option value="score" data-i18n="opt.score">점수순</option><option value="name" data-i18n="opt.name">이름순</option></select>
-<label><span class="checkbox-inline"><input id="ownedOnly" type="checkbox"/> <span data-i18n="lbl.ownedOnly">보유만 보기</span></span></label>
+<label class="owned-only-label"><span class="checkbox-inline"><input id="ownedOnly" type="checkbox"/> <span data-i18n="lbl.ownedOnly">보유만 보기</span></span></label>
 <button id="exportCsvBtn" type="button" title="현재 결과를 CSV로 저장" data-i18n="btn.exportCsv">CSV 내보내기</button>
 </div>
 </label><div>
