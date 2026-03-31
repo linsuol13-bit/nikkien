@@ -73,6 +73,8 @@ const PART_WEIGHTS = {
 <!-- ── 성능 최적화: 외부 리소스 프리커넥트 ── -->
 <meta http-equiv="x-dns-prefetch-control" content="on">
 <link rel="icon" type="image/png" href="제목_없음.png">
+<link rel="apple-touch-icon" href="제목_없음.png">
+<link rel="shortcut icon" href="제목_없음.png">
 <style>
   ::-webkit-scrollbar{width:7px;height:7px}
   ::-webkit-scrollbar-track{background:var(--pk-5,#fff5f8);border-radius:999px}
@@ -12551,6 +12553,12 @@ window.applyI18n = function(){
 
   // html lang 속성
   document.documentElement.lang = lang === 'ko' ? 'ko' : lang === 'ja' ? 'ja' : 'en';
+
+  // 즐겨찾기 select 첫 option 텍스트 갱신
+  var favSel = document.getElementById('stageFavSelect');
+  if(favSel && favSel.options[0] && favSel.options[0].value === ''){
+    favSel.options[0].textContent = d['fav.label'] || '⭐ 즐겨찾기';
+  }
 
   // 다크모드 버튼 텍스트 동기화
   var darkBtn = document.getElementById('darkModeBtn');
