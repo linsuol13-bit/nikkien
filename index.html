@@ -296,18 +296,25 @@ tbody tr:hover{background:#fff5f8}
   table{min-width:0}
   th,td{padding:6px;font-size:14px}
   .group{margin:8px 10px}
-  #controls .filter-row{flex-wrap:wrap;align-items:center;width:100%;overflow:hidden}
-  #controls .filter-row select{box-sizing:border-box;max-width:100%}
+  #controls .filter-row{flex-wrap:wrap;align-items:center;width:100%}
+  /* 모든 select/input이 화면 밖으로 나가지 않도록 */
+  #controls .filter-row select,
   #controls .filter-row input[type=text]{box-sizing:border-box;max-width:100%}
+  /* 스테이지 분류 + 검색: 한 줄에 나란히 */
   label[for="stageGroupSelect"]{flex-shrink:0;white-space:nowrap}
+  #stageGroupSelect{flex:1;min-width:0;max-width:130px;box-sizing:border-box}
   label[for="stageSearchInput"]{flex-shrink:0;white-space:nowrap}
-  label[for="stageSelect"]{flex-shrink:0;white-space:nowrap;width:100%}
-  #stageGroupSelect{flex:1;min-width:0;max-width:140px}
-  #stageSearchInput{flex:1;min-width:0}
-  #stageSelect{flex:1;min-width:0;width:0 !important;box-sizing:border-box}
-
+  #stageSearchInput{flex:1;min-width:0;box-sizing:border-box}
+  /* 하위 스테이지: 레이블이 줄 전체 차지 → select 다음 줄 전체 */
+  label[for="stageSelect"]{width:100%;white-space:nowrap}
+  #stageSelect{width:100% !important;box-sizing:border-box}
+  /* 즐겨찾기 버튼/select: 하위 스테이지 바로 아래 한 줄 */
+  #stageFavBtn{flex-shrink:0}
+  #stageFavSelect{flex:1;min-width:0;box-sizing:border-box;display:none}
+  #stageFavSelect[style*="block"],#stageFavSelect:not([style*="none"]){width:100% !important}
+  /* 정렬: 한 줄에 나란히 */
   label[data-i18n="lbl.sort"]{flex-shrink:0;white-space:nowrap}
-  #sortBy{flex:1;min-width:0}
+  #sortBy{flex:1;min-width:0;box-sizing:border-box}
   #controls .filter-row .owned-only-label{
     order:-1;
     width:100%;
