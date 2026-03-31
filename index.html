@@ -297,12 +297,13 @@ tbody tr:hover{background:#fff5f8}
   th,td{padding:6px;font-size:14px}
   .group{margin:8px 10px}
   #controls .filter-row{flex-wrap:wrap;align-items:center}
-  #controls .filter-row select{max-width:calc(100vw - 24px);box-sizing:border-box}
+  #controls .filter-row select{box-sizing:border-box}
   #controls .filter-row input[type=text]{box-sizing:border-box}
-  #stageSelect{width:calc(100vw - 24px) !important}
-  #stageGroupSelect{width:calc(45vw - 16px) !important;flex-shrink:0}
-  #stageSearchInput{width:calc(55vw - 20px) !important;flex-shrink:0}
-  label[for="stageSearchInput"]{display:none !important}
+  /* 레이블+컨트롤 한 줄 쌍 */
+  #controls .filter-row .filter-pair{display:flex;align-items:center;gap:6px;width:100%}
+  #controls .filter-row .filter-pair label{flex-shrink:0;white-space:nowrap;font-size:15px}
+  #controls .filter-row .filter-pair select,
+  #controls .filter-row .filter-pair input[type=text]{flex:1;width:0;min-width:0}
   #controls .filter-row .owned-only-label{
     order:-1;
     width:100%;
@@ -747,12 +748,12 @@ var stages = window.stages;
 <section id="controls">
 <div><label>
 <div class="filter-row">
-<label for="stageGroupSelect" data-i18n="lbl.stageGroup">스테이지 분류</label>
-<select id="stageGroupSelect"><option value="" data-i18n="opt.all">전체</option></select>
-<label for="stageSearchInput" data-i18n="lbl.search">검색</label>
-<input id="stageSearchInput" type="text" placeholder="하위 스테이지 검색" data-i18n-placeholder="lbl.stageSub"/>
-<label for="stageSelect" data-i18n="lbl.stageSub">하위 스테이지</label>
-<select id="stageSelect"></select>
+<div class="filter-pair"><label for="stageGroupSelect" data-i18n="lbl.stageGroup">스테이지 분류</label>
+<select id="stageGroupSelect"><option value="" data-i18n="opt.all">전체</option></select></div>
+<div class="filter-pair"><label for="stageSearchInput" data-i18n="lbl.search">검색</label>
+<input id="stageSearchInput" type="text" placeholder="하위 스테이지 검색" data-i18n-placeholder="lbl.stageSub"/></div>
+<div class="filter-pair"><label for="stageSelect" data-i18n="lbl.stageSub">하위 스테이지</label>
+<select id="stageSelect"></select></div>
 <button id="stageFavBtn" type="button" title="즐겨찾기 추가/제거" style="padding:6px 10px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:19px">☆</button>
 <select id="stageFavSelect" style="display:none;min-width:160px;border-color:#f5c842"><option value="" data-i18n="fav.label">⭐ 즐겨찾기</option></select>
 <label data-i18n="lbl.partFilter">부위 필터 (그룹)</label><select id="partFilter"><option value="" data-i18n="opt.all">전체</option>
