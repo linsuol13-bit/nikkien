@@ -4967,7 +4967,10 @@ document.addEventListener('DOMContentLoaded', function(){});
       if(!opt.value) continue; // skip 전체
       var o = document.createElement('option');
       o.value = opt.value;
-      o.textContent = opt.textContent || opt.text || opt.value;
+      // data-ko 속성 복사 (번역 기준값)
+      var koVal = opt.getAttribute('data-ko') || opt.textContent.trim() || opt.value;
+      o.setAttribute('data-ko', koVal);
+      o.textContent = window.translatePart ? window.translatePart(koVal) : (opt.textContent || opt.text || opt.value);
       dst.appendChild(o);
     }
   }
@@ -8676,17 +8679,18 @@ document.addEventListener('DOMContentLoaded', function(){});
       if (!v) continue;
       if (label === FIRE || v === FIRE){ hasFire = true; continue; }
       if (isAccOrSpecLabel(v) || isAccOrSpecLabel(label)){ needUnified = true; continue; }
-      keep.push({v:v, t:label});
+      var koLabel = opt.getAttribute('data-ko') || label;
+      keep.push({v:v, t:label, ko:koLabel});
     }
 
     while (sel.firstChild) sel.removeChild(sel.firstChild);
     if (needUnified){
-      var o = document.createElement('option'); o.value = '장식/특수'; o.textContent = '장식/특수'; sel.appendChild(o);
+      var o = document.createElement('option'); o.value = '장식/특수'; o.setAttribute('data-ko','장식/특수'); o.textContent = window.translatePart ? window.translatePart('장식/특수') : '장식/특수'; sel.appendChild(o);
     }
     if (hasFire){
-      var f = document.createElement('option'); f.value = FIRE; f.textContent = FIRE; sel.appendChild(f);
+      var f = document.createElement('option'); f.value = FIRE; f.setAttribute('data-ko',FIRE); f.textContent = window.translatePart ? window.translatePart(FIRE) : FIRE; sel.appendChild(f);
     }
-    for (var j=0;j<keep.length;j++){ var k = document.createElement('option'); k.value = keep[j].v; k.textContent = keep[j].t; sel.appendChild(k); }
+    for (var j=0;j<keep.length;j++){ var k = document.createElement('option'); k.value = keep[j].v; var koT = keep[j].ko || keep[j].t; k.setAttribute('data-ko', koT); k.textContent = window.translatePart ? window.translatePart(koT) : koT; sel.appendChild(k); }
   }
 
   // Patch functions that repopulate the selector
@@ -8827,35 +8831,36 @@ document.addEventListener('DOMContentLoaded', function(){});
       var opt = sel.options[i];
       var v = opt && (opt.value || '');
       var label = opt && (opt.textContent || opt.text || v);
+      var koLabel = opt.getAttribute('data-ko') || label;
       if (!v) continue;
 
-      if (v === '장식/특수') { hasUnifiedAccSpec = true; keep.push({v:v, t:label}); continue; }
+      if (v === '장식/특수') { hasUnifiedAccSpec = true; keep.push({v:v, t:label, ko:koLabel}); continue; }
       if (v === FIRE || label === FIRE) { hasFire = true; continue; }
 
       if (v === '양말' || v === '양말장식' || label === '양말' || label === '양말장식'){
         needSocksUnified = true;
         continue; // will replace with unified option
       }
-      keep.push({v:v, t:label});
+      keep.push({v:v, t:label, ko:koLabel});
     }
 
     while (sel.firstChild) sel.removeChild(sel.firstChild);
 
     // Keep existing '장식/특수' (if present)
     if (hasUnifiedAccSpec){
-      var a = document.createElement('option'); a.value = '장식/특수'; a.textContent = '장식/특수'; sel.appendChild(a);
+      var a = document.createElement('option'); a.value = '장식/특수'; a.setAttribute('data-ko','장식/특수'); a.textContent = window.translatePart ? window.translatePart('장식/특수') : '장식/특수'; sel.appendChild(a);
     }
     // Insert unified socks option if needed
     if (needSocksUnified){
-      var s = document.createElement('option'); s.value = '양말/양말장식'; s.textContent = '양말/양말장식'; sel.appendChild(s);
+      var s = document.createElement('option'); s.value = '양말/양말장식'; s.setAttribute('data-ko','양말/양말장식'); s.textContent = window.translatePart ? window.translatePart('양말/양말장식') : '양말/양말장식'; sel.appendChild(s);
     }
     // Keep '반딧불의 영혼' right after
     if (hasFire){
-      var f = document.createElement('option'); f.value = FIRE; f.textContent = FIRE; sel.appendChild(f);
+      var f = document.createElement('option'); f.value = FIRE; f.setAttribute('data-ko',FIRE); f.textContent = window.translatePart ? window.translatePart(FIRE) : FIRE; sel.appendChild(f);
     }
     // Append others
     for (var j=0;j<keep.length;j++){
-      var k = document.createElement('option'); k.value = keep[j].v; k.textContent = keep[j].t; sel.appendChild(k);
+      var k = document.createElement('option'); k.value = keep[j].v; var koT = keep[j].ko || keep[j].t; k.setAttribute('data-ko', koT); k.textContent = window.translatePart ? window.translatePart(koT) : koT; sel.appendChild(k);
     }
   }
 
@@ -9018,6 +9023,7 @@ document.addEventListener('DOMContentLoaded', function(){});
       var opt = sel.options[i];
       var v = norm(opt.value || '');
       var t = norm(opt.textContent || opt.text || v);
+      var ko = opt.getAttribute('data-ko') || t;
       if (!v) continue;
 
       // kill any '(자동)' labels
@@ -9030,19 +9036,19 @@ document.addEventListener('DOMContentLoaded', function(){});
       if (isAccSpecSub(v) || isAccSpecSub(t)) continue;
 
       var key = v + '::' + t;
-      if (!seen[key]){ seen[key] = true; others.push({v:v, t:t}); }
+      if (!seen[key]){ seen[key] = true; others.push({v:v, t:t, ko:ko}); }
     }
 
     // Rebuild list
     while (sel.firstChild) sel.removeChild(sel.firstChild);
     if (hasUnified){
-      var a = document.createElement('option'); a.value = UNIFIED; a.textContent = UNIFIED; sel.appendChild(a);
+      var a = document.createElement('option'); a.value = UNIFIED; a.setAttribute('data-ko',UNIFIED); a.textContent = window.translatePart ? window.translatePart(UNIFIED) : UNIFIED; sel.appendChild(a);
     }
     if (hasFire){
-      var f = document.createElement('option'); f.value = FIRE; f.textContent = FIRE; sel.appendChild(f);
+      var f = document.createElement('option'); f.value = FIRE; f.setAttribute('data-ko',FIRE); f.textContent = window.translatePart ? window.translatePart(FIRE) : FIRE; sel.appendChild(f);
     }
     for (var j=0;j<others.length;j++){
-      var o = document.createElement('option'); o.value = others[j].v; o.textContent = others[j].t; sel.appendChild(o);
+      var o = document.createElement('option'); o.value = others[j].v; var koT = others[j].ko || others[j].t; o.setAttribute('data-ko', koT); o.textContent = window.translatePart ? window.translatePart(koT) : koT; sel.appendChild(o);
     }
   }
 
@@ -12452,6 +12458,7 @@ var PART_MAP = {
     '헤어':'Hair','원피스':'Dress','아우터':'Coat','상의':'Top','하의':'Bottom',
     '양말':'Hosiery','양말장식':'Sock Deco','신발':'Shoes','뷰티':'Makeup',
     '반딧불의 영혼':'Spirit of Sheen',
+    '장식/특수':'Accessory','양말/양말장식':'Hosiery',
     '의상':'Clothing','귀':'Earring','목':'Neck','손':'Hand','소품':'Props','특수':'Special',
     '머리':'Hair ornament','베일':'Veil','헤어핀':'Hairpin','귀장식':'Ear ornament',
     '귀':'Earring','목도리':'Scarf','목걸이':'Necklace',
@@ -12481,6 +12488,7 @@ var PART_MAP = {
     '헤어':'ヘア','원피스':'ワンピース','아우터':'アウター','상의':'トップス',
     '하의':'ボトムス','양말':'ソックス','양말장식':'ソックス飾り','신발':'シューズ',
     '뷰티':'ビューティー','반딧불의 영혼':'ホタルの魂',
+    '장식/특수':'アクセサリー','양말/양말장식':'ソックス',
     '의상':'衣装','귀':'イヤリング','목':'ネック','손':'ハンド','소품':'小物','특수':'スペシャル',
     '머리':'髪飾り','베일':'ベール','헤어핀':'ヘアピン','귀장식':'耳飾り',
     '귀':'イヤリング','목도리':'マフラー','목걸이':'ネックレス',
@@ -12664,6 +12672,19 @@ window.applyI18n = function(){
         var ko = og.getAttribute('data-ko') || og.label;
         if(!og.getAttribute('data-ko')) og.setAttribute('data-ko', ko);
         og.label = window.translatePart ? window.translatePart(ko) : ko;
+      });
+    }
+  }catch(e){}
+
+  // codePartSelectInline 옵션 텍스트 번역 (코드 입력 부위 선택)
+  try{
+    var cpSel = document.getElementById('codePartSelectInline');
+    if(cpSel){
+      Array.from(cpSel.options).forEach(function(opt){
+        if(!opt.value) return;
+        var ko = opt.getAttribute('data-ko') || opt.textContent.trim() || opt.value;
+        if(!opt.getAttribute('data-ko')) opt.setAttribute('data-ko', ko);
+        opt.textContent = window.translatePart ? window.translatePart(ko) : ko;
       });
     }
   }catch(e){}
