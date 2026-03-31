@@ -296,15 +296,15 @@ tbody tr:hover{background:#fff5f8}
   table{min-width:0}
   th,td{padding:6px;font-size:14px}
   .group{margin:8px 10px}
-  #controls .filter-row{flex-wrap:wrap;align-items:center}
-  #controls .filter-row select{box-sizing:border-box}
-  #controls .filter-row input[type=text]{box-sizing:border-box}
+  #controls .filter-row{flex-wrap:wrap;align-items:center;width:100%;overflow:hidden}
+  #controls .filter-row select{box-sizing:border-box;max-width:100%}
+  #controls .filter-row input[type=text]{box-sizing:border-box;max-width:100%}
   label[for="stageGroupSelect"]{flex-shrink:0;white-space:nowrap}
   label[for="stageSearchInput"]{flex-shrink:0;white-space:nowrap}
   label[for="stageSelect"]{flex-shrink:0;white-space:nowrap;width:100%;margin-top:2px}
-  #stageGroupSelect{flex:1;width:0 !important;min-width:80px;max-width:140px}
-  #stageSearchInput{flex:1;width:0 !important;min-width:80px}
-  #stageSelect{width:calc(100% - 6em) !important;flex:1}
+  #stageGroupSelect{flex:1;min-width:0;max-width:140px}
+  #stageSearchInput{flex:1;min-width:0;max-width:100%}
+  #stageSelect{width:100% !important;max-width:100%;box-sizing:border-box}
   #controls .filter-row .owned-only-label{
     order:-1;
     width:100%;
