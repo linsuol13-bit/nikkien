@@ -392,10 +392,10 @@ tbody tr:hover{background:#fff5f8}
 #noticeBar{
   display:flex;gap:8px;
   padding:10px 20px 0 20px;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
 }
 .nbar-btn{
-  display:flex;align-items:center;gap:6px;
+  display:flex;align-items:center;justify-content:center;gap:6px;
   padding:7px 16px;
   border:1.5px solid var(--pk-border);
   border-radius:999px;
@@ -551,8 +551,9 @@ body.dark #noticeModalClose{color:#a06080}
 body.dark #noticeModalClose:hover{background:#3a1a2e;color:#f48fb1}
 /* ── 모바일 ── */
 @media(max-width:600px){
-  #noticeBar{padding:8px 10px 0 10px;gap:6px}
-  .nbar-btn{padding:6px 12px;font-size:13px}
+  #noticeBar{padding:8px 10px 0 10px;gap:5px}
+  .nbar-btn{flex:1;padding:6px 8px;font-size:12px;gap:4px}
+  .nbar-icon{font-size:13px}
   #noticeModal{width:94vw;max-height:85vh;border-radius:14px}
   #noticeModalHeader{padding:12px 14px 10px}
   #noticeModalBody{padding:10px 14px 14px}
@@ -864,7 +865,7 @@ var stages = window.stages;
   <button class="nbar-btn" onclick="openNoticeModal('updates')">
     <span class="nbar-icon">📋</span>
     <span class="nbar-label n-ko">업데이트 현황</span>
-    <span class="nbar-label n-en" style="display:none">Update History</span>
+    <span class="nbar-label n-en" style="display:none">Update</span>
   </button>
   <button class="nbar-btn" onclick="openNoticeModal('etc')">
     <span class="nbar-icon">📌</span>
@@ -1234,9 +1235,9 @@ body.dark .ud-more{ background:#27202a;border-color:#4a2d3a;color:#f48fb1; }
 /* ── 공지 모달 시스템 ── */
 (function(){
   var TITLES = {
-    guide:   { ko:'📖 홈페이지 설명',  en:'📖 How to Use'      },
-    updates: { ko:'📋 업데이트 현황',  en:'📋 Update History'  },
-    etc:     { ko:'📌 추가 안내사항',  en:'📌 Announcements'   },
+    guide:   { ko:'📖 홈페이지 설명',  en:'📖 How to Use'   },
+    updates: { ko:'📋 업데이트 현황',  en:'📋 Update'       },
+    etc:     { ko:'📌 추가 안내사항',  en:'📌 Announcements'},
   };
   var BADGE_I18N = {
     'badge.new':    { ko:'NEW',     en:'NEW'    },
