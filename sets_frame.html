@@ -611,7 +611,9 @@ function trim(s){ return norm(s).trim(); }
 
     // 정렬
     const sortVal = sortSel ? sortSel.value : 'default';
-    if(sortVal !== 'default' && (OWNED_CODES.size > 0 || OWNED_NAMES.size > 0)){
+    // 기본 정렬: 최신 등록순 (배열 역순)
+    if(sortVal === 'default') full = full.slice().reverse();
+    else if(sortVal !== 'default' && (OWNED_CODES.size > 0 || OWNED_NAMES.size > 0)){
       full = full.map(s => {
         const parts = Array.isArray(s.parts) ? s.parts : [];
         let ownedCount = 0;

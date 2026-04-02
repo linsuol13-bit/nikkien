@@ -512,6 +512,11 @@ function getItemTags(it){
     if (!dlg || !frame) return;
 
     frame.src = url;
+    // 로드 완료 후 현재 다크 상태 전달
+    frame.onload = function(){
+      var isDark = document.body.classList.contains('dark');
+      try{ frame.contentWindow.postMessage({type:'NIKKI_DARK_CHANGE', dark: isDark}, '*'); }catch(e){}
+    };
     if (typeof dlg.showModal === 'function'){
       dlg.showModal();
     }else{
@@ -1070,6 +1075,9 @@ function getItemTags(it){
     if (!msg || typeof msg !== 'object') return;
     if(msg.type === 'NIKKI_DARK_CHANGE'){
       document.body.classList.toggle('dark', !!msg.dark);
+      // 하위 detailFrame에도 전파
+      var df = document.getElementById('detailFrame');
+      if(df && df.contentWindow){ try{ df.contentWindow.postMessage({type:'NIKKI_DARK_CHANGE', dark:!!msg.dark}, '*'); }catch(e){} }
       return;
     }
     if(msg.type === 'NIKKI_SERVER_CHANGE'){
