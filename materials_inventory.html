@@ -1,4 +1,8 @@
 <!doctype html>
+<script>if(new URLSearchParams(location.search).get('dark')==='1')document.documentElement.setAttribute('data-dark','1');</script>
+<style>[data-dark='1'] body,[data-dark='1'] *{background-color:#1a1018!important;color:#f0e4ec!important;border-color:#4a2d3a!important}</style>
+<script>(function(){if(new URLSearchParams(location.search).get('dark')==='1'){var apply=function(){document.body.classList.add('dark');document.documentElement.removeAttribute('data-dark');};if(document.body)apply();else document.addEventListener('DOMContentLoaded',apply);}})();</script>
+
 <style id="custom-font">
 @font-face {
   font-family: "AngyeongGothic";
@@ -166,6 +170,21 @@ body { background:var(--pk-5); color:var(--pk-text); min-height:100vh; }
   #matSearch { width:140px; }
   #matSearch:focus { width:170px; }
 }
+
+  /* ── 다크모드 ── */
+  body.dark{--pk-5:#1a1018;--pk-text:#f0e4ec;--pk-border:#4a2d3a;--pk-4:#2a1a2a;--pk-muted:#c0849c;background:#1a1018;color:#f0e4ec}
+  body.dark .navbar{background:#27202a;border-color:#4a2d3a}
+  body.dark .save-btn{background:#27202a;border-color:#4a2d3a;color:#f48fb1}
+  body.dark .status-bar{background:#27202a;border-color:#4a2d3a}
+  body.dark .mat-card{background:#27202a;border-color:#4a2d3a}
+  body.dark .mat-card.has-stock{background:#0a2a14;border-color:#166534}
+  body.dark .mat-img{background:#fff}
+  body.dark .qty-btn{background:#27202a;border-color:#4a2d3a;color:#f48fb1}
+  body.dark .qty-input{background:#1a1018;border-color:#4a2d3a;color:#f0e4ec}
+  body.dark .search-wrap input{background:#27202a;border-color:#4a2d3a;color:#f0e4ec}
+  body.dark .owned-toggle{background:#27202a;border-color:#4a2d3a;color:#f0e4ec}
+  body.dark ::-webkit-scrollbar-track{background:#1a1018}
+  body.dark ::-webkit-scrollbar-thumb{background:#4a2d3a}
 </style>
 
 <nav class="navbar">
@@ -1590,6 +1609,10 @@ body { background:var(--pk-5); color:var(--pk-text); min-height:100vh; }
     if(ev.origin && ev.origin !== location.origin && ev.origin !== 'null') return;
     const msg = ev.data;
     if(!msg) return;
+    if(msg.type === 'NIKKI_DARK_CHANGE'){
+      document.body.classList.toggle('dark', !!msg.dark);
+      return;
+    }
     if(msg.type === 'NIKKI_SERVER_CHANGE'){
       window.NIKKI_SERVER = msg.server;
       refreshNames();
@@ -1600,7 +1623,9 @@ body { background:var(--pk-5); color:var(--pk-text); min-height:100vh; }
   });
 
   // 초기 적용
-  document.addEventListener('DOMContentLoaded', function(){ applyMiLang(window.__MI_LANG); });
+  document.addEventListener('DOMContentLoaded', function(){
+    applyMiLang(window.__MI_LANG);
+  });
 
   function esc(s){ return String(s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 })();

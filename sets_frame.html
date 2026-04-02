@@ -1,6 +1,10 @@
 <!doctype html>
 <html lang="ko">
 <head>
+<script>if(new URLSearchParams(location.search).get('dark')==='1')document.documentElement.setAttribute('data-dark','1');</script>
+<style>[data-dark='1'] body,[data-dark='1'] *{background-color:#1a1018!important;color:#f0e4ec!important;border-color:#4a2d3a!important}</style>
+<script>(function(){if(new URLSearchParams(location.search).get('dark')==='1'){var apply=function(){document.body.classList.add('dark');document.documentElement.removeAttribute('data-dark');};if(document.body)apply();else document.addEventListener('DOMContentLoaded',apply);}})();</script>
+
 <style id="custom-font">
 @font-face {
   font-family: "AngyeongGothic";
@@ -49,6 +53,23 @@
   .card{background:#fff;border:1.5px solid var(--pk-border);border-radius:16px;overflow:hidden;cursor:pointer;box-shadow:var(--pk-shadow);transition:transform .13s,box-shadow .13s,border-color .13s;position:relative}
   .card::before{content:'';display:block;height:3px;background:var(--pk-grad)}
   .card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(233,30,140,.14);border-color:var(--pk-2)}
+  /* 스포일러 카드 */
+  .card.spoiler .thumb{filter:blur(12px) brightness(0.7);transform:scale(1.08);transition:filter .3s,transform .3s}
+  .card.spoiler .meta{filter:blur(5px);transition:filter .3s;user-select:none}
+  .spoiler-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(45,26,34,.72);color:#fff;font-size:13px;font-weight:600;padding:6px 14px;border-radius:999px;pointer-events:none;z-index:5;white-space:nowrap;transition:opacity .3s}
+  /* 스포일러 확인 팝업 */
+  .spoiler-confirm-overlay{display:none;position:fixed;inset:0;background:rgba(45,26,34,.55);z-index:9999;align-items:center;justify-content:center}
+  .spoiler-confirm-overlay.show{display:flex}
+  .spoiler-confirm-box{background:#fff;border-radius:20px;padding:28px 28px 22px;max-width:320px;width:90%;box-shadow:0 20px 60px rgba(233,30,140,.2);text-align:center;display:flex;flex-direction:column;gap:16px}
+  .spoiler-confirm-icon{font-size:36px}
+  .spoiler-confirm-title{font-size:17px;font-weight:600;color:var(--pk-text);line-height:1.4}
+  .spoiler-confirm-desc{font-size:14px;color:var(--pk-muted);line-height:1.5}
+  .spoiler-confirm-btns{display:flex;gap:10px;justify-content:center}
+  .spoiler-confirm-btns button{flex:1;padding:10px 0;border-radius:12px;border:1.5px solid var(--pk-border);font-size:15px;font-weight:600;cursor:pointer;transition:background .13s,color .13s}
+  .spoiler-btn-yes{background:var(--pk-grad);color:#fff;border-color:transparent !important}
+  .spoiler-btn-yes:hover{opacity:.88}
+  .spoiler-btn-no{background:#fff;color:var(--pk-muted)}
+  .spoiler-btn-no:hover{background:var(--pk-4);color:var(--pk-1)}
   .thumb{width:100%;height:220px;object-fit:cover;background:var(--pk-5);display:block}
   .card .meta{padding:10px 10px 12px 10px;display:flex;flex-direction:column;gap:6px}
   /* 완성도 바 */
@@ -154,6 +175,33 @@
   .source-list li{padding:5px 12px;border-radius:999px;background:#fff;border:1.5px solid var(--pk-border);font-weight:500;color:var(--pk-1);font-size:14px;transition:background .13s}
   .source-list li:hover{background:var(--pk-4)}
   .source-list li::before{content:none}
+
+  /* ── 다크모드 ── */
+  body.dark{--pk-5:#1a1018;--pk-text:#f0e4ec;--pk-border:#4a2d3a;--pk-4:#2a1a2a;--pk-muted:#c0849c;background:#1a1018;color:#f0e4ec}
+  body.dark input[type=text]{background:#27202a;border-color:#4a2d3a;color:#f0e4ec}
+  body.dark select{background:#27202a;border-color:#4a2d3a;color:#f0e4ec}
+  body.dark .card{background:#27202a;border-color:#4a2d3a}
+  body.dark .thumb{background:#fff}
+  body.dark .filter-toggle{background:#27202a;border-color:#4a2d3a;color:#c0849c}
+  body.dark .filter-toggle.on{background:var(--pk-grad);border-color:transparent;color:#fff}
+  body.dark .pbtn{background:#27202a;border-color:#4a2d3a;color:#f0e4ec}
+  body.dark .pbtn:hover{background:#2a1a2a}
+  body.dark .pbtn[disabled]:hover{background:#27202a;border-color:#4a2d3a}
+  body.dark .dlg{background:#27202a}
+  body.dark .close{background:#27202a;border-color:#4a2d3a;color:#c0849c}
+  body.dark .close:hover{background:#2a1a2a}
+  body.dark .section{background:#27202a;border-color:#4a2d3a}
+  body.dark .pitem{background:#1a1018;border-color:#4a2d3a}
+  body.dark .pitem:hover{background:#2a1a2a}
+  body.dark .pitem.owned-yes{background:#0a2a14;border-color:#166534}
+  body.dark .pitem.owned-no{background:#2a0a0a;border-color:#7f1d1d}
+  body.dark .spoiler-confirm-box{background:#27202a}
+  body.dark .spoiler-btn-no{background:#27202a;color:#c0849c}
+  body.dark .source-list li{background:#1a1018;border-color:#4a2d3a;color:#f48fb1}
+  body.dark .guideBox{background:#0e1a2a;border-color:#1e3a6a}
+  body.dark .guideBox .body{color:#7dd3f8}
+  body.dark ::-webkit-scrollbar-track{background:#1a1018}
+  body.dark ::-webkit-scrollbar-thumb{background:#4a2d3a}
 </style>
 </head>
 <body>
@@ -261,8 +309,9 @@
     var il = document.getElementById('itemsLoader');
     if(sl) sl.addEventListener('load', function(){ tryReadFrame('setsLoader','sets',300); });
     if(il) il.addEventListener('load', function(){ tryReadFrame('itemsLoader','items',300); });
-    // 추가 안전망: 2초 후에도 SETS가 비어있으면 재시도
     setTimeout(function(){ tryReadFrame('setsLoader','sets',0); tryReadFrame('itemsLoader','items',0); }, 2000);
+    // 다크 상태 요청
+
   });
 })();
 </script>
@@ -600,7 +649,12 @@ function trim(s){ return norm(s).trim(); }
     const frag = document.createDocumentFragment();
     for(const s of pageList){
       const card = document.createElement("div");
-      card.className = "card";
+      // 스포일러 판정: NA서버 → name_en 없으면 스포일러, JP서버 → name_jp 없으면 스포일러
+      const _server = window.NIKKI_SERVER || 'na';
+      const _lang = window.__SF_LANG || 'ko';
+      const isSpoiler = (_server === 'na' && !trim(s.name_en) && !trim(s.name_na))
+                     || (_server === 'jp' && !trim(s.name_jp));
+      card.className = "card" + (isSpoiler ? " spoiler" : "");
       const img = trim(s.thumb) || (Array.isArray(s.images) && s.images[0]) || "";
       const sub = listSubName(s);
 
@@ -655,6 +709,7 @@ function trim(s){ return norm(s).trim(); }
         </div>` : '';
 
       card.innerHTML = `
+        ${isSpoiler ? `<div class="spoiler-badge">🔒 ${_server === 'jp' ? ((_lang === 'en') ? 'Not on JP server' : 'JP 미출시') : ((_lang === 'en') ? 'Not on EN server' : 'EN 미출시')}</div>` : ''}
         ${img ? `<img class="thumb" loading="lazy" decoding="async" src="${img}" alt="">` : `<div class="thumb"></div>`}
         <div class="meta">
           <div class="name">${escapeHtml(listMainName(s))}</div>
@@ -666,7 +721,11 @@ function trim(s){ return norm(s).trim(); }
           ${completionHtml}
         </div>
       `;
-      card.addEventListener("click", ()=>openSet(s));
+      if(isSpoiler){
+        card.addEventListener("click", ()=>showSpoilerConfirm(s));
+      } else {
+        card.addEventListener("click", ()=>openSet(s));
+      }
       frag.appendChild(card);
     }
     grid.appendChild(frag);
@@ -736,7 +795,7 @@ function trim(s){ return norm(s).trim(); }
   }
 
 
-  function openSet(set){
+  window.openSet = function openSet(set){
     if(!set) return;
 
     dlgMain.textContent = displayName(set);
@@ -1241,9 +1300,14 @@ function trim(s){ return norm(s).trim(); }
       return;
     }
 
+    if(msg.type === 'NIKKI_DARK_CHANGE'){
+      document.body.classList.toggle('dark', !!msg.dark);
+      return;
+    }
     if(msg.type === 'NIKKI_LANG_CHANGE'){
       window.__SF_LANG = msg.lang || 'ko';
       if(typeof applySfLang === 'function') applySfLang(window.__SF_LANG);
+      renderList();
       return;
     }
     if(msg.type === 'SETS_OWNED_UPDATE' && Array.isArray(msg.owned)){
@@ -1410,5 +1474,64 @@ function trim(s){ return norm(s).trim(); }
   })();
 </script>
 
+
+<!-- 스포일러 확인 팝업 -->
+<div class="spoiler-confirm-overlay" id="spoilerOverlay">
+  <div class="spoiler-confirm-box">
+    <div class="spoiler-confirm-icon">🔒</div>
+    <div class="spoiler-confirm-title" id="spoilerConfirmTitle">미출시 세트입니다</div>
+    <div class="spoiler-confirm-desc" id="spoilerConfirmDesc">아직 서버에 출시되지 않은 세트예요.<br>그래도 확인하시겠어요?</div>
+    <div class="spoiler-confirm-btns">
+      <button class="spoiler-btn-no" id="spoilerBtnNo">아니오</button>
+      <button class="spoiler-btn-yes" id="spoilerBtnYes">예</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var _pendingSet = null;
+  var overlay = document.getElementById('spoilerOverlay');
+  var btnYes = document.getElementById('spoilerBtnYes');
+  var btnNo = document.getElementById('spoilerBtnNo');
+  var titleEl = document.getElementById('spoilerConfirmTitle');
+  var descEl = document.getElementById('spoilerConfirmDesc');
+
+  window.showSpoilerConfirm = function(s){
+    _pendingSet = s;
+    var lang = window.__SF_LANG || 'ko';
+    var server = window.NIKKI_SERVER || 'na';
+    if(lang === 'en'){
+      titleEl.textContent = server === 'jp' ? 'Not released on JP server' : 'Not released on EN server';
+      descEl.innerHTML = 'This set has not been released yet.<br>Do you still want to view it?';
+      btnYes.textContent = 'Yes';
+      btnNo.textContent = 'No';
+    } else {
+      titleEl.textContent = server === 'jp' ? 'JP 미출시 세트입니다' : 'EN 미출시 세트입니다';
+      descEl.innerHTML = '아직 서버에 출시되지 않은 세트예요.<br>그래도 확인하시겠어요?';
+      btnYes.textContent = '예';
+      btnNo.textContent = '아니오';
+    }
+    overlay.classList.add('show');
+  };
+
+  btnYes.addEventListener('click', function(){
+    overlay.classList.remove('show');
+    if(_pendingSet && typeof openSet === 'function') openSet(_pendingSet);
+    _pendingSet = null;
+  });
+
+  btnNo.addEventListener('click', function(){
+    overlay.classList.remove('show');
+    _pendingSet = null;
+  });
+
+  overlay.addEventListener('click', function(e){
+    if(e.target === overlay){
+      overlay.classList.remove('show');
+      _pendingSet = null;
+    }
+  });
+})();
+</script>
 </body>
 </html>

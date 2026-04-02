@@ -1,6 +1,10 @@
 <!doctype html>
 <html lang="ko">
 <head>
+<script>if(new URLSearchParams(location.search).get('dark')==='1')document.documentElement.setAttribute('data-dark','1');</script>
+<style>[data-dark='1'] body,[data-dark='1'] *{background-color:#1a1018!important;color:#f0e4ec!important;border-color:#4a2d3a!important}</style>
+<script>(function(){if(new URLSearchParams(location.search).get('dark')==='1'){var apply=function(){document.body.classList.add('dark');document.documentElement.removeAttribute('data-dark');};if(document.body)apply();else document.addEventListener('DOMContentLoaded',apply);}})();</script>
+
 <style id="custom-font">
 @font-face {
   font-family: "AngyeongGothic";
@@ -62,6 +66,29 @@
   .badge-craft-no:hover{box-shadow:0 2px 8px rgba(190,18,60,.15)}
   .itembtn.owned-only-on{background:#eaffea;border-color:#cdeccc}
   .itembtn.reform-only-on{background:#fef9c3;border-color:#fde047;color:#92400e}
+  /* ── 다크모드 ── */
+  body.dark{--pk-5:#1a1018;--pk-text:#f0e4ec;--pk-border:#4a2d3a;--pk-4:#2a1a2a;--pk-muted:#c0849c;background:#1a1018;color:#f0e4ec}
+  body.dark .sidebar{background:#27202a;border-color:#4a2d3a}
+  body.dark .side-head{background:linear-gradient(135deg,#27202a,#2a1a2a);border-color:#4a2d3a}
+  body.dark .itembtn{color:#f0e4ec}
+  body.dark .itembtn:hover{background:#2a1a2a;border-color:#4a2d3a}
+  body.dark .badge{background:#3a1a2a;border-color:#4a2d3a;color:#f48fb1}
+  body.dark input,body.dark select,body.dark button{background:#27202a;border-color:#4a2d3a;color:#f0e4ec}
+  body.dark button:hover{background:#2a1a2a;border-color:#4a2d3a}
+  body.dark .card{background:#27202a;border-color:#4a2d3a}
+  body.dark th{background:linear-gradient(135deg,#27202a,#2a1a2a);color:#f48fb1}
+  body.dark td{border-color:#3a1a2a}
+  body.dark tr:hover td{background:#2a1a2a}
+  body.dark .mat-pop{background:#27202a;border-color:#4a2d3a}
+  body.dark .badge-owned{background:#14532d;border-color:#166534;color:#bbf7d0}
+  body.dark .badge-craft-ok{background:#14532d;border-color:#166534;color:#bbf7d0}
+  body.dark .badge-craft-no{background:#3b1a1a;border-color:#7f1d1d;color:#fca5a5}
+  body.dark .itembtn.owned-only-on{background:#14532d;border-color:#166534}
+  body.dark .itembtn.reform-only-on{background:#3b2a00;border-color:#78350f;color:#fcd34d}
+  body.dark ::-webkit-scrollbar-track{background:#1a1018}
+  body.dark ::-webkit-scrollbar-thumb{background:#4a2d3a}
+  body.dark .thumb{background:#fff}
+
 
   /* 재료 팝오버 */
   .mat-pop{
@@ -1041,6 +1068,10 @@ function getItemTags(it){
     if (ev.origin !== location.origin && ev.origin !== 'null') return;
     const msg = ev && ev.data;
     if (!msg || typeof msg !== 'object') return;
+    if(msg.type === 'NIKKI_DARK_CHANGE'){
+      document.body.classList.toggle('dark', !!msg.dark);
+      return;
+    }
     if(msg.type === 'NIKKI_SERVER_CHANGE'){
       window.NIKKI_SERVER = msg.server;
       // 서버 변경 시 _owned 전체 재계산

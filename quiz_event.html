@@ -1,6 +1,10 @@
 <!doctype html>
 <html lang="ko">
 <head>
+<script>if(new URLSearchParams(location.search).get('dark')==='1')document.documentElement.setAttribute('data-dark','1');</script>
+<style>[data-dark='1'] body,[data-dark='1'] *{background-color:#1a1018!important;color:#f0e4ec!important;border-color:#4a2d3a!important}</style>
+<script>(function(){if(new URLSearchParams(location.search).get('dark')==='1'){var apply=function(){document.body.classList.add('dark');document.documentElement.removeAttribute('data-dark');};if(document.body)apply();else document.addEventListener('DOMContentLoaded',apply);}})();</script>
+
 <style id="custom-font">
 @font-face {
   font-family: "AngyeongGothic";
@@ -133,6 +137,21 @@
 
   /* 빈 상태 */
   .empty{color:var(--pk-muted);padding:24px 16px;text-align:center;font-size:17px}
+
+  /* ── 다크모드 ── */
+  body.dark{--pk-5:#1a1018;--pk-text:#f0e4ec;--pk-border:#4a2d3a;--pk-4:#2a1a2a;--pk-muted:#c0849c;background:#1a1018;color:#f0e4ec}
+  body.dark header{background:#27202a;border-color:#4a2d3a}
+  body.dark .card{background:#27202a;border-color:#4a2d3a}
+  body.dark .choice{background:#1a1018;border-color:#4a2d3a;color:#f0e4ec}
+  body.dark .choice:hover{background:#2a1a2a}
+  body.dark .answer{background:linear-gradient(135deg,#2a1a2a,#27202a);border-color:#4a2d3a}
+  body.dark summary{background:#2a1a2a;border-color:#4a2d3a}
+  body.dark summary:hover{background:#3a1a2a;border-color:var(--pk-2)}
+  body.dark input[type=text]{background:#27202a;border-color:#4a2d3a;color:#f0e4ec}
+  body.dark button{background:#27202a;border-color:#4a2d3a;color:#f0e4ec}
+  body.dark button:hover{background:#2a1a2a;border-color:var(--pk-2)}
+  body.dark ::-webkit-scrollbar-track{background:#1a1018}
+  body.dark ::-webkit-scrollbar-thumb{background:#4a2d3a}
 </style>
 </head>
 <body>
@@ -3945,7 +3964,7 @@ render(QUIZ_QUESTIONS.slice());
 window.__QZ_LANG = (function(){ try{ return window.parent.UI_LANG||localStorage.getItem('nikki_ui_lang')||'ko'; }catch(e){ return 'ko'; } })();
 
 var QZ_EN = {
-  qz_title: 'Quiz Event',
+  qz_title: 'Miraland Quiz',
   qSearch_ph: 'Search (title/content)',
   btnExpand: 'Expand All',
   btnCollapse: 'Collapse All',
@@ -3978,9 +3997,15 @@ function applyQzLang(lang){
 window.addEventListener('message', function(ev){
   if(ev.origin!==location.origin && ev.origin!=='null') return;
   var msg = ev.data;
-  if(!msg || msg.type!=='NIKKI_LANG_CHANGE') return;
+  if(!msg || typeof msg !== 'object') return;
+  if(msg.type === 'NIKKI_DARK_CHANGE'){
+    document.body.classList.toggle('dark', !!msg.dark);
+    return;
+  }
+  if(msg.type !== 'NIKKI_LANG_CHANGE') return;
   applyQzLang(msg.lang||'ko');
 });
+
 
 // 초기 언어 적용
 applyQzLang(window.__QZ_LANG);

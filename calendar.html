@@ -1,4 +1,8 @@
 <!doctype html>
+<script>if(new URLSearchParams(location.search).get('dark')==='1')document.documentElement.setAttribute('data-dark','1');</script>
+<style>[data-dark='1'] body,[data-dark='1'] *{background-color:#1a1018!important;color:#f0e4ec!important;border-color:#4a2d3a!important}</style>
+<script>(function(){if(new URLSearchParams(location.search).get('dark')==='1'){var apply=function(){document.body.classList.add('dark');document.documentElement.removeAttribute('data-dark');};if(document.body)apply();else document.addEventListener('DOMContentLoaded',apply);}})();</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=0.5,maximum-scale=5,user-scalable=yes">
 <title>이벤트 달력</title>
@@ -83,6 +87,10 @@ select:focus{outline:none;border-color:var(--p2)}
 .mrow{display:flex;gap:6px;align-items:flex-start;margin-bottom:7px;font-size:13px}
 .mlbl2{font-weight:700;color:var(--p1);min-width:52px;flex-shrink:0;font-size:11px;padding-top:1px}
 .mnote{margin-top:9px;padding:9px 11px;border-radius:9px;background:var(--p5);border:1px solid var(--pb);font-size:12px;line-height:1.6;white-space:pre-wrap}
+.ntab{padding:5px 11px;border-radius:999px;border:1.5px solid var(--pb);background:#fff;font-size:12px;font-weight:600;color:var(--pm);cursor:pointer;transition:background .13s,color .13s}
+.ntab.on{background:var(--p1);color:#fff;border-color:transparent}
+.ntab:hover:not(.on){background:var(--p5);color:var(--p1)}
+.ntab.disabled{opacity:.35;cursor:default}
 .macts{display:flex;gap:7px;margin-top:12px;justify-content:flex-end}
 .bdel{padding:6px 12px;border-radius:9px;border:1.5px solid #fca5a5;background:#fff5f5;color:#dc2626;font-weight:600;font-size:12px;cursor:pointer}
 .bdel:hover{background:#fee2e2}
@@ -109,6 +117,27 @@ select:focus{outline:none;border-color:var(--p2)}
   /* 모바일: 이벤트 카드 1개씩 세로로 */
   .ev-card{flex:0 0 100% !important;min-width:0 !important}
 }
+
+/* ── 다크모드 ── */
+body.dark{background:#1a1018;color:#f0e4ec}
+body.dark .bar{background:#27202a;border-color:#4a2d3a}
+body.dark .cell{background:#27202a;border-color:#4a2d3a}
+body.dark .cell.om{background:#1a1018}
+body.dark .tbtn{background:#27202a;border-color:#4a2d3a;color:#f48fb1}
+body.dark .mnav button{background:#27202a;border-color:#4a2d3a;color:#f48fb1}
+body.dark select{background:#27202a;border-color:#4a2d3a;color:#f0e4ec}
+body.dark .vtog button{background:#27202a;border-color:#4a2d3a;color:#f0e4ec}
+body.dark .litem{background:#27202a;border-color:#4a2d3a}
+body.dark .litem:hover{border-color:#f48fb1}
+body.dark .modal{background:#27202a;border-color:#4a2d3a}
+body.dark .mcls{background:#27202a;border-color:#4a2d3a;color:#c0849c}
+body.dark .ntab{background:#27202a;border-color:#4a2d3a;color:#c0849c}
+body.dark .fg input,body.dark .fg select,body.dark .fg textarea{background:#1a1018;border-color:#4a2d3a;color:#f0e4ec}
+body.dark .bcan{background:#27202a;border-color:#4a2d3a;color:#f0e4ec}
+body.dark .mnote{background:#1a1018;border-color:#4a2d3a}
+body.dark .set-btn{background:#2a1a2a;border-color:#4a2d3a;color:#f48fb1}
+body.dark .mimg{background:#fff}
+body.dark .ev-img-ph{background:#2a1a2a}
 </style>
 
 <div class="bar">
@@ -122,7 +151,7 @@ select:focus{outline:none;border-color:var(--p2)}
   <select id="fSrv">
     <option value="">전체 서버</option>
     <option value="jp">🇯🇵 일본</option>
-    <option value="na">🌎 북미</option>
+    <option value="na" selected>🌎 북미</option>
     <option value="all">공통</option>
   </select>
   <div class="vtog" id="statusTog">
@@ -155,7 +184,14 @@ select:focus{outline:none;border-color:var(--p2)}
       <div class="mrow"><span class="mlbl2">서버</span><span id="dsrv"></span></div>
 
       <div class="mrow" id="dsetsrow" style="display:none"><span class="mlbl2">관련 세트</span><div id="dsets" style="display:flex;flex-wrap:wrap;gap:6px"></div></div>
-      <div id="dnote" class="mnote" style="display:none"></div>
+      <!-- 이벤트 설명 탭 -->
+      <div id="noteTabWrap" style="display:none;margin-top:9px">
+        <div id="noteTabBtns" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+          <button class="ntab on" id="ntabOriginal" data-tab="original">🌎 EN Original</button>
+          <button class="ntab" id="ntabKorean" data-tab="korean">Korean</button>
+        </div>
+        <div id="noteTabContent" class="mnote"></div>
+      </div>
       <div class="macts">
         <button class="bdel" id="bdel">삭제</button>
         <button class="bedit" id="bedit">편집</button>
@@ -169,18 +205,18 @@ select:focus{outline:none;border-color:var(--p2)}
   <div class="modal">
     <div class="mhd"><h3 id="ftitle">이벤트 추가</h3><button class="mcls" id="fcls">✕</button></div>
     <div class="mbody">
-      <div class="fg"><label>이름</label><input type="text" id="fname"></div>
+      <div class="fg"><label id="flblName">이름</label><input type="text" id="fname"></div>
       <div class="fr">
-        <div class="fg"><label>시작일</label><input type="date" id="fstart"></div>
-        <div class="fg"><label>종료일</label><input type="date" id="fend"></div>
+        <div class="fg"><label id="flblStart">시작일</label><input type="date" id="fstart"></div>
+        <div class="fg"><label id="flblEnd">종료일</label><input type="date" id="fend"></div>
       </div>
-      <div class="fg"><label>서버</label>
-        <select id="fsrv2"><option value="jp">🇯🇵 일본</option><option value="na">🌎 북미</option><option value="all">공통</option></select>
+      <div class="fg"><label id="flblSrv">서버</label>
+        <select id="fsrv2"><option value="jp">🇯🇵 일본</option><option value="na" selected>🌎 북미</option><option value="all">공통</option></select>
       </div>
-      <div class="fg"><label>이미지 URL (선택)</label><input type="text" id="fimg" placeholder="https://..."></div>
-      <div class="fg"><label>관련 세트 (쉼표로 구분)</label><input type="text" id="fsets" placeholder="예: Stubborn Knight, Golden Knight"></div>
-      <div class="fg"><label>설명/노트</label><textarea id="fnote"></textarea></div>
-      <div class="fg"><label>색상</label><div class="cchips" id="cchips"></div><input type="hidden" id="fcolor" value="#f57f17"></div>
+      <div class="fg"><label id="flblImg">이미지 URL (선택)</label><input type="text" id="fimg" placeholder="https://..."></div>
+      <div class="fg"><label id="flblSets">관련 세트 (쉼표로 구분)</label><input type="text" id="fsets" placeholder="예: Stubborn Knight, Golden Knight"></div>
+      <div class="fg"><label id="flblNote">설명/노트</label><textarea id="fnote"></textarea></div>
+      <div class="fg"><label id="flblColor">색상</label><div class="cchips" id="cchips"></div><input type="hidden" id="fcolor" value="#f57f17"></div>
       <div class="facts"><button class="bcan" id="fcan">취소</button><button class="bsave" id="fsave">저장</button></div>
     </div>
   </div>
@@ -410,7 +446,11 @@ var editId = null;
 function pad(n){ return String(n).padStart(2,'0'); }
 function esc(s){ return String(s||'').replace(/[&<>"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];}); }
 function fmt(d){ if(!d)return''; var p=d.split('-'); return p[0]+'.'+p[1]+'.'+p[2]; }
-function srvLabel(id){ return id==='jp'?'🇯🇵 일본':id==='na'?'🌎 북미':'공통'; }
+function srvLabel(id){
+  var l = window.__CAL_LANG || 'en';
+  if(l==='en') return id==='jp'?'🇯🇵 Japan':id==='na'?'🌎 North America':'Global';
+  return id==='jp'?'🇯🇵 일본':id==='na'?'🌎 북미':'공통';
+}
 function srvCss(id){ return id==='jp'?'sj':id==='na'?'sn':'sa'; }
 
 var curStatus = '';
@@ -506,11 +546,11 @@ function renderCal(){
       if(ev.img){
         evCards += '<div data-id="'+ev.id+'" class="ev-card" style="flex:0 0 calc('+cardW+'% - 2px);min-width:0;cursor:pointer;border-radius:6px;overflow:hidden;border-bottom:3px solid '+col+'">'
           +'<img src="'+ev.img+'" alt="" style="width:100%;height:60px;object-fit:cover;object-position:center;display:block" onerror="this.style.display=\'none\'">'
-          +'<div style="background:'+col+';padding:2px 4px;font-size:9px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(ev.name)+'</div>'
+          +'<div style="background:'+col+';padding:2px 4px;font-size:9px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(evDisplayName(ev))+'</div>'
           +'</div>';
       } else {
         evCards += '<div data-id="'+ev.id+'" class="ev-card evbtn '+pos+'" style="flex:0 0 calc('+cardW+'% - 2px);min-width:0;cursor:pointer;background:'+col+';height:18px;display:flex;align-items:center;border-radius:4px">'
-          +'<span style="font-size:9px;font-weight:700;color:#fff;padding:0 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(ev.name)+'</span>'
+          +'<span style="font-size:9px;font-weight:700;color:#fff;padding:0 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(evDisplayName(ev))+'</span>'
           +'</div>';
       }
     }
@@ -557,8 +597,9 @@ function renderList(){
     var th=ev.img?'<img class="lth" src="'+esc(ev.img)+'" alt="" onerror="this.style.display=\'none\'">':'<div class="lph" style="background:'+col+'22">🌸</div>';
     var today2=new Date(); today2.setHours(0,0,0,0);
     var s2=new Date(ev.start+'T00:00:00'); var e2=new Date(ev.end+'T00:00:00');
-    var stLabel=e2<today2?'<span class="badge" style="background:#f5f5f5;color:#999;border-color:#ddd">종료</span>':s2<=today2?'<span class="badge" style="background:#e8f5e9;color:#2e7d32;border-color:#c8e6c9">진행중</span>':'<span class="badge" style="background:#fff8e1;color:#f57f17;border-color:#ffe082">예정</span>';
-    return '<div class="litem" data-id="'+ev.id+'">'+th+'<div><div style="font-weight:700;font-size:13px;margin-bottom:2px">'+esc(ev.name)+(ev.nameEn&&ev.nameEn!==ev.name?' <span style="font-size:11px;color:var(--pm)">'+esc(ev.nameEn)+'</span>':'')+'</div><div style="font-size:11px;color:var(--pm);margin-bottom:3px">'+fmt(ev.start)+' ~ '+fmt(ev.end)+'</div>'+stLabel+' <span class="badge '+srvCss(ev.server)+'">'+srvLabel(ev.server)+'</span></div></div>';
+    var _cl = window.__CAL_LANG||'en';
+    var stLabel=e2<today2?'<span class="badge" style="background:#f5f5f5;color:#999;border-color:#ddd">'+(_cl==='en'?'Ended':'종료')+'</span>':s2<=today2?'<span class="badge" style="background:#e8f5e9;color:#2e7d32;border-color:#c8e6c9">'+(_cl==='en'?'Active':'진행중')+'</span>':'<span class="badge" style="background:#fff8e1;color:#f57f17;border-color:#ffe082">'+(_cl==='en'?'Upcoming':'예정')+'</span>';
+    return '<div class="litem" data-id="'+ev.id+'">'+th+'<div><div style="font-weight:700;font-size:13px;margin-bottom:2px">'+esc(evDisplayName(ev))+(ev.nameEn&&ev.nameEn!==ev.name&&(window.__CAL_LANG||'en')!=='en'?' <span style="font-size:11px;color:var(--pm)">'+esc(ev.nameEn)+'</span>':'')+'</div><div style="font-size:11px;color:var(--pm);margin-bottom:3px">'+fmt(ev.start)+' ~ '+fmt(ev.end)+'</div>'+stLabel+' <span class="badge '+srvCss(ev.server)+'">'+srvLabel(ev.server)+'</span></div></div>';
   }).join('');
   el.querySelectorAll('.litem').forEach(function(el2){ el2.addEventListener('click',function(){ openDetail(el2.dataset.id); }); });
 }
@@ -566,7 +607,13 @@ function renderList(){
 function openDetail(id){
   var ev=EVENTS.find(function(e){return e.id===id;});
   if(!ev) return;
-  document.getElementById('dname').textContent=ev.name;
+  document.getElementById('dname').textContent=evDisplayName(ev);
+  var _cl2 = window.__CAL_LANG||'en';
+  var lbl2s = document.querySelectorAll('.mlbl2');
+  var lbl2Texts = _cl2==='en' ? ['Period','Server','Related Sets'] : ['기간','서버','관련 세트'];
+  lbl2s.forEach(function(el,i){ if(lbl2Texts[i]) el.textContent = lbl2Texts[i]; });
+  document.getElementById('bdel').textContent = _cl2==='en'?'Delete':'삭제';
+  document.getElementById('bedit').textContent = _cl2==='en'?'Edit':'편집';
   document.getElementById('ddate').textContent=fmt(ev.start)+' ~ '+fmt(ev.end);
   document.getElementById('dsrv').innerHTML='<span class="badge '+srvCss(ev.server)+'">'+srvLabel(ev.server)+'</span>';
 
@@ -588,8 +635,48 @@ function openDetail(id){
       });
     }, 0);
   } else { setsrow.style.display='none'; }
-  var nt=document.getElementById('dnote');
-  if(ev.note){nt.textContent=ev.note;nt.style.display='block';}else nt.style.display='none';
+  // 설명 탭
+  var noteWrap = document.getElementById('noteTabWrap');
+  var noteContent = document.getElementById('noteTabContent');
+  var server = window.NIKKI_SERVER || 'na';
+  var calLang = window.__CAL_LANG || 'en';
+  // 서버에 따라 원문/한국어 결정
+  var originalText = server === 'jp' ? (ev.noteJp||'') : (ev.noteEn||'');
+  var koreanText   = server === 'jp' ? (ev.noteJpKr||ev.note||'') : (ev.note||'');
+  var hasAny = (originalText.trim() || koreanText.trim());
+  // 탭 버튼 라벨 업데이트
+  var ntabOrig = document.getElementById('ntabOriginal');
+  var ntabKr   = document.getElementById('ntabKorean');
+  if(ntabOrig) ntabOrig.textContent = server === 'jp'
+    ? (calLang==='en' ? '🇯🇵 JP Original' : '🇯🇵 JP 원문')
+    : (calLang==='en' ? '🌎 EN Original' : '🌎 EN 원문');
+  if(ntabKr) ntabKr.textContent = calLang==='en' ? 'Korean' : '한국어';
+  // 비활성화 처리
+  if(ntabOrig) ntabOrig.classList.toggle('disabled', !originalText.trim());
+  if(ntabKr)   ntabKr.classList.toggle('disabled',   !koreanText.trim());
+  if(hasAny){
+    noteWrap.style.display='block';
+    // 첫 번째 유효한 탭 선택
+    var showOriginal = !!originalText.trim();
+    document.querySelectorAll('.ntab').forEach(function(b){ b.classList.remove('on'); });
+    if(showOriginal){ if(ntabOrig) ntabOrig.classList.add('on'); noteContent.textContent = originalText; }
+    else            { if(ntabKr)   ntabKr.classList.add('on');   noteContent.textContent = koreanText; }
+    // 탭 클릭 이벤트
+    if(ntabOrig) ntabOrig.onclick = function(){
+      if(ntabOrig.classList.contains('disabled')) return;
+      document.querySelectorAll('.ntab').forEach(function(b){ b.classList.remove('on'); });
+      ntabOrig.classList.add('on');
+      noteContent.textContent = originalText;
+    };
+    if(ntabKr) ntabKr.onclick = function(){
+      if(ntabKr.classList.contains('disabled')) return;
+      document.querySelectorAll('.ntab').forEach(function(b){ b.classList.remove('on'); });
+      ntabKr.classList.add('on');
+      noteContent.textContent = koreanText;
+    };
+  } else {
+    noteWrap.style.display='none';
+  }
   document.getElementById('bdel').dataset.id=id;
   document.getElementById('bedit').dataset.id=id;
   document.getElementById('dbd').classList.remove('h');
@@ -613,7 +700,8 @@ function setChip(col){ document.getElementById('cchips').querySelectorAll('.cc')
 
 function openForm(ev){
   editId=ev?ev.id:null;
-  document.getElementById('ftitle').textContent=ev?'이벤트 편집':'이벤트 추가';
+  var _cl3 = window.__CAL_LANG||'en';
+  document.getElementById('ftitle').textContent=ev?(_cl3==='en'?'Edit Event':'이벤트 편집'):(_cl3==='en'?'Add Event':'이벤트 추가');
   document.getElementById('fname').value=ev?ev.name:'';
 
   document.getElementById('fstart').value=ev?ev.start:'';
@@ -631,8 +719,8 @@ function saveForm(){
   var name=document.getElementById('fname').value.trim();
   var start=document.getElementById('fstart').value;
   var end=document.getElementById('fend').value;
-  if(!name||!start||!end){alert('이름, 시작일, 종료일은 필수예요');return;}
-  if(start>end){alert('종료일이 시작일보다 빨라요');return;}
+  if(!name||!start||!end){alert(window.__CAL_LANG==='en'?'Name, start date, and end date are required.':'이름, 시작일, 종료일은 필수예요');return;}
+  if(start>end){alert(window.__CAL_LANG==='en'?'End date cannot be before start date.':'종료일이 시작일보다 빨라요');return;}
   var setsRaw=document.getElementById('fsets').value.trim();
   var sets=setsRaw?setsRaw.split(',').map(function(s){return s.trim();}).filter(Boolean):[];
   var ev={id:editId||uid(),name:name,nameEn:'',start:start,end:end,server:document.getElementById('fsrv2').value,img:document.getElementById('fimg').value.trim(),note:document.getElementById('fnote').value.trim(),color:document.getElementById('fcolor').value,sets:sets};
@@ -658,13 +746,110 @@ function openSetById(setId, setName){
     }
   }catch(e){}
 }
-function delEv(id){if(!confirm('삭제할까요?'))return;EVENTS=EVENTS.filter(function(e){return e.id!==id;});closeDetail();renderCal();renderList();}
+function delEv(id){if(!confirm(window.__CAL_LANG==='en'?'Delete this event?':'삭제할까요?'))return;EVENTS=EVENTS.filter(function(e){return e.id!==id;});closeDetail();renderCal();renderList();}
 
 function showCal(){document.getElementById('cv').classList.remove('off');document.getElementById('lv').classList.remove('on');document.getElementById('bCal').classList.add('on');document.getElementById('bList').classList.remove('on');}
 function showList(){document.getElementById('cv').classList.add('off');document.getElementById('lv').classList.add('on');document.getElementById('bList').classList.add('on');document.getElementById('bCal').classList.remove('on');renderList();}
 
+// 언어 설정
+function getCalLang(){
+  try{ return window.parent.UI_LANG || localStorage.getItem('nikki_ui_lang') || 'en'; }catch(e){ return 'en'; }
+}
+window.__CAL_LANG = getCalLang();
+
+// 부모로부터 언어 변경 수신
+window.addEventListener('message', function(e){
+  if(e.data && e.data.type === 'NIKKI_DARK_CHANGE'){
+    document.body.classList.toggle('dark', !!e.data.dark);
+    return;
+  }
+  if(e.data && e.data.type === 'NIKKI_LANG_CHANGE'){
+    window.__CAL_LANG = e.data.lang || 'en';
+    applyCalLang();
+    renderCal();
+    if(document.getElementById('lv').classList.contains('on')) renderList();
+  }
+});
+
+function t(ko, en){
+  return window.__CAL_LANG === 'en' ? en : ko;
+}
+
+function evDisplayName(ev){
+  var l = window.__CAL_LANG || 'en';
+  if(l === 'en' && ev.nameEn && ev.nameEn.trim()) return ev.nameEn;
+  return ev.name;
+}
+
+function applyCalLang(){
+  var l = window.__CAL_LANG;
+  document.documentElement.lang = l === 'en' ? 'en' : 'ko';
+  // 헤더
+  document.querySelector('h2').textContent = l==='en' ? '🌸 Event Calendar' : '🌸 이벤트 달력';
+  // 오늘 버튼
+  document.getElementById('bToday').textContent = l==='en' ? 'Today' : '오늘';
+  // 서버 필터
+  var fSrv = document.getElementById('fSrv');
+  fSrv.options[0].text = l==='en' ? 'All servers' : '전체 서버';
+  fSrv.options[1].text = l==='en' ? '🇯🇵 Japan' : '🇯🇵 일본';
+  fSrv.options[2].text = l==='en' ? '🌎 North America' : '🌎 북미';
+  fSrv.options[3].text = l==='en' ? 'Global' : '공통';
+  // 상태 토글
+  var stBtns = document.querySelectorAll('#statusTog [data-st]');
+  var stLabels = l==='en' ? ['All','Active','Ended'] : ['전체','진행중','종료됨'];
+  stBtns.forEach(function(b,i){ b.textContent = stLabels[i]; });
+  // 추가 버튼
+  document.getElementById('bAdd').textContent = l==='en' ? '+ Add' : '+ 추가';
+  // 상세 팝업 라벨
+  var lbl2s = document.querySelectorAll('.mlbl2');
+  var lbl2Texts = l==='en' ? ['Period','Server','Related Sets'] : ['기간','서버','관련 세트'];
+  lbl2s.forEach(function(el,i){ if(lbl2Texts[i]) el.textContent = lbl2Texts[i]; });
+  // 상세 버튼
+  var bdel = document.getElementById('bdel');
+  var bedit = document.getElementById('bedit');
+  if(bdel) bdel.textContent = l==='en' ? 'Delete' : '삭제';
+  if(bedit) bedit.textContent = l==='en' ? 'Edit' : '편집';
+  // 폼 모달
+  document.getElementById('ftitle').textContent = l==='en' ? 'Add Event' : '이벤트 추가';
+  // 노트 탭 버튼
+  // 탭 라벨은 openDetail에서 서버+언어 기준으로 동적 처리
+  // 폼 라벨
+  var flblName = document.getElementById('flblName');
+  var flblStart = document.getElementById('flblStart');
+  var flblEnd = document.getElementById('flblEnd');
+  var flblSrv = document.getElementById('flblSrv');
+  var flblSets = document.getElementById('flblSets');
+  if(flblName) flblName.textContent = l==='en'?'Name':'이름';
+  if(flblStart) flblStart.textContent = l==='en'?'Start Date':'시작일';
+  if(flblEnd) flblEnd.textContent = l==='en'?'End Date':'종료일';
+  if(flblSrv) flblSrv.textContent = l==='en'?'Server':'서버';
+  if(flblSets) flblSets.textContent = l==='en'?'Related Sets (comma separated)':'관련 세트 (쉼표로 구분)';
+  // 폼 버튼
+  var fcan = document.getElementById('fcan');
+  var fsave = document.getElementById('fsave');
+  if(fcan) fcan.textContent = l==='en'?'Cancel':'취소';
+  if(fsave) fsave.textContent = l==='en'?'Save':'저장';
+  var flblImg = document.getElementById('flblImg');
+  var flblNote = document.getElementById('flblNote');
+  var flblColor = document.getElementById('flblColor');
+  var fimg = document.getElementById('fimg');
+  var fsrv2 = document.getElementById('fsrv2');
+  if(flblImg) flblImg.textContent = l==='en'?'Image URL (optional)':'이미지 URL (선택)';
+  if(flblNote) flblNote.textContent = l==='en'?'Description/Note':'설명/노트';
+  if(flblColor) flblColor.textContent = l==='en'?'Color':'색상';
+  if(fimg) fimg.placeholder = 'https://...';
+  if(fsrv2){
+    fsrv2.options[0].text = l==='en'?'🇯🇵 Japan':'🇯🇵 일본';
+    fsrv2.options[1].text = l==='en'?'🌎 North America':'🌎 북미';
+    fsrv2.options[2].text = l==='en'?'Global':'공통';
+  }
+  var fsets = document.getElementById('fsets');
+  if(fsets) fsets.placeholder = l==='en'?'e.g. Stubborn Knight, Golden Knight':'예: Stubborn Knight, Golden Knight';
+}
+
 // 초기화
 renderCal();
+applyCalLang();
 
 document.getElementById('bPrev').addEventListener('click',function(){curM--;if(curM<0){curM=11;curY--;}renderCal();if(document.getElementById('lv').classList.contains('on')) renderList();});
 document.getElementById('bNext').addEventListener('click',function(){curM++;if(curM>11){curM=0;curY++;}renderCal();if(document.getElementById('lv').classList.contains('on')) renderList();});

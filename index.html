@@ -96,7 +96,7 @@ const PART_WEIGHTS = {
 }
 /* ── 기본 ── */
 *{box-sizing:border-box}
-body{font-family:'Nunito','Apple SD Gothic Neo',system-ui,sans-serif;margin:0;background:var(--pk-5);color:var(--pk-text)}
+body{font-family:'Nunito','Apple SD Gothic Neo',system-ui,sans-serif;margin:0;background:var(--pk-5);color:var(--pk-text);transition:background .2s,color .2s}
 h1{margin:0 0 6px 0;font-size:24px}
 
 /* ── 배너 헤더 ── */
@@ -135,7 +135,7 @@ h1{margin:0 0 6px 0;font-size:24px}
 nav.tabs{
   display:flex;gap:6px;padding:10px 20px;
   border-bottom:1px solid var(--pk-border);
-  background:#fff;position:sticky;top:80px;z-index:2;
+  background:var(--nav-bg, #fff);position:sticky;top:80px;z-index:2;
   justify-content:flex-start;
   box-shadow:0 2px 8px rgba(233,30,140,.06);
 }
@@ -160,7 +160,7 @@ nav.tabs{
 /* ── 컨트롤 바 ── */
 #controls{
   display:flex;gap:12px;align-items:end;flex-wrap:wrap;
-  padding:10px 20px;background:#fff8fa;
+  padding:10px 20px;background:var(--nav-bg, #fff8fa);
   position:sticky;top:138px;z-index:1;
   border-bottom:1px solid var(--pk-border);
 }
@@ -184,7 +184,7 @@ button:hover{background:var(--pk-4);border-color:var(--pk-3)}
   box-shadow:0 1px 4px rgba(233,30,140,.06);
   display:flex;flex-direction:column;gap:8px;
   position:relative;overflow:hidden;
-  transition:transform .15s,box-shadow .15s;
+  transition:transform .15s,box-shadow .15s,background .2s,border-color .2s;
 }
 .card::before{
   content:'';position:absolute;top:0;left:0;right:0;height:3px;
@@ -265,7 +265,7 @@ tbody tr:hover{background:#fff5f8}
 .skill{display:inline-block;margin:4px 6px 0 0;padding:5px 10px;background:var(--pk-4);border:1px solid var(--pk-border);border-radius:999px;font-size:14px;color:var(--pk-1)}
 .pill-small{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--pk-border);border-radius:999px;font-size:14px;background:#fff;cursor:pointer;color:var(--pk-text)}
 .pill-small .k{opacity:.75}
-.pill-small .v{font-weight:500}
+.pill-small .v{font-weight:500;color:var(--pk-1)}
 .partbar .pill-small:hover{background:var(--pk-4);border-color:var(--pk-2)}
 .small{font-size:14px}
 .partbar-wrap .muted.small{font-size:14px;color:var(--pk-muted)}
@@ -273,7 +273,7 @@ tbody tr:hover{background:#fff5f8}
 .gtab.is-on{background:var(--pk-4);border-color:var(--pk-2)}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border:1px solid var(--pk-border);border-radius:999px;font-size:14px;background:#fff;cursor:pointer;color:var(--pk-text)}
 .chip .k{opacity:.75}
-.chip .v{font-weight:500}
+.chip .v{font-weight:500;color:var(--pk-1)}
 .chip:hover{background:var(--pk-4);border-color:var(--pk-2)}
 #partFilter option.groupHdr{font-weight:500}
 .tag-bar{padding:0 20px 8px 20px}
@@ -388,6 +388,175 @@ tbody tr:hover{background:#fff5f8}
 /* === End: Harden getFilteredList === */
 </script>
 <style>
+/* ── 공지 버튼 바 ── */
+#noticeBar{
+  display:flex;gap:8px;
+  padding:10px 20px 0 20px;
+  flex-wrap:wrap;
+}
+.nbar-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 16px;
+  border:1.5px solid var(--pk-border);
+  border-radius:999px;
+  background:#fff;
+  color:var(--pk-1);
+  font-size:14px;font-weight:600;
+  cursor:pointer;font-family:inherit;
+  transition:background .15s,border-color .15s,box-shadow .15s,transform .1s;
+  white-space:nowrap;
+}
+.nbar-btn:hover{
+  background:var(--pk-4);
+  border-color:var(--pk-2);
+  box-shadow:0 2px 8px rgba(233,30,140,.12);
+  transform:translateY(-1px);
+}
+.nbar-icon{ font-size:15px; }
+/* ── 모달 오버레이 ── */
+#noticeModalOverlay{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(45,26,34,.38);
+  z-index:9000;
+  align-items:center;justify-content:center;
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+  animation:nmFadeIn .18s ease;
+}
+#noticeModalOverlay.nm-open{ display:flex; }
+@keyframes nmFadeIn{ from{opacity:0} to{opacity:1} }
+/* ── 모달 창 ── */
+#noticeModal{
+  background:#fff;
+  border:1.5px solid var(--pk-border);
+  border-radius:18px;
+  box-shadow:0 8px 40px rgba(233,30,140,.18);
+  width:min(480px,92vw);
+  max-height:80vh;
+  display:flex;flex-direction:column;
+  animation:nmSlideUp .2s ease;
+  overflow:hidden;
+}
+@keyframes nmSlideUp{ from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+#noticeModalHeader{
+  display:flex;align-items:center;
+  padding:14px 18px 12px;
+  border-bottom:1px solid var(--pk-border);
+  background:linear-gradient(90deg,#fce4ec,#fff5f8);
+  flex-shrink:0;
+}
+#noticeModalTitle{
+  flex:1;font-size:16px;font-weight:700;color:var(--pk-1);
+}
+#noticeModalClose{
+  background:none;border:none;cursor:pointer;
+  font-size:18px;color:var(--pk-muted);padding:2px 6px;
+  border-radius:999px;line-height:1;font-family:inherit;
+  transition:background .12s,color .12s;
+}
+#noticeModalClose:hover{ background:var(--pk-4);color:var(--pk-1); }
+#noticeModalBody{
+  overflow-y:auto;padding:12px 18px 16px;
+  flex:1;
+}
+.nmodal-panel{ }
+/* ── 공지 아이템 (모달 안) ── */
+.notice-item{
+  display:flex;gap:8px;align-items:flex-start;
+  padding:8px 0;border-bottom:1px solid var(--pk-4);
+  font-size:14px;line-height:1.55;
+}
+.notice-item:last-child{border-bottom:none;padding-bottom:0}
+.notice-item .n-date{
+  flex-shrink:0;font-size:12px;color:var(--pk-muted);
+  padding-top:2px;min-width:62px;white-space:nowrap;
+}
+.notice-item .n-badge{
+  flex-shrink:0;font-size:11px;font-weight:700;
+  padding:2px 7px;border-radius:999px;
+  white-space:nowrap;margin-top:2px;
+}
+.nbadge-new{background:#e91e8c;color:#fff}
+.nbadge-update{background:#ff7043;color:#fff}
+.nbadge-fix{background:#7e57c2;color:#fff}
+.nbadge-info{background:#29b6f6;color:#fff}
+.notice-item .n-text{flex:1;color:var(--pk-text)}
+.notice-item .n-text strong{color:var(--pk-1)}
+/* ── 가이드 모달 내부 탭 ── */
+.guide-tabs{
+  display:flex;gap:4px;flex-wrap:wrap;
+  padding-bottom:10px;margin-bottom:10px;
+  border-bottom:1px solid var(--pk-border);
+}
+.gtab-btn{
+  padding:4px 11px;border-radius:999px;
+  border:1.5px solid var(--pk-border);
+  background:#fff;color:var(--pk-1);
+  font-size:12px;font-weight:600;cursor:pointer;
+  font-family:inherit;transition:all .13s;white-space:nowrap;
+}
+.gtab-btn:hover{ background:var(--pk-4);border-color:var(--pk-2); }
+.gtab-btn.active{ background:var(--pk-grad);border-color:transparent;color:#fff; }
+/* 가이드 섹션 공통 */
+.guide-intro{
+  font-size:14px;font-weight:600;color:var(--pk-1);
+  margin-bottom:8px;line-height:1.5;
+}
+.guide-sub{
+  font-size:13px;font-weight:700;color:var(--pk-muted);
+  margin:10px 0 4px;letter-spacing:.3px;
+}
+.guide-row{
+  display:flex;align-items:flex-start;gap:8px;
+  padding:5px 0;border-bottom:1px solid var(--pk-4);
+  font-size:13px;line-height:1.55;color:var(--pk-text);
+}
+.guide-row:last-child{ border-bottom:none; }
+.guide-icon{ flex-shrink:0;font-size:14px;padding-top:1px; }
+.guide-chip{
+  flex-shrink:0;display:inline-block;
+  padding:2px 9px;border-radius:999px;
+  background:var(--pk-4);border:1px solid var(--pk-border);
+  color:var(--pk-1);font-size:12px;font-weight:600;
+  white-space:nowrap;
+}
+.guide-muted{ color:var(--pk-muted);font-size:12px; }
+.guide-tip{
+  background:#fff8fa;border-radius:8px;padding:6px 10px !important;
+  border:1px solid var(--pk-border) !important;
+  color:var(--pk-muted);font-size:12px;margin-top:4px;
+  border-bottom:1px solid var(--pk-border) !important;
+}
+code{
+  background:var(--pk-4);border-radius:4px;
+  padding:1px 5px;font-size:12px;color:var(--pk-1);
+  font-family:monospace;
+}
+/* 다크모드 */
+body.dark .gtab-btn{ background:#27202a;border-color:#4a2d3a;color:#f48fb1; }
+body.dark .gtab-btn.active{ background:var(--pk-grad);border-color:transparent;color:#fff; }
+body.dark .guide-row{ border-bottom-color:#4a2d3a;color:#f0e4ec; }
+body.dark .guide-chip{ background:#3a1a2e;border-color:#4a2d3a;color:#f48fb1; }
+body.dark .guide-tip{ background:#2d1a22;border-color:#4a2d3a !important; }
+body.dark code{ background:#3a1a2e;color:#f48fb1; }
+body.dark .guide-tabs{ border-bottom-color:#4a2d3a; }
+body.dark .nbar-btn:hover{background:#3a1a2e;border-color:#c2185b}
+body.dark #noticeModal{background:#27202a;border-color:#4a2d3a}
+body.dark #noticeModalHeader{background:linear-gradient(90deg,#3a1a2e,#2d1a22)}
+body.dark #noticeModalTitle{color:#f48fb1}
+body.dark #noticeModalBody{color:#f0e4ec}
+body.dark .notice-item{border-bottom-color:#4a2d3a}
+body.dark #noticeModalClose{color:#a06080}
+body.dark #noticeModalClose:hover{background:#3a1a2e;color:#f48fb1}
+/* ── 모바일 ── */
+@media(max-width:600px){
+  #noticeBar{padding:8px 10px 0 10px;gap:6px}
+  .nbar-btn{padding:6px 12px;font-size:13px}
+  #noticeModal{width:94vw;max-height:85vh;border-radius:14px}
+  #noticeModalHeader{padding:12px 14px 10px}
+  #noticeModalBody{padding:10px 14px 14px}
+}
 .req-badge{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:6px;border:1px solid #ff9b9b;background:#ffecec;color:#d40000;font-weight:500;font-size:14px}
 .stat-card{background:#fff;border:1.5px solid #f8bbd0;border-radius:12px;padding:6px 14px;text-align:center;min-width:64px;box-shadow:0 2px 8px rgba(233,30,140,.07)}
 .sc-lbl{font-size:13px;color:#a06080;font-weight:500;margin-bottom:2px}
@@ -425,8 +594,11 @@ tbody tr:hover{background:#fff5f8}
   select,input[type=text],button{font-size:16px;padding:6px}
   .tab{font-size:13px;padding:5px 7px}
 }
-body.dark{background:#1a1018;color:#f0e4ec}
-body.dark nav.tabs,body.dark #controls,body.dark .card,body.dark .group,body.dark table,body.dark th{background:#27202a;border-color:#4a2d3a;color:#f0e4ec}
+body.dark{background:#1a1018;color:#f0e4ec;--nav-bg:#27202a;--nav-border:#4a2d3a;--nav-color:#f48fb1}
+body.dark nav.tabs,body.dark #controls,body.dark .group,body.dark table,body.dark th{background:#27202a;border-color:#4a2d3a;color:#f0e4ec}
+body.dark .card{background:#27202a;border-color:#4a2d3a;color:#f0e4ec}
+body.dark nav.tabs{background:#27202a !important;border-color:#4a2d3a !important;box-shadow:0 2px 8px rgba(0,0,0,.3) !important}
+body.dark #controls{background:#27202a !important;border-color:#4a2d3a !important}
 body.dark .site-banner{background:linear-gradient(135deg,#8b0a50 0%,#c2185b 45%,#880e4f 100%)}
 body.dark .tab{background:#27202a;border-color:#4a2d3a;color:#f48fb1}
 body.dark .tab.active{background:var(--pk-grad);border-color:transparent;color:#fff}
@@ -440,6 +612,10 @@ body.dark .sc-lbl{font-size:13px;color:#a06080;font-weight:500;margin-bottom:2px
 body.dark #ownedProgressWrap>div:first-child{color:#c0849c}
 body.dark .muted{color:#c0849c}
 body.dark #darkModeBtn{background:#27202a;border-color:#4a2d3a;color:#f48fb1}
+body.dark #langToggleBtn{border-color:#4a2d3a !important;color:#f48fb1 !important}
+body.dark #serverToggleBtn{border-color:#4a2d3a !important;color:#f48fb1 !important}
+body.dark #shortcutHelpBtn{border-color:#4a2d3a !important;color:#f48fb1 !important}
+body.dark #stageFavBtn{border-color:#4a2d3a !important}
 body.dark .req-unowned{background:#3b1a1a !important;border-color:#7f1d1d !important}
 body.dark #reqUnownedBanner{background:#3b1a1a;border-color:#7f1d1d}
 body.dark #outfitCompareBanner{background:#1e1a3a;border-color:#4a2d6a;color:#c4b5fd}
@@ -483,6 +659,28 @@ body.dark .cnf-desc{color:#d4d4d8}
 body.dark .cnf-chip{background:#3b1a1a;border-color:#7f1d1d;color:#fca5a5}
 body.dark .cnf-ok{background:#14532d;border-color:#166534;color:#bbf7d0}
 body.dark .cnf-close,.dark .cnf-btn{background:#27272a;border-color:#3f3f46;color:#d4d4d8}
+/* ── styleRadarWrap / 배너 기본(라이트) 스타일 ── */
+#styleRadarWrap{background:#fff8fa;border:1px solid var(--pk-border);border-radius:10px}
+#reqUnownedBanner{background:#fff3f3;border:1px solid #ffc9c9;color:#a30000}
+#outfitCompareBanner{background:#f0f7ff;border:1px solid #cfe4ff;color:#1a4b8c}
+/* ── 다크모드 누락 요소 보완 ── */
+body.dark #styleRadarWrap{background:#27202a;border-color:#4a2d3a}
+body.dark #styleRadarWrap span{color:#c0849c}
+body.dark .chip .v{color:#f48fb1}
+body.dark .pill-small .v{color:#f48fb1}
+body.dark #reqUnownedBanner{background:#3b1a1a;border:1px solid #7f1d1d;color:#fca5a5}
+body.dark #outfitCompareBanner{background:#1e1a3a;border:1px solid #4a2d6a;color:#c4b5fd}
+body.dark .tag-chip{background:#27202a;border-color:#4a2d3a;color:#f48fb1}
+body.dark .tag-chip input[type=checkbox]{accent-color:#f48fb1}
+body.dark #outfitCompareBanner{background:#1e1a3a !important;border-color:#4a2d6a !important;color:#c4b5fd !important}
+body.dark #reqUnownedBanner{background:#3b1a1a !important;border-color:#7f1d1d !important;color:#fca5a5 !important}
+body.dark #controls label,body.dark .filter-row label{color:#f0e4ec}
+body.dark .sc-lbl{color:#c0849c}
+body.dark .sc-num{color:#f48fb1}
+body.dark .score{color:#f48fb1}
+body.dark thead th{background:#27202a;color:#f48fb1;border-color:#4a2d3a}
+body.dark .pinfo{color:#a1a1aa}
+body.dark #list .card .score{color:#f48fb1}
 /* ── 이미지 라이트박스 ── */
 #imgLightbox{display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.82);align-items:center;justify-content:center;cursor:zoom-out}
 #imgLightbox.open{display:flex}
@@ -650,11 +848,492 @@ var stages = window.stages;
   <button class="tab" data-tab="translate" data-i18n="tab.translate">스테이지 번역</button>
   <button class="tab" data-tab="calendar" data-i18n="tab.calendar">이벤트 달력</button>
   <button class="tab" data-tab="materials" data-i18n="tab.materials">재료 보유</button>
-  <button id="langToggleBtn" onclick="toggleUILang()" style="margin-left:4px;padding:4px 10px;border-radius:20px;border:1.5px solid #f8bbd0;background:#fff;cursor:pointer;font-size:16px;font-weight:500;color:#e91e8c">🇰🇷 KO</button>
-  <button id="serverToggleBtn" onclick="toggleServer()" style="margin-left:4px;padding:4px 10px;border-radius:20px;border:1.5px solid #f8bbd0;background:#fff;cursor:pointer;font-size:16px;font-weight:500;color:#e91e8c">🌎 북미</button>
-  <button id="darkModeBtn" type="button" style="margin-left:auto;padding:6px 12px;border:1px solid #ddd;border-radius:10px;background:#fff;cursor:pointer;font-size:16px" title="다크모드 전환" data-i18n="btn.dark">🌙 다크</button>
-  <button id="shortcutHelpBtn" type="button" title="단축키 도움말" style="padding:5px 11px;border-radius:999px;border:1.5px solid var(--pk-border,#f8bbd0);background:#fff;cursor:pointer;font-size:17px;font-weight:500;color:var(--pk-1,#e91e8c)">?</button>
+  <button id="langToggleBtn" onclick="toggleUILang()" style="margin-left:4px;padding:4px 10px;border-radius:20px;border:1.5px solid #f8bbd0;background:var(--nav-bg,#fff);cursor:pointer;font-size:16px;font-weight:500;color:#e91e8c">🇰🇷 KO</button>
+  <button id="serverToggleBtn" onclick="toggleServer()" style="margin-left:4px;padding:4px 10px;border-radius:20px;border:1.5px solid #f8bbd0;background:var(--nav-bg,#fff);cursor:pointer;font-size:16px;font-weight:500;color:#e91e8c">🌎 북미</button>
+  <button id="darkModeBtn" type="button" style="margin-left:auto;padding:6px 12px;border:1px solid #ddd;border-radius:10px;background:var(--nav-bg,#fff);cursor:pointer;font-size:16px" title="다크모드 전환" data-i18n="btn.dark">🌙 다크</button>
+  <button id="shortcutHelpBtn" type="button" title="단축키 도움말" style="padding:5px 11px;border-radius:999px;border:1.5px solid var(--pk-border,#f8bbd0);background:var(--nav-bg,#fff);cursor:pointer;font-size:17px;font-weight:500;color:var(--pk-1,#e91e8c)">?</button>
 </nav>
+
+<!-- ── 공지 버튼 바 ── -->
+<div id="noticeBar">
+  <button class="nbar-btn" onclick="openNoticeModal('guide')">
+    <span class="nbar-icon">📖</span>
+    <span class="nbar-label n-ko">홈페이지 설명</span>
+    <span class="nbar-label n-en" style="display:none">How to Use</span>
+  </button>
+  <button class="nbar-btn" onclick="openNoticeModal('updates')">
+    <span class="nbar-icon">📋</span>
+    <span class="nbar-label n-ko">업데이트 현황</span>
+    <span class="nbar-label n-en" style="display:none">Update History</span>
+  </button>
+  <button class="nbar-btn" onclick="openNoticeModal('etc')">
+    <span class="nbar-icon">📌</span>
+    <span class="nbar-label n-ko">추가 안내사항</span>
+    <span class="nbar-label n-en" style="display:none">Announcements</span>
+  </button>
+</div>
+
+<!-- ── 공지 모달 ── -->
+<div id="noticeModalOverlay" onclick="closeNoticeModal(event)">
+  <div id="noticeModal">
+    <div id="noticeModalHeader">
+      <span id="noticeModalTitle"></span>
+      <button id="noticeModalClose" onclick="closeNoticeModal()" title="닫기">✕</button>
+    </div>
+    <div id="noticeModalBody">
+
+      <!-- 홈페이지 설명 -->
+      <div class="nmodal-panel" id="nmpanel-guide">
+
+        <!-- 섹션 탭 -->
+        <div class="guide-tabs">
+          <button class="gtab-btn active" onclick="switchGuideTab('overview')"><span class="gko">🌸 개요</span><span class="gen" style="display:none">🌸 Overview</span></button>
+          <button class="gtab-btn" onclick="switchGuideTab('tab1')"><span class="gko">✨ 추천/점수</span><span class="gen" style="display:none">✨ Calculator</span></button>
+          <button class="gtab-btn" onclick="switchGuideTab('tab2')"><span class="gko">👗 아이템</span><span class="gen" style="display:none">👗 Items</span></button>
+          <button class="gtab-btn" onclick="switchGuideTab('tab3')"><span class="gko">💎 세트</span><span class="gen" style="display:none">💎 Sets</span></button>
+          <button class="gtab-btn" onclick="switchGuideTab('tab4')"><span class="gko">❓ 퀴즈</span><span class="gen" style="display:none">❓ Quiz</span></button>
+          <button class="gtab-btn" onclick="switchGuideTab('tab5')"><span class="gko">📖 번역</span><span class="gen" style="display:none">📖 TL</span></button>
+          <button class="gtab-btn" onclick="switchGuideTab('tab6')"><span class="gko">📅 달력</span><span class="gen" style="display:none">📅 Calendar</span></button>
+          <button class="gtab-btn" onclick="switchGuideTab('tab7')"><span class="gko">🧪 재료</span><span class="gen" style="display:none">🧪 Materials</span></button>
+          <button class="gtab-btn" onclick="switchGuideTab('save')"><span class="gko">💾 저장</span><span class="gen" style="display:none">💾 Storage</span></button>
+        </div>
+
+        <!-- 개요 -->
+        <div class="gsection active" id="gsec-overview">
+          <div class="guide-intro gko">홈페이지는 총 <strong>7개 탭</strong>으로 구성되어 있어요!</div>
+          <div class="guide-intro gen" style="display:none">This site has <strong>7 tabs</strong> in total!</div>
+          <div class="guide-row gko"><span class="guide-icon">🌎</span><span><strong>북미 / 🇯🇵 일본</strong> — 서버 전환 (클릭마다 토글)</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🌎</span><span><strong>NA / 🇯🇵 JP</strong> — Toggle server (click to switch)</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🌙</span><span><strong>다크</strong> — 다크모드 전환</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🌙</span><span><strong>Dark</strong> — Toggle dark mode</span></div>
+          <div class="guide-row gko"><span class="guide-icon">❓</span><span><strong>? 버튼</strong> — 단축키 목록 보기</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">❓</span><span><strong>? Button</strong> — View keyboard shortcuts</span></div>
+          <div class="guide-row guide-tip gko">위 탭 버튼을 눌러 각 탭의 상세 설명을 확인하세요 💕</div>
+          <div class="guide-row guide-tip gen" style="display:none">Click the tab buttons above to view details for each tab 💕</div>
+        </div>
+
+        <!-- 탭1: 추천/점수 -->
+        <div class="gsection" id="gsec-tab1" style="display:none">
+          <div class="guide-intro gko">스테이지를 선택하면 해당 스테이지에서 <strong>점수가 높은 의상 순서</strong>로 정렬해서 보여드려요 🎯</div>
+          <div class="guide-intro gen" style="display:none">Select a stage to see outfits sorted by <strong>highest score</strong> for that stage 🎯</div>
+          <div class="guide-sub gko">🌷 스테이지 선택</div>
+          <div class="guide-sub gen" style="display:none">🌷 Stage Selection</div>
+          <div class="guide-row gko"><span class="guide-chip">스테이지 분류</span><span>챕터(장) 선택</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Stage Group</span><span>Select chapter</span></div>
+          <div class="guide-row gko"><span class="guide-chip">검색창</span><span>스테이지 이름으로 검색</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Search</span><span>Search by stage name</span></div>
+          <div class="guide-row gko"><span class="guide-chip">하위 스테이지</span><span>세부 스테이지 선택</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Sub Stage</span><span>Select specific stage</span></div>
+          <div class="guide-row gko"><span class="guide-chip">☆ 버튼</span><span>자주 쓰는 스테이지 즐겨찾기 등록</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">☆ Button</span><span>Bookmark frequently used stages</span></div>
+          <div class="guide-row gko"><span class="guide-chip">⭐ 즐겨찾기</span><span>등록한 스테이지 바로 선택</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">⭐ Favorites</span><span>Jump to bookmarked stages</span></div>
+          <div class="guide-sub gko">🌷 보유 의상 입력</div>
+          <div class="guide-sub gen" style="display:none">🌷 Owned Item Input</div>
+          <div class="guide-row gko"><span class="guide-icon">📝</span><span><code>코드번호::부위</code> 형태로 한 줄에 하나씩 입력<br><span class="guide-muted">예) 1::헤어 &nbsp;/&nbsp; 30::원피스 &nbsp;/&nbsp; 4477::헤어</span></span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">📝</span><span>Enter one item per line as <code>code::part</code><br><span class="guide-muted">e.g. 1::Hair &nbsp;/&nbsp; 30::Dress &nbsp;/&nbsp; 4477::Hair</span></span></div>
+          <div class="guide-row guide-tip gko">💡 코드 번호는 아이템 정보 탭 또는 세트정보 탭에서 확인하세요!</div>
+          <div class="guide-row guide-tip gen" style="display:none">💡 Find item codes in the Item Info or Set Info tabs!</div>
+          <div class="guide-row guide-tip gko">💡 세트정보 탭에서 파츠 클릭 시 자동 등록도 가능해요.</div>
+          <div class="guide-row guide-tip gen" style="display:none">💡 Click a part in the Set Info tab to register it automatically.</div>
+          <div class="guide-sub gko">🌷 입력 모드</div>
+          <div class="guide-sub gen" style="display:none">🌷 Input Mode</div>
+          <div class="guide-row gko"><span class="guide-chip">보유 모드</span><span>코드번호::부위 형태로 직접 입력</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Owned Mode</span><span>Enter directly as code::part</span></div>
+          <div class="guide-row gko"><span class="guide-chip">코드 모드</span><span>코드 번호만 입력 후 부위 선택해서 일괄 적용</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Code Mode</span><span>Enter codes only, then select part to apply in bulk</span></div>
+          <div class="guide-sub gko">🌷 주요 버튼</div>
+          <div class="guide-sub gen" style="display:none">🌷 Key Buttons</div>
+          <div class="guide-row gko"><span class="guide-chip">내보내기(.txt)</span><span>보유 목록 파일로 백업</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Export(.txt)</span><span>Back up your owned list to a file</span></div>
+          <div class="guide-row gko"><span class="guide-chip">불러오기(.txt)</span><span>백업 파일에서 목록 복원</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Import(.txt)</span><span>Restore list from backup file</span></div>
+          <div class="guide-row gko"><span class="guide-chip">코드순 정렬</span><span>번호 순서로 정렬</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Sort by Code</span><span>Sort items by code number</span></div>
+          <div class="guide-row gko"><span class="guide-chip">중복 제거</span><span>중복 입력된 항목 자동 삭제</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Remove Dupes</span><span>Auto-remove duplicate entries</span></div>
+          <div class="guide-sub gko">🌷 통계 &amp; 필터</div>
+          <div class="guide-sub gen" style="display:none">🌷 Stats &amp; Filter</div>
+          <div class="guide-row gko"><span class="guide-icon">📊</span><span>보유 수 / 전체 수 / 보유율 / 미보유 수 자동 계산<br>부위별 보유 현황 표도 함께 표시돼요.<br><span class="guide-muted">👉 표의 행을 클릭하면 해당 부위만 필터됩니다!</span></span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">📊</span><span>Auto-calculates owned / total / rate / missing<br>Part-by-part ownership table is also shown.<br><span class="guide-muted">👉 Click a row to filter by that part!</span></span></div>
+          <div class="guide-row gko"><span class="guide-chip">부위 필터</span><span>헤어·원피스·신발 등 원하는 부위만 보기</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Part Filter</span><span>Show only hair, dress, shoes, etc.</span></div>
+          <div class="guide-row gko"><span class="guide-chip">정렬</span><span>점수순 / 이름순 선택</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Sort</span><span>By score / by name</span></div>
+          <div class="guide-row gko"><span class="guide-chip">CSV 내보내기</span><span>현재 결과를 엑셀로 저장</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Export CSV</span><span>Save current results to spreadsheet</span></div>
+          <div class="guide-row guide-tip gko">⚠️ 상하의 vs 원피스 중 어떤 조합이 유리한지는 스테이지 선택 후 점수순 정렬로 확인하세요!</div>
+          <div class="guide-row guide-tip gen" style="display:none">⚠️ To compare Top+Bottom vs Dress, select a stage and sort by score!</div>
+        </div>
+
+        <!-- 탭2: 아이템 정보 -->
+        <div class="gsection" id="gsec-tab2" style="display:none">
+          <div class="guide-intro gko">등록된 모든 의상의 <strong>상세 정보</strong>를 확인할 수 있어요 🗂️</div>
+          <div class="guide-intro gen" style="display:none">View <strong>detailed info</strong> on all registered outfits 🗂️</div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>왼쪽 사이드바에서 부위 선택 → 오른쪽에 목록 표시</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Select part from left sidebar → list appears on the right</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>이름으로 검색 가능</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Searchable by name</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>보유 여부 자동 표시 (추천/점수 탭 연동)</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Owned status shown automatically (synced with Stage Calculator)</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>재료 보유 탭 연동 → 🟢 제작 가능 / 🔴 재료 부족 뱃지 표시</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Linked to Materials tab → 🟢 Craftable / 🔴 Materials needed badge</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>마우스 올리면 필요 재료 미리보기 표시</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Hover to preview required materials</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>상세 화면에서 [보유 등록] 클릭 시 자동 추가</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Click [Register Owned] in detail view to add automatically</span></div>
+        </div>
+
+        <!-- 탭3: 세트정보 -->
+        <div class="gsection" id="gsec-tab3" style="display:none">
+          <div class="guide-intro gko">이벤트 세트 의상의 <strong>전체 정보</strong>를 한눈에! 🖼️</div>
+          <div class="guide-intro gen" style="display:none">View <strong>full info</strong> on event set outfits at a glance! 🖼️</div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>세트 이미지 갤러리 보기</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>View set image gallery</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>구성 파츠 목록 및 코드 번호 확인</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Check part list and code numbers</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>파츠 클릭 시 추천/점수 탭에 즉시 등록</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Click a part to instantly register it in the Stage Calculator tab</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>이벤트 획득 방법 안내 (가챠·상점·교환 등)</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>How to obtain event items (gacha, shop, exchange, etc.)</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>포즈 변형 파츠 별도 표시</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Pose variation parts displayed separately</span></div>
+          <div class="guide-sub gko">🔮 서버별 미출시 스포일러</div>
+          <div class="guide-sub gen" style="display:none">🔮 Unreleased Item Spoilers by Server</div>
+          <div class="guide-row gko"><span class="guide-icon">🌎</span><span><strong>북미 미출시 스포일러</strong> — 북미 서버에 아직 출시되지 않은 예정 아이템을 미리 확인할 수 있어요.<br><span class="guide-muted">버튼 클릭 → 경고 확인 후 한 번 더 클릭하면 내용이 표시돼요.</span></span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🌎</span><span><strong>NA Unreleased Spoilers</strong> — Preview items not yet released on the NA server.<br><span class="guide-muted">Click the button → acknowledge the warning → click again to reveal.</span></span></div>
+          <div class="guide-row gko"><span class="guide-icon">🇯🇵</span><span><strong>일본 미출시 스포일러</strong> — 일본 서버에 아직 출시되지 않은 예정 아이템을 미리 확인할 수 있어요.</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🇯🇵</span><span><strong>JP Unreleased Spoilers</strong> — Preview items not yet released on the JP server.</span></div>
+          <div class="guide-row guide-tip gko">⚠️ 스포일러 내용은 블러 처리되어 있어요. 클릭하기 전까지는 내용이 보이지 않으니 원하지 않는 분은 클릭하지 마세요!</div>
+          <div class="guide-row guide-tip gen" style="display:none">⚠️ Spoiler content is blurred by default. Don't click if you'd like to avoid spoilers!</div>
+        </div>
+
+        <!-- 탭4: 퀴즈 -->
+        <div class="gsection" id="gsec-tab4" style="display:none">
+          <div class="guide-intro gko">이벤트 퀴즈 <strong>문제와 정답</strong>을 카드 형태로 제공해요 🃏</div>
+          <div class="guide-intro gen" style="display:none">Quiz event <strong>questions and answers</strong> are provided as cards 🃏</div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>[새 창으로 열기] 버튼으로 별도 창에서도 볼 수 있어요!</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Use the [Open in New Tab] button to view in a separate window!</span></div>
+        </div>
+
+        <!-- 탭5: 스테이지 번역 -->
+        <div class="gsection" id="gsec-tab5" style="display:none">
+          <div class="guide-intro gko">스테이지 스토리 대사를 <strong>번역</strong>해서 제공해요 💬</div>
+          <div class="guide-intro gen" style="display:none">Stage story dialogue provided with <strong>translations</strong> 💬</div>
+          <div class="guide-sub gko">🌷 사용 방법</div>
+          <div class="guide-sub gen" style="display:none">🌷 How to Use</div>
+          <div class="guide-row gko"><span class="guide-chip">①</span><span>챕터 선택</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">①</span><span>Select a chapter</span></div>
+          <div class="guide-row gko"><span class="guide-chip">②</span><span>스테이지 선택 (또는 검색창에서 이름 검색)</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">②</span><span>Select a stage (or search by name)</span></div>
+          <div class="guide-row gko"><span class="guide-chip">③</span><span>캐릭터 아바타와 함께 대사 표시!</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">③</span><span>Dialogue displayed with character avatars!</span></div>
+          <div class="guide-sub gko">🌷 언어 전환</div>
+          <div class="guide-sub gen" style="display:none">🌷 Language Toggle</div>
+          <div class="guide-row"><span class="guide-icon">🌐</span><span>🇰🇷 한국어 &nbsp;·&nbsp; 🇺🇸 English &nbsp;·&nbsp; 🇨🇳 中文 &nbsp;·&nbsp; 🇯🇵 日本語</span></div>
+        </div>
+
+        <!-- 탭6: 이벤트 달력 -->
+        <div class="gsection" id="gsec-tab6" style="display:none">
+          <div class="guide-intro gko">이벤트 일정을 <strong>달력</strong>으로 한눈에 확인해요 🗓️</div>
+          <div class="guide-intro gen" style="display:none">View event schedules at a glance on a <strong>calendar</strong> 🗓️</div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>월별 달력 / 리스트 뷰 전환 가능</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Switch between monthly calendar / list view</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>이벤트 클릭 → 이미지 · 기간 · 메모 상세 확인</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Click an event → view image, duration, and notes</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>이벤트 상세 확인 시 언어 전환 가능</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Language can be switched in event detail view</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>종료 · 진행중 · 예정 카테고리 필터</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Filter by Ended / Ongoing / Upcoming</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>➕ 버튼으로 직접 이벤트 추가 · 수정 · 삭제 가능</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Use ➕ button to add, edit, or delete events</span></div>
+          <div class="guide-row guide-tip gko">⚠️ 이벤트 데이터는 브라우저에 저장돼요. 다른 기기나 브라우저에서는 표시되지 않아요!</div>
+          <div class="guide-row guide-tip gen" style="display:none">⚠️ Event data is saved in your browser. It won't appear on other devices or browsers!</div>
+          <div class="guide-row guide-tip gko">💕 이벤트는 바로바로 업데이트됩니다!</div>
+          <div class="guide-row guide-tip gen" style="display:none">💕 Events are updated as soon as they're available!</div>
+        </div>
+
+        <!-- 탭7: 재료 보유 -->
+        <div class="gsection" id="gsec-tab7" style="display:none">
+          <div class="guide-intro gko">의상 제작에 필요한 <strong>재료 수량</strong>을 관리해요 🎒</div>
+          <div class="guide-intro gen" style="display:none">Manage <strong>material quantities</strong> needed for crafting outfits 🎒</div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>재료 카드에서 보유 수량 직접 입력</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Enter owned quantity directly on each material card</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>수량 입력 시 카드가 초록색으로 변경 ✅</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Card turns green when quantity is entered ✅</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>[저장] 버튼 클릭 시 수량 저장</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Click [Save] to save quantities</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>아이템 정보 탭과 자동 연동 → 재료가 충분하면 🟢 제작 가능 뱃지 표시!</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Auto-linked with Item Info tab → 🟢 Craftable badge shows when materials are sufficient!</span></div>
+          <div class="guide-row guide-tip gko">⚠️ 현재 이 탭은 진행 중이에요. 참고용으로만 활용해 주세요!</div>
+          <div class="guide-row guide-tip gen" style="display:none">⚠️ This tab is currently a work in progress. Use for reference only!</div>
+        </div>
+
+        <!-- 저장 안내 -->
+        <div class="gsection" id="gsec-save" style="display:none">
+          <div class="guide-intro gko">💾 <strong>데이터 저장 안내</strong></div>
+          <div class="guide-intro gen" style="display:none">💾 <strong>Data Storage Info</strong></div>
+          <div class="guide-row gko"><span class="guide-chip">보유 의상 목록</span><span>브라우저 자동 저장</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Owned Item List</span><span>Auto-saved in browser</span></div>
+          <div class="guide-row gko"><span class="guide-chip">서버 설정</span><span>브라우저 자동 저장</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Server Setting</span><span>Auto-saved in browser</span></div>
+          <div class="guide-row gko"><span class="guide-chip">재료 보유 수량</span><span>저장 버튼 클릭 시 저장</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Material Quantities</span><span>Saved when you click the Save button</span></div>
+          <div class="guide-row gko"><span class="guide-chip">이벤트 달력 일정</span><span>브라우저 자동 저장</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Event Calendar</span><span>Auto-saved in browser</span></div>
+          <div class="guide-row guide-tip gko">⚠️ 브라우저 캐시 삭제 또는 다른 기기 접속 시 초기화될 수 있어요.<br>[내보내기] 기능으로 정기적으로 백업해두시길 권장드려요!</div>
+          <div class="guide-row guide-tip gen" style="display:none">⚠️ Data may be lost if browser cache is cleared or you access from another device.<br>Use [Export] regularly to back up your data!</div>
+        </div>
+
+      </div>
+
+      <!-- 업데이트 현황 -->
+      <div class="nmodal-panel" id="nmpanel-updates" style="display:none">
+        <div class="notice-item">
+          <span class="n-date">2026.04.02</span>
+          <span class="n-badge nbadge-new" data-i18n-badge="badge.new">NEW</span>
+          <span class="n-text n-ko"><strong>스포일러 기능 · 캘린더 영어 전환 탭 추가</strong></span>
+          <span class="n-text n-en" style="display:none"><strong>Spoiler feature · Calendar language tab added</strong></span>
+        </div>
+        <div class="notice-item ud-clickable" onclick="openUpdateMini('20260402')">
+          <span class="n-date">2026.04.02</span>
+          <span class="n-badge nbadge-update" data-i18n-badge="badge.update">업데이트</span>
+          <span class="n-text n-ko"><strong>2026년 4월 2일 데이터 최신화</strong></span>
+          <span class="n-text n-en" style="display:none"><strong>Data updated — April 2, 2026</strong></span>
+          <span class="ud-more n-ko">자세히 ›</span>
+          <span class="ud-more n-en" style="display:none">Details ›</span>
+        </div>
+      </div>
+
+      <!-- 추가 안내사항 -->
+      <div class="nmodal-panel" id="nmpanel-etc" style="display:none">
+        <div class="notice-item">
+          <span class="n-date">📌</span>
+          <span class="n-text n-ko"><strong>지뢰 의상 제보 환영!</strong> — 점수를 깎는 지뢰 의상을 알고 계신다면 제보해 주세요 🙏<br><span style="font-size:12px;color:var(--pk-muted)">제보 시 의상 이름과 부위를 함께 알려주세요!</span></span>
+          <span class="n-text n-en" style="display:none"><strong>Landmine outfit reports welcome!</strong> — If you know of any outfits that lower your score, please let us know 🙏<br><span style="font-size:12px;color:var(--pk-muted)">Please include the outfit name and part when reporting!</span></span>
+        </div>
+        <div class="notice-item">
+          <span class="n-date">📌</span>
+          <span class="n-text n-ko"><strong>오류 제보</strong> — 잘못된 정보를 발견하시면 KakaoTalk 또는 Contact 폼으로 알려주세요!</span>
+          <span class="n-text n-en" style="display:none"><strong>Bug report</strong> — If you find any incorrect information, please let us know via KakaoTalk or the Contact form!</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── 업데이트 상세 미니 모달 ── -->
+<div id="updateMiniOverlay" onclick="closeUpdateMini(event)" style="display:none;position:fixed;inset:0;z-index:9500;display:none;align-items:center;justify-content:center;">
+  <div id="updateMiniModal">
+    <div id="updateMiniHeader">
+      <span id="updateMiniTitle"></span>
+      <button onclick="closeUpdateMini()" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--pk-muted);padding:2px 6px;border-radius:999px;font-family:inherit;line-height:1;" title="닫기">✕</button>
+    </div>
+    <div id="updateMiniBody">
+      <!-- ✏️ 날짜별 상세 내용 -->
+      <div class="umini-panel" id="umini-20260402">
+        <div class="umini-row n-ko">🔹 러브 니키 의상 데이터 최신화</div>
+        <div class="umini-row n-en" style="display:none">🔹 Love Nikki outfit data updated</div>
+        <!-- 내용 추가 시 여기에 umini-row 추가 -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ── 업데이트 클릭 항목 ── */
+.ud-clickable{ cursor:pointer; transition:background .13s; border-radius:8px; padding-left:4px; margin-left:-4px; }
+.ud-clickable:hover{ background:var(--pk-4); }
+.ud-more{
+  flex-shrink:0;font-size:12px;font-weight:600;
+  color:var(--pk-1);white-space:nowrap;margin-left:auto;
+  padding:2px 8px;border-radius:999px;
+  border:1px solid var(--pk-border);background:#fff;
+}
+/* ── 업데이트 미니 모달 ── */
+#updateMiniOverlay{
+  background:rgba(45,26,34,.28);
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+}
+#updateMiniOverlay.um-open{ display:flex !important; }
+#updateMiniModal{
+  background:#fff;
+  border:1.5px solid var(--pk-border);
+  border-radius:14px;
+  box-shadow:0 6px 28px rgba(233,30,140,.18);
+  width:min(340px,86vw);
+  max-height:60vh;
+  display:flex;flex-direction:column;
+  animation:nmSlideUp .18s ease;
+  overflow:hidden;
+}
+#updateMiniHeader{
+  display:flex;align-items:center;
+  padding:11px 14px 10px;
+  border-bottom:1px solid var(--pk-border);
+  background:linear-gradient(90deg,#fce4ec,#fff5f8);
+  flex-shrink:0;
+}
+#updateMiniTitle{
+  flex:1;font-size:14px;font-weight:700;color:var(--pk-1);
+}
+#updateMiniBody{ overflow-y:auto;padding:10px 14px 12px; }
+.umini-row{
+  font-size:13px;padding:6px 0;
+  border-bottom:1px solid var(--pk-4);
+  color:var(--pk-text);line-height:1.5;
+}
+.umini-row:last-child{ border-bottom:none; }
+/* 다크모드 */
+body.dark #updateMiniModal{ background:#27202a;border-color:#4a2d3a; }
+body.dark #updateMiniHeader{ background:linear-gradient(90deg,#3a1a2e,#2d1a22); }
+body.dark .umini-row{ border-bottom-color:#4a2d3a;color:#f0e4ec; }
+body.dark .ud-more{ background:#27202a;border-color:#4a2d3a;color:#f48fb1; }
+</style>
+
+<script>
+(function(){
+  var MINI_TITLES = {
+    '20260402': { ko:'📋 2026.04.02 업데이트 상세', en:'📋 2026.04.02 Update Details' },
+  };
+
+  window.openUpdateMini = function(id){
+    var lang = window.UI_LANG || 'ko';
+    var overlay = document.getElementById('updateMiniOverlay');
+    var titleEl = document.getElementById('updateMiniTitle');
+    // 패널 전환
+    document.querySelectorAll('.umini-panel').forEach(function(p){ p.style.display = 'none'; });
+    var panel = document.getElementById('umini-'+id);
+    if(panel) panel.style.display = '';
+    // 제목
+    if(titleEl && MINI_TITLES[id]) titleEl.textContent = MINI_TITLES[id][lang] || MINI_TITLES[id]['ko'];
+    // 언어 적용
+    var isEn = lang === 'en';
+    document.querySelectorAll('#updateMiniModal .n-ko').forEach(function(el){ el.style.display = isEn ? 'none' : ''; });
+    document.querySelectorAll('#updateMiniModal .n-en').forEach(function(el){ el.style.display = isEn ? '' : 'none'; });
+    if(overlay) overlay.classList.add('um-open');
+  };
+
+  window.closeUpdateMini = function(e){
+    if(e && e.target !== document.getElementById('updateMiniOverlay')) return;
+    var overlay = document.getElementById('updateMiniOverlay');
+    if(overlay) overlay.classList.remove('um-open');
+  };
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      var overlay = document.getElementById('updateMiniOverlay');
+      if(overlay && overlay.classList.contains('um-open')) overlay.classList.remove('um-open');
+    }
+  });
+})();
+</script>
+
+<script>
+/* ── 공지 모달 시스템 ── */
+(function(){
+  var TITLES = {
+    guide:   { ko:'📖 홈페이지 설명',  en:'📖 How to Use'      },
+    updates: { ko:'📋 업데이트 현황',  en:'📋 Update History'  },
+    etc:     { ko:'📌 추가 안내사항',  en:'📌 Announcements'   },
+  };
+  var BADGE_I18N = {
+    'badge.new':    { ko:'NEW',     en:'NEW'    },
+    'badge.update': { ko:'업데이트', en:'Update' },
+  };
+
+  function getLang(){ return window.UI_LANG || 'ko'; }
+
+  function applyNoticeLang(){
+    var lang = getLang();
+    var isEn = lang === 'en';
+
+    // 버튼 바 레이블 — inline으로 명시해야 flex 레이아웃 유지
+    document.querySelectorAll('#noticeBar .n-ko').forEach(function(el){
+      el.style.display = isEn ? 'none' : 'inline';
+    });
+    document.querySelectorAll('#noticeBar .n-en').forEach(function(el){
+      el.style.display = isEn ? 'inline' : 'none';
+    });
+
+    // 모달 내 텍스트 (n-ko / n-en)
+    document.querySelectorAll('#noticeModal .n-ko').forEach(function(el){
+      el.style.display = isEn ? 'none' : '';
+    });
+    document.querySelectorAll('#noticeModal .n-en').forEach(function(el){
+      el.style.display = isEn ? '' : 'none';
+    });
+    // 가이드 섹션 한/영 (gko / gen)
+    document.querySelectorAll('#nmpanel-guide .gko').forEach(function(el){
+      el.style.display = isEn ? 'none' : '';
+    });
+    document.querySelectorAll('#nmpanel-guide .gen').forEach(function(el){
+      el.style.display = isEn ? '' : 'none';
+    });
+
+    // 뱃지
+    document.querySelectorAll('#noticeModal [data-i18n-badge]').forEach(function(el){
+      var k = el.getAttribute('data-i18n-badge');
+      if(BADGE_I18N[k]) el.textContent = BADGE_I18N[k][lang] || BADGE_I18N[k]['ko'];
+    });
+
+    // 모달 제목 — 열려있든 닫혀있든 항상 갱신 (다음에 열릴 때도 올바른 언어로)
+    var overlay = document.getElementById('noticeModalOverlay');
+    var cur = overlay ? overlay.getAttribute('data-cur') : null;
+    var titleEl = document.getElementById('noticeModalTitle');
+    if(cur && TITLES[cur] && titleEl){
+      titleEl.textContent = TITLES[cur][lang] || TITLES[cur]['ko'];
+    }
+  }
+
+  window.openNoticeModal = function(id){
+    var lang = getLang();
+    var overlay = document.getElementById('noticeModalOverlay');
+    var titleEl = document.getElementById('noticeModalTitle');
+    // 패널 전환
+    ['guide','updates','etc'].forEach(function(t){
+      var p = document.getElementById('nmpanel-'+t);
+      if(p) p.style.display = (t === id) ? '' : 'none';
+    });
+    if(titleEl && TITLES[id]) titleEl.textContent = TITLES[id][lang] || TITLES[id]['ko'];
+    if(overlay){
+      overlay.setAttribute('data-cur', id);
+      overlay.classList.add('nm-open');
+      document.body.style.overflow = 'hidden';
+    }
+    applyNoticeLang();
+  };
+
+  window.closeNoticeModal = function(e){
+    if(e && e.target !== document.getElementById('noticeModalOverlay') && e.target !== document.getElementById('noticeModalClose')) return;
+    var overlay = document.getElementById('noticeModalOverlay');
+    if(overlay) overlay.classList.remove('nm-open');
+    document.body.style.overflow = '';
+  };
+
+  // ESC 키로 닫기
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') window.closeNoticeModal({target: document.getElementById('noticeModalOverlay')});
+  });
+
+  // 언어 전환은 toggleUILang에서 직접 __applyNoticeLang을 호출하므로 여기선 초기 적용만
+  document.addEventListener('DOMContentLoaded', function(){ applyNoticeLang(); });
+  window.__applyNoticeLang = applyNoticeLang;
+
+  // 가이드 모달 내부 탭 전환
+  window.switchGuideTab = function(id){
+    var secs = document.querySelectorAll('#nmpanel-guide .gsection');
+    secs.forEach(function(s){ s.style.display = 'none'; });
+    var target = document.getElementById('gsec-'+id);
+    if(target) target.style.display = '';
+    var btns = document.querySelectorAll('#nmpanel-guide .gtab-btn');
+    btns.forEach(function(b){ b.classList.remove('active'); });
+    var clicked = Array.from(btns).find(function(b){ return b.getAttribute('onclick') === 'switchGuideTab(\''+id+'\')'; });
+    if(clicked) clicked.classList.add('active');
+  };
+})();
+</script>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 (function(){
@@ -686,18 +1365,25 @@ var stages = window.stages;
       var lazySrc = lazyFrame && lazyFrame.dataset && lazyFrame.dataset.src;
       if(lazyFrame && lazySrc && !lazyFrame.dataset.loaded){
         lazyFrame.dataset.loaded = '1';
-        lazyFrame.src = lazySrc;
+        var _darkParam = document.body.classList.contains('dark') ? '?dark=1' : '';
+        lazyFrame.src = lazySrc + _darkParam;
         // 로드 완료 후 현재 언어 전달
         lazyFrame.addEventListener('load', function onLazyLoad(){
           lazyFrame.removeEventListener('load', onLazyLoad);
+          var _dark = document.body.classList.contains('dark');
           try{
             lazyFrame.contentWindow.postMessage({type:'NIKKI_LANG_CHANGE', lang: window.UI_LANG||'ko'}, '*');
+            lazyFrame.contentWindow.postMessage({type:'NIKKI_DARK_CHANGE', dark: _dark}, '*');
           }catch(e){}
         });
       } else if(lazyFrame && lazyFrame.dataset.loaded){
-        // 이미 로드된 탭으로 재진입 시에도 언어 동기화
+        // 이미 로드된 탭으로 재진입 시에도 언어/다크 동기화
         setTimeout(function(){
-          try{ lazyFrame.contentWindow.postMessage({type:'NIKKI_LANG_CHANGE', lang: window.UI_LANG||'ko'}, '*'); }catch(e){}
+          var _dark = document.body.classList.contains('dark');
+          try{
+            lazyFrame.contentWindow.postMessage({type:'NIKKI_LANG_CHANGE', lang: window.UI_LANG||'ko'}, '*');
+            lazyFrame.contentWindow.postMessage({type:'NIKKI_DARK_CHANGE', dark: _dark}, '*');
+          }catch(e){}
         }, 50);
       }
     }
@@ -766,7 +1452,7 @@ var stages = window.stages;
 <input id="stageSearchInput" type="text" placeholder="하위 스테이지 검색" data-i18n-placeholder="lbl.stageSub"/>
 <label for="stageSelect" data-i18n="lbl.stageSub">하위 스테이지</label>
 <select id="stageSelect"></select>
-<button id="stageFavBtn" type="button" title="즐겨찾기 추가/제거" style="padding:6px 10px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:19px">☆</button>
+<button id="stageFavBtn" type="button" title="즐겨찾기 추가/제거" style="padding:6px 10px;border-radius:8px;border:1px solid #ddd;background:var(--nav-bg,#fff);cursor:pointer;font-size:19px">☆</button>
 <select id="stageFavSelect" style="display:none;min-width:160px;border-color:#f5c842"><option value="" data-i18n="fav.label">⭐ 즐겨찾기</option></select>
 <label data-i18n="lbl.partFilter">부위 필터 (그룹)</label><select id="partFilter"><option value="" data-i18n="opt.all">전체</option>
 <optgroup label="의상">
@@ -904,17 +1590,17 @@ var stages = window.stages;
 <div class="muted" style="font-size:14px" data-i18n="txt.partClickHint">행을 클릭하면 해당 부위로 필터가 적용됩니다.</div>
 </section>
 </section>
-<div id="styleRadarWrap" style="display:none;margin:8px 20px 0 20px;padding:8px 12px;background:#fff;border:1px solid #eee;border-radius:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+<div id="styleRadarWrap" style="display:none;margin:8px 20px 0 20px;padding:8px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
   <span style="font-size:14px;color:#888;white-space:nowrap" data-i18n="txt.reqStat">필요 스탯</span>
   <div id="styleStatChips" style="display:flex;gap:6px;flex-wrap:wrap"></div>
 </div>
 <section id="tips" style="display:none"></section><section id="skills"></section>
-<div id="reqUnownedBanner" style="display:none;margin:6px 20px;padding:10px 14px;background:#fff3f3;border:1px solid #ffc9c9;border-radius:10px;font-size:16px;color:#a30000;display:flex;align-items:center;gap:10px">
+<div id="reqUnownedBanner" style="display:none;margin:6px 20px;padding:10px 14px;border-radius:10px;font-size:16px;align-items:center;gap:10px">
   <span style="font-size:19px">⚠</span>
   <span id="reqUnownedText">추천 아이템 중 미보유 0개</span>
   <span style="color:#888;font-size:14px" id="reqUnownedSub"></span>
 </div>
-<div id="outfitCompareBanner" style="display:none;margin:6px 20px;padding:10px 14px;background:#f0f7ff;border:1px solid #cfe4ff;border-radius:10px;font-size:16px;color:#1a4b8c;align-items:center;gap:10px">
+<div id="outfitCompareBanner" class="outfit-compare-banner" style="display:none;margin:6px 20px;padding:10px 14px;border-radius:10px;font-size:16px;align-items:center;gap:10px">
   <span style="font-size:19px">👗</span>
   <span id="outfitCompareText"></span>
   <span style="color:#555;font-size:14px" id="outfitCompareSub"></span>
@@ -1531,8 +2217,6 @@ function toThumb(u){
   return data;
 }
   window.addEventListener('message', function(ev){
-    // origin 검증 (file:// 환경 포함)
-    if(ev.origin && ev.origin !== location.origin && ev.origin !== 'null') return;
     var msg = ev.data;
     if (!msg || !msg.__splitData) return;
     if (msg.key==='items'){
@@ -2883,6 +3567,18 @@ var ACC_OTHER    = ["반딧불의 영혼"];
   window.addEventListener('load', function(){
     ensureStagesSynced();
     setTimeout(postRender, 200);
+    setTimeout(function(){
+      if(!window.stages||!window.stages.length){
+        var sf=document.getElementById('stagesFrame');
+        if(sf&&sf.contentWindow) try{ sf.contentWindow.postMessage({__splitRequest:true,key:'stages'},'*'); }catch(e){}
+      }
+    }, 1000);
+    setTimeout(function(){
+      if(!window.stages||!window.stages.length){
+        var sf=document.getElementById('stagesFrame');
+        if(sf&&sf.contentWindow) try{ sf.contentWindow.postMessage({__splitRequest:true,key:'stages'},'*'); }catch(e){}
+      }
+    }, 2500);
   });
   document.addEventListener('DOMContentLoaded', function(){
     ensureStagesSynced();
@@ -3239,7 +3935,9 @@ function __populateStages(){
   dedup.forEach(s => {
     const o = document.createElement('option');
     o.value = s.stage_id;
-    o.textContent = s.stage_id;
+    o.setAttribute('data-ko', s.stage_id);
+    o.setAttribute('data-en', s.stage_id_en || s.stage_id);
+    o.textContent = (window.UI_LANG === 'en' && s.stage_id_en) ? s.stage_id_en : s.stage_id;
     sel.appendChild(o);
   });
   if (prev && Array.from(sel.options).some(o => o.value === prev)) sel.value = prev;
@@ -3252,9 +3950,6 @@ function __populateStages(){
 document.addEventListener('DOMContentLoaded', function(){});
 </script>
 <!-- data iframes (hidden) -->
-<iframe id="itemsFrame" src="./items.html" style="display:none;width:0;height:0;border:0;"></iframe>
-<iframe id="stagesFrame" src="./stages.html" style="display:none;width:0;height:0;border:0;"></iframe>
-<iframe id="setsFrame" src="sets_frame_fixed.html" style="display:none;width:0;height:0;border:0;"></iframe>
 <script>
 (function(){
   // Safe override of render() that avoids DOM reorders and freezes
@@ -4441,12 +5136,16 @@ document.addEventListener('DOMContentLoaded', function(){});
       opt0.textContent = list.length ? "스테이지 선택" : "(스테이지 없음)";
       sel.appendChild(opt0);
       // options
+      var _lang = window.UI_LANG || 'ko';
       list.forEach(function(st){
         var id = String(st && st.stage_id || "").trim();
         if(!id) return;
         var opt = document.createElement('option');
         opt.value = id;
-        opt.textContent = id;
+        opt.setAttribute('data-ko', id);
+        var enName = st.stage_id_en || id;
+        opt.setAttribute('data-en', enName);
+        opt.textContent = (_lang === 'en') ? enName : id;
         sel.appendChild(opt);
       });
       // restore previous
@@ -9384,7 +10083,7 @@ document.addEventListener('DOMContentLoaded', function(){});
     return out;
   }
 
-  const TAG_TIER_MULT = {"SSS":0.08,"SS":0.06,"S":0.05,"A":0.04,"B":0.03,"C":0.02,"D":0.01};
+  const TAG_TIER_MULT = {"SSS":1.00,"SS":0.80,"S":0.65,"A":0.42,"B":0.24,"C":0.13,"D":0.03};
   const TAG_ALIAS = {"洛丽塔":"롤리타","欧式古典":"유럽고전","未来系":"미래계","童话系":"동화계","睡衣":"잠옷","动物系":"애니멀룩"};
 
   function normalizeTags(item){
@@ -9457,7 +10156,7 @@ document.addEventListener('DOMContentLoaded', function(){});
   };
 
   // Stage tag rules (additive): {name, tier, stacks}
-  const TAG_TIER_MULT = { SSS:0.08, SS:0.06, S:0.05, A:0.04, B:0.03, C:0.02, D:0.01 };
+  const TAG_TIER_MULT = { SSS:1.00, SS:0.80, S:0.65, A:0.42, B:0.24, C:0.13, D:0.03 };
 
   // Minimal aliases for matching (do NOT transform stored tags)
   const TAG_ALIAS = {
@@ -9601,6 +10300,36 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
     return finalScore;
   };
 
+})();
+</script>
+
+<!-- === mine_items 래퍼: FINAL SCORING 이후 재적용 === -->
+<script>
+(function(){
+  function normMine(s){
+    try{ return String(s||'').normalize('NFKC').toLowerCase().replace(/\s+/g,'').replace(/[・‧·．\.]/g,'·'); }
+    catch(e){ return String(s||'').toLowerCase().replace(/\s+/g,''); }
+  }
+  function isMined(item, stage){
+    try{
+      if(!stage||!Array.isArray(stage.mine_items)||!stage.mine_items.length) return false;
+      var nm=normMine(item&&item.name); if(!nm) return false;
+      if(!stage.__mineNameSet2){
+        var set=new Set();
+        stage.mine_items.forEach(function(x){ var k=normMine(x); if(k) set.add(k); });
+        try{ Object.defineProperty(stage,'__mineNameSet2',{value:set,enumerable:false,configurable:true}); }catch(e){ stage.__mineNameSet2=set; }
+      }
+      if(stage.__mineNameSet2&&stage.__mineNameSet2.has(nm)) return true;
+      return stage.mine_items.includes(String((item&&item.name)||'').trim());
+    }catch(e){ return false; }
+  }
+  var _prev = window.scoreItemForStage;
+  window.scoreItemForStage = function(item, stage){
+    try{
+      if(isMined(item, stage)) return 0;
+      return typeof _prev==='function' ? _prev(item, stage) : 0;
+    }catch(e){ return 0; }
+  };
 })();
 </script>
 
@@ -10160,6 +10889,14 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
 
   const $ = (id)=> document.getElementById(id);
 
+  // 언어 설정에 따른 아이템 이름 반환 (전역 오버라이드 보장)
+  function getItemName(it){
+    if(!it) return '';
+    if(window.NIKKI_SERVER === 'jp') return it.name_jp || it.name || '';
+    if(window.UI_LANG === 'en') return it.name || '';
+    return it.name || '';
+  }
+
   function norm(s){
     try{
       if (typeof window.normOwnedName === 'function') return window.normOwnedName(s);
@@ -10390,7 +11127,12 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
         pageList.forEach(function(it){
           var stars = Math.max(0, Math.min(6, Number(it.stars||0)));
           var tgs = toTags(it);
-          var name = String(getItemName(it)||'-');
+          var name = String((function(it){
+            if(!it) return '';
+            if(window.NIKKI_SERVER === 'jp') return it.name_jp || it.name || '';
+            if(window.UI_LANG === 'en') return it.name || '';
+            return it.name || '';
+          })(it)||'-');
           var safeName = name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
           var _rawPart = (typeof window.displayShort==='function') ? window.displayShort(it.part) : (it.part||'-');
           var partLabel = (window.translatePart ? window.translatePart(_rawPart) : _rawPart) || '-';
@@ -10415,6 +11157,8 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
           h3.style.cssText = 'margin:0;flex:1;display:flex;justify-content:space-between;align-items:center';
           var nameSpan = document.createElement('span');
           nameSpan.textContent = name;
+          nameSpan.setAttribute('data-name-ko', it.name || it.name_jp || '');
+          nameSpan.setAttribute('data-name-en', it.name || '');
           var copyBtn = document.createElement('button');
           copyBtn.className = 'copy-btn';
           copyBtn.setAttribute('onclick', "copyText('"+safeName+"')");
@@ -10590,6 +11334,7 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
     if (msg.type === 'ITEMSINFO_REQUEST_DATA'){
       sendItems();
     }
+
     if (msg.type === 'CALENDAR_OPEN_SET' && msg.setName){
       if(typeof window.__showPanel === 'function') window.__showPanel('sets');
       window.scrollTo({top:0, behavior:'smooth'});
@@ -10761,11 +11506,15 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
     const q = search ? String(search.value||'').trim().toLowerCase() : '';
 
     const prev = stageSel.value;
+    const _lang = window.UI_LANG || 'ko';
     const filtered = all.filter(s=>{
       const id = String(s.stage_id||'');
       const cat = stageCategory(id);
       if (g && cat !== g) return false;
-      if (q && !id.toLowerCase().includes(q)) return false;
+      if (q){
+        const idEn = String(s.stage_id_en||'').toLowerCase();
+        if (!id.toLowerCase().includes(q) && !idEn.includes(q)) return false;
+      }
       return true;
     });
 
@@ -10773,7 +11522,9 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
     filtered.forEach(s=>{
       const o = document.createElement('option');
       o.value = s.stage_id;
-      o.textContent = s.stage_id;
+      o.setAttribute('data-ko', s.stage_id);
+      o.setAttribute('data-en', s.stage_id_en || s.stage_id);
+      o.textContent = (_lang === 'en' && s.stage_id_en) ? s.stage_id_en : s.stage_id;
       stageSel.appendChild(o);
     });
 
@@ -10783,6 +11534,22 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
 
     // trigger downstream render
     try{ if (typeof window.renderAll === 'function') window.renderAll(); }catch(e){}
+  }
+
+  var STAGE_GROUP_EN = {
+    '이벤트': 'Event',
+    '스타일대회': "Stylist's Arena",
+    '클럽대전': 'Club Battle',
+    '기타': 'Other'
+  };
+  function stageCategoryLabel(koGroup){
+    if (window.UI_LANG !== 'en') return koGroup;
+    if (STAGE_GROUP_EN[koGroup]) return STAGE_GROUP_EN[koGroup];
+    var m = koGroup.match(/^클럽미션\s*(\d+)$/);
+    if (m) return 'Commission Requests ' + m[1];
+    m = koGroup.match(/^제\s*(\d+)\s*장$/);
+    if (m) return 'Volume ' + m[1];
+    return koGroup;
   }
 
   function populateGroups(){
@@ -10796,12 +11563,13 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
     arr.sort(sortGroup);
 
     const prev = groupSel.value;
-    groupSel.innerHTML = '<option value="">전체</option>';
+    const _lang = window.UI_LANG || 'ko';
+    groupSel.innerHTML = '<option value="">' + (_lang === 'en' ? 'All' : '전체') + '</option>';
     arr.forEach(g=>{
-      if (!g || g==='기타') return; // 숨기고 싶으면 여기서 조절
+      if (!g || g==='기타') return;
       const o = document.createElement('option');
       o.value = g;
-      o.textContent = g;
+      o.textContent = stageCategoryLabel(g);
       groupSel.appendChild(o);
     });
 
@@ -11315,10 +12083,42 @@ function showToast(msg){
 (function(){
   var LS='nikiDarkMode';
   var btn=$('darkModeBtn');
+  function applyDarkStyles(dark){
+    var nav = document.querySelector('nav.tabs');
+    var ctrl = document.getElementById('controls');
+    if(dark){
+      if(nav)  { nav.style.background='#27202a';  nav.style.borderColor='#4a2d3a'; nav.style.boxShadow='0 2px 8px rgba(0,0,0,.3)'; }
+      if(ctrl) { ctrl.style.background='#27202a'; ctrl.style.borderColor='#4a2d3a'; }
+    } else {
+      if(nav)  { nav.style.background='#fff';     nav.style.borderColor=''; nav.style.boxShadow=''; }
+      if(ctrl) { ctrl.style.background='#fff8fa'; ctrl.style.borderColor=''; }
+    }
+  }
+
   function apply(dark){
     document.body.classList.toggle('dark', dark);
     if(btn) btn.textContent = dark ? (window.t ? window.t('btn.dark.on') : '☀️ 라이트') : (window.t ? window.t('btn.dark') : '🌙 다크');
     try{ localStorage.setItem(LS, dark?'1':'0'); }catch(e){}
+    applyDarkStyles(dark);
+    // iframe들에 다크 상태 전파
+    ['itemsInfoFrame','setsViewFrame','calendarFrame','materialsFrame','quizFrame'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el && el.contentWindow){ try{ el.contentWindow.postMessage({type:'NIKKI_DARK_CHANGE', dark:dark}, '*'); }catch(e){} }
+    });
+    // itemsInfoFrame 안의 모든 하위 iframe(item_detail 등)에도 전파
+    try{
+      var iif = document.getElementById('itemsInfoFrame');
+      if(iif && iif.contentDocument){
+        iif.contentDocument.querySelectorAll('iframe').forEach(function(f){
+          try{ f.contentWindow.postMessage({type:'NIKKI_DARK_CHANGE', dark:dark}, '*'); }catch(e){}
+        });
+      }
+    }catch(e){}
+    setTimeout(function(){
+      if(typeof window.updateOutfitBanner === 'function') window.updateOutfitBanner();
+      if(typeof window.updateReqBanner === 'function') window.updateReqBanner();
+      if(typeof window.updateRadar === 'function') window.updateRadar();
+    }, 50);
   }
   try{ if(localStorage.getItem(LS)==='1') apply(true); }catch(e){}
   if(btn) btn.addEventListener('click', function(){
@@ -11406,7 +12206,11 @@ function updateReqBanner(){
 
   if(unowned === 0){ banner.style.display='none'; return; }
 
+  var _isDarkReq = document.body.classList.contains('dark');
   banner.style.display='flex';
+  banner.style.background = _isDarkReq ? '#3b1a1a' : '#fff3f3';
+  banner.style.border = _isDarkReq ? '1px solid #7f1d1d' : '1px solid #ffc9c9';
+  banner.style.color = _isDarkReq ? '#fca5a5' : '#a30000';
   var _t = window.t || function(k){ return k; };
   var _lang = window.UI_LANG || 'ko';
   var _of = _lang === 'en' ? ' / ' + total + ' missing: ' : _lang === 'ja' ? ' ' + total + '個中 ' : ' ' + total + '개 중 ';
@@ -11479,12 +12283,13 @@ function updateOutfitBanner(){
   var _top   = _bl==='ko'?'상의':(_bl==='zh'?'上衣':'Top');
   var _bot   = _bl==='ko'?'하의':(_bl==='zh'?'裤子':'Bottom');
 
+  var _isDark = document.body.classList.contains('dark');
   if(diff > 0){
     // 상하의가 유리
     banner.style.display = 'flex';
-    banner.style.background = '#f0f7ff';
-    banner.style.borderColor = '#cfe4ff';
-    banner.style.color = '#1a4b8c';
+    banner.style.background = _isDark ? '#1e1a3a' : '#f0f7ff';
+    banner.style.borderColor = _isDark ? '#4a2d6a' : '#cfe4ff';
+    banner.style.color = _isDark ? '#c4b5fd' : '#1a4b8c';
     textEl.textContent = _bl==='ko'
       ? '상의+하의 조합이 원피스보다 유리해요! (+' + _fmt(diff) + '점)'
       : _top+'+'+_bot+' combo beats '+_dress+'! (+' + _fmt(diff) + ' pts)';
@@ -11494,9 +12299,9 @@ function updateOutfitBanner(){
   } else if(diff < 0){
     // 원피스가 유리
     banner.style.display = 'flex';
-    banner.style.background = '#fff7ed';
-    banner.style.borderColor = '#fed7aa';
-    banner.style.color = '#92400e';
+    banner.style.background = _isDark ? '#2a1a0e' : '#fff7ed';
+    banner.style.borderColor = _isDark ? '#78350f' : '#fed7aa';
+    banner.style.color = _isDark ? '#fcd34d' : '#92400e';
     textEl.textContent = _bl==='ko'
       ? '원피스가 상의+하의 조합보다 유리해요! (+' + _fmt(Math.abs(diff)) + '점)'
       : _dress+' beats '+_top+'+'+_bot+' combo! (+' + _fmt(Math.abs(diff)) + ' pts)';
@@ -11852,15 +12657,23 @@ function updateRadar(){
 
   if(!present.length){ wrap.style.display='none'; return; }
 
+  var _dark = document.body.classList.contains('dark');
   wrap.style.display = 'flex';
+  wrap.style.background = _dark ? '#27202a' : '#fff8fa';
+  wrap.style.border = _dark ? '1px solid #4a2d3a' : '1px solid var(--pk-border)';
   chips.innerHTML = '';
   present.forEach(function(x){
     var chip = document.createElement('span');
     var col = ATTR_COLOR[x.attr] || '#888';
     chip.className = 'tag-chip';
     chip.setAttribute('data-ko', ATTR_KR[x.attr] || x.attr);
-    chip.style.cssText = 'display:inline-block;padding:3px 10px;border-radius:999px;font-size:14px;font-weight:500;'
-      + 'background:' + col + '22;border:1px solid ' + col + '66;color:' + col;
+    if(_dark){
+      chip.style.cssText = 'display:inline-block;padding:3px 10px;border-radius:999px;font-size:14px;font-weight:500;'
+        + 'background:' + col + '33;border:1px solid ' + col + '77;color:' + col;
+    } else {
+      chip.style.cssText = 'display:inline-block;padding:3px 10px;border-radius:999px;font-size:14px;font-weight:500;'
+        + 'background:' + col + '22;border:1px solid ' + col + '66;color:' + col;
+    }
     var label = ATTR_KR[x.attr] || x.attr;
     chip.textContent = window.translatePart ? window.translatePart(label) : label;
     chips.appendChild(chip);
@@ -12243,10 +13056,10 @@ var I18N = {
     'txt.ownedTotal': '보유 / 전체(등록)',
   },
   en: {
-    'tab.calc':       'Recommend/Score',
+    'tab.calc':       'Stage Calculator',
     'tab.itemsinfo':  'Item Info',
     'tab.sets':       'Set Info',
-    'tab.quiz':       'Quiz Event',
+    'tab.quiz':       'Miraland Quiz',
     'tab.translate':  'Stage TL',
     'tab.calendar':   'Event Calendar',
     'tab.materials':  'Materials',
@@ -12456,7 +13269,7 @@ var LANG_LABELS = { ko:'🇰🇷 KO', en:'🇺🇸 EN' };
 var PART_MAP = {
   en: {
     '헤어':'Hair','원피스':'Dress','아우터':'Coat','상의':'Top','하의':'Bottom',
-    '양말':'Hosiery','양말장식':'Sock Deco','신발':'Shoes','뷰티':'Makeup',
+    '양말':'Hosiery','양말장식':'Leglet','신발':'Shoes','뷰티':'Makeup',
     '반딧불의 영혼':'Spirit of Sheen',
     '장식/특수':'Accessory','양말/양말장식':'Hosiery',
     '의상':'Clothing','귀':'Earring','목':'Neck','손':'Hand','소품':'Props','특수':'Special',
@@ -12578,7 +13391,7 @@ window.applyI18n = function(){
   // 서버 토글 버튼 텍스트 동기화 (서버명은 ko 고정, 버튼 텍스트만 갱신)
   var serverBtn = document.getElementById('serverToggleBtn');
   if(serverBtn){
-    serverBtn.textContent = window.NIKKI_SERVER === 'jp' ? '🇯🇵 일본' : '🌎 북미';
+    serverBtn.textContent = (window.NIKKI_SERVER === 'jp' ? (window.UI_LANG === 'en' ? '🇯🇵 JP' : '🇯🇵 일본') : (window.UI_LANG === 'en' ? '🌎 NA' : '🌎 북미'));
   }
 
   // 카드 목록 재렌더 (이전/다음 버튼 텍스트 갱신)
@@ -12596,8 +13409,17 @@ window.applyI18n = function(){
     }
   }catch(e){}
   // 이미 렌더된 카드의 부위 배지, 보유 배지, 추천 배지, 점수 즉시 업데이트
+  // rAF 이후에 실행되도록 setTimeout으로 늦춤
+  setTimeout(function(){
   try{
     document.querySelectorAll('#list .card').forEach(function(card){
+      // 아이템 이름
+      var nameSpan = card.querySelector('h3 > span[data-name-ko]');
+      if(nameSpan){
+        var ko = nameSpan.getAttribute('data-name-ko') || '';
+        var en = nameSpan.getAttribute('data-name-en') || ko;
+        nameSpan.textContent = (window.UI_LANG === 'en' && en) ? en : ko || en;
+      }
       // 부위 배지 (첫번째 .badge)
       var b1 = card.querySelector('.badges > .badge:first-child');
       if(b1){
@@ -12622,6 +13444,7 @@ window.applyI18n = function(){
       if(cp) cp.textContent = window.t ? window.t('btn.copyName') : '이름 복사';
     });
   }catch(e){}
+  }, 50); // setTimeout end
   // renderPartBar 및 partChips 재렌더
   try{ if(typeof window.renderPartBar === 'function') window.renderPartBar(); }catch(e){}
   try{
@@ -12703,9 +13526,26 @@ window.toggleUILang = function(){
   window.UI_LANG = LANG_CYCLE[(cur+1) % LANG_CYCLE.length];
   localStorage.setItem('nikki_ui_lang', window.UI_LANG);
   window.applyI18n();
+  if(typeof window.__populateStages === 'function') window.__populateStages();
+  if(typeof window.renderAll === 'function') window.renderAll();
+  // 공지/스포일러 언어 즉시 갱신
+  if(typeof window.__applyNoticeLang === 'function') window.__applyNoticeLang();
+  if(typeof window.__applySpoilerLang === 'function') window.__applySpoilerLang();
 };
 
-document.addEventListener('DOMContentLoaded', function(){ window.applyI18n(); });
+document.addEventListener('DOMContentLoaded', function(){
+  window.applyI18n();
+  // 공지/스포일러 초기 언어 적용
+  if(typeof window.__applyNoticeLang === 'function') window.__applyNoticeLang();
+  if(typeof window.__applySpoilerLang === 'function') window.__applySpoilerLang();
+  // 서버 버튼 초기 텍스트 강제 갱신 (HTML 하드코딩값 덮어쓰기)
+  var serverBtn = document.getElementById('serverToggleBtn');
+  if(serverBtn){
+    serverBtn.textContent = (window.NIKKI_SERVER === 'jp')
+      ? (window.UI_LANG === 'en' ? '🇯🇵 JP' : '🇯🇵 일본')
+      : (window.UI_LANG === 'en' ? '🌎 NA' : '🌎 북미');
+  }
+});
 
 })();
 </script>
@@ -12717,6 +13557,7 @@ window.NIKKI_SERVER = localStorage.getItem('nikki_server') || 'na';
 function getItemName(it){
   if(!it) return '';
   if(window.NIKKI_SERVER === 'jp') return it.name_jp || it.name || '';
+  if(window.UI_LANG === 'en') return it.name || '';
   return it.name || '';
 }
 function getItemTags(it){
@@ -12729,7 +13570,7 @@ function toggleServer(){
   window.NIKKI_SERVER = window.NIKKI_SERVER === 'na' ? 'jp' : 'na';
   localStorage.setItem('nikki_server', window.NIKKI_SERVER);
   var btn = document.getElementById('serverToggleBtn');
-  if(btn) btn.textContent = window.NIKKI_SERVER === 'jp' ? '🇯🇵 일본' : '🌎 북미';
+  if(btn) btn.textContent = (window.NIKKI_SERVER === 'jp' ? (window.UI_LANG === 'en' ? '🇯🇵 JP' : '🇯🇵 일본') : (window.UI_LANG === 'en' ? '🌎 NA' : '🌎 북미'));
   if(typeof window.rebuildOwnedSet === 'function') window.rebuildOwnedSet();
   if(typeof window.renderAll === 'function') window.renderAll();
   if(typeof window.ensureBeautyParts === 'function') window.ensureBeautyParts();
@@ -12751,7 +13592,7 @@ function toggleServer(){
 
 document.addEventListener('DOMContentLoaded', function(){
   var btn = document.getElementById('serverToggleBtn');
-  if(btn) btn.textContent = window.NIKKI_SERVER === 'jp' ? '🇯🇵 일본' : '🌎 북미';
+  if(btn) btn.textContent = (window.NIKKI_SERVER === 'jp' ? (window.UI_LANG === 'en' ? '🇯🇵 JP' : '🇯🇵 일본') : (window.UI_LANG === 'en' ? '🌎 NA' : '🌎 북미'));
   document.querySelectorAll('.tab').forEach(function(tab){
     tab.addEventListener('click', function(){
       setTimeout(function(){
@@ -12780,7 +13621,6 @@ document.addEventListener('DOMContentLoaded', function(){
 <script>
 /* ===== 아이템 상세(item_detail.html)에서 보유 등록/확인 요청 처리 ===== */
 window.addEventListener('message', function(ev){
-  if(ev.origin && ev.origin !== location.origin && ev.origin !== 'null') return;
   var msg = ev.data;
   if (!msg || typeof msg !== 'object') return;
 
