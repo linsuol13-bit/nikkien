@@ -414,16 +414,38 @@ function __applyStaticTranslation(){
   var clr = document.getElementById('clear'); if(clr) clr.textContent = d.clear_btn||'지우기';
 }
 
+var __PART_MAP_EN = {
+  '헤어':'Hair','원피스':'Dress','아우터':'Coat','상의':'Top','하의':'Bottom',
+  '양말':'Hosiery','양말장식':'Sock Deco','신발':'Shoes','뷰티':'Makeup',
+  '반딧불의 영혼':'Spirit of Sheen',
+  '장식':'Accessory','머리':'Hair ornament','베일':'Veil','헤어핀':'Hairpin',
+  '귀장식':'Ear ornament','귀':'Earring','목도리':'Scarf','목걸이':'Necklace',
+  '팔찌(우)':'R. Bracelet','팔찌(좌)':'L. Bracelet','장갑':'Glove',
+  '소품(우)':'R. Handheld','소품(좌)':'L. Handheld','양손':'Both hands',
+  '허리':'Waist','얼굴':'Face','가슴':'Brooch','문신':'Tattoo',
+  '날개':'Wings','꼬리':'Tail','전경':'Foreground','배경':'Background',
+  '상단':'Head ornament','하단':'Ground','스킨':'Skin','특수':'Special',
+};
+function __translatePartLocal(ko){
+  if(!ko) return ko;
+  var tp = __getTP();
+  var r = tp ? tp(ko) : null;
+  if(r && r !== ko) return r;
+  // 복합 부위명 처리 (예: "장식 - 머리")
+  var base = ko.split(/\s*[-·]\s*/)[0].trim();
+  return __PART_MAP_EN[base] || __PART_MAP_EN[ko] || ko;
+}
+
 function __applyRowTranslation(){
   var lang = __getLang();
   var d = lang === 'en' ? II_EN : II_KO;
-  var tp = __getTP();
   document.querySelectorAll('#rows tr').forEach(function(tr){
-    // 부위 컬럼 (5번째, index 4)
+    // 부위 컬럼 (index 4)
     var td = tr.cells[4]; if(!td) return;
     var ko = td.getAttribute('data-ko');
     if(!ko){ ko = td.textContent.trim(); td.setAttribute('data-ko', ko); }
-    td.textContent = (lang==='en' && tp) ? (tp(ko)||ko) : ko;
+    const _dispKo = ko.includes(' - ') ? ko.split(' - ').pop() : ko;
+    td.textContent = lang==='en' ? __translatePartLocal(_dispKo) : _dispKo;
     // 배지
     tr.querySelectorAll('.badge-owned').forEach(function(b){ b.textContent = d.badge_owned; });
     tr.querySelectorAll('.badge-craft-ok').forEach(function(b){ b.textContent = d.badge_craft_ok; });
@@ -479,6 +501,9 @@ window.addEventListener('message', function(ev){
   __applyStaticTranslation();
   __applySidebarTranslation();
   __applyRowTranslation();
+  // detailFrame(item_detail.html)에도 언어 변경 전파
+  var df = document.getElementById('detailFrame');
+  if(df && df.contentWindow){ try{ df.contentWindow.postMessage({type:'NIKKI_LANG_CHANGE', lang: msg.lang}, '*'); }catch(e){} }
 });
 
 window.NIKKI_SERVER = window.NIKKI_SERVER || 'na';
@@ -512,10 +537,12 @@ function getItemTags(it){
     if (!dlg || !frame) return;
 
     frame.src = url;
-    // 로드 완료 후 현재 다크 상태 전달
+    // 로드 완료 후 현재 다크 상태 + UI 언어 전달
     frame.onload = function(){
       var isDark = document.body.classList.contains('dark');
       try{ frame.contentWindow.postMessage({type:'NIKKI_DARK_CHANGE', dark: isDark}, '*'); }catch(e){}
+      var uiLang = (window.__II_LANG) || (window.parent && window.parent.UI_LANG) || 'ko';
+      try{ frame.contentWindow.postMessage({type:'NIKKI_LANG_CHANGE', lang: uiLang}, '*'); }catch(e){}
     };
     if (typeof dlg.showModal === 'function'){
       dlg.showModal();
@@ -643,7 +670,8 @@ function getItemTags(it){
     clearTimeout(_popHideTimer);
     loadMatInv();
     const lang = window.NIKKI_SERVER === 'jp' ? 'ja' : (window.NIKKI_SERVER === 'na' ? 'en' : 'ko');
-    matPopTitle.textContent = '도안 재료' + (ri.canCraft ? ' ✓' : '');
+    const _isEn = (window.__II_LANG || window.parent && window.parent.UI_LANG || 'ko') === 'en';
+    matPopTitle.textContent = (_isEn ? 'Materials' : '도안 재료') + (ri.canCraft ? ' ✓' : '');
     matPopTitle.style.color = ri.canCraft ? '#15803d' : 'var(--pk-1)';
 
     matPopList.innerHTML = '';
@@ -671,7 +699,7 @@ function getItemTags(it){
     if(matsOnly.length && choices.length){
       const lbl = document.createElement('div');
       lbl.style.cssText = 'font-size:10px;color:var(--pk-muted);font-weight:600;width:100%;margin-bottom:2px';
-      lbl.textContent = '필수 재료';
+      lbl.textContent = _isEn ? 'Required' : '필수 재료';
       matPopList.appendChild(lbl);
     }
     matsOnly.forEach(m => matPopList.appendChild(makeItem(m)));
@@ -679,7 +707,7 @@ function getItemTags(it){
     if(choices.length){
       const lbl = document.createElement('div');
       lbl.style.cssText = 'font-size:10px;color:var(--pk-1);font-weight:700;width:100%;margin-top:6px;margin-bottom:2px';
-      lbl.textContent = '이 중 1개';
+      lbl.textContent = _isEn ? '1 of these' : '이 중 1개';
       matPopList.appendChild(lbl);
       choices.forEach(m => matPopList.appendChild(makeItem(m)));
     }
@@ -929,7 +957,7 @@ function getItemTags(it){
       if(ri && ri.hasMats){
         const b = document.createElement('span');
         b.className = ri.canCraft ? 'badge-craft-ok' : 'badge-craft-no';
-        b.textContent = ri.canCraft ? '🔨 제작가능' : '🔨 재료부족';
+        { const _d2 = __getLang()==='en' ? II_EN : II_KO; b.textContent = ri.canCraft ? _d2.badge_craft_ok : _d2.badge_craft_no; }
         b.addEventListener('mouseenter', (e)=>{ e.stopPropagation(); showMatPop(b, ri); });
         b.addEventListener('mouseleave', ()=> hideMatPop());
         b.addEventListener('click', (e)=>{ e.stopPropagation(); showMatPop(b, ri); });
@@ -939,7 +967,12 @@ function getItemTags(it){
       const tdStars = document.createElement('td');
       tdStars.textContent = it.stars ?? '';
       const tdPart = document.createElement('td');
-      tdPart.textContent = it.part ?? '';
+      {
+        const _koPart = it.part ?? '';
+        tdPart.setAttribute('data-ko', _koPart);
+        const _dispPart = _koPart.includes(' - ') ? _koPart.split(' - ').pop() : _koPart;
+        tdPart.textContent = __getLang()==='en' ? __translatePartLocal(_dispPart) : _dispPart;
+      }
 
       // 보유 토글 버튼
       const tdOwn = document.createElement('td');

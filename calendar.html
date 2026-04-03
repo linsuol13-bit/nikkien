@@ -786,6 +786,11 @@ function applyCalLang(){
   document.documentElement.lang = l === 'en' ? 'en' : 'ko';
   // 헤더
   document.querySelector('h2').textContent = l==='en' ? '🌸 Event Calendar' : '🌸 이벤트 달력';
+  // 요일 헤더
+  var chdrDivs = document.querySelectorAll('.chdr div');
+  var days_ko = ['일','월','화','수','목','금','토'];
+  var days_en = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  chdrDivs.forEach(function(el, i){ el.textContent = l==='en' ? days_en[i] : days_ko[i]; });
   // 오늘 버튼
   document.getElementById('bToday').textContent = l==='en' ? 'Today' : '오늘';
   // 서버 필터

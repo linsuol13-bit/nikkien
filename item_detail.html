@@ -522,12 +522,12 @@ body.dark .dyeitem img{background:#fff}
   <button class="navbar-btn" id="btnClose" title="닫기">×</button>
   <span class="navbar-title" id="title">아이템 상세</span>
   <div class="lang-switcher">
-    <button class="lang-btn active" data-lang="ko">한국어</button>
-    <button class="lang-btn" data-lang="en">EN</button>
-    <button class="lang-btn" data-lang="zh">中</button>
-    <button class="lang-btn" data-lang="ja">日</button>
+    <button class="lang-btn active" data-lang="ko" data-label-ko="한국어" data-label-en="Korean">한국어</button>
+    <button class="lang-btn" data-lang="en" data-label-ko="EN" data-label-en="EN">EN</button>
+    <button class="lang-btn" data-lang="zh" data-label-ko="中" data-label-en="Chinese">中</button>
+    <button class="lang-btn" data-lang="ja" data-label-ko="日" data-label-en="Japanese">日</button>
   </div>
-  <button id="btnRegisterOwned">
+  <button id="btnRegisterOwned" data-label-ko="보유 등록" data-label-en="Add to Owned">
     <span style="font-size:15px">👗</span> 보유 등록
   </button>
 </nav>
@@ -637,18 +637,21 @@ document.addEventListener('DOMContentLoaded', function(){
         b.classList.toggle('active', b.dataset.lang === window.__activeLang);
       });
 
+      // UI_LANG 기반 버튼 라벨 재적용 (홈페이지 언어가 EN이면 라벨도 영어 유지)
+      if(typeof window.__applyUILang === 'function') window.__applyUILang();
+
       // 타이틀 즉시 반영
       var titleEl = document.getElementById('title');
       var sidebarNameEl = document.getElementById('sidebarName');
       var subEl = document.getElementById('subtitle');
       var nm = getLocalizedName(window.__currentDetail);
-      if(titleEl) titleEl.textContent = nm || '아이템 상세';
+      if(titleEl) titleEl.textContent = nm || (window.UI_LANG==='en' ? 'Item Detail' : '아이템 상세');
       if(sidebarNameEl) sidebarNameEl.textContent = nm || '—';
       // 부위 번역 갱신
       if(subEl && window.__currentDetail){
         var rawPart = (window.__currentDetail.part || '') || new URLSearchParams(location.search).get('part') || '';
         var rawCode = window.__currentDetail.code || new URLSearchParams(location.search).get('code') || '';
-        subEl.textContent = getLocalizedPart(rawPart) + ' · 코드 ' + rawCode;
+        subEl.textContent = getLocalizedPart(rawPart) + (window.UI_LANG==='en' ? ' · Code ' : ' · 코드 ') + rawCode;
       }
 
       // 섹션 전체 재렌더 (이름/설명/재료/염색 이름 모두 반영)
@@ -900,8 +903,8 @@ document.addEventListener('DOMContentLoaded', function(){
         // s-chip으로 변환된 칩 전체를 다시 그리기
         elChipsEl.innerHTML = "";
         if(detail.heart) elChipsEl.appendChild(chip("<b>❤</b> " + esc(detail.heart)));
-        if(detail.part || part) elChipsEl.appendChild(chip("<b>부위</b> " + esc(getLocalizedPart(detail.part || part))));
-        elChipsEl.appendChild(chip("<b>코드</b> " + esc(detail.code ?? code)));
+        if(detail.part || part) elChipsEl.appendChild(chip("<b>" + (window.UI_LANG==='en'?'Part':'부위') + "</b> " + esc(getLocalizedPart(detail.part || part))));
+        elChipsEl.appendChild(chip("<b>" + (window.UI_LANG==='en'?'Code':'코드') + "</b> " + esc(detail.code ?? code)));
         const tags = Array.isArray(detail.tags) ? detail.tags.filter(Boolean) : [];
         for(const t of tags.slice(0, 12)) elChipsEl.appendChild(chip(esc(t)));
       }
@@ -913,8 +916,8 @@ document.addEventListener('DOMContentLoaded', function(){
     // 현재 선택 언어 반영
     window.__currentDetail = detail;
     const nm = getLocalizedName(detail);
-    elTitle.textContent = nm || "아이템 상세";
-    elSub.textContent = getLocalizedPart(detail.part || part || "") + " · 코드 " + (detail.code ?? code);
+    elTitle.textContent = nm || (window.UI_LANG==='en' ? "Item Detail" : "아이템 상세");
+    elSub.textContent = getLocalizedPart(detail.part || part || "") + (window.UI_LANG==='en' ? " · Code " : " · 코드 ") + (detail.code ?? code);
 
     // thumb
     const th = pickThumb(detail);
@@ -924,8 +927,8 @@ document.addEventListener('DOMContentLoaded', function(){
     // chips
     elChips.innerHTML = "";
     if (detail.heart) elChips.appendChild(chip("<b>❤</b> " + esc(detail.heart)));
-    if (detail.part || part) elChips.appendChild(chip("<b>부위</b> " + esc(getLocalizedPart(detail.part || part))));
-    elChips.appendChild(chip("<b>코드</b> " + esc(detail.code ?? code)));
+    if (detail.part || part) elChips.appendChild(chip("<b>" + (window.UI_LANG==='en'?'Part':'부위') + "</b> " + esc(getLocalizedPart(detail.part || part))));
+    elChips.appendChild(chip("<b>" + (window.UI_LANG==='en'?'Code':'코드') + "</b> " + esc(detail.code ?? code)));
 
     const tags = Array.isArray(detail.tags) ? detail.tags.filter(Boolean) : [];
     for (const t of tags.slice(0, 12)){
@@ -945,6 +948,34 @@ document.addEventListener('DOMContentLoaded', function(){
   function buildSections(detail, sections){
     function esc(s){ return String(s ?? "").replace(/[&<>"]/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c])); }
 
+    // UI 언어 번역 헬퍼
+    const _ui = window.UI_LANG || 'ko';
+    const _isEn = _ui === 'en';
+    const _T = {
+      nameSection:  _isEn ? 'Names' : '이름',
+      nameSub:      _isEn ? '4 languages' : '4개 언어',
+      descSection:  _isEn ? 'Description' : '아이템 설명',
+      imgSection:   _isEn ? 'Images' : '이미지',
+      specSection:  _isEn ? 'Stats' : '스펙',
+      srcSection:   _isEn ? 'Sources' : '획득경로',
+      craftSection: _isEn ? 'Materials' : '도안 재료',
+      dyeSection:   _isEn ? 'Dye' : '염색',
+      setSection:   _isEn ? 'Set' : '세트',
+      langKo:       _isEn ? 'Korean' : '한국',
+      langEn:       _isEn ? 'English' : '영어',
+      langZh:       _isEn ? 'Chinese' : '중국',
+      langJa:       _isEn ? 'Japanese' : '일본',
+      craftOk:      _isEn ? '✓ Craftable' : '✓ 제작 가능',
+      craftNo:      _isEn ? 'Not enough' : '재료 부족',
+      matReq:       _isEn ? 'Required' : '필수 재료',
+      matChoice:    _isEn ? 'Choose one' : '선택 재료',
+      matOr:        _isEn ? '1 of these' : '이 중 1개',
+      noMat:        _isEn ? 'No material info.' : '재료 정보가 없어.',
+      noDye:        _isEn ? 'No dye images.' : '염색 이미지가 없어.',
+      noInfo:       _isEn ? 'No detail info.' : '표시할 상세 정보가 없어.',
+      setView:      _isEn ? 'View full set →' : '세트 전체 보기 →',
+    };
+
     // Names
     if (detail.names){
       const n = detail.names || {};
@@ -953,13 +984,13 @@ document.addEventListener('DOMContentLoaded', function(){
         ? `<div class="lang${activeLang===cls?' lang-active':''}"><span class="pill ${cls}">${label}</span><div class="text">${esc(val)}</div></div>`
         : "";
       const rows = [
-        makeLangRow("ko","한국",n.ko),
-        makeLangRow("en","영어",n.en),
-        makeLangRow("zh","중국",n.zh),
-        makeLangRow("ja","일본",n.ja),
+        makeLangRow("ko",_T.langKo,n.ko),
+        makeLangRow("en",_T.langEn,n.en),
+        makeLangRow("zh",_T.langZh,n.zh),
+        makeLangRow("ja",_T.langJa,n.ja),
       ].filter(Boolean).join('<div class="lang-divider"></div>');
       sections.push(`
-        <div class="sec-title">이름 <small>4개 언어</small></div>
+        <div class="sec-title">${_T.nameSection} <small>${_T.nameSub}</small></div>
         <div class="lang-list">${rows}</div>
       `);
     }
@@ -972,13 +1003,13 @@ document.addEventListener('DOMContentLoaded', function(){
         ? `<div class="lang${activeLang===cls?' lang-active':''}"><span class="pill ${cls}">${label}</span><div class="text">${esc(val)}</div></div>`
         : "";
       const rows = [
-        makeLangRow("ko","한국",d.ko),
-        makeLangRow("en","영어",d.en),
-        makeLangRow("zh","중국",d.zh),
-        makeLangRow("ja","일본",d.ja),
+        makeLangRow("ko",_T.langKo,d.ko),
+        makeLangRow("en",_T.langEn,d.en),
+        makeLangRow("zh",_T.langZh,d.zh),
+        makeLangRow("ja",_T.langJa,d.ja),
       ].filter(Boolean).join('<div class="lang-divider"></div>');
       sections.push(`
-        <div class="sec-title">아이템 설명</div>
+        <div class="sec-title">${_T.descSection}</div>
         <div class="lang-list">${rows}</div>
       `);
     }
@@ -989,7 +1020,7 @@ document.addEventListener('DOMContentLoaded', function(){
       const pairs = imgs.slice(0, 6);
       const cards = pairs.map(src => `<div class="imgcard"><img src="${esc(src)}" alt="" loading="lazy" decoding="async"></div>`).join("");
       sections.push(`
-        <div class="sec-title">이미지</div>
+        <div class="sec-title">${_T.imgSection}</div>
         <div class="grid2">${cards}</div>
       `);
     }
@@ -1027,7 +1058,7 @@ document.addEventListener('DOMContentLoaded', function(){
         return `<div class="stat-wrap"><div class="stat stat-${esc(koLabel)}">${label}</div><div class="grade grade-${g||""}">${g||"?"}</div></div>`;
       }).join("");
       sections.push(`
-        <div class="sec-title">스펙</div>
+        <div class="sec-title">${_T.specSection}</div>
         <div class="stats">${statsHtml}</div>
       `);
     }
@@ -1036,7 +1067,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const sources = detail.sources ? (Array.isArray(detail.sources) ? detail.sources : [detail.sources]) : [];
     if (sources.length){
       sections.push(`
-        <div class="sec-title">획득경로</div>
+        <div class="sec-title">${_T.srcSection}</div>
         <div class="source-box">
           <ul class="source-list">${sources.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>
         </div>
@@ -1079,8 +1110,8 @@ if (detail.reform && detail.reform.enabled){
 
   const craftBadgeHtml = (mats.length > 0 || choices.length > 0)
     ? (canCraft
-        ? `<span class="craft-badge craft-ok">✓ 제작 가능</span>`
-        : `<span class="craft-badge craft-no">재료 부족</span>`)
+        ? `<span class="craft-badge craft-ok">${_T.craftOk}</span>`
+        : `<span class="craft-badge craft-no">${_T.craftNo}</span>`)
     : '';
 
   // 재료 카드 렌더 헬퍼
@@ -1111,23 +1142,23 @@ if (detail.reform && detail.reform.enabled){
 
   // 필수 재료 HTML
   const requiredHtml = mats.length
-    ? `${choices.length ? `<div class="mat-section-label">필수 재료</div>` : ''}
+    ? `${choices.length ? `<div class="mat-section-label">${_T.matReq}</div>` : ''}
        <div class="materials">${mats.map(m => matCard(m, false)).join('')}</div>`
     : '';
 
   // 선택 재료 HTML (OR — 1개만 있으면 됨)
   const choicesHtml = choices.length
     ? `<div class="mat-section-label" style="margin-top:${mats.length?10:0}px">
-         선택 재료 <span class="mat-or-label">이 중 1개</span>
+         ${_T.matChoice} <span class="mat-or-label">${_T.matOr}</span>
        </div>
        <div class="mat-or-wrap">${choices.map(m => matCard(m, true)).join('')}</div>`
     : '';
 
   const emptyHtml = (!mats.length && !choices.length)
-    ? `<div class="muted">재료 정보가 없어.</div>` : '';
+    ? `<div class="muted">${_T.noMat}</div>` : '';
 
   sections.push(`
-    <div class="sec-title">도안 재료 ${craftBadgeHtml}</div>
+    <div class="sec-title">${_T.craftSection} ${craftBadgeHtml}</div>
     <div class="box box-plain">
       ${requiredHtml}${choicesHtml}${emptyHtml}
     </div>
@@ -1153,9 +1184,9 @@ if (detail.reform && detail.reform.enabled){
           <button class="imgbtn" type="button"${dataAttr}><img src="${s}" alt=""></button>
           ${dyeName ? `<div class="dyename">${dyeName}</div>` : ""}
         </div>`;
-      }).join("") : `<div class="muted">염색 이미지가 없어.</div>`;
+      }).join("") : `<div class="muted">${_T.noDye}</div>`;
       sections.push(`
-        <div class="sec-title">염색</div>
+        <div class="sec-title">${_T.dyeSection}</div>
         <div class="dyegrid">${dHtml}</div>
       `);
     }
@@ -1168,9 +1199,9 @@ if (detail.reform && detail.reform.enabled){
         : (s.name || '');
       const thumbSrc = esc(s.thumb || (detail.imgs ? (Array.isArray(detail.imgs) ? detail.imgs[0] : detail.imgs) : '') || '');
       const thumb = thumbSrc ? `<img class="set-thumb" src="${thumbSrc}" alt="">` : '';
-      const subText = s.sub ? esc(s.sub) : '세트 전체 보기 →';
+      const subText = s.sub ? esc(s.sub) : _T.setView;
       sections.push(`
-        <div class="sec-title">세트</div>
+        <div class="sec-title">${_T.setSection}</div>
         <div class="set-card" data-setid="${esc(s.id||'')}" data-setname="${esc(setName)}">
           ${thumb}
           <div class="set-info">
@@ -1184,7 +1215,7 @@ if (detail.reform && detail.reform.enabled){
 
     // fallback
     if (!sections.length){
-      sections.push(`<div class="muted">표시할 상세 정보가 없어.</div>`);
+      sections.push(`<div class="muted">${_T.noInfo}</div>`);
     }
 
   }  // end buildSections
@@ -1480,6 +1511,12 @@ function parsePageToTarget(page){
       document.body.classList.toggle('dark', !!msg.dark);
       return;
     }
+    if(msg.type === 'NIKKI_LANG_CHANGE'){
+      window.UI_LANG = msg.lang || 'ko';
+      try{ localStorage.setItem('nikki_ui_lang', window.UI_LANG); }catch(e){}
+      if(typeof window.__applyUILang === 'function') window.__applyUILang();
+      return;
+    }
     if(msg.type !== 'NIKKI_SERVER_CHANGE') return;
     var lang = serverToLang(msg.server);
     if(lang === window.__activeLang) return;
@@ -1500,13 +1537,26 @@ function parsePageToTarget(page){
     if(subEl2 && window.__currentDetail){
       var rawPart2 = (window.__currentDetail.part || '') || new URLSearchParams(location.search).get('part') || '';
       var rawCode2 = window.__currentDetail.code || new URLSearchParams(location.search).get('code') || '';
-      subEl2.textContent = getLocalizedPart(rawPart2) + ' · 코드 ' + rawCode2;
+      subEl2.textContent = getLocalizedPart(rawPart2) + (window.UI_LANG==='en' ? ' · Code ' : ' · 코드 ') + rawCode2;
     }
     // 섹션 전체 재렌더
     if(window.__currentDetail && typeof window.__rerenderSections === 'function'){
       window.__rerenderSections(window.__currentDetail);
     }
   });
+})();
+
+/* ===== UI 언어 초기화 ===== */
+(function(){
+  try{
+    window.UI_LANG = localStorage.getItem('nikki_ui_lang') || 'ko';
+    // 부모 창 UI_LANG 직접 참조
+    if(window.top && window.top !== window && window.top.UI_LANG){
+      window.UI_LANG = window.top.UI_LANG;
+    } else if(window.parent && window.parent !== window && window.parent.UI_LANG){
+      window.UI_LANG = window.parent.UI_LANG;
+    }
+  }catch(e){ window.UI_LANG = 'ko'; }
 })();
 
 /* ===== 보유 등록 버튼 ===== */
@@ -1602,19 +1652,24 @@ function parsePageToTarget(page){
     return false;
   }
 
+  function regLabel(registered){
+    var en = window.UI_LANG === 'en';
+    if(registered) return '<span style="font-size:18px">✓</span> ' + (en ? 'Owned' : '보유 등록됨');
+    return '<span style="font-size:18px">👗</span> ' + (en ? 'Add to Owned' : '보유 등록');
+  }
+
   function updateBtnState(registered){
     _registered = registered;
     if (registered){
       btnReg.style.background = 'linear-gradient(135deg,#22c55e,#4ade80)';
       btnReg.style.borderColor = '#86efac';
       btnReg.style.color = '#fff';
-      btnReg.innerHTML = '<span style="font-size:18px">✓</span> 보유 등록됨';
     } else {
       btnReg.style.background = '#fff';
       btnReg.style.borderColor = 'var(--pk-border)';
       btnReg.style.color = 'var(--pk-muted)';
-      btnReg.innerHTML = '<span style="font-size:18px">👗</span> 보유 등록';
     }
+    btnReg.innerHTML = regLabel(registered);
   }
 
   btnReg.addEventListener('click', function(){
@@ -1627,12 +1682,16 @@ function parsePageToTarget(page){
     }
 
     var sent = tryRegisterViaParent(partVal, codeVal);
+    var en = window.UI_LANG === 'en';
     if (sent){
       updateBtnState(true);
-      showToastLocal('✓ 부위: ' + partVal + ' · 코드: ' + codeVal + ' 등록 요청 완료!', true);
+      showToastLocal(en
+        ? '✓ Part: ' + partVal + ' · Code: ' + codeVal + ' registered!'
+        : '✓ 부위: ' + partVal + ' · 코드: ' + codeVal + ' 등록 요청 완료!', true);
     } else {
-      // standalone(단독 페이지)으로 열렸을 때 안내
-      showToastLocal('홈페이지 내에서 열어야 보유 등록이 적용돼요', false);
+      showToastLocal(en
+        ? 'Please open this page within the main site to register ownership.'
+        : '홈페이지 내에서 열어야 보유 등록이 적용돼요', false);
     }
   });
 
@@ -1662,6 +1721,51 @@ function parsePageToTarget(page){
     send(window.top);
     if (window.parent !== window.top) send(window.parent);
   }, 300);
+})();
+
+/* ===== UI 언어 일괄 적용 ===== */
+window.__applyUILang = function(){
+  var en = window.UI_LANG === 'en';
+  // lang-btn 텍스트 갱신
+  document.querySelectorAll('.lang-btn[data-label-ko]').forEach(function(btn){
+    btn.textContent = en ? (btn.getAttribute('data-label-en') || btn.textContent) : btn.getAttribute('data-label-ko');
+    // active 클래스 있으면 유지
+  });
+  // 보유 등록 버튼 갱신
+  var btnReg = document.getElementById('btnRegisterOwned');
+  if(btnReg){
+    var registered = btnReg.style.background.indexOf('22c55e') !== -1;
+    if(registered){
+      btnReg.innerHTML = '<span style="font-size:15px">✓</span> ' + (en ? 'Owned' : '보유 등록됨');
+    } else {
+      btnReg.innerHTML = '<span style="font-size:15px">👗</span> ' + (en ? 'Add to Owned' : '보유 등록');
+    }
+  }
+};
+
+// 초기 로드: 최상위 window.top.UI_LANG 폴링 후 적용
+(function(){
+  function getTopLang(){
+    try{ if(window.top && window.top !== window) return window.top.UI_LANG || null; }catch(e){}
+    try{ if(window.parent && window.parent !== window) return window.parent.UI_LANG || null; }catch(e){}
+    return null;
+  }
+  function tryApply(){
+    var lang = getTopLang();
+    if(lang) window.UI_LANG = lang;
+    if(typeof window.__applyUILang === 'function') window.__applyUILang();
+  }
+  // DOMContentLoaded + 여러 타이밍에 시도 (iframe 로드 순서 불확실)
+  function schedule(){
+    setTimeout(tryApply, 0);
+    setTimeout(tryApply, 200);
+    setTimeout(tryApply, 600);
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', schedule);
+  } else {
+    schedule();
+  }
 })();
 
 </script>
