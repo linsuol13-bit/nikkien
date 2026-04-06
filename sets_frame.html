@@ -176,6 +176,39 @@
   .source-list li:hover{background:var(--pk-4)}
   .source-list li::before{content:none}
 
+  /* ── 즐겨찾기 ── */
+  .fav-btn{
+    position:absolute;top:8px;right:8px;z-index:4;
+    width:32px;height:32px;border-radius:50%;
+    border:1.5px solid var(--pk-border);
+    background:rgba(255,255,255,0.88);
+    cursor:pointer;font-size:17px;line-height:1;
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .15s,background .13s,border-color .13s;
+    backdrop-filter:blur(4px);
+  }
+  .fav-btn:hover{transform:scale(1.18);background:#fff7fa;border-color:var(--pk-2)}
+  .fav-btn.is-fav{background:#fff0f6;border-color:var(--pk-2);color:#e91e8c}
+  .fav-filter-toggle{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;border:1.5px solid var(--pk-border);background:#fff;font-size:14px;font-weight:500;color:var(--pk-muted);cursor:pointer;transition:background .13s,border-color .13s,color .13s;user-select:none;white-space:nowrap}
+  .fav-filter-toggle.active{background:var(--pk-grad);border-color:transparent;color:#fff}
+  /* 다이얼로그 내 즐겨찾기 버튼 */
+  .dlg-fav-btn{
+    padding:6px 14px;border-radius:999px;
+    border:1.5px solid var(--pk-border);
+    background:#fff;color:var(--pk-muted);
+    font-size:14px;font-weight:500;cursor:pointer;
+    transition:background .13s,border-color .13s,color .13s;
+    white-space:nowrap;
+  }
+  .dlg-fav-btn:hover{background:var(--pk-4);border-color:var(--pk-2);color:var(--pk-1)}
+  .dlg-fav-btn.is-fav{background:#fff0f6;border-color:var(--pk-2);color:#e91e8c}
+  body.dark .fav-btn{background:rgba(39,32,42,0.88);border-color:#4a2d3a}
+  body.dark .fav-btn.is-fav{background:#3a1a2e;border-color:#c2185b}
+  body.dark .fav-filter-toggle{background:#27202a;border-color:#4a2d3a;color:#c0849c}
+  body.dark .fav-filter-toggle.active{background:var(--pk-grad);border-color:transparent;color:#fff}
+  body.dark .dlg-fav-btn{background:#27202a;border-color:#4a2d3a;color:#c0849c}
+  body.dark .dlg-fav-btn.is-fav{background:#3a1a2e;border-color:#c2185b;color:#f48fb1}
+
   /* ── 다크모드 ── */
   body.dark{--pk-5:#1a1018;--pk-text:#f0e4ec;--pk-border:#4a2d3a;--pk-4:#2a1a2a;--pk-muted:#c0849c;background:#1a1018;color:#f0e4ec}
   body.dark input[type=text]{background:#27202a;border-color:#4a2d3a;color:#f0e4ec}
@@ -212,12 +245,15 @@
     <label class="filter-toggle" id="missingFilterToggle">
       <input type="checkbox" id="missingFilterCb"> <span id="sf_missingFilter">✗ 미보유 있는 세트만</span>
     </label>
+    <label class="fav-filter-toggle" id="favFilterToggle">
+      <input type="checkbox" id="favFilterCb" style="display:none"> <span id="sf_favFilter">⭐ 즐겨찾기만</span>
+    </label>
     <select id="sortSel" style="height:32px;padding:0 8px;border:1.5px solid var(--pk-border);border-radius:8px;background:#fff;font-size:13px;color:var(--pk-text);cursor:pointer;">
-      <option value="default" id="sf_sortDefault">기본 순서</option>
-      <option value="owned_desc" id="sf_sortOwnedDesc">보유 많은 순</option>
-      <option value="owned_asc" id="sf_sortOwnedAsc">보유 적은 순</option>
-      <option value="pct_desc" id="sf_sortPctDesc">완성도 높은 순</option>
-      <option value="pct_asc" id="sf_sortPctAsc">완성도 낮은 순</option>
+      <option value="default"    data-ko="기본 순서"      data-en="Default order">기본 순서</option>
+      <option value="owned_desc" data-ko="보유 많은 순"   data-en="Most owned">보유 많은 순</option>
+      <option value="owned_asc"  data-ko="보유 적은 순"   data-en="Least owned">보유 적은 순</option>
+      <option value="pct_desc"   data-ko="완성도 높은 순" data-en="Highest completion">완성도 높은 순</option>
+      <option value="pct_asc"    data-ko="완성도 낮은 순" data-en="Lowest completion">완성도 낮은 순</option>
     </select>
     <div class="muted" id="status">로딩중...</div>
   </div>
@@ -235,7 +271,10 @@
         <div class="names" id="dlgNames"></div>
         <div id="dlgCompletion" style="margin-top:6px;display:none"></div>
       </div>
-      <button class="close" id="closeBtn" type="button">닫기</button>
+      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
+        <button class="dlg-fav-btn" id="dlgFavBtn" type="button">⭐ 즐겨찾기</button>
+        <button class="close" id="closeBtn" type="button">닫기</button>
+      </div>
     </div>
     <div class="dlgBody">
       <div class="section">
@@ -373,6 +412,8 @@
   const zoomImg = $("zoomImg");
   const missingFilterToggle = $("missingFilterToggle");
   const missingFilterCb = $("missingFilterCb");
+  const favFilterCb = $("favFilterCb");
+  const favFilterToggle = $("favFilterToggle");
   const sortSel = $("sortSel");
   const missingSection = $("missingSection");
   const missingList = $("missingList");
@@ -382,6 +423,29 @@
   let ITEMS = [];
   let OWNED_NAMES = new Set(); // 보유 의상 이름 목록 (fallback)
   let OWNED_CODES = new Set(); // 보유 의상 코드 목록 (코드::부위 or 코드 형식)
+
+  // ── 즐겨찾기 (localStorage 기반) ──
+  const FAV_KEY = 'nikki_sets_favorites';
+  let FAV_IDS = new Set();
+  let _currentOpenSetId = null; // 현재 열린 세트 ID 추적
+
+  function loadFavs(){
+    try{ FAV_IDS = new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]')); }
+    catch(e){ FAV_IDS = new Set(); }
+  }
+  function saveFavs(){
+    try{ localStorage.setItem(FAV_KEY, JSON.stringify([...FAV_IDS])); }
+    catch(e){}
+  }
+  function isFav(set){ return set && set.id && FAV_IDS.has(String(set.id)); }
+  function toggleFav(set){
+    if(!set || !set.id) return;
+    const id = String(set.id);
+    if(FAV_IDS.has(id)){ FAV_IDS.delete(id); }
+    else { FAV_IDS.add(id); }
+    saveFavs();
+  }
+  loadFavs();
 
   // 세트의 기본 파츠 + 모든 변형 파츠를 합산해서 반환
   function getAllSetParts(set){
@@ -570,22 +634,29 @@ function trim(s){ return norm(s).trim(); }
 
     const ql = query.toLowerCase();
 
-    // sources 텍스트 합치기
+    // sources 텍스트 합치기 (한국어 + 영어 label/desc 포함)
     const srcText = Array.isArray(set.sources)
-      ? set.sources.map(s => [s.label, s.type, s.desc, s.text, s.value].map(x=>trim(x)).join(" ")).join(" ")
+      ? set.sources.map(s => [s.label, s.label_en, s.type, s.desc, s.desc_en, s.text, s.value].map(x=>trim(x)).join(" ")).join(" ")
       : "";
 
-    // event 텍스트 합치기
+    // event 텍스트 합치기 (영어 필드 추가)
     const ev = set.event || null;
     const evText = ev
-      ? [ev.title, ev.desc, ev.guide].map(x=>trim(x)).join(" ")
+      ? [ev.title, ev.title_en, ev.desc, ev.desc_en, ev.guide, ev.guide_en].map(x=>trim(x)).join(" ")
+      : "";
+
+    // variants label 합치기 (한국어 + 영어)
+    const varText = Array.isArray(set.variants)
+      ? set.variants.map(v => [v.label, v.label_en].map(x=>trim(x)).join(" ")).join(" ")
       : "";
 
     const hay = [
       set.name_kr, set.name_cn, set.name_en, set.name_na, set.name_jp, set.name,
       set.id,
+      set.desc_en,
       srcText,
-      evText
+      evText,
+      varText
     ].map(x=>trim(x).toLowerCase()).join(" ");
 
     return hay.includes(ql);
@@ -594,7 +665,13 @@ function trim(s){ return norm(s).trim(); }
   function renderList(){
     const query = trim(q.value);
     const showMissingOnly = missingFilterCb && missingFilterCb.checked;
+    const showFavOnly = favFilterCb && favFilterCb.checked;
     let full = SETS.filter(s=>matchesQuery(s, query));
+
+    // 즐겨찾기 필터
+    if(showFavOnly){
+      full = full.filter(s => isFav(s));
+    }
 
     // 미보유 필터: 보유 데이터가 있을 때만 활성화
     if(showMissingOnly && (OWNED_CODES.size > 0 || OWNED_NAMES.size > 0)){
@@ -711,6 +788,7 @@ function trim(s){ return norm(s).trim(); }
 
       card.innerHTML = `
         ${isSpoiler ? `<div class="spoiler-badge">🔒 ${_server === 'jp' ? ((_lang === 'en') ? 'Not on JP server' : 'JP 미출시') : ((_lang === 'en') ? 'Not on EN server' : 'EN 미출시')}</div>` : ''}
+        <button class="fav-btn${isFav(s)?' is-fav':''}" data-set-id="${escapeHtml(String(s.id||''))}" title="${isFav(s)?(window.__SF_LANG==='en'?'Remove favorite':'즐겨찾기 해제'):(window.__SF_LANG==='en'?'Add to favorites':'즐겨찾기 추가')}" type="button">${isFav(s)?'⭐':'☆'}</button>
         ${img ? `<img class="thumb" loading="lazy" decoding="async" src="${img}" alt="">` : `<div class="thumb"></div>`}
         <div class="meta">
           <div class="name">${escapeHtml(listMainName(s))}</div>
@@ -723,9 +801,15 @@ function trim(s){ return norm(s).trim(); }
         </div>
       `;
       if(isSpoiler){
-        card.addEventListener("click", ()=>showSpoilerConfirm(s));
+        card.addEventListener("click", (e)=>{
+          if(e.target.closest('.fav-btn')){ handleFavBtnClick(e, s); return; }
+          showSpoilerConfirm(s);
+        });
       } else {
-        card.addEventListener("click", ()=>openSet(s));
+        card.addEventListener("click", (e)=>{
+          if(e.target.closest('.fav-btn')){ handleFavBtnClick(e, s); return; }
+          openSet(s);
+        });
       }
       frag.appendChild(card);
     }
@@ -796,8 +880,65 @@ function trim(s){ return norm(s).trim(); }
   }
 
 
+  // ── 즐겨찾기 버튼 클릭 핸들러 ──
+  function handleFavBtnClick(e, s){
+    e.stopPropagation();
+    toggleFav(s);
+    // 카드 버튼 즉시 갱신
+    const btn = e.target.closest('.fav-btn');
+    if(btn){
+      const f = isFav(s);
+      btn.classList.toggle('is-fav', f);
+      btn.textContent = f ? '⭐' : '☆';
+      btn.title = f ? (window.__SF_LANG==='en'?'Remove favorite':'즐겨찾기 해제') : (window.__SF_LANG==='en'?'Add to favorites':'즐겨찾기 추가');
+    }
+    // 즐겨찾기만 보기 필터가 켜져 있으면 목록 갱신
+    // 다이얼로그가 같은 세트로 열려있으면 버튼 상태도 갱신
+    if(_currentOpenSetId === String(s.id||'')) updateDlgFavBtn(s);
+  }
+
+  function updateDlgFavBtn(set){
+    const dlgFavBtn = document.getElementById('dlgFavBtn');
+    if(!dlgFavBtn) return;
+    const f = isFav(set);
+    dlgFavBtn.classList.toggle('is-fav', f);
+    dlgFavBtn.textContent = f
+      ? (window.__SF_LANG==='en' ? '⭐ Unfavorite' : '⭐ 즐겨찾기 해제')
+      : (window.__SF_LANG==='en' ? '☆ Favorite'   : '☆ 즐겨찾기');
+  }
+
   window.openSet = function openSet(set){
     if(!set) return;
+    _currentOpenSetId = String(set.id || '');
+
+    // 다이얼로그 즐겨찾기 버튼 상태 갱신
+    updateDlgFavBtn(set);
+
+    // ✅ 다이얼로그 열릴 때마다 현재 언어로 고정 텍스트 강제 갱신
+    (function(){
+      var _isEn = window.__SF_LANG === 'en';
+      var _texts = {
+        sf_h3Photo:     _isEn ? 'Set Photos'       : '세트사진',
+        sf_h3Parts:     _isEn ? 'Set Parts Info'   : '세트 부위별 정보',
+        sf_partsHint:   _isEn ? 'Click a part to open its item detail page.' : '부위를 클릭하면 해당 의상 상세페이지가 열려.',
+        sf_h3Variants:  _isEn ? 'Reform · Evolve · Pose' : '리폼 · 진화 · 포즈',
+        sf_missingTitle:_isEn ? 'Missing Items'    : '미보유 아이템'
+      };
+      Object.keys(_texts).forEach(function(id){
+        var el = document.getElementById(id);
+        if(el) el.textContent = _texts[id];
+      });
+      // 정렬 select도 갱신
+      var _sel = document.getElementById('sortSel');
+      if(_sel) Array.from(_sel.options).forEach(function(opt){
+        var txt = _isEn ? opt.getAttribute('data-en') : opt.getAttribute('data-ko');
+        if(txt) opt.textContent = txt;
+      });
+      var cb = document.getElementById('closeBtn'); if(cb) cb.textContent = _isEn?'Close':'닫기';
+      var vh = document.getElementById('sf_variantsHint'); if(vh) vh.textContent = _isEn?'Click an item to open its detail page.':'파생 의상을 클릭하면 해당 아이템 상세페이지가 열려.';
+      var md = document.getElementById('sf_missingDesc'); if(md) md.textContent = _isEn?'Items not yet registered as owned.':'아직 등록되지 않은 아이템 목록이야.';
+      var ab = document.getElementById('sf_acqBadge'); if(ab) ab.textContent = _isEn?'📍 Set Sources':'📍 세트 획득경로';
+    })();
 
     dlgMain.textContent = displayName(set);
     dlgNames.innerHTML = "";
@@ -1237,6 +1378,36 @@ function trim(s){ return norm(s).trim(); }
 
   closeBtn.addEventListener("click", ()=>{ try{ dlg.close(); }catch(e){} });
 
+  // 다이얼로그 즐겨찾기 버튼
+  const dlgFavBtn = document.getElementById('dlgFavBtn');
+  if(dlgFavBtn){
+    dlgFavBtn.addEventListener('click', ()=>{
+      const set = SETS.find(s => String(s.id||'') === _currentOpenSetId);
+      if(!set) return;
+      toggleFav(set);
+      updateDlgFavBtn(set);
+      // 카드 그리드의 ☆ 버튼도 즉시 갱신
+      const cardBtn = grid.querySelector(`.fav-btn[data-set-id="${CSS.escape(String(set.id||''))}"]`);
+      if(cardBtn){
+        const f = isFav(set);
+        cardBtn.classList.toggle('is-fav', f);
+        cardBtn.textContent = f ? '⭐' : '☆';
+        cardBtn.title = f ? (window.__SF_LANG==='en'?'Remove favorite':'즐겨찾기 해제') : (window.__SF_LANG==='en'?'Add to favorites':'즐겨찾기 추가');
+      }
+      if(favFilterCb && favFilterCb.checked) renderList();
+    });
+  }
+
+  // 즐겨찾기 필터 토글
+  if(favFilterCb && favFilterToggle){
+    favFilterToggle.addEventListener('click', ()=>{
+      favFilterCb.checked = !favFilterCb.checked;
+      favFilterToggle.classList.toggle('active', favFilterCb.checked);
+      currentPage = 1;
+      renderList();
+    });
+  }
+
   // ✅ 빈 화면(다이얼로그 바깥 영역) 클릭 시 닫기
   // dialog는 backdrop 자체에 이벤트가 안 잡히므로,
   // dialog 요소 자체를 클릭했을 때(target이 dialog일 때) 닫도록 처리
@@ -1282,7 +1453,8 @@ function trim(s){ return norm(s).trim(); }
     if(msg.__splitData === true && msg.key === "sets" && Array.isArray(msg.data)){
       SETS = msg.data.filter(x=>x && typeof x === "object");
       status.textContent = SETS.length ? (window.__SF_LANG==='en' ? "Sets loaded: " + SETS.length : "세트 로드 완료: " + SETS.length + "개") : (window.__SF_LANG==='en'?"Set data is empty.":"세트 데이터가 비어있어.");
-      renderList();
+      if(typeof applySfLang === 'function') applySfLang(window.__SF_LANG);
+      else renderList();
   schedulePostHeight(true);
       return;
     }
@@ -1307,6 +1479,7 @@ function trim(s){ return norm(s).trim(); }
     }
     if(msg.type === 'NIKKI_LANG_CHANGE'){
       window.__SF_LANG = msg.lang || 'ko';
+      updateSortLang(window.__SF_LANG);
       if(typeof applySfLang === 'function') applySfLang(window.__SF_LANG);
       renderList();
       return;
@@ -1322,7 +1495,21 @@ function trim(s){ return norm(s).trim(); }
     }
   });
 
+  // ✅ select 언어 갱신 함수 (IIFE 안에서 정의 - renderList와 같은 스코프)
+  function updateSortLang(lang){
+    var sel = document.getElementById('sortSel');
+    if(!sel) return;
+    var isEn = lang === 'en';
+    Array.from(sel.options).forEach(function(opt){
+      var txt = isEn ? opt.getAttribute('data-en') : opt.getAttribute('data-ko');
+      if(txt) opt.textContent = txt;
+    });
+  }
+  // window에 노출해서 applySfLang(IIFE 외부)에서도 호출 가능하게
+  window.__sfUpdateSortLang = updateSortLang;
+
   // initial render
+  updateSortLang(window.__SF_LANG || 'ko');
   renderList();
 })();
 
@@ -1344,6 +1531,7 @@ function trim(s){ return norm(s).trim(); }
     sortDefault:'Default order', sortOwnedDesc:'Most owned', sortOwnedAsc:'Least owned',
     sortPctDesc:'Highest completion', sortPctAsc:'Lowest completion',
     missingFilter:'✗ Sets with missing items only',
+    favFilter:'⭐ Favorites only',
     h3Photo:'Set Photos', h3Parts:'Set Parts Info',
     partsHint:'Click a part to open its item detail page.',
     h3Variants:'Reform · Evolve · Pose', missingTitle:'Missing Items',
@@ -1353,6 +1541,7 @@ function trim(s){ return norm(s).trim(); }
     sortDefault:'기본 순서', sortOwnedDesc:'보유 많은 순', sortOwnedAsc:'보유 적은 순',
     sortPctDesc:'완성도 높은 순', sortPctAsc:'완성도 낮은 순',
     missingFilter:'✗ 미보유 있는 세트만',
+    favFilter:'⭐ 즐겨찾기만',
     h3Photo:'세트사진', h3Parts:'세트 부위별 정보',
     partsHint:'부위를 클릭하면 해당 의상 상세페이지가 열려.',
     h3Variants:'리폼 · 진화 · 포즈', missingTitle:'미보유 아이템',
@@ -1396,14 +1585,18 @@ function trim(s){ return norm(s).trim(); }
     var qEl = document.getElementById('q'); if(qEl) qEl.placeholder = d.searchPh;
     // 미보유 필터 텍스트
     var mf = document.getElementById('sf_missingFilter'); if(mf) mf.textContent = d.missingFilter;
-    // 정렬 select
-    var sortEl = document.querySelector('select');
-    if(sortEl){
-      Array.from(sortEl.options).forEach(function(opt){
-        var map = {default:d.sortDefault, owned_desc:d.sortOwnedDesc, owned_asc:d.sortOwnedAsc, pct_desc:d.sortPctDesc, pct_asc:d.sortPctAsc};
-        if(map[opt.value]) opt.textContent = map[opt.value];
-      });
+    // 즐겨찾기 필터 텍스트
+    var ff = document.getElementById('sf_favFilter'); if(ff) ff.textContent = d.favFilter;
+    // 열려있는 다이얼로그 즐겨찾기 버튼 텍스트 갱신
+    var dfb = document.getElementById('dlgFavBtn');
+    if(dfb){
+      const set = SETS.find(s => String(s.id||'') === _currentOpenSetId);
+      if(set) updateDlgFavBtn(set);
     }
+    // 정렬 select — IIFE 안의 함수 호출
+    if(typeof window.__sfUpdateSortLang === 'function') window.__sfUpdateSortLang(lang);
+    // 닫기 버튼
+    var cb = document.getElementById('closeBtn'); if(cb) cb.textContent = lang==='en'?'Close':'닫기';
     // 다이얼로그 내 고정 텍스트
     ['sf_h3Photo','sf_h3Parts','sf_partsHint','sf_h3Variants','sf_missingTitle'].forEach(function(id){
       var el = document.getElementById(id); if(el) el.textContent = d[{sf_h3Photo:'h3Photo',sf_h3Parts:'h3Parts',sf_partsHint:'partsHint',sf_h3Variants:'h3Variants',sf_missingTitle:'missingTitle'}[id]];
@@ -1443,9 +1636,16 @@ function trim(s){ return norm(s).trim(); }
     var lang = (function(){ try{ return window.parent.UI_LANG||localStorage.getItem('nikki_ui_lang')||'ko'; }catch(e){ return 'ko'; } })();
     window.__SF_LANG = lang;
     if(document.readyState==='loading'){
-      document.addEventListener('DOMContentLoaded', function(){ applySfLang(lang); });
+      document.addEventListener('DOMContentLoaded', function(){
+        applySfLang(lang);
+        // ✅ 부모에게 준비 완료 알림 → 부모가 현재 언어를 재전송
+        try{ window.parent.postMessage({type:'SETS_FRAME_READY'}, '*'); }catch(e){}
+      });
     } else {
       applySfLang(lang);
+      if(typeof renderList === 'function') renderList();
+      // ✅ 부모에게 준비 완료 알림 → 부모가 현재 언어를 재전송
+      try{ window.parent.postMessage({type:'SETS_FRAME_READY'}, '*'); }catch(e){}
     }
   })();
 

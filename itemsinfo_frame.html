@@ -196,8 +196,15 @@
         <option value="name" id="ii_sortName">이름순</option>
         <option value="stars" id="ii_sortStars">별순</option>
       </select>
-      <button id="ownedOnlyBtn" type="button" title="보유 아이템만 보기" data-ii="ii_ownedOnly">보유만</button>
-      <button id="reformOnlyBtn" type="button" title="지금 제작 가능한 아이템만 보기" data-ii="ii_reformOnly">🔨 제작 가능만</button>
+      <select id="ownedFilter" title="보유 필터">
+        <option value="all"     id="ii_ownedAll">전체</option>
+        <option value="owned"   id="ii_ownedOnly">보유만</option>
+        <option value="missing" id="ii_missingOnly">미보유만</option>
+      </select>
+      <select id="craftFilter" title="제작 필터">
+        <option value="all"       id="ii_craftAll">🔨 제작 전체</option>
+        <option value="craftable" id="ii_reformOnly">🔨 제작 가능만</option>
+      </select>
       <button id="clear">지우기</button>
     </div>
 
@@ -375,7 +382,7 @@ var II_EN = {
   ii_title:'Item Info', ii_q_input_ph:'Search name / tag (e.g. reform, wine)',
   ii_starAll:'Stars ★ All', ii_sortPartCode:'Part→Code', ii_sortCode:'By Code',
   ii_sortName:'By Name', ii_sortStars:'By Stars',
-  ii_ownedOnly:'Owned only', ii_reformOnly:'🔨 Craftable only', clear_btn:'Clear',
+  ii_ownedOnly:'Owned only', ii_missingOnly:'Missing only', ii_ownedAll:'All', ii_reformOnly:'🔨 Craftable only', ii_craftAll:'🔨 All', clear_btn:'Clear',
   ii_thImg:'Image', ii_thCode:'Code', ii_thName:'Name', ii_thStar:'Stars', ii_thPart:'Part',
   ii_empty:'No items to display.',
   ii_note:'※ This tab is separate from stage / score filters.',
@@ -386,7 +393,7 @@ var II_KO = {
   ii_title:'아이템 정보', ii_q_input_ph:'이름 / 태그 검색 (예: 리폼, 와인)',
   ii_starAll:'별★ 전체', ii_sortPartCode:'부위→코드', ii_sortCode:'코드순',
   ii_sortName:'이름순', ii_sortStars:'별순',
-  ii_ownedOnly:'보유만', ii_reformOnly:'🔨 제작 가능만', clear_btn:'지우기',
+  ii_ownedOnly:'보유만', ii_missingOnly:'미보유만', ii_ownedAll:'전체', ii_reformOnly:'🔨 제작 가능만', ii_craftAll:'🔨 제작 전체', clear_btn:'지우기',
   ii_thImg:'이미지', ii_thCode:'코드', ii_thName:'이름', ii_thStar:'별', ii_thPart:'부위',
   ii_empty:'표시할 아이템이 없어요.',
   ii_note:'※ 이 탭은 스테이지/추천 필터와 완전히 분리되어 있어.',
@@ -403,7 +410,8 @@ function __applyStaticTranslation(){
   // id로 직접 접근 가능한 것들
   var ids = ['ii_title','ii_starAll','ii_sortPartCode','ii_sortCode','ii_sortName','ii_sortStars',
              'ii_thImg','ii_thCode','ii_thName','ii_thStar','ii_thPart',
-             'ii_empty','ii_note','ii_detailTitle'];
+             'ii_empty','ii_note','ii_detailTitle',
+             'ii_ownedAll','ii_ownedOnly','ii_missingOnly','ii_craftAll','ii_reformOnly'];
   ids.forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=d[id]||''; });
   // data-ii 속성으로 접근 (id 충돌 방지)
   document.querySelectorAll('[data-ii]').forEach(function(el){
@@ -606,8 +614,8 @@ function getItemTags(it){
 
   let ITEMS = [];
   let active = 0;
-  let ownedOnly = false;
-  let reformOnly = false;
+  let ownedFilter = 'all';   // 'all' | 'owned' | 'missing'
+  let craftFilter = 'all';   // 'all' | 'craftable'
   let MAT_INV = {}; // 재료 보유 인벤토리 (localStorage: nikki_mat_inventory)
 
   function loadMatInv(){
@@ -863,11 +871,13 @@ function getItemTags(it){
       });
     }
 
-    if (ownedOnly){
+    if (ownedFilter === 'owned'){
       list = list.filter(it => it._owned === true);
+    } else if (ownedFilter === 'missing'){
+      list = list.filter(it => it._owned !== true);
     }
 
-    if (reformOnly){
+    if (craftFilter === 'craftable'){
       loadMatInv();
       list = list.filter(it => {
         const ri = getReformInfo(it);
@@ -1050,44 +1060,15 @@ function getItemTags(it){
     __applyRowTranslation();
   }
 
-  const reformOnlyBtn = $('reformOnlyBtn');
-  if(reformOnlyBtn){
-    reformOnlyBtn.addEventListener('click', ()=>{
-      reformOnly = !reformOnly;
-      reformOnlyBtn.classList.toggle('reform-only-on', reformOnly);
-      loadMatInv(); // 최신 인벤토리 반영
-      page = 1; render();
-    });
-  }
-
-  $('clear').addEventListener('click', ()=>{
-    $('q').value = '';
-    $('sort').value = 'part_code';
-    $('starFilter').value = '';
-    ownedOnly = false;
-    reformOnly = false;
-    const ob = $('ownedOnlyBtn');
-    if(ob) ob.classList.remove('owned-only-on');
-    const rb = $('reformOnlyBtn');
-    if(rb) rb.classList.remove('reform-only-on');
-    active = 0;
-    buildSidebar();
-    render();
-  });
-  $('q').addEventListener('input', ()=>{ page = 1; render(); });
-  $('sort').addEventListener('change', ()=>{ page = 1; render(); });
-  $('starFilter').addEventListener('change', ()=>{ page = 1; render(); });
-
-  const ownedOnlyBtn = $('ownedOnlyBtn');
-  if(ownedOnlyBtn){
-    ownedOnlyBtn.addEventListener('click', ()=>{
-      ownedOnly = !ownedOnly;
-      ownedOnlyBtn.classList.toggle('owned-only-on', ownedOnly);
-      if(ownedOnly){
+  // 보유 필터 드롭다운
+  const ownedFilterSel = $('ownedFilter');
+  if(ownedFilterSel){
+    ownedFilterSel.addEventListener('change', ()=>{
+      ownedFilter = ownedFilterSel.value;
+      if(ownedFilter === 'owned'){
+        // _owned 재계산 시도 (코드::부위 기반)
         const ownedCount = ITEMS.filter(it => it._owned === true).length;
-        console.log('[보유만] OWNED_SET size:', OWNED_SET.size, '/ _owned items:', ownedCount, '/ 샘플:', Array.from(OWNED_SET).slice(0,3));
         if(ownedCount === 0 && OWNED_SET.size > 0){
-          // _owned 재계산 시도 (코드::부위 기반)
           ITEMS = ITEMS.map(it => {
             const code = it.code != null ? String(it.code).trim() : '';
             const p2 = normPart(it.part||'');
@@ -1098,6 +1079,38 @@ function getItemTags(it){
         }
       }
       page = 1; render();
+    });
+  }
+
+  // 제작 필터 드롭다운
+  const craftFilterSel = $('craftFilter');
+  if(craftFilterSel){
+    craftFilterSel.addEventListener('change', ()=>{
+      craftFilter = craftFilterSel.value;
+      if(craftFilter === 'craftable') loadMatInv();
+      page = 1; render();
+    });
+  }
+
+  // Message bridge — origin 검증 추가
+  $('q').addEventListener('input', ()=>{ page = 1; render(); });
+  $('sort').addEventListener('change', ()=>{ page = 1; render(); });
+  $('starFilter').addEventListener('change', ()=>{ page = 1; render(); });
+
+  // clear 버튼
+  const clearBtn = document.getElementById('clear');
+  if(clearBtn){
+    clearBtn.addEventListener('click', ()=>{
+      $('q').value = '';
+      $('sort').value = 'part_code';
+      $('starFilter').value = '';
+      ownedFilter = 'all';
+      craftFilter = 'all';
+      const of = $('ownedFilter'); if(of) of.value = 'all';
+      const cf = $('craftFilter'); if(cf) cf.value = 'all';
+      active = 0;
+      buildSidebar();
+      render();
     });
   }
 

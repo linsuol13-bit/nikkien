@@ -18,24 +18,57 @@
 <meta charset="utf-8">
 <script>
 (function(){
+  // ✅ BUG FIX: iframe 로드 타이밍 경합 조건 수정
+  // 이전: onload 직후 contentWindow.SETS 접근 → 빈 배열 전송 가능성
+  // 수정: readyState 기반 재시도 로직으로 안정적 데이터 수신 보장
+  var _sent = false;
+
   function send(data){
+    if(_sent) return; // 중복 전송 방지
+    _sent = true;
     try{
       parent.postMessage({__splitData:true, key:'sets', data:data}, '*');
     }catch(e){}
   }
+
+  function tryReadSets(frame, attempts){
+    attempts = attempts || 0;
+    var maxAttempts = 25; // 최대 2.5초 (100ms × 25)
+    try{
+      var sets = frame.contentWindow && frame.contentWindow.SETS;
+      if(Array.isArray(sets) && sets.length > 0){
+        send(sets);
+        return;
+      }
+    }catch(e){
+      // cross-origin 오류 발생 시 재시도 중단
+      if(attempts >= maxAttempts){
+        send([]);
+      }
+      return;
+    }
+    if(attempts < maxAttempts){
+      setTimeout(function(){ tryReadSets(frame, attempts + 1); }, 100);
+    } else {
+      send([]);
+    }
+  }
+
   window.addEventListener('DOMContentLoaded', function(){
     var f = document.createElement('iframe');
     f.src = 'sets_data.html';
     f.style.display = 'none';
     document.body.appendChild(f);
-    f.onload = function(){
-      try{
-        var sets = (f.contentWindow && f.contentWindow.SETS) ? f.contentWindow.SETS : [];
-        send(sets);
-      }catch(e){
-        send([]);
-      }
-    };
+
+    f.addEventListener('load', function(){
+      // ✅ onload 후 즉시 읽지 않고 재시도 루프로 데이터가 채워질 때까지 대기
+      tryReadSets(f, 0);
+    });
+
+    // ✅ 안전망: 4초 후에도 _sent=false면 강제 재시도
+    setTimeout(function(){
+      if(!_sent) tryReadSets(f, 0);
+    }, 4000);
   });
 })();
 </script>

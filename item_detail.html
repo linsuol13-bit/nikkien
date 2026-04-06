@@ -382,11 +382,11 @@ body.dark .dyeitem img{background:#fff}
 .imgcard{
   border:1.5px solid var(--pk-border);border-radius:12px;
   background:var(--pk-5);overflow:hidden;
-  min-height:130px;display:flex;align-items:center;justify-content:center;
+  min-height:100px;display:flex;align-items:center;justify-content:center;
   transition:box-shadow .15s;
 }
 .imgcard:hover{box-shadow:0 6px 18px rgba(233,30,140,.12)}
-.imgcard img{max-width:100%;height:auto;display:block;cursor:zoom-in;transition:transform .15s}
+.imgcard img{max-width:100%;height:200px;object-fit:contain;display:block;cursor:zoom-in;transition:transform .15s}
 .imgcard:hover img{transform:scale(1.03)}
 
 /* ── 스탯 ── */
@@ -961,10 +961,10 @@ document.addEventListener('DOMContentLoaded', function(){
       craftSection: _isEn ? 'Materials' : '도안 재료',
       dyeSection:   _isEn ? 'Dye' : '염색',
       setSection:   _isEn ? 'Set' : '세트',
-      langKo:       _isEn ? 'Korean' : '한국',
-      langEn:       _isEn ? 'English' : '영어',
-      langZh:       _isEn ? 'Chinese' : '중국',
-      langJa:       _isEn ? 'Japanese' : '일본',
+      langKo:       _isEn ? 'KO' : '한국',
+      langEn:       _isEn ? 'EN' : '영어',
+      langZh:       _isEn ? 'ZH' : '중국',
+      langJa:       _isEn ? 'JA' : '일본',
       craftOk:      _isEn ? '✓ Craftable' : '✓ 제작 가능',
       craftNo:      _isEn ? 'Not enough' : '재료 부족',
       matReq:       _isEn ? 'Required' : '필수 재료',
@@ -1065,11 +1065,20 @@ document.addEventListener('DOMContentLoaded', function(){
 
     // Sources
     const sources = detail.sources ? (Array.isArray(detail.sources) ? detail.sources : [detail.sources]) : [];
+    const sourceNameMap = {
+      '옷가게': 'Clothes Store',
+      '신데렐라의비밀': 'Pavilion of Fantasy',
+      '신데렐라의꿈': 'Pavilion of Mystery',
+      '리폼': 'Customization',
+      '스테이지 1장 3-12': 'Stage V1: 3-12 (Maiden)',
+      '도안제작': 'Crafting',
+    };
+    const translateSource = s => (_isEn && sourceNameMap[s]) ? sourceNameMap[s] : s;
     if (sources.length){
       sections.push(`
         <div class="sec-title">${_T.srcSection}</div>
         <div class="source-box">
-          <ul class="source-list">${sources.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>
+          <ul class="source-list">${sources.map(s=>`<li>${esc(translateSource(s))}</li>`).join("")}</ul>
         </div>
       `);
     }

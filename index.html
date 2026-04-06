@@ -753,6 +753,15 @@ window.addEventListener('message', function(ev){
     df.addEventListener('load', function(){ setTimeout(sendResp, 100); }, { once: true });
   }
 });
+
+// ✅ sets_frame 준비 완료 신호 수신 시 현재 언어 재전송
+window.addEventListener('message', function(ev){
+  if(!ev.data || ev.data.type !== 'SETS_FRAME_READY') return;
+  var sf = document.getElementById('setsViewFrame');
+  if(sf && sf.contentWindow){
+    try{ sf.contentWindow.postMessage({type:'NIKKI_LANG_CHANGE', lang: window.UI_LANG||'ko'}, '*'); }catch(e){}
+  }
+});
 </script>
 </head>
 <body>
