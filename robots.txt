@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# 내부용 파일 크롤링 제외
+Disallow: /nikkien/sets_frame.html
+Disallow: /nikkien/sets_frame_data_bridge.html
+Disallow: /nikkien/sets_frame_DESC_ONLY.html
+Disallow: /nikkien/itemsinfo_frame.html
+Disallow: /nikkien/item_details_frame.html
+Disallow: /nikkien/stages_frame_v2.html
+Disallow: /nikkien/materials_data.html
+
+Sitemap: https://linsuol13-bit.github.io/nikkien/sitemap.xml

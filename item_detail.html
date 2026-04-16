@@ -30,51 +30,48 @@
 
 /* ── 세트 섹션 ── */
 .set-card {
-  display: flex;
-  flex-direction: row;
+  display: inline-flex;
+  flex-direction: column;
   align-items: center;
-  gap: 14px;
-  padding: 12px 14px;
+  gap: 6px;
+  padding: 10px 12px;
   border: 1.5px solid var(--pk-border);
   border-radius: 16px;
   background: #fff;
   cursor: pointer;
-  overflow: hidden;
   transition: border-color .15s, box-shadow .15s;
   text-decoration: none;
+  width: 88px;
 }
 .set-card:hover {
   border-color: var(--pk-2);
-  box-shadow: 0 6px 20px rgba(233,30,140,.12);
+  box-shadow: 0 4px 14px rgba(233,30,140,.12);
 }
 .set-thumb {
-  width: 72px; height: 72px;
-  object-fit: cover;
-  border-radius: 12px;
-  border: 1.5px solid var(--pk-border);
-  background: var(--pk-5);
+  width: 60px; height: 60px;
+  object-fit: contain;
+  border-radius: 0;
+  border: none;
+  background: transparent;
   flex: 0 0 auto;
 }
 
-.set-info { flex: 1; min-width: 0; }
+.set-info { width: 100%; text-align: center; }
 .set-name {
-  font-size: 15px;
+  font-size: 11px;
   font-weight: 500;
   color: var(--pk-text);
-  white-space: nowrap;
+  word-break: keep-all;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.3;
 }
-.set-sub {
-  font-size: 12px;
-  color: var(--pk-muted);
-  margin-top: 2px;
-}
-.set-arrow {
-  font-size: 20px;
-  color: var(--pk-2);
-  flex: 0 0 auto;
-}
+.set-sub { display: none; }
+.set-arrow { display: none; }
+.set-grid { display: flex; flex-wrap: wrap; gap: 10px; }
 </style>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -572,7 +569,14 @@ document.addEventListener('error', function(ev) {
 <script>
 /* ── 언어 선택 ── */
 window.__activeLang = (function(){
-  try { return localStorage.getItem('nikki_detail_lang') || 'ko'; } catch(e){ return 'ko'; }
+  try {
+    var saved = localStorage.getItem('nikki_detail_lang');
+    if(saved) return saved;
+    var server = localStorage.getItem('nikki_server') || 'na';
+    if(server === 'jp') return 'ja';
+    if(server === 'na') return 'en';
+    return 'ko';
+  } catch(e){ return 'ko'; }
 })();
 
 function getLocalizedName(detail){
@@ -832,11 +836,35 @@ document.addEventListener('DOMContentLoaded', function(){
   function chip(html){ const d=document.createElement("div"); d.className="chip"; d.innerHTML=html; return d; }
 
   // --- Detail loader via postMessage (works even on file://) ---
+  // ── 부위별 데이터 파일 경로 ──
+  function getDetailFrameUrl(partName, itemCode){
+    const PART_FILE = {
+      "헤어":   "item_data/item_details_헤어.html",
+      "원피스": "item_data/item_details_원피스.html",
+      "상의":   "item_data/item_details_상의.html",
+      "하의":   "item_data/item_details_하의.html",
+      "아우터": "item_data/item_details_아우터.html",
+      "양말":   "item_data/item_details_양말.html",
+      "신발":   "item_data/item_details_신발.html",
+      "뷰티":   "item_data/item_details_뷰티.html",
+      "반딧불": "item_data/item_details_반딧불.html",
+    };
+    // 장식은 코드 범위로 분할
+    if (!partName || partName === "장식" || String(partName).startsWith("장식")) {
+      const c = Number(itemCode);
+      if (c <= 4000)  return "item_data/item_details_장식_A.html";
+      if (c <= 8000)  return "item_data/item_details_장식_B.html";
+      if (c <= 12000) return "item_data/item_details_장식_C.html";
+      return "item_data/item_details_장식_D.html";
+    }
+    return PART_FILE[partName] || "item_data/item_details_헤어.html";
+  }
+
   function loadDetail(){
     return new Promise((resolve) => {
       const frame = document.createElement("iframe");
       frame.style.display = "none";
-      frame.src = "./item_details_frame.html";
+      frame.src = "./" + getDetailFrameUrl(part, code);
       document.body.appendChild(frame);
 
       let done = false;
@@ -844,7 +872,7 @@ document.addEventListener('DOMContentLoaded', function(){
         if (done) return;
         done = true;
         cleanup();
-        resolve({ok:false, error:"item_details_frame.html에 데이터가 없거나, 로드에 실패했어."});
+        resolve({ok:false, error:"데이터 파일에 데이터가 없거나, 로드에 실패했어."});
       }, 1800);
 
       function cleanup(){
@@ -906,11 +934,40 @@ document.addEventListener('DOMContentLoaded', function(){
         if(detail.part || part) elChipsEl.appendChild(chip("<b>" + (window.UI_LANG==='en'?'Part':'부위') + "</b> " + esc(getLocalizedPart(detail.part || part))));
         elChipsEl.appendChild(chip("<b>" + (window.UI_LANG==='en'?'Code':'코드') + "</b> " + esc(detail.code ?? code)));
         const tags = Array.isArray(detail.tags) ? detail.tags.filter(Boolean) : [];
-        for(const t of tags.slice(0, 12)) elChipsEl.appendChild(chip(esc(t)));
+        for(const t of tags.slice(0, 12)) elChipsEl.appendChild(chip(esc(translateTag(t))));
       }
     }
   }
   window.__rerenderSections = __rerenderSections;
+
+  // 태그 번역 (예: "화려 +200" → "Gorgeous +200" when lang=en)
+  const __TAG_STAT_NAMES = {
+    "화려": { en: "Gorgeous", zh: "", ja: "" },
+    "우아": { en: "Elegant",  zh: "", ja: "" },
+    "성숙": { en: "Mature",   zh: "", ja: "" },
+    "섹시": { en: "Sexy",     zh: "", ja: "" },
+    "시원": { en: "Cool",     zh: "", ja: "" },
+    "따뜻": { en: "Warm",     zh: "", ja: "" },
+    "활발": { en: "Lively",   zh: "", ja: "" },
+    "큐티": { en: "Cute",     zh: "", ja: "" },
+    "심플": { en: "Simple",   zh: "", ja: "" },
+    "청순": { en: "Pure",     zh: "", ja: "" },
+  };
+  function translateTag(tag){
+    const lang = window.__activeLang || "ko";
+    if(lang === "ko") return tag;
+    const str = String(tag);
+    // "화려 +200" 형식: 앞 스탯명만 번역, 나머지(공백+숫자 등) 유지
+    const m = str.match(/^([가-힣]+)([\s\S]*)$/);
+    if(!m) return tag;
+    const koWord = m[1];
+    const rest = m[2];
+    const map = __TAG_STAT_NAMES[koWord];
+    if(!map) return tag;
+    const translated = map[lang];
+    if(!translated) return tag;
+    return translated + rest;
+  }
 
   function render(detail){
     // 현재 선택 언어 반영
@@ -932,7 +989,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
     const tags = Array.isArray(detail.tags) ? detail.tags.filter(Boolean) : [];
     for (const t of tags.slice(0, 12)){
-      elChips.appendChild(chip(esc(t)));
+      elChips.appendChild(chip(esc(translateTag(t))));
     }
 
     // content sections
@@ -951,6 +1008,10 @@ document.addEventListener('DOMContentLoaded', function(){
     // UI 언어 번역 헬퍼
     const _ui = window.UI_LANG || 'ko';
     const _isEn = _ui === 'en';
+    const _server = localStorage.getItem('nikki_server') || 'na';
+    const _isNa = _server === 'na';
+    const _isJp = _server === 'jp';
+    const _serverItemLang = _isNa ? 'en' : _isJp ? 'ja' : (window.__activeLang || 'ko');
     const _T = {
       nameSection:  _isEn ? 'Names' : '이름',
       nameSub:      _isEn ? '4 languages' : '4개 언어',
@@ -1073,7 +1134,10 @@ document.addEventListener('DOMContentLoaded', function(){
       '스테이지 1장 3-12': 'Stage V1: 3-12 (Maiden)',
       '도안제작': 'Crafting',
     };
-    const translateSource = s => (_isEn && sourceNameMap[s]) ? sourceNameMap[s] : s;
+    const translateSource = s => {
+      if (_isNa || _isJp) return s;
+      return (_isEn && sourceNameMap[s]) ? sourceNameMap[s] : s;
+    };
     if (sources.length){
       sections.push(`
         <div class="sec-title">${_T.srcSection}</div>
@@ -1129,24 +1193,119 @@ if (detail.reform && detail.reform.enabled){
     const qty     = Number(m.qty) || 1;
     const codeVal = esc(m.code ?? m.itemCode ?? '');
     const _mn     = m.name || '';
+    const _nameLang = _serverItemLang;
     const matName = esc(typeof _mn === 'object'
-      ? (_mn[window.__activeLang || 'ko'] || _mn.ko || _mn.en || _mn.zh || _mn.ja || '')
+      ? (_mn[_nameLang] || _mn.en || _mn.ko || _mn.zh || _mn.ja || '')
       : _mn);
     const have   = Number(inv[_driveId(m.img||'')]) || 0;
     const enough = have >= qty;
     const qtyClass  = enough ? 'qty qty-ok' : (have > 0 ? 'qty qty-partial' : 'qty');
     const haveHint  = `<div class="mat-have ${enough?'have-ok':''}">${have}/${qty}</div>`;
+    const needsLoad = !m.img && codeVal && m.part;
+    const imgId  = needsLoad ? `mat-img-${codeVal}-${esc(m.part)}`  : '';
+    const nameId = needsLoad ? `mat-name-${codeVal}-${esc(m.part)}` : '';
+    const imgSrc = needsLoad ? '' : img;
     return `<div class="mat">
       <button class="matbtn" type="button"
-              data-img="${img}"
+              data-img="${imgSrc}"
               ${codeVal ? ` data-code="${codeVal}"` : ''}
               ${m.part  ? ` data-part="${esc(m.part)}"` : ''}>
-        <img class="mimg ${enough?'mimg-ok':''}" src="${img}" alt="" loading="lazy" decoding="async">
-        <div class="matname" data-mimg="${img}" data-mcode="${codeVal}">${matName}</div>
+        <img class="mimg ${enough?'mimg-ok':''}" ${imgId?`id="${imgId}"`:''}  src="${imgSrc}" alt="" loading="lazy" decoding="async">
+        <div class="matname" ${nameId?`id="${nameId}"`:''} data-mimg="${imgSrc}" data-mcode="${codeVal}">${matName}</div>
         <div class="${qtyClass}">× ${qty}</div>
         ${haveHint}
       </button>
     </div>`;
+  }
+
+  function _loadMatByCode(code, part){
+    return new Promise(resolve => {
+      const f = document.createElement('iframe');
+      f.style.display = 'none';
+      f.src = './' + getDetailFrameUrl(part, code);
+      document.body.appendChild(f);
+      let done = false;
+      const t = setTimeout(() => { if(!done){ done=true; f.remove(); resolve(null); } }, 2000);
+      function onMsg(ev){
+        if(ev.origin !== location.origin && ev.origin !== 'null') return;
+        const d = ev.data || {};
+        if(d.type === 'ITEM_DETAIL' && String(d.code) === String(code)){
+          if(done) return;
+          done = true; clearTimeout(t);
+          window.removeEventListener('message', onMsg);
+          f.remove(); resolve(d.detail);
+        }
+        if(d.type === 'ITEM_DETAILS_LOADED'){
+          try{ f.contentWindow.postMessage({ type:'GET_ITEM_DETAIL', code: String(code), part }, '*'); }catch(e){}
+        }
+      }
+      window.addEventListener('message', onMsg);
+      f.addEventListener('load', () => {
+        try{ f.contentWindow.postMessage({ type:'GET_ITEM_DETAIL', code: String(code), part }, '*'); }catch(e){}
+      });
+    });
+  }
+
+  function _fillMatImages(allMats){
+    allMats.forEach(m => {
+      if(m.img || !m.code || !m.part) return;
+      const codeVal = String(m.code ?? m.itemCode ?? '');
+      const partVal = m.part;
+      const imgEl  = document.getElementById(`mat-img-${codeVal}-${partVal}`);
+      const nameEl = document.getElementById(`mat-name-${codeVal}-${partVal}`);
+      if(!imgEl && !nameEl) return;
+      _loadMatByCode(codeVal, partVal).then(detail => {
+        if(!detail) return;
+        const imgs = Array.isArray(detail.imgs) ? detail.imgs : [];
+        const src = imgs[0] || '';
+        if(src && imgEl){ imgEl.src = src; imgEl.closest('button').dataset.img = src; }
+        if(nameEl && !nameEl.textContent){
+          const n = detail.names || {};
+          nameEl.textContent = n[_serverItemLang] || n.en || n.ko || n.ja || n.zh || '';
+        }
+      });
+    });
+  }
+
+  // sets_data.html에서 세트 이름/thumb 자동 로드
+  function _fillSetData(sets, lang){
+    if(!sets || !sets.length) return;
+    // sets_data.html이 이미 로드된 경우 바로 사용
+    const setsFrame = document.createElement('iframe');
+    setsFrame.style.display = 'none';
+    setsFrame.src = './item_data/sets_data.html';
+    document.body.appendChild(setsFrame);
+    let done = false;
+    const t = setTimeout(() => { if(!done){ done=true; setsFrame.remove(); } }, 3000);
+    setsFrame.addEventListener('load', () => {
+      try{
+        const SETS = setsFrame.contentWindow && setsFrame.contentWindow.SETS;
+        if(!SETS) return;
+        // id -> set 맵 생성
+        const setMap = {};
+        SETS.forEach(s => { if(s.id) setMap[s.id] = s; });
+        sets.forEach(s => {
+          const sid = s.id || '';
+          if(!sid) return;
+          const data = setMap[sid];
+          if(!data) return;
+          // 이름 결정
+          const langMap = { ko: 'name_kr', en: 'name_en', ja: 'name_jp', zh: 'name_cn' };
+          const nameKey = langMap[lang] || 'name_en';
+          const name = data[nameKey] || data.name_en || data.name_kr || '';
+          // DOM 업데이트
+          const nameEl  = document.getElementById(`set-name-${sid}`);
+          const thumbEl = document.getElementById(`set-thumb-${sid}`);
+          const cardEl  = document.getElementById(`set-card-${sid}`);
+          if(nameEl && name) nameEl.textContent = name;
+          if(thumbEl && data.thumb) thumbEl.src = data.thumb;
+          if(cardEl && name) cardEl.dataset.setname = name;
+        });
+        done = true;
+        clearTimeout(t);
+        setsFrame.remove();
+      }catch(e){ setsFrame.remove(); }
+    });
   }
 
   // 필수 재료 HTML
@@ -1172,6 +1331,8 @@ if (detail.reform && detail.reform.enabled){
       ${requiredHtml}${choicesHtml}${emptyHtml}
     </div>
   `);
+
+  setTimeout(() => _fillMatImages([...mats, ...choices]), 0);
 }
 
     // Dye
@@ -1183,9 +1344,10 @@ if (detail.reform && detail.reform.enabled){
         const s = esc(src);
         const page = dpages[i] ? esc(dpages[i]) : "";
         const _dn = dnames[i];
+        const _dyeLang = _serverItemLang;
         const dyeName = _dn
           ? esc(typeof _dn === "object"
-            ? (_dn[window.__activeLang || "ko"] || _dn.ko || _dn.en || _dn.zh || _dn.ja || "")
+            ? (_dn[_dyeLang] || _dn.en || _dn.ko || _dn.zh || _dn.ja || "")
             : _dn)
           : "";
         const dataAttr = page ? ` data-page="${page}"` : ` data-img="${s}"`;
@@ -1202,24 +1364,29 @@ if (detail.reform && detail.reform.enabled){
 
     // Set
     if (detail.set){
-      const s = detail.set;
-      const setName = typeof s.name === 'object'
-        ? (s.name[window.__activeLang||'ko'] || s.name.ko || s.name.en || s.name.ja || '')
-        : (s.name || '');
-      const thumbSrc = esc(s.thumb || (detail.imgs ? (Array.isArray(detail.imgs) ? detail.imgs[0] : detail.imgs) : '') || '');
-      const thumb = thumbSrc ? `<img class="set-thumb" src="${thumbSrc}" alt="">` : '';
-      const subText = s.sub ? esc(s.sub) : _T.setView;
-      sections.push(`
-        <div class="sec-title">${_T.setSection}</div>
-        <div class="set-card" data-setid="${esc(s.id||'')}" data-setname="${esc(setName)}">
-          ${thumb}
+      const sets = Array.isArray(detail.set) ? detail.set : [detail.set];
+      const setLang = _serverItemLang;
+      const cardsHtml = sets.map(s => {
+        const sid = esc(s.id || '');
+        const fallbackName = typeof s.name === 'object'
+          ? (s.name[setLang] || s.name.ko || s.name.en || s.name.ja || '')
+          : (s.name || '');
+        const thumbSrc = esc(s.thumb || '');
+        const subText = _T.setView;
+        return `<div class="set-card" data-setid="${sid}" data-setname="${esc(fallbackName)}" id="set-card-${sid}">
+          <img class="set-thumb" id="set-thumb-${sid}" src="${thumbSrc}" alt="">
           <div class="set-info">
-            <div class="set-name">${esc(setName)}</div>
+            <div class="set-name" id="set-name-${sid}">${esc(fallbackName)}</div>
             <div class="set-sub">${subText}</div>
           </div>
           <div class="set-arrow">›</div>
-        </div>
+        </div>`;
+      }).join('');
+      sections.push(`
+        <div class="sec-title">${_T.setSection}</div>
+        ${cardsHtml}
       `);
+      setTimeout(() => _fillSetData(sets, setLang), 0);
     }
 
     // fallback
@@ -1283,9 +1450,10 @@ function __ensureDetailsMap(cb){
     if (__DETAILS_LOADING) return;
     __DETAILS_LOADING = true;
 
+    // reform 재료 이름 조회용 → 현재 아이템의 부위 파일만 로드
     const frame = document.createElement("iframe");
     frame.style.display = "none";
-    frame.src = "./item_details_frame.html";
+    frame.src = "./" + getDetailFrameUrl(part, code);
     document.body.appendChild(frame);
 
     frame.addEventListener("load", ()=>{
@@ -1523,12 +1691,34 @@ function parsePageToTarget(page){
     if(msg.type === 'NIKKI_LANG_CHANGE'){
       window.UI_LANG = msg.lang || 'ko';
       try{ localStorage.setItem('nikki_ui_lang', window.UI_LANG); }catch(e){}
+      var mappedLang = msg.lang || 'ko';
+      if(mappedLang !== window.__activeLang){
+        window.__activeLang = mappedLang;
+        try{ localStorage.setItem('nikki_detail_lang', mappedLang); }catch(e){}
+        document.querySelectorAll('.lang-btn').forEach(function(b){
+          b.classList.toggle('active', b.dataset.lang === mappedLang);
+        });
+        var titleEl2 = document.getElementById('title');
+        var sidebarNameEl2 = document.getElementById('sidebarName');
+        var subEl3 = document.getElementById('subtitle');
+        var nm2 = getLocalizedName(window.__currentDetail);
+        if(titleEl2) titleEl2.textContent = nm2 || (window.UI_LANG==='en' ? 'Item Detail' : '아이템 상세');
+        if(sidebarNameEl2) sidebarNameEl2.textContent = nm2 || '—';
+        if(subEl3 && window.__currentDetail){
+          var rawPart3 = (window.__currentDetail.part || '') || new URLSearchParams(location.search).get('part') || '';
+          var rawCode3 = window.__currentDetail.code || new URLSearchParams(location.search).get('code') || '';
+          subEl3.textContent = getLocalizedPart(rawPart3) + (window.UI_LANG==='en' ? ' · Code ' : ' · 코드 ') + rawCode3;
+        }
+        if(window.__currentDetail && typeof window.__rerenderSections === 'function'){
+          window.__rerenderSections(window.__currentDetail);
+        }
+      }
       if(typeof window.__applyUILang === 'function') window.__applyUILang();
       return;
     }
     if(msg.type !== 'NIKKI_SERVER_CHANGE') return;
+    try{ localStorage.setItem('nikki_server', msg.server); }catch(e){}
     var lang = serverToLang(msg.server);
-    if(lang === window.__activeLang) return;
     window.__activeLang = lang;
     try{ localStorage.setItem('nikki_detail_lang', lang); }catch(e){}
     // 버튼 active 상태 갱신

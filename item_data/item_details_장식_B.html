@@ -1,0 +1,79 @@
+<!doctype html>
+<style id="custom-font">
+@font-face {
+  font-family: "AngyeongGothic";
+  src: url("../Ba안경고딕_김영화_cej8784_naver_com_.ttf") format("truetype");
+  font-weight: normal; font-style: normal; font-display: swap;
+}
+* { font-family: "AngyeongGothic", system-ui, AppleSDGothicNeo, sans-serif !important; }
+.badge,.pill,.pill-small,.tag-pill,.tag-chip,.chip,.gtab,.skill,.countpill{font-size:14px!important}
+.sc-num,.chip .v,.pill-small .v{font-weight:700!important}
+.tl-title-id,.tl-title-sub,.tl-speaker,.tl-kr-trans{font-weight:700!important}
+.score,.badge{font-weight:700!important}
+.badge.tag,.tag-pill,.tag-chip{font-weight:400!important}
+</style>
+<meta charset="utf-8">
+<title>Item Details - 장식 (코드 4001~8000)</title>
+
+<script>
+/**
+ * 장식 (코드 4001~8000) 아이템 상세 데이터
+ */
+window.ITEM_DETAILS = {
+
+  // 여기에 아이템 데이터를 추가하세요
+  // 예시:
+  // "1": {
+  //   code: 1,
+  //   part: "원피스",
+  //   heart: 3,
+  //   names: { ko: "아이템명", en: "Item Name", zh: "中文名", ja: "日本語名" },
+  //   desc: { ko: "설명", en: "Description", zh: "说明", ja: "説明" },
+  //   imgs: [ "https://drive.google.com/thumbnail?id=...&sz=w1000" ],
+  //   statCards: [ { name: "심플", grade: "S" } ],
+  //   sources: [ "출처" ],
+  //   reform: { enabled: false },
+  //   dye: { enabled: false }
+  // },
+
+};
+
+// ---- postMessage API (cross-origin/file:// safe) ----
+(function(){
+  function sendReady(){
+    try {
+      Object.keys(window.ITEM_DETAILS).forEach(function(k){
+        var d = window.ITEM_DETAILS[k];
+        if(d && d.part){
+          var ck = String(d.code||k) + "_" + String(d.part);
+          if(!window.ITEM_DETAILS[ck]) window.ITEM_DETAILS[ck] = d;
+        }
+      });
+    }catch(e){}
+    try {
+      (window.parent || window.opener || window).postMessage(
+        { type: "ITEM_DETAILS_LOADED" }, "*"
+      );
+    } catch(e) {}
+  }
+
+  window.addEventListener("message", function(ev){
+    var d = ev.data || {};
+    if (d.type === "GET_ITEM_DETAIL") {
+      var code = String(d.code ?? "");
+      var part = String(d.part ?? "");
+      var compositeKey = code + "_" + part;
+      var byComposite = window.ITEM_DETAILS[compositeKey] || null;
+      var byCode = window.ITEM_DETAILS[code] || null;
+      var detail = byComposite || (byCode && (!part || !byCode.part || String(byCode.part) === String(part)) ? byCode : null) || null;
+      try {
+        ev.source && ev.source.postMessage(
+          { type: "ITEM_DETAIL", code: code, detail: detail }, "*"
+        );
+      } catch(e) {}
+    }
+  });
+
+  sendReady();
+})();
+</script>
