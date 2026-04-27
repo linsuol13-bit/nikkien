@@ -940,10 +940,12 @@ var stages = window.stages;
           <div class="guide-intro gen" style="display:none">This site has <strong>7 tabs</strong> in total!</div>
           <div class="guide-row gko"><span class="guide-icon">🌎</span><span><strong>북미 / 🇯🇵 일본</strong> — 서버 전환 (클릭마다 토글)</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-icon">🌎</span><span><strong>NA / 🇯🇵 JP</strong> — Toggle server (click to switch)</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🇰🇷</span><span><strong>KO / EN</strong> — UI 언어 전환 (한국어 ↔ 영어)</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🇰🇷</span><span><strong>KO / EN</strong> — Toggle UI language (Korean ↔ English)</span></div>
           <div class="guide-row gko"><span class="guide-icon">🌙</span><span><strong>다크</strong> — 다크모드 전환</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-icon">🌙</span><span><strong>Dark</strong> — Toggle dark mode</span></div>
-          <div class="guide-row gko"><span class="guide-icon">❓</span><span><strong>? 버튼</strong> — 단축키 목록 보기</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-icon">❓</span><span><strong>? Button</strong> — View keyboard shortcuts</span></div>
+          <div class="guide-row gko"><span class="guide-icon">❓</span><span><strong>? 버튼</strong> — 단축키 목록 보기 (← → 페이지 이동, Ctrl+F 검색 포커스, Esc 모달 닫기)</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">❓</span><span><strong>? Button</strong> — View keyboard shortcuts (← → paging, Ctrl+F search, Esc close modal)</span></div>
           <div class="guide-row guide-tip gko">위 탭 버튼을 눌러 각 탭의 상세 설명을 확인하세요 💕</div>
           <div class="guide-row guide-tip gen" style="display:none">Click the tab buttons above to view details for each tab 💕</div>
         </div>
@@ -954,14 +956,14 @@ var stages = window.stages;
           <div class="guide-intro gen" style="display:none">Select a stage to see outfits sorted by <strong>highest score</strong> for that stage 🎯</div>
           <div class="guide-sub gko">🌷 스테이지 선택</div>
           <div class="guide-sub gen" style="display:none">🌷 Stage Selection</div>
-          <div class="guide-row gko"><span class="guide-chip">스테이지 분류</span><span>챕터(장) 선택</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-chip">Stage Group</span><span>Select a chapter</span></div>
+          <div class="guide-row gko"><span class="guide-chip">스테이지 분류</span><span>챕터(장) / 이벤트 / 스타일대회 등 분류 선택</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Stage Group</span><span>Select chapter / event / stylist's arena, etc.</span></div>
           <div class="guide-row gko"><span class="guide-chip">검색창</span><span>스테이지 이름으로 검색</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-chip">Search</span><span>Search by stage name</span></div>
           <div class="guide-row gko"><span class="guide-chip">하위 스테이지</span><span>세부 스테이지 선택</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-chip">Sub Stage</span><span>Select a specific stage</span></div>
-          <div class="guide-row gko"><span class="guide-chip">☆ 버튼</span><span>자주 쓰는 스테이지 즐겨찾기 등록</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-chip">☆ Button</span><span>Bookmark frequently used stages</span></div>
+          <div class="guide-row gko"><span class="guide-chip">☆ 버튼</span><span>현재 스테이지 즐겨찾기 등록/해제</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">☆ Button</span><span>Bookmark / remove current stage from favorites</span></div>
           <div class="guide-row gko"><span class="guide-chip">⭐ 즐겨찾기</span><span>등록한 스테이지 바로 선택</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-chip">⭐ Favorites</span><span>Jump to bookmarked stages</span></div>
           <div class="guide-sub gko">🌷 보유 의상 입력</div>
@@ -976,15 +978,15 @@ var stages = window.stages;
           <div class="guide-sub gen" style="display:none">🌷 Input Mode</div>
           <div class="guide-row gko"><span class="guide-chip">보유 모드</span><span>코드번호::부위 형태로 직접 입력</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-chip">Owned Mode</span><span>Enter manually with code::part</span></div>
-          <div class="guide-row gko"><span class="guide-chip">코드 모드</span><span>코드 번호만 입력 후 부위 선택해서 일괄 적용</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-chip">Code Mode</span><span>Enter codes only, then select part to apply in bulk</span></div>
+          <div class="guide-row gko"><span class="guide-chip">코드 모드</span><span>코드 번호만 입력 후 부위 선택해서 일괄 적용 (장식/특수 통합 지원)</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Code Mode</span><span>Enter codes only, select part to apply in bulk (accessory/special unified)</span></div>
           <div class="guide-sub gko">🌷 주요 버튼</div>
           <div class="guide-sub gen" style="display:none">🌷 Key Buttons</div>
           <div class="guide-row gko"><span class="guide-chip">내보내기(.txt)</span><span>보유 목록 파일로 백업</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-chip">Export(.txt)</span><span>Back up your owned list to a file</span></div>
           <div class="guide-row gko"><span class="guide-chip">불러오기(.txt)</span><span>백업 파일에서 목록 복원</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-chip">Import(.txt)</span><span>Restore list from backup file</span></div>
-          <div class="guide-row gko"><span class="guide-chip">코드순 정렬</span><span>번호 순서로 정렬</span></div>
+          <div class="guide-row gko"><span class="guide-chip">코드순 정렬</span><span>코드 번호 순서로 정렬</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-chip">Sort by Code</span><span>Sort items by code number</span></div>
           <div class="guide-row gko"><span class="guide-chip">중복 제거</span><span>중복 입력된 항목 자동 삭제</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-chip">Remove Dupes</span><span>Auto-remove duplicate entries</span></div>
@@ -994,68 +996,118 @@ var stages = window.stages;
           <div class="guide-row gen" style="display:none"><span class="guide-icon">📊</span><span>Auto-calculates owned / total / rate / missing<br>Part-by-part ownership table is also shown.<br><span class="guide-muted">👉 Click a row to filter by that part!</span></span></div>
           <div class="guide-row gko"><span class="guide-chip">부위 필터</span><span>헤어·원피스·신발 등 원하는 부위만 보기</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-chip">Part Filter</span><span>Show only hair, dress, shoes, etc.</span></div>
+          <div class="guide-row gko"><span class="guide-chip">보유만 보기</span><span>체크 시 보유 중인 의상만 표시</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Owned Only</span><span>Show only outfits you own</span></div>
           <div class="guide-row gko"><span class="guide-chip">정렬</span><span>점수순 / 이름순 선택</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-chip">Sort</span><span>By score / by name</span></div>
           <div class="guide-row gko"><span class="guide-chip">CSV 내보내기</span><span>현재 결과를 엑셀로 저장</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-chip">Export CSV</span><span>Save current results to spreadsheet</span></div>
-          <div class="guide-row guide-tip gko">⚠️ 상하의 vs 원피스 중 어떤 조합이 유리한지는 스테이지 선택 후 점수순 정렬로 확인하세요!</div>
-          <div class="guide-row guide-tip gen" style="display:none">⚠️ To compare Top+Bottom vs Dress, select a stage and sort by score!</div>
+          <div class="guide-sub gko">🌷 결과 화면</div>
+          <div class="guide-sub gen" style="display:none">🌷 Results</div>
+          <div class="guide-row gko"><span class="guide-icon">📄</span><span>결과는 <strong>24개씩 페이지</strong>로 표시돼요<br><span class="guide-muted">« ◀ 1~10 ▶ » 버튼으로 이동 / ← → 키보드 단축키도 지원</span></span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">📄</span><span>Results shown <strong>24 per page</strong><br><span class="guide-muted">Navigate with « ◀ 1~10 ▶ » buttons or ← → keyboard shortcuts</span></span></div>
+          <div class="guide-row gko"><span class="guide-chip">⭐ 추천 먼저 보기</span><span>ON 시 추천 아이템(노란 배지)을 목록 맨 위로 이동</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">⭐ Recommended First</span><span>Moves recommended items (yellow badge) to top of list</span></div>
+          <div class="guide-row gko"><span class="guide-icon">👗</span><span>원피스 vs 상의+하의 <strong>자동 비교 배너</strong> — 어느 조합이 점수가 높은지 알려드려요</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">👗</span><span><strong>Auto compare banner</strong> — shows whether Dress or Top+Bottom gives higher score</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🖱️</span><span>카드 <strong>우클릭</strong> → 아이템 비교 모드에 추가 (최대 4개)</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🖱️</span><span><strong>Right-click</strong> a card → add to item compare mode (up to 4)</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🖼️</span><span>카드 이미지 클릭 → 아이템 상세 팝업</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🖼️</span><span>Click card image → item detail popup</span></div>
+          <div class="guide-row guide-tip gko">⚠️ 상하의 vs 원피스 중 어떤 조합이 유리한지는 상단 자동 배너로 바로 확인할 수 있어요!</div>
+          <div class="guide-row guide-tip gen" style="display:none">⚠️ Check the auto-banner at the top to see whether Top+Bottom or Dress is more advantageous!</div>
         </div>
 
         <!-- 탭2: 아이템 정보 -->
         <div class="gsection" id="gsec-tab2" style="display:none">
           <div class="guide-intro gko">등록된 모든 의상의 <strong>상세 정보</strong>를 확인할 수 있어요 🗂️</div>
           <div class="guide-intro gen" style="display:none">View <strong>detailed info</strong> on all registered outfits 🗂️</div>
-          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>왼쪽 사이드바에서 부위 선택 → 오른쪽에 목록 표시</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Select the item types from the left sidebar</span></div>
-          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>이름으로 검색 가능</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Searchable by name</span></div>
-          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>보유 여부 자동 표시 (추천/점수 탭 연동)</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Owned status shown automatically (synced with Stage Calculator)</span></div>
-          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>재료 보유 탭 연동 → 🟢 제작 가능 / 🔴 재료 부족 뱃지 표시</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Linked to Materials tab → 🟢 Craftable / 🔴 Materials needed badge</span></div>
-          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>마우스 올리면 필요 재료 미리보기 표시</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Hover to preview required materials</span></div>
-          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>상세 화면에서 [보유 등록] 클릭 시 자동 추가</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Click [Register Owned] in detail view to add automatically</span></div>
+          <div class="guide-sub gko">🌷 탐색 &amp; 검색</div>
+          <div class="guide-sub gen" style="display:none">🌷 Browse &amp; Search</div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>왼쪽 사이드바에서 부위 선택 → 오른쪽에 해당 부위 목록 표시</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Select a part from the left sidebar → list shown on the right</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>이름 / 태그 검색 가능 (예: 리폼, 와인)</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Search by name or tag (e.g. reform, wine)</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>별★ 필터 — 원하는 성급만 보기</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Star ★ filter — show only selected star rating</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>정렬: 부위→코드 / 코드순 / 이름순 / 별순</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Sort by: Part→Code / Code / Name / Stars</span></div>
+          <div class="guide-sub gko">🌷 보유 &amp; 제작 필터</div>
+          <div class="guide-sub gen" style="display:none">🌷 Owned &amp; Craft Filter</div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>보유 필터: 전체 / 보유만 / 미보유만</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Owned filter: All / Owned only / Missing only</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>제작 필터: 🔨 제작 가능한 아이템만 보기</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Craft filter: Show only 🔨 craftable items</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>행에 마우스 올리면 필요 재료 팝오버 미리보기</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Hover over a row to preview required materials in a popover</span></div>
+          <div class="guide-sub gko">🌷 보유 등록</div>
+          <div class="guide-sub gen" style="display:none">🌷 Register Owned</div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>각 행 오른쪽 <strong>+ 버튼</strong> 클릭 → 보유 등록/해제 즉시 반영</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Click the <strong>+ button</strong> on each row → instantly register or remove ownership</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>행 클릭 → 아이템 상세 팝업 (이미지·스탯·재료 등 확인)</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Click a row → item detail popup (image, stats, materials, etc.)</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>결과는 <strong>30개씩 페이지</strong>로 표시 — « ◀ 1~10 ▶ » 버튼으로 이동</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Results shown <strong>30 per page</strong> — navigate with « ◀ 1~10 ▶ » buttons</span></div>
         </div>
 
         <!-- 탭3: 세트정보 -->
         <div class="gsection" id="gsec-tab3" style="display:none">
           <div class="guide-intro gko">이벤트 세트 의상의 <strong>전체 정보</strong>를 한눈에! 🖼️</div>
           <div class="guide-intro gen" style="display:none">View <strong>full info</strong> on event set outfits at a glance! 🖼️</div>
-          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>세트 이미지 갤러리 보기</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>View set image gallery</span></div>
-          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>구성 파츠 목록 및 코드 번호 확인</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Check part list and code numbers</span></div>
-          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>파츠 클릭 시 추천/점수 탭에 즉시 등록</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Click a part to instantly register it in the Stage Calculator tab</span></div>
-          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>이벤트 획득 방법 안내 (가챠·상점·교환 등)</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>How to obtain event items (gacha, shop, exchange, etc.)</span></div>
-          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>포즈 변형 파츠 별도 표시</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Pose variation parts displayed separately</span></div>
+          <div class="guide-sub gko">🌷 목록 화면</div>
+          <div class="guide-sub gen" style="display:none">🌷 List View</div>
+          <div class="guide-row gko"><span class="guide-chip">검색</span><span>세트 이름으로 검색 (한/중/영/북미 이름 모두 지원)</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Search</span><span>Search set name (KO / ZH / EN / NA all supported)</span></div>
+          <div class="guide-row gko"><span class="guide-chip">✗ 미보유 있는 세트만</span><span>미보유 파츠가 하나라도 있는 세트만 필터</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">✗ Missing Only</span><span>Filter to sets with at least one unowned part</span></div>
+          <div class="guide-row gko"><span class="guide-chip">⭐ 즐겨찾기만</span><span>즐겨찾기한 세트만 표시</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">⭐ Favorites Only</span><span>Show only favorited sets</span></div>
+          <div class="guide-row gko"><span class="guide-chip">정렬</span><span>기본순 / 보유 많은순 / 보유 적은순 / 완성도 높은순 / 완성도 낮은순</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Sort</span><span>Default / Most owned / Least owned / Highest completion / Lowest completion</span></div>
+          <div class="guide-row gko"><span class="guide-icon">📊</span><span>각 카드에 <strong>완성도 바</strong> 표시 — 보유 파츠/전체 파츠 비율을 한눈에</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">📊</span><span>Each card shows a <strong>completion bar</strong> — owned / total parts at a glance</span></div>
+          <div class="guide-row gko"><span class="guide-icon">⭐</span><span>카드 우상단 <strong>★ 버튼</strong>으로 즐겨찾기 등록/해제</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">⭐</span><span><strong>★ button</strong> at top-right of card to favorite / unfavorite</span></div>
+          <div class="guide-sub gko">🌷 세트 상세 (카드 클릭 시)</div>
+          <div class="guide-sub gen" style="display:none">🌷 Set Detail (click a card)</div>
+          <div class="guide-row gko"><span class="guide-icon">🖼️</span><span>세트 이미지 갤러리 — 이미지 클릭 시 <strong>확대 줌</strong></span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🖼️</span><span>Set image gallery — click image to <strong>zoom in</strong></span></div>
+          <div class="guide-row gko"><span class="guide-icon">📍</span><span>획득경로 — 가챠 / 상점 / 교환 / 이벤트 등 취득 방법 안내</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">📍</span><span>Acquisition — gacha / shop / exchange / event info</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🗓️</span><span>이벤트 정보 &amp; 공략 박스 — 이벤트 기간 / 진행 방법 안내</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🗓️</span><span>Event info &amp; guide box — event period and how to participate</span></div>
+          <div class="guide-row gko"><span class="guide-icon">👗</span><span>부위별 정보 — 보유(초록) / 미보유(빨강) 색상으로 구분, 클릭 시 아이템 상세 팝업</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">👗</span><span>Parts list — owned (green) / missing (red), click to open item detail popup</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔀</span><span>리폼·진화·포즈 변형 — 파생 아이템 목록 별도 표시, 클릭 시 상세 팝업</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔀</span><span>Reform / Evolution / Pose variants — listed separately, click for detail popup</span></div>
+          <div class="guide-row gko"><span class="guide-icon">✗</span><span>미보유 아이템 섹션 — 아직 보유하지 않은 파츠만 모아서 표시</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">✗</span><span>Missing items section — lists only parts you don't own yet</span></div>
+          <div class="guide-row gko"><span class="guide-chip">파츠 클릭</span><span>추천/점수 탭에 해당 파츠 즉시 보유 등록</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Click Part</span><span>Instantly register the part as owned in Stage Calculator</span></div>
           <div class="guide-sub gko">🔮 서버별 미출시 스포일러</div>
           <div class="guide-sub gen" style="display:none">🔮 Unreleased Item Spoilers by Server</div>
-          <div class="guide-row gko"><span class="guide-icon">🌎</span><span><strong>북미 미출시 스포일러</strong> — 북미 서버에 아직 출시되지 않은 예정 아이템을 미리 확인할 수 있어요.<br><span class="guide-muted">버튼 클릭 → 경고 확인 후 한 번 더 클릭하면 내용이 표시돼요.</span></span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-icon">🌎</span><span><strong>NA Unreleased Spoilers</strong> — Preview items not yet released on the NA server.<br><span class="guide-muted">Click the button → acknowledge the warning → click again to reveal.</span></span></div>
-          <div class="guide-row gko"><span class="guide-icon">🇯🇵</span><span><strong>일본 미출시 스포일러</strong> — 일본 서버에 아직 출시되지 않은 예정 아이템을 미리 확인할 수 있어요.</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-icon">🇯🇵</span><span><strong>JP Unreleased Spoilers</strong> — Preview items not yet released on the JP server.</span></div>
-          <div class="guide-row guide-tip gko">⚠️ 스포일러 내용은 블러 처리되어 있어요. 클릭하기 전까지는 내용이 보이지 않으니 원하지 않는 분은 클릭하지 마세요!</div>
-          <div class="guide-row guide-tip gen" style="display:none">⚠️ Spoiler content is blurred by default. Don't click if you'd like to avoid spoilers!</div>
+          <div class="guide-row gko"><span class="guide-icon">🌎</span><span><strong>북미 미출시 스포일러</strong> — 북미 서버 미출시 예정 아이템 미리 확인<br><span class="guide-muted">버튼 클릭 → 경고 확인 후 한 번 더 클릭하면 표시돼요.</span></span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🌎</span><span><strong>NA Unreleased Spoilers</strong> — Preview items not yet released on the NA server<br><span class="guide-muted">Click button → acknowledge warning → click again to reveal.</span></span></div>
+          <div class="guide-row gko"><span class="guide-icon">🇯🇵</span><span><strong>일본 미출시 스포일러</strong> — 일본 서버 미출시 예정 아이템 미리 확인</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🇯🇵</span><span><strong>JP Unreleased Spoilers</strong> — Preview items not yet released on the JP server</span></div>
+          <div class="guide-row guide-tip gko">⚠️ 스포일러는 블러 처리 — 클릭 전까지 내용이 보이지 않아요!</div>
+          <div class="guide-row guide-tip gen" style="display:none">⚠️ Spoiler content is blurred — content hidden until you click!</div>
         </div>
 
         <!-- 탭4: 퀴즈 -->
         <div class="gsection" id="gsec-tab4" style="display:none">
           <div class="guide-intro gko">이벤트 퀴즈 <strong>문제와 정답</strong>을 카드 형태로 제공해요 🃏</div>
           <div class="guide-intro gen" style="display:none">Quiz event <strong>questions and answers</strong> are provided as cards 🃏</div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>이벤트별로 분류된 퀴즈 목록 제공</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Quiz list organized by event</span></div>
           <div class="guide-row gko"><span class="guide-icon">🔹</span><span>[새 창으로 열기] 버튼으로 별도 창에서도 볼 수 있어요!</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Use the [Open in New Tab] button to view in a separate window!</span></div>
         </div>
 
         <!-- 탭5: 스테이지 번역 -->
         <div class="gsection" id="gsec-tab5" style="display:none">
-          <div class="guide-intro gko">스테이지 스토리 대사를 <strong>번역</strong>해서 제공해요 💬</div>
-          <div class="guide-intro gen" style="display:none">Stage story dialogue provided with <strong>translations</strong> 💬</div>
+          <div class="guide-intro gko">스테이지 스토리 대사를 <strong>한국어로 번역</strong>해서 제공해요 💬</div>
+          <div class="guide-intro gen" style="display:none">Stage story dialogue provided with <strong>Korean translations</strong> 💬</div>
           <div class="guide-sub gko">🌷 사용 방법</div>
           <div class="guide-sub gen" style="display:none">🌷 How to Use</div>
           <div class="guide-row gko"><span class="guide-chip">①</span><span>챕터 선택</span></div>
@@ -1067,6 +1119,8 @@ var stages = window.stages;
           <div class="guide-sub gko">🌷 언어 전환</div>
           <div class="guide-sub gen" style="display:none">🌷 Language Toggle</div>
           <div class="guide-row"><span class="guide-icon">🌐</span><span>🇰🇷 한국어 &nbsp;·&nbsp; 🇺🇸 English &nbsp;·&nbsp; 🇨🇳 中文 &nbsp;·&nbsp; 🇯🇵 日本語</span></div>
+          <div class="guide-row guide-tip gko">💡 한국어 탭은 번역본, 나머지 탭은 각 서버의 원문이에요.</div>
+          <div class="guide-row guide-tip gen" style="display:none">💡 Korean tab shows the translation; other tabs show original server text.</div>
         </div>
 
         <!-- 탭6: 이벤트 달력 -->
@@ -1077,7 +1131,7 @@ var stages = window.stages;
           <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Switch between monthly calendar / list view</span></div>
           <div class="guide-row gko"><span class="guide-icon">🔹</span><span>이벤트 클릭 → 이미지 · 기간 · 메모 상세 확인</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Click an event → view image, duration, and notes</span></div>
-          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>이벤트 상세 확인 시 언어 전환 가능</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>이벤트 상세에서 언어 전환 가능</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Language can be switched in event detail view</span></div>
           <div class="guide-row gko"><span class="guide-icon">🔹</span><span>종료 · 진행중 · 예정 카테고리 필터</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Filter by Ended / Ongoing / Upcoming</span></div>
@@ -1085,40 +1139,42 @@ var stages = window.stages;
           <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Use ➕ button to add, edit, or delete events</span></div>
           <div class="guide-row guide-tip gko">⚠️ 이벤트 데이터는 브라우저에 저장돼요. 다른 기기나 브라우저에서는 표시되지 않아요!</div>
           <div class="guide-row guide-tip gen" style="display:none">⚠️ Event data is saved in your browser. It won't appear on other devices or browsers!</div>
-          <div class="guide-row guide-tip gko">💕 이벤트는 바로바로 업데이트됩니다!</div>
-          <div class="guide-row guide-tip gen" style="display:none">💕 Events are updated as soon as they're available!</div>
+          <div class="guide-row guide-tip gko">💕 이벤트 일정은 업데이트 시 바로바로 반영됩니다!</div>
+          <div class="guide-row guide-tip gen" style="display:none">💕 Event schedules are updated as soon as they're available!</div>
         </div>
 
         <!-- 탭7: 재료 보유 -->
         <div class="gsection" id="gsec-tab7" style="display:none">
-          <div class="guide-intro gko">의상 제작에 필요한 <strong>재료 수량</strong>을 관리해요 🎒</div>
-          <div class="guide-intro gen" style="display:none">Manage <strong>material quantities</strong> needed for crafting outfits 🎒</div>
+          <div class="guide-intro gko">리폼(제작)에 필요한 <strong>재료 수량</strong>을 관리해요 🧵</div>
+          <div class="guide-intro gen" style="display:none">Manage <strong>material quantities</strong> needed for reform (crafting) 🧵</div>
           <div class="guide-row gko"><span class="guide-icon">🔹</span><span>재료 카드에서 보유 수량 직접 입력</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Enter owned quantity directly on each material card</span></div>
           <div class="guide-row gko"><span class="guide-icon">🔹</span><span>수량 입력 시 카드가 초록색으로 변경 ✅</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Card turns green when quantity is entered ✅</span></div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>이름 검색 / 보유만 보기 필터 지원</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Name search / owned-only filter supported</span></div>
           <div class="guide-row gko"><span class="guide-icon">🔹</span><span>[저장] 버튼 클릭 시 수량 저장</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Click [Save] to save quantities</span></div>
-          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>아이템 정보 탭과 자동 연동 → 재료가 충분하면 🟢 제작 가능 뱃지 표시!</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Auto-linked with Item Info tab → 🟢 Craftable badge shows when materials are sufficient!</span></div>
-          <div class="guide-row guide-tip gko">⚠️ 현재 이 탭은 진행 중이에요. 참고용으로만 활용해 주세요!</div>
-          <div class="guide-row guide-tip gen" style="display:none">⚠️ This tab is currently a work in progress. Use for reference only!</div>
+          <div class="guide-row gko"><span class="guide-icon">🔹</span><span>아이템 정보 탭과 자동 연동 → 재료가 충분하면 🟢 제작 가능, 부족하면 🔴 재료 부족 배지 표시</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-icon">🔹</span><span>Auto-linked with Item Info tab → 🟢 Craftable when materials sufficient, 🔴 Materials needed when short</span></div>
         </div>
 
         <!-- 저장 안내 -->
         <div class="gsection" id="gsec-save" style="display:none">
           <div class="guide-intro gko">💾 <strong>데이터 저장 안내</strong></div>
           <div class="guide-intro gen" style="display:none">💾 <strong>Data Storage Info</strong></div>
-          <div class="guide-row gko"><span class="guide-chip">보유 의상 목록</span><span>브라우저 자동 저장</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-chip">Owned Item List</span><span>Auto-saved in browser</span></div>
+          <div class="guide-row gko"><span class="guide-chip">보유 의상 목록</span><span>브라우저 자동 저장 (타이핑 중 자동 반영)</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Owned Item List</span><span>Auto-saved in browser (updated as you type)</span></div>
           <div class="guide-row gko"><span class="guide-chip">서버 설정</span><span>브라우저 자동 저장</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-chip">Server Setting</span><span>Auto-saved in browser</span></div>
-          <div class="guide-row gko"><span class="guide-chip">재료 보유 수량</span><span>저장 버튼 클릭 시 저장</span></div>
-          <div class="guide-row gen" style="display:none"><span class="guide-chip">Material Quantities</span><span>Saved when you click the Save button</span></div>
+          <div class="guide-row gko"><span class="guide-chip">즐겨찾기</span><span>브라우저 자동 저장</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Favorites</span><span>Auto-saved in browser</span></div>
+          <div class="guide-row gko"><span class="guide-chip">재료 보유 수량</span><span>[저장] 버튼 클릭 시 저장</span></div>
+          <div class="guide-row gen" style="display:none"><span class="guide-chip">Material Quantities</span><span>Saved when you click [Save]</span></div>
           <div class="guide-row gko"><span class="guide-chip">이벤트 달력 일정</span><span>브라우저 자동 저장</span></div>
           <div class="guide-row gen" style="display:none"><span class="guide-chip">Event Calendar</span><span>Auto-saved in browser</span></div>
-          <div class="guide-row guide-tip gko">⚠️ 브라우저 캐시 삭제 또는 다른 기기 접속 시 초기화될 수 있어요.<br>[내보내기] 기능으로 정기적으로 백업해두시길 권장드려요!</div>
-          <div class="guide-row guide-tip gen" style="display:none">⚠️ Data may be lost if browser cache is cleared or you access from another device.<br>Use [Export] regularly to back up your data!</div>
+          <div class="guide-row guide-tip gko">⚠️ 브라우저 캐시 삭제 또는 다른 기기 접속 시 초기화될 수 있어요.<br>[내보내기(.txt)] 기능으로 정기적으로 백업해두세요!</div>
+          <div class="guide-row guide-tip gen" style="display:none">⚠️ Data may be lost if browser cache is cleared or you access from another device.<br>Use [Export(.txt)] regularly to back up your data!</div>
         </div>
 
       </div>
@@ -11363,31 +11419,33 @@ if(String(item.part||"").trim() === "반딧불의 영혼"){
 
     btns.innerHTML = '';
 
+    // 처음
+    btns.appendChild(mkBtn('«', 1, state.page<=1, false));
     // Prev
     btns.appendChild(mkBtn(window.t ? window.t('btn.prev') : '이전', state.page-1, state.page<=1, false));
 
-    // Page numbers (compact)
-    const maxNums = 7;
-    let start = Math.max(1, state.page - Math.floor(maxNums/2));
-    let end = start + maxNums - 1;
-    if (end > totalPages){ end = totalPages; start = Math.max(1, end - maxNums + 1); }
+    // Page numbers (10개씩 묶음)
+    const GROUP = 10;
+    const groupIdx = Math.floor((state.page - 1) / GROUP);
+    const start = groupIdx * GROUP + 1;
+    const end = Math.min(start + GROUP - 1, totalPages);
+    const hasPrevGroup = groupIdx > 0;
+    const hasNextGroup = end < totalPages;
 
-    if (start > 1){
-      btns.appendChild(mkBtn('1', 1, false, state.page===1));
-      if (start > 2) btns.appendChild(mkBtn('…', null, true, false));
-    }
+    // 이전 그룹 버튼
+    btns.appendChild(mkBtn('◀', start - 1, !hasPrevGroup, false));
 
     for (let p = start; p <= end; p++){
       btns.appendChild(mkBtn(String(p), p, false, state.page===p));
     }
 
-    if (end < totalPages){
-      if (end < totalPages - 1) btns.appendChild(mkBtn('…', null, true, false));
-      btns.appendChild(mkBtn(String(totalPages), totalPages, false, state.page===totalPages));
-    }
+    // 다음 그룹 버튼
+    btns.appendChild(mkBtn('▶', end + 1, !hasNextGroup, false));
 
     // Next
     btns.appendChild(mkBtn(window.t ? window.t('btn.next') : '다음', state.page+1, state.page>=totalPages, false));
+    // 마지막
+    btns.appendChild(mkBtn('»', totalPages, state.page>=totalPages, false));
   }
 
   // Click handler for pager

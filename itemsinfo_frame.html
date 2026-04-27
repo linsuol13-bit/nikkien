@@ -226,9 +226,11 @@
     </div>
     <div id="pager" style="margin-top:10px">
       <span class="muted" id="pageInfo"></span>
+      <button id="firstPage" type="button" class="page-btn">«</button>
       <button id="prevPage" type="button" class="page-btn">‹</button>
       <span id="pageNumbers"></span>
       <button id="nextPage" type="button" class="page-btn">›</button>
+      <button id="lastPage" type="button" class="page-btn">»</button>
     </div>
     <div class="muted" style="padding:8px 2px" id="ii_note">※ 이 탭은 스테이지/추천 필터와 완전히 분리되어 있어.</div>
 
@@ -1030,29 +1032,48 @@ function getItemTags(it){
     if (prev) prev.disabled = (page <= 1);
     if (next) next.disabled = (page >= totalPages);
 
-    // 번호 버튼 렌더링
+    // 처음/마지막 버튼
+    const firstBtn = document.getElementById('firstPage');
+    const lastBtn = document.getElementById('lastPage');
+    if (firstBtn) firstBtn.disabled = (page <= 1);
+    if (lastBtn) lastBtn.disabled = (page >= totalPages);
+
+    // 번호 버튼 렌더링 (10개씩 묶음)
     if (pageNumbers) {
       pageNumbers.innerHTML = '';
       if (totalPages > 1) {
-        const WINDOW = 2;
-        let pages = new Set([1, totalPages]);
-        for (let i = Math.max(1, page - WINDOW); i <= Math.min(totalPages, page + WINDOW); i++) pages.add(i);
-        const sorted = Array.from(pages).sort((a,b)=>a-b);
-        let prevP = 0;
-        for (const p of sorted) {
-          if (p - prevP > 1) {
-            const dots = document.createElement('span');
-            dots.textContent = '…';
-            dots.style.cssText = 'padding:0 4px;color:var(--pk-muted);font-size:14px;align-self:center';
-            pageNumbers.appendChild(dots);
-          }
+        const GROUP = 10;
+        const groupIdx = Math.floor((page - 1) / GROUP);
+        const gStart = groupIdx * GROUP + 1;
+        const gEnd = Math.min(gStart + GROUP - 1, totalPages);
+
+        // 이전 그룹 버튼
+        if (groupIdx > 0) {
+          const prevG = document.createElement('button');
+          prevG.type = 'button';
+          prevG.className = 'page-btn';
+          prevG.textContent = '◀';
+          prevG.addEventListener('click', function(){ page = gStart - 1; render(); stt(); });
+          pageNumbers.appendChild(prevG);
+        }
+
+        for (let p = gStart; p <= gEnd; p++) {
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.className = 'page-btn' + (p === page ? ' active' : '');
           btn.textContent = p;
           btn.addEventListener('click', (function(pg){ return function(){ page=pg; render(); stt(); }; })(p));
           pageNumbers.appendChild(btn);
-          prevP = p;
+        }
+
+        // 다음 그룹 버튼
+        if (gEnd < totalPages) {
+          const nextG = document.createElement('button');
+          nextG.type = 'button';
+          nextG.className = 'page-btn';
+          nextG.textContent = '▶';
+          nextG.addEventListener('click', function(){ page = gEnd + 1; render(); stt(); });
+          pageNumbers.appendChild(nextG);
         }
       }
     }
@@ -1189,6 +1210,8 @@ function getItemTags(it){
   }
 
   // 페이지네이션 리스너 — 초기화 시 한 번만 등록 (__bind 패턴 제거)
+  document.getElementById('firstPage').addEventListener('click',()=>{page=1;render();stt();});
+  document.getElementById('lastPage').addEventListener('click',()=>{const total=FILTERED.length;page=Math.max(1,Math.ceil(total/PAGE_SIZE));render();stt();});
   function stt(){try{window.scrollTo({top:0,behavior:'smooth'});}catch(e){}try{window.parent.postMessage({type:'ITEMSINFO_SCROLL_TOP'},'*');}catch(e){}}
   document.getElementById('prevPage').addEventListener('click',()=>{page--;render();stt();});
   document.getElementById('nextPage').addEventListener('click',()=>{page++;render();stt();});
