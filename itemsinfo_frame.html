@@ -426,7 +426,7 @@ function __applyStaticTranslation(){
 
 var __PART_MAP_EN = {
   '헤어':'Hair','원피스':'Dress','아우터':'Coat','상의':'Top','하의':'Bottom',
-  '양말':'Hosiery','양말장식':'Sock Deco','신발':'Shoes','뷰티':'Makeup',
+  '양말':'Hosiery','양말장식':'Leglet','신발':'Shoes','뷰티':'Makeup',
   '반딧불의 영혼':'Spirit of Sheen',
   '장식':'Accessory','머리':'Hair ornament','베일':'Veil','헤어핀':'Hairpin',
   '귀장식':'Ear ornament','귀':'Earring','목도리':'Scarf','목걸이':'Necklace',
@@ -469,7 +469,7 @@ function __applySidebarTranslation(){
   // 내장 번역 맵 (tp 없을 때 fallback)
   var SMAP = {
     '헤어':'Hair','원피스':'Dress','아우터':'Coat','상의':'Top','하의':'Bottom',
-    '양말':'Hosiery','양말장식':'Sock Deco','신발':'Shoes','뷰티':'Makeup',
+    '양말':'Hosiery','양말장식':'Leglet','신발':'Shoes','뷰티':'Makeup',
     '반딧불의 영혼':'Spirit of Sheen',
     '머리':'Hair ornament','베일':'Veil','헤어핀':'Hairpin','귀장식':'Ear ornament',
     '귀':'Earring','목도리':'Scarf','목걸이':'Necklace',
@@ -818,7 +818,7 @@ function getItemTags(it){
         if(_ko==='전체') _s.textContent='All';
         else if(_ko==='장식 전체') _s.textContent='All Accessories';
         else if(isGroup) _s.innerHTML='Accessories <span class="toggle-arrow">▶</span>';
-        else { var _SMAP={'헤어':'Hair','원피스':'Dress','아우터':'Coat','상의':'Top','하의':'Bottom','양말':'Hosiery','양말장식':'Sock Deco','신발':'Shoes','뷰티':'Makeup','반딧불의 영혼':'Spirit of Sheen','머리':'Hair ornament','베일':'Veil','헤어핀':'Hairpin','귀장식':'Ear ornament','귀':'Earring','목도리':'Scarf','목걸이':'Necklace','팔찌(우)':'R. Bracelet','팔찌(좌)':'L. Bracelet','장갑':'Glove','소품(우)':'R. Handheld','소품(좌)':'L. Handheld','양손':'Both hands','허리':'Waist','얼굴':'Face','가슴':'Brooch','문신':'Tattoo','날개':'Wings','꼬리':'Tail','전경':'Foreground','배경':'Background','상단':'Head ornament','하단':'Ground','스킨':'Skin'}; var _tp2=__getTP(); var _t=(_tp2?_tp2(_ko):null)||_SMAP[_ko]; if(_t&&_t!==_ko) _s.textContent=_t; }
+        else { var _SMAP={'헤어':'Hair','원피스':'Dress','아우터':'Coat','상의':'Top','하의':'Bottom','양말':'Hosiery','양말장식':'Leglet','신발':'Shoes','뷰티':'Makeup','반딧불의 영혼':'Spirit of Sheen','머리':'Hair ornament','베일':'Veil','헤어핀':'Hairpin','귀장식':'Ear ornament','귀':'Earring','목도리':'Scarf','목걸이':'Necklace','팔찌(우)':'R. Bracelet','팔찌(좌)':'L. Bracelet','장갑':'Glove','소품(우)':'R. Handheld','소품(좌)':'L. Handheld','양손':'Both hands','허리':'Waist','얼굴':'Face','가슴':'Brooch','문신':'Tattoo','날개':'Wings','꼬리':'Tail','전경':'Foreground','배경':'Background','상단':'Head ornament','하단':'Ground','스킨':'Skin'}; var _tp2=__getTP(); var _t=(_tp2?_tp2(_ko):null)||_SMAP[_ko]; if(_t&&_t!==_ko) _s.textContent=_t; }
       }
       btn.addEventListener('click', function(){
         if(isGroup){
